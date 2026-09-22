@@ -6,11 +6,24 @@ import {
   getAllBerths,
   getPontoonSpine,
   pontoons,
+  MAP_WIDTH,
+  MAP_HEIGHT,
   type Berth,
 } from "../../../../data/berths";
 import { classifyBoatLength, getSeason } from "../../../../data/marinas";
 
-const VIEW_BOX = "0 0 700 420";
+const VIEW_BOX = `0 0 ${MAP_WIDTH} ${MAP_HEIGHT}`;
+
+const MAP_COLORS = {
+  water: "#d3e2e6",
+  land: "#e6e2d8",
+  breakwater: "#54626d",
+};
+
+const BREAKWATER_THICKNESS = 60;
+const LAND_TOP_HEIGHT = 40;
+const LAND_CORNER_WIDTH = 150;
+const LAND_CORNER_HEIGHT = 200;
 
 // Fixed pseudo-random pattern so availability is stable across renders
 // and page loads, not a fresh random draw each time. Purely simulated —
@@ -183,8 +196,8 @@ export default function BerthAvailabilityMap({
 
       {result && result.boatClass && matchingBerths.length === 0 ? (
         <p className="mt-4 text-sm font-light text-neutral-500">
-          No Class {result.boatClass} berths in this preview area (pontoons
-          I, J, B, K) — more pontoons coming soon.
+          No Class {result.boatClass} berths modeled yet in this schematic —
+          larger vessel classes are coming in a future pass.
         </p>
       ) : null}
 
@@ -204,10 +217,73 @@ export default function BerthAvailabilityMap({
       <div className="mt-8">
         <svg
           viewBox={VIEW_BOX}
-          className="w-full rounded-sm bg-[#eef5f8]"
+          className="w-full rounded-sm"
           role="img"
           aria-label="Schematic map of Marina de Cascais berths"
         >
+          {/* Water fills the whole canvas; land and breakwater are drawn on top. */}
+          <rect
+            x={0}
+            y={0}
+            width={MAP_WIDTH}
+            height={MAP_HEIGHT}
+            fill={MAP_COLORS.water}
+          />
+
+          {/* Land: promenade strip along the top, plus the Casa de São
+              Bernardo corner where the west-quay pontoons (P-K) anchor. */}
+          <rect
+            x={0}
+            y={0}
+            width={MAP_WIDTH}
+            height={LAND_TOP_HEIGHT}
+            fill={MAP_COLORS.land}
+          />
+          <rect
+            x={0}
+            y={0}
+            width={LAND_CORNER_WIDTH}
+            height={LAND_CORNER_HEIGHT}
+            fill={MAP_COLORS.land}
+          />
+
+          {/* Breakwater sea-walls framing the bottom and right edges. */}
+          <rect
+            x={0}
+            y={MAP_HEIGHT - BREAKWATER_THICKNESS}
+            width={MAP_WIDTH}
+            height={BREAKWATER_THICKNESS}
+            fill={MAP_COLORS.breakwater}
+          />
+          <rect
+            x={MAP_WIDTH - BREAKWATER_THICKNESS}
+            y={0}
+            width={BREAKWATER_THICKNESS}
+            height={MAP_HEIGHT}
+            fill={MAP_COLORS.breakwater}
+          />
+
+          {/* Reception / fuel pier, right edge. */}
+          <g>
+            <rect
+              x={MAP_WIDTH - BREAKWATER_THICKNESS - 60}
+              y={470}
+              width={60}
+              height={26}
+              fill="#0a1a2f"
+            />
+            <text
+              x={MAP_WIDTH - BREAKWATER_THICKNESS - 30}
+              y={487}
+              fontSize={9}
+              fontWeight={600}
+              fill="#ffffff"
+              textAnchor="middle"
+            >
+              Reception / Fuel
+            </text>
+          </g>
+
           {pontoons.map((pontoon) => {
             const spine = getPontoonSpine(pontoon);
             return (

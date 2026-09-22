@@ -5,7 +5,6 @@ import { FACILITY_LABELS, getMarina, marinas } from "../../../../data/marinas";
 import BerthAvailabilityMap from "./BerthAvailabilityMap";
 import FacilityIcon from "./facility-icons";
 import Breadcrumbs from "../../../components/Breadcrumbs";
-import MarinaMap from "./MarinaMapLoader";
 
 type Props = {
   params: Promise<{ country: string; marina: string }>;
@@ -76,17 +75,6 @@ export default async function MarinaPage({ params }: Props) {
             marinaName={marina.name}
             transientRates={marina.transientRates}
             vatRate={marina.vatRate}
-          />
-        </div>
-      </section>
-
-      <section className="px-6 pb-16 md:px-8">
-        <div className="mx-auto max-w-5xl">
-          <MarinaMap
-            lat={marina.coordinates.lat}
-            lng={marina.coordinates.lng}
-            name={marina.name}
-            address={marina.address}
           />
         </div>
       </section>

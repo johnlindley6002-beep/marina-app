@@ -90,63 +90,234 @@ export function generateBerths(pontoon: Pontoon): Berth[] {
   return berths;
 }
 
-// Real pontoon letters and berth numbering are read from Marina de
-// Cascais's official plan ("A3_MAPA_IMPRESSÃO.pdf"). This is a
-// representative subset (I, J, B, K of the real A-P range) to validate
-// the parametric approach — the rest of the marina follows in a later
-// pass.
+// Schematic canvas bounds, used by the map component's viewBox.
+export const MAP_WIDTH = 1050;
+export const MAP_HEIGHT = 620;
+
+const SPACING = 9;
+const BERTH_LENGTH = 16;
+const BERTH_WIDTH = 6;
+
+const LEFT_SPINE_X = 160;
+const CENTRE_SPINE_X = 680;
+
+// All 16 real pontoon letters (A-P), laid out per Marina de Cascais's
+// official plan ("A3_MAPA_IMPRESSÃO.pdf", also saved for reference at
+// /public/images/cascais-marina-plan.webp):
+//
+// - LEFT group (west quay), anchored to land on the left, fingers
+//   pointing right: P, O, N, M, L, K stacked top-to-bottom.
+// - CENTRE group, a herringbone off one shared central spine: F-J
+//   point left, E-A point right, paired in rows top-to-bottom
+//   (F/E, G/D, H/C, I/B, J/A). Row length decreases going down, just
+//   like the real plan.
+//
+// I, J, B, and K keep their REAL berth numbers, read directly off the
+// official plan. The other 12 pontoons use clean, representative
+// counts that shrink in the same proportion as the real plan, rather
+// than hand-tracing all ~650 berths — the goal is a proportionally
+// faithful, maintainable schematic, not a pixel-exact reproduction.
 //
 // PROVISIONAL: the real plan shows berth numbers but not size classes.
 // No authoritative per-pontoon/per-berth class mapping was available,
-// so the classes below are a reasonable placeholder. Update once the
-// real mapping is confirmed.
+// so the classes below are a reasonable placeholder spread across the
+// tariff's classes. Update once the real mapping is confirmed.
 export const pontoons: Pontoon[] = [
+  // Left group (west quay), top to bottom: P, O, N, M, L, K.
+  {
+    id: "P",
+    origin: { x: LEFT_SPINE_X, y: 100 },
+    angleDeg: 0,
+    spacing: SPACING,
+    berthLength: BERTH_LENGTH,
+    berthWidth: BERTH_WIDTH,
+    rows: [
+      { side: "a", startNumber: 2, endNumber: 60, step: 2, sizeClass: "III" },
+      { side: "b", startNumber: 1, endNumber: 59, step: 2, sizeClass: "III" },
+    ],
+  },
+  {
+    id: "O",
+    origin: { x: LEFT_SPINE_X, y: 178 },
+    angleDeg: 0,
+    spacing: SPACING,
+    berthLength: BERTH_LENGTH,
+    berthWidth: BERTH_WIDTH,
+    rows: [
+      { side: "a", startNumber: 2, endNumber: 52, step: 2, sizeClass: "III" },
+      { side: "b", startNumber: 1, endNumber: 51, step: 2, sizeClass: "III" },
+    ],
+  },
+  {
+    id: "N",
+    origin: { x: LEFT_SPINE_X, y: 256 },
+    angleDeg: 0,
+    spacing: SPACING,
+    berthLength: BERTH_LENGTH,
+    berthWidth: BERTH_WIDTH,
+    rows: [
+      { side: "a", startNumber: 2, endNumber: 44, step: 2, sizeClass: "II" },
+      { side: "b", startNumber: 1, endNumber: 43, step: 2, sizeClass: "II" },
+    ],
+  },
+  {
+    id: "M",
+    origin: { x: LEFT_SPINE_X, y: 334 },
+    angleDeg: 0,
+    spacing: SPACING,
+    berthLength: BERTH_LENGTH,
+    berthWidth: BERTH_WIDTH,
+    rows: [
+      { side: "a", startNumber: 2, endNumber: 36, step: 2, sizeClass: "II" },
+      { side: "b", startNumber: 1, endNumber: 35, step: 2, sizeClass: "II" },
+    ],
+  },
+  {
+    id: "L",
+    origin: { x: LEFT_SPINE_X, y: 412 },
+    angleDeg: 0,
+    spacing: SPACING,
+    berthLength: BERTH_LENGTH,
+    berthWidth: BERTH_WIDTH,
+    rows: [
+      { side: "a", startNumber: 2, endNumber: 28, step: 2, sizeClass: "IA" },
+      { side: "b", startNumber: 1, endNumber: 27, step: 2, sizeClass: "IA" },
+    ],
+  },
+  {
+    id: "K",
+    origin: { x: LEFT_SPINE_X, y: 490 },
+    angleDeg: 0,
+    spacing: SPACING,
+    berthLength: BERTH_LENGTH,
+    berthWidth: BERTH_WIDTH,
+    rows: [
+      { side: "a", startNumber: 2, endNumber: 20, step: 2, sizeClass: "IA" },
+      { side: "b", startNumber: 1, endNumber: 13, step: 2, sizeClass: "IA" },
+    ],
+  },
+
+  // Centre group (herringbone off the central spine), top to bottom
+  // rows: F/E, G/D, H/C, I/B, J/A. Left-pointing (F,G,H,I,J) then
+  // right-pointing (E,D,C,B,A).
+  {
+    id: "F",
+    origin: { x: CENTRE_SPINE_X, y: 100 },
+    angleDeg: 180,
+    spacing: SPACING,
+    berthLength: BERTH_LENGTH,
+    berthWidth: BERTH_WIDTH,
+    rows: [
+      { side: "a", startNumber: 2, endNumber: 40, step: 2, sizeClass: "III" },
+      { side: "b", startNumber: 1, endNumber: 39, step: 2, sizeClass: "III" },
+    ],
+  },
+  {
+    id: "E",
+    origin: { x: CENTRE_SPINE_X, y: 100 },
+    angleDeg: 0,
+    spacing: SPACING,
+    berthLength: BERTH_LENGTH,
+    berthWidth: BERTH_WIDTH,
+    rows: [
+      { side: "a", startNumber: 2, endNumber: 40, step: 2, sizeClass: "III" },
+      { side: "b", startNumber: 1, endNumber: 39, step: 2, sizeClass: "III" },
+    ],
+  },
+  {
+    id: "G",
+    origin: { x: CENTRE_SPINE_X, y: 192 },
+    angleDeg: 180,
+    spacing: SPACING,
+    berthLength: BERTH_LENGTH,
+    berthWidth: BERTH_WIDTH,
+    rows: [
+      { side: "a", startNumber: 2, endNumber: 34, step: 2, sizeClass: "II" },
+      { side: "b", startNumber: 1, endNumber: 33, step: 2, sizeClass: "II" },
+    ],
+  },
+  {
+    id: "D",
+    origin: { x: CENTRE_SPINE_X, y: 192 },
+    angleDeg: 0,
+    spacing: SPACING,
+    berthLength: BERTH_LENGTH,
+    berthWidth: BERTH_WIDTH,
+    rows: [
+      { side: "a", startNumber: 2, endNumber: 34, step: 2, sizeClass: "II" },
+      { side: "b", startNumber: 1, endNumber: 33, step: 2, sizeClass: "II" },
+    ],
+  },
+  {
+    id: "H",
+    origin: { x: CENTRE_SPINE_X, y: 284 },
+    angleDeg: 180,
+    spacing: SPACING,
+    berthLength: BERTH_LENGTH,
+    berthWidth: BERTH_WIDTH,
+    rows: [
+      { side: "a", startNumber: 2, endNumber: 28, step: 2, sizeClass: "II" },
+      { side: "b", startNumber: 1, endNumber: 27, step: 2, sizeClass: "II" },
+    ],
+  },
+  {
+    id: "C",
+    origin: { x: CENTRE_SPINE_X, y: 284 },
+    angleDeg: 0,
+    spacing: SPACING,
+    berthLength: BERTH_LENGTH,
+    berthWidth: BERTH_WIDTH,
+    rows: [
+      { side: "a", startNumber: 2, endNumber: 28, step: 2, sizeClass: "II" },
+      { side: "b", startNumber: 1, endNumber: 27, step: 2, sizeClass: "II" },
+    ],
+  },
   {
     id: "I",
-    origin: { x: 140, y: 110 },
-    angleDeg: 0,
-    spacing: 13,
-    berthLength: 22,
-    berthWidth: 9,
+    origin: { x: CENTRE_SPINE_X, y: 376 },
+    angleDeg: 180,
+    spacing: SPACING,
+    berthLength: BERTH_LENGTH,
+    berthWidth: BERTH_WIDTH,
     rows: [
       { side: "a", startNumber: 2, endNumber: 42, step: 2, sizeClass: "II" },
       { side: "b", startNumber: 1, endNumber: 37, step: 2, sizeClass: "II" },
     ],
   },
   {
-    id: "J",
-    origin: { x: 140, y: 190 },
-    angleDeg: 0,
-    spacing: 13,
-    berthLength: 22,
-    berthWidth: 9,
-    rows: [
-      { side: "a", startNumber: 2, endNumber: 32, step: 2, sizeClass: "I" },
-      { side: "b", startNumber: 1, endNumber: 29, step: 2, sizeClass: "I" },
-    ],
-  },
-  {
     id: "B",
-    origin: { x: 610, y: 110 },
-    angleDeg: 180,
-    spacing: 13,
-    berthLength: 22,
-    berthWidth: 9,
+    origin: { x: CENTRE_SPINE_X, y: 376 },
+    angleDeg: 0,
+    spacing: SPACING,
+    berthLength: BERTH_LENGTH,
+    berthWidth: BERTH_WIDTH,
     rows: [
       { side: "a", startNumber: 2, endNumber: 38, step: 2, sizeClass: "II" },
       { side: "b", startNumber: 1, endNumber: 31, step: 2, sizeClass: "II" },
     ],
   },
   {
-    id: "K",
-    origin: { x: 70, y: 270 },
-    angleDeg: 90,
-    spacing: 13,
-    berthLength: 22,
-    berthWidth: 9,
+    id: "J",
+    origin: { x: CENTRE_SPINE_X, y: 468 },
+    angleDeg: 180,
+    spacing: SPACING,
+    berthLength: BERTH_LENGTH,
+    berthWidth: BERTH_WIDTH,
     rows: [
-      { side: "a", startNumber: 2, endNumber: 20, step: 2, sizeClass: "IA" },
-      { side: "b", startNumber: 1, endNumber: 13, step: 2, sizeClass: "IA" },
+      { side: "a", startNumber: 2, endNumber: 32, step: 2, sizeClass: "I" },
+      { side: "b", startNumber: 1, endNumber: 29, step: 2, sizeClass: "I" },
+    ],
+  },
+  {
+    id: "A",
+    origin: { x: CENTRE_SPINE_X, y: 468 },
+    angleDeg: 0,
+    spacing: SPACING,
+    berthLength: BERTH_LENGTH,
+    berthWidth: BERTH_WIDTH,
+    rows: [
+      { side: "a", startNumber: 2, endNumber: 32, step: 2, sizeClass: "I" },
+      { side: "b", startNumber: 1, endNumber: 29, step: 2, sizeClass: "I" },
     ],
   },
 ];
