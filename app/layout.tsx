@@ -1,6 +1,10 @@
 import type { Metadata, Viewport } from "next";
+import dynamic from "next/dynamic";
 import { Titillium_Web } from "next/font/google";
 import "./globals.css";
+import Footer from "./components/Footer";
+
+const Navbar = dynamic(() => import("./components/Navbar"));
 
 const titillium = Titillium_Web({
   weight: ["300", "400", "600"],
@@ -29,7 +33,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${titillium.variable} h-full antialiased`}>
-      <body className="flex min-h-full flex-col font-sans">{children}</body>
+      <body className="flex min-h-full flex-col font-sans">
+        <Navbar />
+        <div className="flex-1">{children}</div>
+        <Footer />
+      </body>
     </html>
   );
 }

@@ -1,6 +1,8 @@
 export type Marina = {
   id: string;
   name: string;
+  country: string;
+  countrySlug: string;
   location: string;
   address: string;
   coordinates: { lat: number; lng: number };
@@ -11,12 +13,15 @@ export type Marina = {
   vhfChannel: number;
   description: string;
   facilities: string[];
+  heroImage: string;
 };
 
 export const marinas: Marina[] = [
   {
     id: "cascais",
     name: "Marina de Cascais",
+    country: "Portugal",
+    countrySlug: "portugal",
     location: "Cascais, Portuguese Riviera, ~35 km west of Lisbon",
     address: "Casa de São Bernardo, 2750-800 Cascais, Portugal",
     coordinates: { lat: 38.693, lng: -9.418 },
@@ -35,5 +40,29 @@ export const marinas: Marina[] = [
       "24h security",
       "Water & power",
     ],
+    heroImage: "/images/cascais-hero-placeholder.svg",
   },
 ];
+
+export function getCountries(): { slug: string; name: string }[] {
+  const countries = new Map<string, string>();
+  for (const marina of marinas) {
+    if (!countries.has(marina.countrySlug)) {
+      countries.set(marina.countrySlug, marina.country);
+    }
+  }
+  return Array.from(countries, ([slug, name]) => ({ slug, name }));
+}
+
+export function getMarinasByCountry(countrySlug: string): Marina[] {
+  return marinas.filter((marina) => marina.countrySlug === countrySlug);
+}
+
+export function getMarina(
+  countrySlug: string,
+  marinaId: string
+): Marina | undefined {
+  return marinas.find(
+    (marina) => marina.countrySlug === countrySlug && marina.id === marinaId
+  );
+}

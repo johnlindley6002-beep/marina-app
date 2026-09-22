@@ -3,8 +3,8 @@
 import { useEffect, useState } from "react";
 
 const mainLinks = [
-  { href: "#marinas", label: "Marinas" },
-  { href: "#about", label: "About us" },
+  { href: "/marinas", label: "Marinas" },
+  { href: "/#about", label: "About us" },
 ];
 
 function SearchIcon() {
@@ -41,7 +41,7 @@ export default function Navbar() {
       <div className="border-b border-white/10">
         <div className="mx-auto flex h-12 max-w-6xl items-center justify-between px-4 md:h-14 md:px-8">
           <a
-            href="#"
+            href="/"
             onClick={closeMenu}
             className="text-sm font-normal lowercase tracking-[0.15em] text-white md:text-[15px]"
           >
@@ -49,10 +49,10 @@ export default function Navbar() {
           </a>
 
           <div className="hidden items-center gap-6 text-[13px] font-normal md:flex">
-            <a href="#" className="text-white/80 hover:text-white">
+            <a href="/" className="text-white/80 hover:text-white">
               Home
             </a>
-            <a href="#contact" className="text-white/80 hover:text-white">
+            <a href="/#contact" className="text-white/80 hover:text-white">
               Contact
             </a>
             <button
@@ -127,14 +127,14 @@ export default function Navbar() {
             ))}
             <hr className="border-white/10" />
             <a
-              href="#"
+              href="/"
               onClick={closeMenu}
               className="text-sm text-white/80 hover:text-white"
             >
               Home
             </a>
             <a
-              href="#contact"
+              href="/#contact"
               onClick={closeMenu}
               className="text-sm text-white/80 hover:text-white"
             >
