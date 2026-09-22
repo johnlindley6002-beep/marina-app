@@ -104,11 +104,18 @@ export const FACILITY_LABELS: Record<FacilityKey, string> = {
   repairs: "Repairs",
 };
 
+// Maps a countryCode to its flag asset. Add an entry here whenever a
+// marina in a new country is added.
+export const COUNTRY_FLAGS: Record<string, string> = {
+  PT: "/images/flags/pt.svg",
+};
+
 export type Marina = {
   id: string;
   name: string;
   country: string;
   countrySlug: string;
+  countryCode: string;
   location: string;
   address: string;
   coordinates: { lat: number; lng: number };
@@ -121,6 +128,7 @@ export type Marina = {
   description: string;
   facilities: FacilityKey[];
   heroImage: string;
+  credit: { text: string; url: string };
   transientRates: Record<MarinaClass, { low: number; high: number }>;
   vatRate: number;
   gettingThere: { byCar: string; byTrain: string; byAir: string };
@@ -133,6 +141,7 @@ export const marinas: Marina[] = [
     name: "Marina de Cascais",
     country: "Portugal",
     countrySlug: "portugal",
+    countryCode: "PT",
     location: "Cascais, Portuguese Riviera, ~35 km west of Lisbon",
     address: "Casa de São Bernardo, 2750-800 Cascais, Portugal",
     coordinates: { lat: 38.693, lng: -9.418 },
@@ -157,7 +166,11 @@ export const marinas: Marina[] = [
       "dryStorage",
       "repairs",
     ],
-    heroImage: "/images/cascais-hero-placeholder.svg",
+    heroImage: "/cascais-hero.jpg",
+    credit: {
+      text: "Vitor Oliveira / Wikimedia Commons, CC BY-SA 2.0",
+      url: "https://creativecommons.org/licenses/by-sa/2.0/",
+    },
     transientRates: TRANSIENT_RATES,
     vatRate: 0.23,
     gettingThere: {
@@ -170,14 +183,21 @@ export const marinas: Marina[] = [
   },
 ];
 
-export function getCountries(): { slug: string; name: string }[] {
-  const countries = new Map<string, string>();
+export function getCountries(): {
+  slug: string;
+  name: string;
+  countryCode: string;
+}[] {
+  const countries = new Map<string, { name: string; countryCode: string }>();
   for (const marina of marinas) {
     if (!countries.has(marina.countrySlug)) {
-      countries.set(marina.countrySlug, marina.country);
+      countries.set(marina.countrySlug, {
+        name: marina.country,
+        countryCode: marina.countryCode,
+      });
     }
   }
-  return Array.from(countries, ([slug, name]) => ({ slug, name }));
+  return Array.from(countries, ([slug, value]) => ({ slug, ...value }));
 }
 
 export function getMarinasByCountry(countrySlug: string): Marina[] {

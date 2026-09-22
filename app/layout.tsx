@@ -3,6 +3,7 @@ import dynamic from "next/dynamic";
 import { Titillium_Web } from "next/font/google";
 import "./globals.css";
 import Footer from "./components/Footer";
+import { LanguageProvider } from "./components/LanguageProvider";
 
 const Navbar = dynamic(() => import("./components/Navbar"));
 
@@ -34,9 +35,11 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${titillium.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col font-sans">
-        <Navbar />
-        <div className="flex-1">{children}</div>
-        <Footer />
+        <LanguageProvider>
+          <Navbar />
+          <div className="flex-1">{children}</div>
+          <Footer />
+        </LanguageProvider>
       </body>
     </html>
   );

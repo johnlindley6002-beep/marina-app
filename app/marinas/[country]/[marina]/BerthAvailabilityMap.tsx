@@ -11,6 +11,7 @@ import {
   type Berth,
 } from "../../../../data/berths";
 import { classifyBoatLength, getSeason } from "../../../../data/marinas";
+import { useLanguage } from "../../../components/LanguageProvider";
 
 const VIEW_BOX = `0 0 ${MAP_WIDTH} ${MAP_HEIGHT}`;
 
@@ -94,6 +95,7 @@ export default function BerthAvailabilityMap({
   initialDeparture = "",
   initialLength = "",
 }: Props) {
+  const { t } = useLanguage();
   const [arrival, setArrival] = useState(initialArrival);
   const [departure, setDeparture] = useState(initialDeparture);
   const [length, setLength] = useState(initialLength);
@@ -107,13 +109,13 @@ export default function BerthAvailabilityMap({
     setSelectedBerthId(null);
 
     if (!lengthValue || Number(lengthValue) <= 0) {
-      setError("Enter your boat's length in metres.");
+      setError(t.berthSearch.errorLength);
       setResult(null);
       return;
     }
 
     if (!arrivalValue || !departureValue) {
-      setError("Choose an arrival and departure date.");
+      setError(t.berthSearch.errorDates);
       setResult(null);
       return;
     }
@@ -122,7 +124,7 @@ export default function BerthAvailabilityMap({
     const departureDate = new Date(departureValue);
 
     if (departureDate <= arrivalDate) {
-      setError("Departure must be after arrival.");
+      setError(t.berthSearch.errorDeparture);
       setResult(null);
       return;
     }
@@ -178,23 +180,19 @@ export default function BerthAvailabilityMap({
     selectedBerth && result?.totalPrice != null ? result.totalPrice : null;
 
   const mailtoHref = (() => {
-    const subject = "Berth request — Marina de Cascais";
-    const lines = [
-      "Hello,",
-      "",
-      "I'd like to enquire about berth availability at Marina de Cascais.",
-    ];
+    const subject = t.berthSearch.mailSubject;
+    const lines = [t.berthSearch.mailGreeting, "", t.berthSearch.mailIntro];
     if (arrival && departure && length) {
       lines.push("");
-      lines.push(`Arrival: ${arrival}`);
-      lines.push(`Departure: ${departure}`);
-      lines.push(`Boat length: ${length} m`);
+      lines.push(`${t.berthSearch.mailArrival}: ${arrival}`);
+      lines.push(`${t.berthSearch.mailDeparture}: ${departure}`);
+      lines.push(`${t.berthSearch.mailBoatLength}: ${length} m`);
       if (selectedBerth) {
-        lines.push(`Berth of interest: ${selectedBerth.id}`);
+        lines.push(`${t.berthSearch.mailBerth}: ${selectedBerth.id}`);
       }
     }
     lines.push("");
-    lines.push("Thanks,");
+    lines.push(t.berthSearch.mailSignoff);
     const body = lines.join("\n");
     return `mailto:${marinaEmail}?subject=${encodeURIComponent(
       subject
@@ -204,19 +202,19 @@ export default function BerthAvailabilityMap({
   return (
     <div className="rounded-sm border border-neutral-200/80 bg-white p-8 md:p-10">
       <h2 className="text-lg font-normal tracking-tight text-navy">
-        Find a berth
+        {t.berthSearch.heading}
       </h2>
       <p className="mt-2 text-sm font-light text-neutral-500">
-        Check simulated availability at {marinaName}.
+        {t.berthSearch.subheading(marinaName)}
       </p>
       <p className="mt-1 text-xs font-light text-neutral-400">
-        Berth availability shown is illustrative for now.
+        {t.berthSearch.illustrative}
       </p>
 
       <form onSubmit={handleSubmit} className="mt-6 grid gap-4 sm:grid-cols-4">
         <label className="block text-sm">
           <span className="text-xs font-normal tracking-wide text-navy/60 uppercase">
-            Arrival
+            {t.berthSearch.arrival}
           </span>
           <input
             type="date"
@@ -228,7 +226,7 @@ export default function BerthAvailabilityMap({
 
         <label className="block text-sm">
           <span className="text-xs font-normal tracking-wide text-navy/60 uppercase">
-            Departure
+            {t.berthSearch.departure}
           </span>
           <input
             type="date"
@@ -240,7 +238,7 @@ export default function BerthAvailabilityMap({
 
         <label className="block text-sm">
           <span className="text-xs font-normal tracking-wide text-navy/60 uppercase">
-            Boat length (m)
+            {t.berthSearch.boatLength}
           </span>
           <input
             type="number"
@@ -248,7 +246,7 @@ export default function BerthAvailabilityMap({
             step="0.1"
             value={length}
             onChange={(event) => setLength(event.target.value)}
-            placeholder="e.g. 7"
+            placeholder={t.berthSearch.lengthPlaceholder}
             className="mt-2 w-full border border-neutral-200 px-3 py-2 text-sm text-navy focus:border-navy/40 focus:outline-none"
           />
         </label>
@@ -258,7 +256,7 @@ export default function BerthAvailabilityMap({
             type="submit"
             className="w-full bg-navy px-6 py-3 text-sm font-normal tracking-wide text-white hover:bg-navy-accent"
           >
-            Search
+            {t.berthSearch.searchButton}
           </button>
         </div>
       </form>
@@ -269,35 +267,29 @@ export default function BerthAvailabilityMap({
 
       {result && result.boatClass && matchingBerths.length === 0 ? (
         <p className="mt-4 text-sm font-light text-neutral-500">
-          No Class {result.boatClass} berths modeled yet in this schematic —
-          larger vessel classes are coming in a future pass.
+          {t.berthSearch.noClass(result.boatClass)}
         </p>
       ) : null}
 
       {result && result.boatClass && matchingBerths.length > 0 && availableBerths.length === 0 ? (
         <p className="mt-4 text-sm font-light text-neutral-500">
-          No available berths match your dates — try different dates.
+          {t.berthSearch.noAvailable}
         </p>
       ) : null}
 
       {result && !result.boatClass ? (
         <p className="mt-4 text-sm font-light text-neutral-500">
-          No berth class fits a vessel this length in our current tariff
-          (max 45 m) — please contact the marina directly.
+          {t.berthSearch.noFit}
         </p>
       ) : null}
 
       {result && result.boatClass && totalNights > 0 ? (
         <p className="mt-4 text-sm font-light text-neutral-500">
           {result.lowNights > 0 && result.highNights > 0
-            ? `Your stay spans both seasons — ${result.lowNights} night${
-                result.lowNights === 1 ? "" : "s"
-              } low season, ${result.highNights} night${
-                result.highNights === 1 ? "" : "s"
-              } high season.`
+            ? t.berthSearch.seasonBoth(result.lowNights, result.highNights)
             : result.highNights > 0
-              ? "Your dates fall in high season (Apr–Sep)."
-              : "Your dates fall in low season (Jan–Mar & Oct–Dec)."}
+              ? t.berthSearch.seasonHigh
+              : t.berthSearch.seasonLow}
         </p>
       ) : null}
 
@@ -434,65 +426,65 @@ export default function BerthAvailabilityMap({
               className="h-3 w-3 rounded-sm"
               style={{ background: STATUS_FILL.available }}
             />
-            Available & fits
+            {t.berthSearch.legendAvailable}
           </span>
           <span className="flex items-center gap-2">
             <span
               className="h-3 w-3 rounded-sm"
               style={{ background: STATUS_FILL.occupied }}
             />
-            Occupied
+            {t.berthSearch.legendOccupied}
           </span>
           <span className="flex items-center gap-2">
             <span
               className="h-3 w-3 rounded-sm"
               style={{ background: STATUS_FILL.unfit }}
             />
-            Doesn&apos;t fit your boat
+            {t.berthSearch.legendUnfit}
           </span>
           <span className="flex items-center gap-2">
             <span
               className="h-3 w-3 rounded-sm"
               style={{ background: STATUS_FILL.neutral }}
             />
-            Not searched yet
+            {t.berthSearch.legendNeutral}
           </span>
         </div>
       </div>
 
       {!result ? (
         <p className="mt-6 text-sm font-light text-neutral-400">
-          Enter your dates and boat length, then search to see berth
-          availability.
+          {t.berthSearch.hintBeforeSearch}
         </p>
       ) : null}
 
       {selectedBerth && result?.boatClass && selectedPrice !== null ? (
         <div className="mt-6 border-t border-neutral-200 pt-6">
           <p className="text-sm font-light text-neutral-500">
-            Berth <span className="font-normal text-navy">{selectedBerth.id}</span>{" "}
-            · Class {selectedBerth.sizeClass} · {totalNights} night
-            {totalNights === 1 ? "" : "s"}
+            {t.berthSearch.priceBerthLine(
+              selectedBerth.id,
+              selectedBerth.sizeClass,
+              totalNights
+            )}
           </p>
           <p className="mt-2 text-xl font-normal text-navy">
             €{selectedPrice.toFixed(2)}
           </p>
           <p className="mt-1 text-xs font-light text-neutral-400">
-            + {Math.round(vatRate * 100)}% VAT and utilities — estimate,
-            confirm with marina.
+            {t.berthSearch.vatNote(Math.round(vatRate * 100))}
           </p>
         </div>
       ) : null}
 
       <div className="mt-6 border-t border-neutral-200 pt-6">
         <p className="text-sm font-light text-neutral-500">
-          Questions about a berth at {marinaName}?
+          {t.berthSearch.ctaHeading(marinaName)}
         </p>
         <a
           href={mailtoHref}
           className="mt-3 inline-block bg-navy-accent px-6 py-3 text-sm font-normal tracking-wide text-white hover:bg-[#254a75]"
         >
-          Contact marina
+          {t.berthSearch.ctaButton}
         </a>
       </div>
     </div>

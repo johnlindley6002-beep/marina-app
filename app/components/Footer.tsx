@@ -1,11 +1,7 @@
+"use client";
+
 import { marinas } from "../../data/marinas";
-
-const companyLinks = [
-  { href: "/#about", label: "About us" },
-  { href: "/#contact", label: "Contact" },
-];
-
-const productLinks = [{ href: "/marinas", label: "Marinas" }];
+import { useLanguage } from "./LanguageProvider";
 
 function InstagramIcon() {
   return (
@@ -45,6 +41,13 @@ function LinkedInIcon() {
 
 export default function Footer() {
   const marina = marinas[0];
+  const { t } = useLanguage();
+
+  const companyLinks = [
+    { href: "/#about", label: t.footer.aboutUs },
+    { href: "/#contact", label: t.footer.contact },
+  ];
+  const productLinks = [{ href: "/marinas", label: t.footer.marinas }];
 
   return (
     <footer className="bg-navy text-white">
@@ -54,7 +57,7 @@ export default function Footer() {
             aldock
           </p>
           <p className="mt-4 max-w-xs text-sm font-light leading-relaxed text-white/60">
-            Marina bookings, simplified.
+            {t.footer.tagline}
           </p>
           <div className="mt-6 flex items-center gap-4 text-white/60">
             <a href="#" aria-label="Instagram" className="hover:text-white">
@@ -68,7 +71,7 @@ export default function Footer() {
 
         <div>
           <p className="text-xs font-normal tracking-[0.25em] text-white/40 uppercase">
-            Company
+            {t.footer.company}
           </p>
           <ul className="mt-4 space-y-3">
             {companyLinks.map((link) => (
@@ -86,7 +89,7 @@ export default function Footer() {
 
         <div>
           <p className="text-xs font-normal tracking-[0.25em] text-white/40 uppercase">
-            Product
+            {t.footer.product}
           </p>
           <ul className="mt-4 space-y-3">
             {productLinks.map((link) => (
@@ -101,7 +104,7 @@ export default function Footer() {
             ))}
           </ul>
           <p className="mt-6 text-xs font-normal tracking-[0.25em] text-white/40 uppercase">
-            Contact
+            {t.footer.contact}
           </p>
           {marina ? (
             <div className="mt-4 space-y-1 text-sm font-light text-white/70">
@@ -125,7 +128,7 @@ export default function Footer() {
 
       <div className="border-t border-white/10 px-6 py-6 md:px-8">
         <p className="mx-auto max-w-6xl text-xs font-light text-white/40">
-          © {new Date().getFullYear()} aldock. All rights reserved.
+          {t.footer.copyright(new Date().getFullYear())}
         </p>
       </div>
     </footer>

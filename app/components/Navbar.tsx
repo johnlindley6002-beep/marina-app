@@ -1,11 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-
-const mainLinks = [
-  { href: "/marinas", label: "Marinas" },
-  { href: "/#about", label: "About us" },
-];
+import { useLanguage } from "./LanguageProvider";
 
 function SearchIcon() {
   return (
@@ -24,8 +20,37 @@ function SearchIcon() {
   );
 }
 
+function LanguageToggle({ className = "" }: { className?: string }) {
+  const { locale, setLocale } = useLanguage();
+  return (
+    <span className={`flex items-center gap-1.5 ${className}`}>
+      <button
+        type="button"
+        onClick={() => setLocale("en")}
+        className={locale === "en" ? "text-white" : "text-white/50 hover:text-white/80"}
+      >
+        EN
+      </button>
+      <span className="text-white/50">/</span>
+      <button
+        type="button"
+        onClick={() => setLocale("pt")}
+        className={locale === "pt" ? "text-white" : "text-white/50 hover:text-white/80"}
+      >
+        PT
+      </button>
+    </span>
+  );
+}
+
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const { t } = useLanguage();
+
+  const mainLinks = [
+    { href: "/marinas", label: t.nav.marinas },
+    { href: "/#about", label: t.nav.aboutUs },
+  ];
 
   useEffect(() => {
     document.body.style.overflow = menuOpen ? "hidden" : "";
@@ -50,28 +75,24 @@ export default function Navbar() {
 
           <div className="hidden items-center gap-6 text-[13px] font-normal md:flex">
             <a href="/" className="text-white/80 hover:text-white">
-              Home
+              {t.nav.home}
             </a>
             <a href="/#contact" className="text-white/80 hover:text-white">
-              Contact
+              {t.nav.contact}
             </a>
             <button
               type="button"
-              aria-label="Search"
+              aria-label={t.nav.search}
               className="text-white/70 hover:text-white"
             >
               <SearchIcon />
             </button>
-            <span className="flex items-center gap-1.5 text-white/50">
-              <span className="text-white">EN</span>
-              <span>/</span>
-              <span>PT</span>
-            </span>
+            <LanguageToggle />
           </div>
 
           <button
             type="button"
-            aria-label={menuOpen ? "Close menu" : "Open menu"}
+            aria-label={menuOpen ? t.nav.closeMenu : t.nav.openMenu}
             aria-expanded={menuOpen}
             onClick={() => setMenuOpen((open) => !open)}
             className="flex h-10 w-10 items-center justify-center md:hidden"
@@ -131,28 +152,24 @@ export default function Navbar() {
               onClick={closeMenu}
               className="text-sm text-white/80 hover:text-white"
             >
-              Home
+              {t.nav.home}
             </a>
             <a
               href="/#contact"
               onClick={closeMenu}
               className="text-sm text-white/80 hover:text-white"
             >
-              Contact
+              {t.nav.contact}
             </a>
             <div className="flex items-center gap-4 pt-1">
               <button
                 type="button"
-                aria-label="Search"
+                aria-label={t.nav.search}
                 className="text-white/70 hover:text-white"
               >
                 <SearchIcon />
               </button>
-              <span className="flex items-center gap-1.5 text-sm text-white/50">
-                <span className="text-white">EN</span>
-                <span>/</span>
-                <span>PT</span>
-              </span>
+              <LanguageToggle className="text-sm" />
             </div>
           </nav>
         </div>
