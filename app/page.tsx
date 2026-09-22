@@ -1,7 +1,10 @@
 import dynamic from "next/dynamic";
 import Image from "next/image";
+import { marinas } from "../data/marinas";
 
 const Navbar = dynamic(() => import("./components/Navbar"));
+
+const marina = marinas[0];
 
 const facilities = [
   {
@@ -104,9 +107,7 @@ export default function Home() {
               A marina experience, reimagined
             </h2>
             <p className="mt-8 text-base leading-relaxed font-light text-neutral-500 md:text-lg">
-              aldock brings clarity to marina management — from berth reservations
-              to guest communications. We believe booking a slip should feel as
-              calm as a morning on the water.
+              {marina.description}
             </p>
           </div>
         </section>
@@ -124,14 +125,17 @@ export default function Home() {
                 Find us on the waterfront
               </h2>
               <p className="mx-auto mt-6 max-w-lg text-base font-light text-neutral-500">
-                Harbour Lane, Marina District
+                {marina.address}
+              </p>
+              <p className="mx-auto mt-2 max-w-lg text-sm font-light text-neutral-400">
+                {marina.location}
               </p>
             </div>
 
             <div className="relative mt-12 aspect-[16/9] max-h-[420px] overflow-hidden rounded-sm border border-neutral-200 md:mt-16">
               <Image
                 src="/images/map-placeholder.svg"
-                alt="Map placeholder for Harbour Lane, Marina District"
+                alt={`Map placeholder for ${marina.address}`}
                 fill
                 sizes="(max-width: 768px) 100vw, 1024px"
                 loading="lazy"
@@ -160,18 +164,22 @@ export default function Home() {
 
             <div className="mt-12 flex flex-col items-center gap-4 sm:flex-row sm:justify-center sm:gap-12">
               <a
-                href="mailto:hello@aldock.com"
+                href={`mailto:${marina.email}`}
                 className="text-sm font-normal tracking-wide text-white/80 hover:text-white"
               >
-                hello@aldock.com
+                {marina.email}
               </a>
               <span className="hidden h-4 w-px bg-white/20 sm:block" />
               <a
-                href="tel:+15551234567"
+                href={`tel:${marina.phone.replace(/\s+/g, "")}`}
                 className="text-sm font-normal tracking-wide text-white/80 hover:text-white"
               >
-                +1 (555) 123-4567
+                {marina.phone}
               </a>
+              <span className="hidden h-4 w-px bg-white/20 sm:block" />
+              <span className="text-sm font-normal tracking-wide text-white/80">
+                VHF Channel {marina.vhfChannel}
+              </span>
             </div>
           </div>
         </section>
@@ -179,3 +187,4 @@ export default function Home() {
     </>
   );
 }
+
