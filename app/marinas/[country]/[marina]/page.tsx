@@ -2,7 +2,7 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { FACILITY_LABELS, getMarina, marinas } from "../../../../data/marinas";
-import BerthSearch from "./BerthSearch";
+import BerthAvailabilityMap from "./BerthAvailabilityMap";
 import FacilityIcon from "./facility-icons";
 import Breadcrumbs from "../../../components/Breadcrumbs";
 import MarinaMap from "./MarinaMapLoader";
@@ -72,7 +72,11 @@ export default async function MarinaPage({ params }: Props) {
 
       <section className="px-6 py-12 md:px-8 md:py-16">
         <div className="mx-auto max-w-5xl">
-          <BerthSearch marinaName={marina.name} />
+          <BerthAvailabilityMap
+            marinaName={marina.name}
+            transientRates={marina.transientRates}
+            vatRate={marina.vatRate}
+          />
         </div>
       </section>
 
