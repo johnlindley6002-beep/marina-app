@@ -5,6 +5,7 @@ import { FACILITY_LABELS, getMarina, marinas } from "../../../../data/marinas";
 import BerthSearch from "./BerthSearch";
 import FacilityIcon from "./facility-icons";
 import Breadcrumbs from "../../../components/Breadcrumbs";
+import MarinaMap from "./MarinaMapLoader";
 
 type Props = {
   params: Promise<{ country: string; marina: string }>;
@@ -77,18 +78,12 @@ export default async function MarinaPage({ params }: Props) {
 
       <section className="px-6 pb-16 md:px-8">
         <div className="mx-auto max-w-5xl">
-          <div className="relative aspect-[16/9] max-h-[420px] overflow-hidden rounded-sm border border-neutral-200">
-            <Image
-              src="/images/map-placeholder.svg"
-              alt={`Map placeholder for ${marina.address}`}
-              fill
-              sizes="(max-width: 768px) 100vw, 1024px"
-              className="object-cover"
-            />
-          </div>
-          <p className="mt-3 text-center text-sm font-light text-neutral-400">
-            Interactive berth map — coming soon
-          </p>
+          <MarinaMap
+            lat={marina.coordinates.lat}
+            lng={marina.coordinates.lng}
+            name={marina.name}
+            address={marina.address}
+          />
         </div>
       </section>
 
