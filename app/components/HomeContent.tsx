@@ -46,8 +46,15 @@ export default function HomeContent() {
     <main>
       <section className="bg-navy px-6 py-20 md:py-32">
         <div className="mx-auto max-w-3xl text-center">
-          <h1 className="text-[clamp(3rem,10vw,6rem)] font-light lowercase leading-none tracking-[0.06em] text-white">
-            aldock
+          <h1>
+            <Image
+              src="/images/aldock-logo.png"
+              alt="aldock"
+              width={407}
+              height={108}
+              priority
+              className="mx-auto h-auto w-[240px] sm:w-[320px] md:w-[420px]"
+            />
           </h1>
           <p className="mx-auto mt-6 max-w-md text-base font-light tracking-wide text-white/60 md:mt-8 md:text-lg">
             {t.home.tagline}

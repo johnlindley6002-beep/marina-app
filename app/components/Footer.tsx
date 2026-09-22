@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { marinas } from "../../data/marinas";
 import { useLanguage } from "./LanguageProvider";
 
@@ -53,9 +54,13 @@ export default function Footer() {
     <footer className="bg-navy text-white">
       <div className="mx-auto grid max-w-6xl gap-10 px-6 py-16 sm:grid-cols-3 md:px-8">
         <div>
-          <p className="text-sm font-normal lowercase tracking-[0.15em] text-white">
-            aldock
-          </p>
+          <Image
+            src="/images/aldock-logo.png"
+            alt="aldock"
+            width={407}
+            height={108}
+            className="h-5 w-auto"
+          />
           <p className="mt-4 max-w-xs text-sm font-light leading-relaxed text-white/60">
             {t.footer.tagline}
           </p>

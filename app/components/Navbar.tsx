@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { useLanguage } from "./LanguageProvider";
 
 function SearchIcon() {
@@ -65,12 +66,15 @@ export default function Navbar() {
     <header className="sticky top-0 z-50 bg-navy text-white">
       <div className="border-b border-white/10">
         <div className="mx-auto flex h-12 max-w-6xl items-center justify-between px-4 md:h-14 md:px-8">
-          <a
-            href="/"
-            onClick={closeMenu}
-            className="text-sm font-normal lowercase tracking-[0.15em] text-white md:text-[15px]"
-          >
-            aldock
+          <a href="/" onClick={closeMenu} className="block">
+            <Image
+              src="/images/aldock-logo.png"
+              alt="aldock"
+              width={407}
+              height={108}
+              priority
+              className="h-5 w-auto md:h-[22px]"
+            />
           </a>
 
           <div className="hidden items-center gap-6 text-[13px] font-normal md:flex">
