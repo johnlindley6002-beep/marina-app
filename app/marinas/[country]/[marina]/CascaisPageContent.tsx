@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { useState } from "react";
 import type { Marina } from "../../../../data/marinas";
 import {
   CLASS_LENGTH_RANGES,
@@ -8,6 +9,7 @@ import {
 } from "../../../../data/marinas";
 import { marinaContent } from "../../../../lib/i18n";
 import BerthAvailabilityMap from "./BerthAvailabilityMap";
+import RequestBerthForm from "./RequestBerthForm";
 import FacilityIcon from "./facility-icons";
 import Breadcrumbs from "../../../components/Breadcrumbs";
 import FlagIcon from "../../../components/FlagIcon";
@@ -34,6 +36,7 @@ export default function CascaisPageContent({
 }: Props) {
   const { t, locale } = useLanguage();
   const content = marinaContent[marina.id as keyof typeof marinaContent];
+  const [selectedBerthId, setSelectedBerthId] = useState<string | null>(null);
 
   const description = content?.description[locale] ?? marina.description;
   const arrivalInstructions =
@@ -103,6 +106,19 @@ export default function CascaisPageContent({
             initialArrival={initialArrival}
             initialDeparture={initialDeparture}
             initialLength={initialLength}
+            onBerthSelect={setSelectedBerthId}
+          />
+        </div>
+      </section>
+
+      <section className="px-6 pb-16 md:px-8">
+        <div className="mx-auto max-w-5xl">
+          <RequestBerthForm
+            marina={marina}
+            initialArrival={initialArrival}
+            initialDeparture={initialDeparture}
+            initialLength={initialLength}
+            selectedBerthId={selectedBerthId}
           />
         </div>
       </section>

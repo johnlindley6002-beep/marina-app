@@ -61,6 +61,7 @@ type Props = {
   initialArrival?: string;
   initialDeparture?: string;
   initialLength?: string;
+  onBerthSelect?: (berthId: string | null) => void;
 };
 
 // Sums each night's actual season rate, rather than assuming the whole
@@ -94,6 +95,7 @@ export default function BerthAvailabilityMap({
   initialArrival = "",
   initialDeparture = "",
   initialLength = "",
+  onBerthSelect,
 }: Props) {
   const { t } = useLanguage();
   const [arrival, setArrival] = useState(initialArrival);
@@ -107,6 +109,7 @@ export default function BerthAvailabilityMap({
 
   const runSearch = (arrivalValue: string, departureValue: string, lengthValue: string) => {
     setSelectedBerthId(null);
+    onBerthSelect?.(null);
 
     if (!lengthValue || Number(lengthValue) <= 0) {
       setError(t.berthSearch.errorLength);
@@ -409,7 +412,12 @@ export default function BerthAvailabilityMap({
                 strokeWidth={isSelected ? 2 : 0}
                 className={clickable ? "cursor-pointer" : undefined}
                 onClick={
-                  clickable ? () => setSelectedBerthId(berth.id) : undefined
+                  clickable
+                    ? () => {
+                        setSelectedBerthId(berth.id);
+                        onBerthSelect?.(berth.id);
+                      }
+                    : undefined
                 }
                 role={clickable ? "button" : "img"}
                 aria-label={`Berth ${berth.id}, Class ${berth.sizeClass}${

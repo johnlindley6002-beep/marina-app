@@ -133,6 +133,7 @@ export type Marina = {
   vatRate: number;
   gettingThere: { byCar: string; byTrain: string; byAir: string };
   arrivalInstructions: string;
+  insuranceMinimumEur: number;
 };
 
 export const marinas: Marina[] = [
@@ -180,6 +181,7 @@ export const marinas: Marina[] = [
     },
     arrivalInstructions:
       "On arrival, berth on the Reception pier and report to the marina office.",
+    insuranceMinimumEur: 1_500_000,
   },
 ];
 
