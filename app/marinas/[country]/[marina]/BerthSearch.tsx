@@ -113,6 +113,9 @@ export default function BerthSearch({ marinaName }: { marinaName: string }) {
           <p className="mt-1 text-sm font-light text-neutral-400">
             Pricing coming soon.
           </p>
+          <p className="mt-3 text-xs font-light text-neutral-400">
+            Estimate only — confirm availability and price with the marina.
+          </p>
         </div>
       ) : null}
     </div>
