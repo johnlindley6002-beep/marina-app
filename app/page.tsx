@@ -1,5 +1,17 @@
 import Image from "next/image";
 import Link from "next/link";
+import type { Metadata } from "next";
+import HomeBerthSearch from "./components/HomeBerthSearch";
+
+export const metadata: Metadata = {
+  title: "aldock — Marina bookings, simplified",
+  description: "Find and book a berth in Portugal's marinas.",
+  openGraph: {
+    title: "aldock — Marina bookings, simplified",
+    description: "Find and book a berth in Portugal's marinas.",
+    images: ["/images/cascais-marina-plan.webp"],
+  },
+};
 
 function ChevronIcon() {
   return (
@@ -46,11 +58,17 @@ export default function Home() {
           <p className="mx-auto mt-6 max-w-md text-base font-light tracking-wide text-white/60 md:mt-8 md:text-lg">
             Marina bookings, simplified.
           </p>
+          <p className="mx-auto mt-2 max-w-md text-sm font-light tracking-wide text-white/50">
+            Find and book a berth in Portugal&apos;s marinas.
+          </p>
+
+          <HomeBerthSearch />
+
           <Link
             href="/marinas"
-            className="mt-10 inline-block bg-navy-accent px-8 py-3 text-sm font-normal tracking-wide text-white hover:bg-[#254a75] md:mt-12"
+            className="mt-6 inline-block text-sm font-normal tracking-wide text-white/70 underline-offset-4 hover:text-white hover:underline"
           >
-            Explore marinas
+            Or browse marinas
           </Link>
         </div>
       </section>

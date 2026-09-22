@@ -1,3 +1,5 @@
+import { marinas } from "../../data/marinas";
+
 const companyLinks = [
   { href: "/#about", label: "About us" },
   { href: "/#contact", label: "Contact" },
@@ -42,6 +44,8 @@ function LinkedInIcon() {
 }
 
 export default function Footer() {
+  const marina = marinas[0];
+
   return (
     <footer className="bg-navy text-white">
       <div className="mx-auto grid max-w-6xl gap-10 px-6 py-16 sm:grid-cols-3 md:px-8">
@@ -99,12 +103,23 @@ export default function Footer() {
           <p className="mt-6 text-xs font-normal tracking-[0.25em] text-white/40 uppercase">
             Contact
           </p>
-          <a
-            href="mailto:hello@aldock.com"
-            className="mt-4 block text-sm font-light text-white/70 hover:text-white"
-          >
-            hello@aldock.com
-          </a>
+          {marina ? (
+            <div className="mt-4 space-y-1 text-sm font-light text-white/70">
+              <p>{marina.address}</p>
+              <a
+                href={`tel:${marina.phone.replace(/\s+/g, "")}`}
+                className="block hover:text-white"
+              >
+                {marina.phone}
+              </a>
+              <a
+                href={`mailto:${marina.email}`}
+                className="block hover:text-white"
+              >
+                {marina.email}
+              </a>
+            </div>
+          ) : null}
         </div>
       </div>
 

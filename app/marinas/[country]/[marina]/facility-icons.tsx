@@ -63,13 +63,47 @@ function Security24hIcon({ className }: IconProps) {
   );
 }
 
-function ShowersLaundryIcon({ className }: IconProps) {
+function LaundryIcon({ className }: IconProps) {
   return (
     <svg {...sharedProps} className={className}>
-      <circle cx="12" cy="13" r="6" />
-      <path d="M9 13a3 3 0 0 0 6 0" />
-      <path d="M8 4h8" />
-      <path d="M12 4v3" />
+      <rect x="4" y="3" width="16" height="18" rx="2" />
+      <circle cx="12" cy="13" r="4.5" />
+      <path d="M9.5 13a2.5 2.5 0 0 0 5 0" />
+      <circle cx="7.5" cy="6.5" r="0.6" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
+function CraneIcon({ className }: IconProps) {
+  return (
+    <svg {...sharedProps} className={className}>
+      <path d="M5 21V6l11-3v4" />
+      <path d="M16 7h4" />
+      <path d="M18 7v5" />
+      <path d="M18 12l2 3" />
+      <path d="M5 15h6" />
+    </svg>
+  );
+}
+
+function PumpOutIcon({ className }: IconProps) {
+  return (
+    <svg {...sharedProps} className={className}>
+      <circle cx="10" cy="14" r="6" />
+      <path d="M10 10v8M7 14h6" />
+      <path d="M15 10l5-5" />
+      <path d="M16.5 5h3.5v3.5" />
+    </svg>
+  );
+}
+
+function WifiIcon({ className }: IconProps) {
+  return (
+    <svg {...sharedProps} className={className}>
+      <path d="M4 9.5a13 13 0 0 1 16 0" />
+      <path d="M7 13a8.5 8.5 0 0 1 10 0" />
+      <path d="M10 16.5a4 4 0 0 1 4 0" />
+      <circle cx="12" cy="19.5" r="1" fill="currentColor" stroke="none" />
     </svg>
   );
 }
@@ -100,10 +134,13 @@ const FACILITY_ICONS: Record<
   water: WaterIcon,
   power: PowerIcon,
   travelLift: TravelLiftIcon,
+  crane: CraneIcon,
+  pumpOut: PumpOutIcon,
+  laundry: LaundryIcon,
   security24h: Security24hIcon,
-  showersLaundry: ShowersLaundryIcon,
-  repairs: RepairsIcon,
+  wifi: WifiIcon,
   dryStorage: DryStorageIcon,
+  repairs: RepairsIcon,
 };
 
 export default function FacilityIcon({

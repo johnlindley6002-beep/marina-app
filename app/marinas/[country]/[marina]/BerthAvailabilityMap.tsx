@@ -1,7 +1,7 @@
 "use client";
 
-import { useMemo, useState, type FormEvent } from "react";
-import type { MarinaClass, Season } from "../../../../data/marinas";
+import { useEffect, useMemo, useState, type FormEvent } from "react";
+import type { MarinaClass } from "../../../../data/marinas";
 import {
   getAllBerths,
   getPontoonSpine,
@@ -47,48 +47,79 @@ const STATUS_FILL: Record<BerthStatus, string> = {
 
 type SearchResult = {
   boatClass: MarinaClass | null;
-  season: Season;
-  nights: number;
+  lowNights: number;
+  highNights: number;
+  totalPrice: number | null;
 };
 
 type Props = {
   marinaName: string;
+  marinaEmail: string;
   transientRates: Record<MarinaClass, { low: number; high: number }>;
   vatRate: number;
+  initialArrival?: string;
+  initialDeparture?: string;
+  initialLength?: string;
 };
+
+// Sums each night's actual season rate, rather than assuming the whole
+// stay is one season — correct for a stay that spans the Apr/Sep or
+// Sep/Oct season boundary.
+function computeStay(
+  arrivalDate: Date,
+  departureDate: Date,
+  boatClass: MarinaClass,
+  transientRates: Record<MarinaClass, { low: number; high: number }>
+) {
+  let lowNights = 0;
+  let highNights = 0;
+  let totalPrice = 0;
+  const cursor = new Date(arrivalDate);
+  while (cursor < departureDate) {
+    const season = getSeason(cursor);
+    totalPrice += transientRates[boatClass][season];
+    if (season === "low") lowNights += 1;
+    else highNights += 1;
+    cursor.setDate(cursor.getDate() + 1);
+  }
+  return { lowNights, highNights, totalPrice };
+}
 
 export default function BerthAvailabilityMap({
   marinaName,
+  marinaEmail,
   transientRates,
   vatRate,
+  initialArrival = "",
+  initialDeparture = "",
+  initialLength = "",
 }: Props) {
-  const [arrival, setArrival] = useState("");
-  const [departure, setDeparture] = useState("");
-  const [length, setLength] = useState("");
+  const [arrival, setArrival] = useState(initialArrival);
+  const [departure, setDeparture] = useState(initialDeparture);
+  const [length, setLength] = useState(initialLength);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<SearchResult | null>(null);
   const [selectedBerthId, setSelectedBerthId] = useState<string | null>(null);
 
   const allBerths = useMemo(() => getAllBerths(), []);
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const runSearch = (arrivalValue: string, departureValue: string, lengthValue: string) => {
     setSelectedBerthId(null);
 
-    if (!length || Number(length) <= 0) {
+    if (!lengthValue || Number(lengthValue) <= 0) {
       setError("Enter your boat's length in metres.");
       setResult(null);
       return;
     }
 
-    if (!arrival || !departure) {
+    if (!arrivalValue || !departureValue) {
       setError("Choose an arrival and departure date.");
       setResult(null);
       return;
     }
 
-    const arrivalDate = new Date(arrival);
-    const departureDate = new Date(departure);
+    const arrivalDate = new Date(arrivalValue);
+    const departureDate = new Date(departureValue);
 
     if (departureDate <= arrivalDate) {
       setError("Departure must be after arrival.");
@@ -96,17 +127,33 @@ export default function BerthAvailabilityMap({
       return;
     }
 
-    const nights = Math.round(
-      (departureDate.getTime() - arrivalDate.getTime()) / (1000 * 60 * 60 * 24)
-    );
+    const boatClass = classifyBoatLength(Number(lengthValue));
+    const stay = boatClass
+      ? computeStay(arrivalDate, departureDate, boatClass, transientRates)
+      : null;
 
     setError(null);
     setResult({
-      boatClass: classifyBoatLength(Number(length)),
-      season: getSeason(arrivalDate),
-      nights,
+      boatClass,
+      lowNights: stay?.lowNights ?? 0,
+      highNights: stay?.highNights ?? 0,
+      totalPrice: stay?.totalPrice ?? null,
     });
   };
+
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    runSearch(arrival, departure, length);
+  };
+
+  // Auto-run the search once if we arrived here pre-filled from the
+  // homepage search (e.g. /marinas/portugal/cascais?arrival=...).
+  useEffect(() => {
+    if (initialArrival && initialDeparture && initialLength) {
+      runSearch(initialArrival, initialDeparture, initialLength);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const statusFor = (berth: Berth): BerthStatus => {
     if (!result) return "neutral";
@@ -126,10 +173,33 @@ export default function BerthAvailabilityMap({
     ? allBerths.find((b) => b.id === selectedBerthId)
     : null;
 
+  const totalNights = result ? result.lowNights + result.highNights : 0;
   const selectedPrice =
-    selectedBerth && result?.boatClass
-      ? result.nights * transientRates[result.boatClass][result.season]
-      : null;
+    selectedBerth && result?.totalPrice != null ? result.totalPrice : null;
+
+  const mailtoHref = (() => {
+    const subject = "Berth request — Marina de Cascais";
+    const lines = [
+      "Hello,",
+      "",
+      "I'd like to enquire about berth availability at Marina de Cascais.",
+    ];
+    if (arrival && departure && length) {
+      lines.push("");
+      lines.push(`Arrival: ${arrival}`);
+      lines.push(`Departure: ${departure}`);
+      lines.push(`Boat length: ${length} m`);
+      if (selectedBerth) {
+        lines.push(`Berth of interest: ${selectedBerth.id}`);
+      }
+    }
+    lines.push("");
+    lines.push("Thanks,");
+    const body = lines.join("\n");
+    return `mailto:${marinaEmail}?subject=${encodeURIComponent(
+      subject
+    )}&body=${encodeURIComponent(body)}`;
+  })();
 
   return (
     <div className="rounded-sm border border-neutral-200/80 bg-white p-8 md:p-10">
@@ -138,6 +208,9 @@ export default function BerthAvailabilityMap({
       </h2>
       <p className="mt-2 text-sm font-light text-neutral-500">
         Check simulated availability at {marinaName}.
+      </p>
+      <p className="mt-1 text-xs font-light text-neutral-400">
+        Berth availability shown is illustrative for now.
       </p>
 
       <form onSubmit={handleSubmit} className="mt-6 grid gap-4 sm:grid-cols-4">
@@ -211,6 +284,20 @@ export default function BerthAvailabilityMap({
         <p className="mt-4 text-sm font-light text-neutral-500">
           No berth class fits a vessel this length in our current tariff
           (max 45 m) — please contact the marina directly.
+        </p>
+      ) : null}
+
+      {result && result.boatClass && totalNights > 0 ? (
+        <p className="mt-4 text-sm font-light text-neutral-500">
+          {result.lowNights > 0 && result.highNights > 0
+            ? `Your stay spans both seasons — ${result.lowNights} night${
+                result.lowNights === 1 ? "" : "s"
+              } low season, ${result.highNights} night${
+                result.highNights === 1 ? "" : "s"
+              } high season.`
+            : result.highNights > 0
+              ? "Your dates fall in high season (Apr–Sep)."
+              : "Your dates fall in low season (Jan–Mar & Oct–Dec)."}
         </p>
       ) : null}
 
@@ -384,8 +471,8 @@ export default function BerthAvailabilityMap({
         <div className="mt-6 border-t border-neutral-200 pt-6">
           <p className="text-sm font-light text-neutral-500">
             Berth <span className="font-normal text-navy">{selectedBerth.id}</span>{" "}
-            · Class {selectedBerth.sizeClass} · {result.nights} night
-            {result.nights === 1 ? "" : "s"}
+            · Class {selectedBerth.sizeClass} · {totalNights} night
+            {totalNights === 1 ? "" : "s"}
           </p>
           <p className="mt-2 text-xl font-normal text-navy">
             €{selectedPrice.toFixed(2)}
@@ -396,6 +483,18 @@ export default function BerthAvailabilityMap({
           </p>
         </div>
       ) : null}
+
+      <div className="mt-6 border-t border-neutral-200 pt-6">
+        <p className="text-sm font-light text-neutral-500">
+          Questions about a berth at {marinaName}?
+        </p>
+        <a
+          href={mailtoHref}
+          className="mt-3 inline-block bg-navy-accent px-6 py-3 text-sm font-normal tracking-wide text-white hover:bg-[#254a75]"
+        >
+          Contact marina
+        </a>
+      </div>
     </div>
   );
 }

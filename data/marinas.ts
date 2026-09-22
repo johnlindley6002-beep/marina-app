@@ -30,24 +30,42 @@ export const TRANSIENT_RATES: Record<MarinaClass, { low: number; high: number }>
   IX: { low: 115.75, high: 253.55 },
 };
 
-// Upper length bound (metres, LOA) for each class.
-const CLASS_MAX_LENGTH_M: [MarinaClass, number][] = [
-  ["I", 6.15],
-  ["IA", 6.5],
-  ["II", 8.0],
-  ["III", 10.0],
-  ["IV", 12.0],
-  ["V", 15.0],
-  ["VI", 18.0],
-  ["VIA", 20.0],
-  ["VII", 25.0],
-  ["VIII", 36.0],
-  ["IX", 45.0],
+// Class order as published in the official tariff.
+export const MARINA_CLASS_ORDER: MarinaClass[] = [
+  "I",
+  "IA",
+  "II",
+  "III",
+  "IV",
+  "V",
+  "VI",
+  "VIA",
+  "VII",
+  "VIII",
+  "IX",
 ];
 
+// Length range (metres, LOA) for each class, per the official tariff.
+export const CLASS_LENGTH_RANGES: Record<
+  MarinaClass,
+  { minM: number; maxM: number }
+> = {
+  I: { minM: 0, maxM: 6.15 },
+  IA: { minM: 6.16, maxM: 6.5 },
+  II: { minM: 6.51, maxM: 8.0 },
+  III: { minM: 8.01, maxM: 10.0 },
+  IV: { minM: 10.01, maxM: 12.0 },
+  V: { minM: 12.01, maxM: 15.0 },
+  VI: { minM: 15.01, maxM: 18.0 },
+  VIA: { minM: 18.01, maxM: 20.0 },
+  VII: { minM: 20.01, maxM: 25.0 },
+  VIII: { minM: 25.01, maxM: 36.0 },
+  IX: { minM: 36.01, maxM: 45.0 },
+};
+
 export function classifyBoatLength(lengthM: number): MarinaClass | null {
-  for (const [marinaClass, maxLength] of CLASS_MAX_LENGTH_M) {
-    if (lengthM <= maxLength) return marinaClass;
+  for (const marinaClass of MARINA_CLASS_ORDER) {
+    if (lengthM <= CLASS_LENGTH_RANGES[marinaClass].maxM) return marinaClass;
   }
   return null;
 }
@@ -64,20 +82,26 @@ export type FacilityKey =
   | "water"
   | "power"
   | "travelLift"
+  | "crane"
+  | "pumpOut"
+  | "laundry"
   | "security24h"
-  | "showersLaundry"
-  | "repairs"
-  | "dryStorage";
+  | "wifi"
+  | "dryStorage"
+  | "repairs";
 
 export const FACILITY_LABELS: Record<FacilityKey, string> = {
   fuel: "Fuel dock",
   water: "Water",
-  power: "Power",
-  travelLift: "70T travel lift",
-  security24h: "24h security",
-  showersLaundry: "Showers & laundry",
-  repairs: "Repairs",
+  power: "Shore power",
+  travelLift: "70-tonne travel lift",
+  crane: "Crane",
+  pumpOut: "Pump-out",
+  laundry: "Laundry",
+  security24h: "24-hour security",
+  wifi: "Wifi",
   dryStorage: "Dry storage",
+  repairs: "Repairs",
 };
 
 export type Marina = {
@@ -99,6 +123,8 @@ export type Marina = {
   heroImage: string;
   transientRates: Record<MarinaClass, { low: number; high: number }>;
   vatRate: number;
+  gettingThere: { byCar: string; byTrain: string; byAir: string };
+  arrivalInstructions: string;
 };
 
 export const marinas: Marina[] = [
@@ -123,14 +149,24 @@ export const marinas: Marina[] = [
       "water",
       "power",
       "travelLift",
+      "crane",
+      "pumpOut",
+      "laundry",
       "security24h",
-      "showersLaundry",
-      "repairs",
+      "wifi",
       "dryStorage",
+      "repairs",
     ],
     heroImage: "/images/cascais-hero-placeholder.svg",
     transientRates: TRANSIENT_RATES,
     vatRate: 0.23,
+    gettingThere: {
+      byCar: "Via the A5 motorway, Cascais exit",
+      byTrain: "Cascais train station, then a short walk to the marina",
+      byAir: "~35 km from Lisbon Humberto Delgado Airport",
+    },
+    arrivalInstructions:
+      "On arrival, berth on the Reception pier and report to the marina office.",
   },
 ];
 
