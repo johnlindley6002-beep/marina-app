@@ -10,7 +10,10 @@ import {
 import { marinaContent } from "../../../../lib/i18n";
 import BerthAvailabilityMap from "./BerthAvailabilityMap";
 import RequestBerthForm from "./RequestBerthForm";
-import FacilityIcon from "./facility-icons";
+import BoatFitCheck from "./BoatFitCheck";
+import PhotoStrip from "./PhotoStrip";
+import ArrivalActions from "./ArrivalActions";
+import FacilitiesGrid from "./FacilitiesGrid";
 import Breadcrumbs from "../../../components/Breadcrumbs";
 import FlagIcon from "../../../components/FlagIcon";
 import { useLanguage } from "../../../components/LanguageProvider";
@@ -19,6 +22,42 @@ function formatCoordinates(lat: number, lng: number) {
   const latLabel = lat >= 0 ? "N" : "S";
   const lngLabel = lng >= 0 ? "E" : "W";
   return `${Math.abs(lat).toFixed(3)}° ${latLabel}, ${Math.abs(lng).toFixed(3)}° ${lngLabel}`;
+}
+
+const PROTECTION_LABELS: Record<Marina["protection"]["level"], string> = {
+  sheltered: "Sheltered",
+  partial: "Partially protected",
+  exposed: "Exposed",
+};
+
+const PROTECTION_BADGE_CLASSES: Record<Marina["protection"]["level"], string> = {
+  sheltered: "border-emerald-200 bg-emerald-50 text-emerald-700",
+  partial: "border-amber-200 bg-amber-50 text-amber-700",
+  exposed: "border-red-200 bg-red-50 text-red-700",
+};
+
+function ProtectionTag({ protection }: { protection: Marina["protection"] }) {
+  return (
+    <div
+      className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm ${PROTECTION_BADGE_CLASSES[protection.level]}`}
+    >
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth={1.5}
+        className="h-4 w-4 shrink-0"
+        aria-hidden="true"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M3 15c1.5 1.2 3 1.2 4.5 0s3-1.2 4.5 0 3 1.2 4.5 0 3-1.2 4.5 0M3 19c1.5 1.2 3 1.2 4.5 0s3-1.2 4.5 0 3 1.2 4.5 0 3-1.2 4.5 0M12 3v9m0 0-3-3m3 3 3-3"
+        />
+      </svg>
+      <span className="font-normal">{PROTECTION_LABELS[protection.level]}</span>
+    </div>
+  );
 }
 
 type Props = {
@@ -91,6 +130,76 @@ export default function CascaisPageContent({
           ]}
         />
       </div>
+
+      <section className="px-6 py-12 md:px-8 md:py-16">
+        <div className="mx-auto max-w-5xl">
+          <p className="text-xs font-normal tracking-[0.25em] text-navy/40 uppercase">
+            Approach &amp; entry
+          </p>
+          <div className="mt-6 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+            <div>
+              <p className="text-xs font-normal tracking-wide text-navy/40 uppercase">
+                VHF channel
+              </p>
+              <p className="mt-2 text-sm font-light text-neutral-600">
+                {marina.vhfChannel}
+              </p>
+            </div>
+            <div>
+              <p className="text-xs font-normal tracking-wide text-navy/40 uppercase">
+                Office hours
+              </p>
+              <p className="mt-2 text-sm font-light text-neutral-600">
+                {t.visiting.summer}: {marina.officeHours.summer}
+                <br />
+                {t.visiting.winter}: {marina.officeHours.winter}
+              </p>
+            </div>
+            <div>
+              <p className="text-xs font-normal tracking-wide text-navy/40 uppercase">
+                Minimum depth
+              </p>
+              <p className="mt-2 text-sm font-light text-neutral-600">
+                {marina.berths.minDepthM.toFixed(1)} m
+              </p>
+            </div>
+            <div>
+              <p className="text-xs font-normal tracking-wide text-navy/40 uppercase">
+                Outside office hours
+              </p>
+              <p className="mt-2 text-sm font-light text-neutral-600">
+                {marina.outsideHoursInstructions}
+              </p>
+            </div>
+          </div>
+          <p className="mt-6 max-w-3xl text-sm leading-relaxed font-light text-neutral-600">
+            {marina.entryNote}
+          </p>
+          <div className="mt-6">
+            <ProtectionTag protection={marina.protection} />
+            <p className="mt-2 text-xs font-light text-neutral-400">
+              {marina.protection.description} General guide only — not a live
+              forecast.
+            </p>
+          </div>
+          <ArrivalActions marina={marina} selectedBerthId={selectedBerthId} />
+        </div>
+      </section>
+
+      <section className="px-6 pb-12 md:px-8 md:pb-16">
+        <div className="mx-auto max-w-5xl">
+          <BoatFitCheck marina={marina} />
+        </div>
+      </section>
+
+      <section className="px-6 pb-12 md:px-8 md:pb-16">
+        <div className="mx-auto max-w-5xl">
+          <p className="mb-4 text-xs font-normal tracking-[0.25em] text-navy/40 uppercase">
+            Photos
+          </p>
+          <PhotoStrip photos={marina.photos} />
+        </div>
+      </section>
 
       <section className="px-6 py-12 md:px-8 md:py-16">
         <div className="mx-auto max-w-5xl">
@@ -338,19 +447,7 @@ export default function CascaisPageContent({
           <p className="text-xs font-normal tracking-wide text-navy/40 uppercase">
             {t.facilities.heading}
           </p>
-          <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
-            {marina.facilities.map((facility) => (
-              <div
-                key={facility}
-                className="flex flex-col items-center gap-3 rounded-sm border border-neutral-200 bg-white px-4 py-6 text-center"
-              >
-                <FacilityIcon facility={facility} className="h-6 w-6 text-navy" />
-                <p className="text-sm font-light text-neutral-600">
-                  {t.facilities[facility]}
-                </p>
-              </div>
-            ))}
-          </div>
+          <FacilitiesGrid facilities={marina.facilityDetails} />
         </div>
       </section>
     </>

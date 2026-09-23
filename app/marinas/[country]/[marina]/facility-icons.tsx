@@ -1,5 +1,5 @@
 import type { ReactElement } from "react";
-import type { FacilityKey } from "../../../../data/marinas";
+import type { FacilityIconKey } from "../../../../data/marinas";
 
 type IconProps = {
   className?: string;
@@ -126,8 +126,58 @@ function DryStorageIcon({ className }: IconProps) {
   );
 }
 
+function ReceptionIcon({ className }: IconProps) {
+  return (
+    <svg {...sharedProps} className={className}>
+      <path d="M3 18h18" />
+      <path d="M5 18a7 7 0 0 1 14 0" />
+      <path d="M12 8V6" />
+      <path d="M10 6h4" />
+    </svg>
+  );
+}
+
+function ShowersIcon({ className }: IconProps) {
+  return (
+    <svg {...sharedProps} className={className}>
+      <path d="M4 20V8a4 4 0 0 1 4-4h2" />
+      <path d="M10 4a6 6 0 0 1 6 6H8a6 6 0 0 1 2-6Z" />
+      <path d="M10 14v1M13 14v1M16 14v1M11.5 18v1M14.5 18v1" />
+    </svg>
+  );
+}
+
+function HeliportIcon({ className }: IconProps) {
+  return (
+    <svg {...sharedProps} className={className}>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M9.5 8v8M14.5 8v8M9.5 12h5" />
+    </svg>
+  );
+}
+
+function WasteIcon({ className }: IconProps) {
+  return (
+    <svg {...sharedProps} className={className}>
+      <path d="M5 7h14" />
+      <path d="M9 7V4h6v3" />
+      <path d="M6.5 7l1 13h9l1-13" />
+      <path d="M10 11v6M14 11v6" />
+    </svg>
+  );
+}
+
+function ExtrasIcon({ className }: IconProps) {
+  return (
+    <svg {...sharedProps} className={className}>
+      <path d="M6 8h12l-1 12H7L6 8Z" />
+      <path d="M9 8a3 3 0 0 1 6 0" />
+    </svg>
+  );
+}
+
 const FACILITY_ICONS: Record<
-  FacilityKey,
+  FacilityIconKey,
   (props: IconProps) => ReactElement
 > = {
   fuel: FuelIcon,
@@ -141,13 +191,18 @@ const FACILITY_ICONS: Record<
   wifi: WifiIcon,
   dryStorage: DryStorageIcon,
   repairs: RepairsIcon,
+  reception: ReceptionIcon,
+  showers: ShowersIcon,
+  heliport: HeliportIcon,
+  waste: WasteIcon,
+  extras: ExtrasIcon,
 };
 
 export default function FacilityIcon({
   facility,
   className = "h-6 w-6",
 }: {
-  facility: FacilityKey;
+  facility: FacilityIconKey;
   className?: string;
 }) {
   const Icon = FACILITY_ICONS[facility];

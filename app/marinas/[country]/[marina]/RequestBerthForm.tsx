@@ -1,11 +1,19 @@
 "use client";
 
 import { useEffect, useMemo, useState, type FormEvent } from "react";
-import type { Marina } from "../../../../data/marinas";
+import {
+  calculateQuote,
+  classifyBoatLength,
+  SEASON_LABELS,
+  type Marina,
+  type Quote,
+} from "../../../../data/marinas";
+import { loadBoatProfile, loadBoats } from "../../../../lib/boatProfile";
 import { COUNTRIES } from "../../../../lib/countries";
+import BoatSwitcher from "../../../components/BoatSwitcher";
 
 type VesselType = "sail" | "motor" | "catamaran" | "other";
-type Amperage = "16" | "32" | "63";
+type Amperage = string;
 type EuStatus = "yes" | "no" | "";
 
 type CrewMember = {
@@ -138,10 +146,15 @@ function formatEurShort(amount: number): string {
   return `€${amount}`;
 }
 
+function formatEur(amount: number): string {
+  return `€${amount.toFixed(2)}`;
+}
+
 function buildSummary(
   form: FormData,
   marina: Marina,
-  nights: number | null
+  nights: number | null,
+  quote: Quote | null
 ): string {
   const lines: string[] = [];
 
@@ -187,6 +200,22 @@ function buildSummary(
   if (services.length > 0) {
     lines.push("SERVICES NEEDED");
     lines.push(...services);
+    lines.push("");
+  }
+
+  if (quote) {
+    lines.push("ESTIMATE (excl. VAT and utilities — to be confirmed by the marina)");
+    lines.push(`Berth class: ${quote.marinaClass}`);
+    quote.berthLines.forEach((l) =>
+      lines.push(
+        `${l.nights} night(s) × ${formatEur(l.rateEur)} (${SEASON_LABELS[l.season]}) = ${formatEur(l.subtotalEur)}`
+      )
+    );
+    quote.addOnLines.forEach((l) => {
+      const parts = [l.amountEur !== null ? formatEur(l.amountEur) : "", l.note ?? ""];
+      lines.push(`${l.label}: ${parts.filter(Boolean).join(" — ")}`);
+    });
+    lines.push(`Estimated total: ${formatEur(quote.estimatedTotalEur)}`);
     lines.push("");
   }
 
@@ -284,6 +313,36 @@ export default function RequestBerthForm({
     }
   }, [selectedBerthId]);
 
+  // Pre-fill from the saved boat (or the last dimensions typed elsewhere),
+  // only into fields the visitor hasn't filled from the search above.
+  useEffect(() => {
+    const store = loadBoats();
+    const active = store.boats.find((b) => b.id === store.activeId);
+    if (active) {
+      const vesselType = (["sail", "motor", "catamaran", "other"] as const).find(
+        (v) => v === active.type
+      );
+      setForm((f) => ({
+        ...f,
+        boatName: f.boatName || active.name,
+        vesselType: f.vesselType || vesselType || "",
+        loa: f.loa || active.loa,
+        beam: f.beam || active.beam,
+        draft: f.draft || active.draft,
+        flagCountry: f.flagCountry || active.flag,
+        homePort: f.homePort || active.homePort,
+      }));
+      return;
+    }
+    const profile = loadBoatProfile();
+    setForm((f) => ({
+      ...f,
+      loa: f.loa || profile.loa,
+      beam: f.beam || profile.beam,
+      draft: f.draft || profile.draft,
+    }));
+  }, []);
+
   useEffect(() => {
     if (submitted) setErrors(validate(form));
   }, [form, submitted]);
@@ -295,6 +354,39 @@ export default function RequestBerthForm({
     const diff = Math.round((d.getTime() - a.getTime()) / (1000 * 60 * 60 * 24));
     return diff > 0 ? diff : null;
   }, [form.arrival, form.departure, form.openEnded]);
+
+  const quote = useMemo(() => {
+    const loaNum = Number(form.loa);
+    if (!form.arrival || !(loaNum > 0)) return null;
+    let departure = form.departure;
+    if (form.openEnded) {
+      const next = new Date(form.arrival);
+      next.setDate(next.getDate() + 1);
+      departure = next.toISOString().slice(0, 10);
+    }
+    return calculateQuote(
+      marina,
+      { loa: loaNum, arrival: form.arrival, departure },
+      {
+        shorePower: form.shorePower,
+        water: form.water,
+        pumpOut: form.pumpOut,
+        fuel: form.fuel,
+        laundry: form.laundry,
+      }
+    );
+  }, [
+    marina,
+    form.loa,
+    form.arrival,
+    form.departure,
+    form.openEnded,
+    form.shorePower,
+    form.water,
+    form.pumpOut,
+    form.fuel,
+    form.laundry,
+  ]);
 
   function setField<K extends keyof FormData>(key: K, value: FormData[K]) {
     setForm((f) => ({ ...f, [key]: value }));
@@ -325,7 +417,7 @@ export default function RequestBerthForm({
     setErrors(validationErrors);
     if (Object.keys(validationErrors).length > 0) return;
 
-    const text = buildSummary(form, marina, nights);
+    const text = buildSummary(form, marina, nights, quote);
     setSummary(text);
     setCopied(false);
 
@@ -444,6 +536,31 @@ export default function RequestBerthForm({
           <legend className="text-xs font-normal tracking-[0.25em] text-navy/40 uppercase">
             Your boat
           </legend>
+          <BoatSwitcher
+            current={{
+              name: form.boatName,
+              type: form.vesselType,
+              loa: form.loa,
+              beam: form.beam,
+              draft: form.draft,
+              flag: form.flagCountry,
+              homePort: form.homePort,
+            }}
+            onSelect={(boat) =>
+              setForm((f) => ({
+                ...f,
+                boatName: boat.name,
+                vesselType: (["sail", "motor", "catamaran", "other"] as const).find(
+                  (v) => v === boat.type
+                ) ?? "",
+                loa: boat.loa,
+                beam: boat.beam,
+                draft: boat.draft,
+                flagCountry: boat.flag,
+                homePort: boat.homePort,
+              }))
+            }
+          />
           <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <label className="block text-sm">
               <span className={labelClass}>
@@ -674,9 +791,11 @@ export default function RequestBerthForm({
                     className={`${inputClass} mt-0 max-w-[160px]`}
                   >
                     <option value="">Amperage…</option>
-                    <option value="16">16A</option>
-                    <option value="32">32A</option>
-                    <option value="63">63A</option>
+                    {marina.serviceFees.amperageOptions.map((amps) => (
+                      <option key={amps} value={String(amps)}>
+                        {amps}A
+                      </option>
+                    ))}
                   </select>
                   {errors.amperage ? <p className={errorClass}>{errors.amperage}</p> : null}
                 </div>
@@ -741,6 +860,79 @@ export default function RequestBerthForm({
             Power and water are metered and charged separately from the berth
             fee.
           </p>
+        </fieldset>
+
+        {/* Price estimate */}
+        <fieldset>
+          <legend className="text-xs font-normal tracking-[0.25em] text-navy/40 uppercase">
+            Your estimate
+          </legend>
+          {quote ? (
+            <div className="mt-4" aria-live="polite">
+              <p className="text-sm font-light text-neutral-500">
+                Class {quote.marinaClass} berth ·{" "}
+                {form.openEnded
+                  ? "nightly rate (open-ended stay)"
+                  : `${quote.nights} night${quote.nights === 1 ? "" : "s"}`}
+              </p>
+              <table className="mt-3 w-full border-collapse text-left text-sm">
+                <tbody>
+                  {quote.berthLines.map((line) => (
+                    <tr
+                      key={line.season}
+                      className="border-b border-neutral-100 text-neutral-600"
+                    >
+                      <td className="py-2 pr-4 font-light">
+                        {line.nights} × {formatEur(line.rateEur)}
+                        <span className="block text-xs text-neutral-400">
+                          {SEASON_LABELS[line.season]}
+                        </span>
+                      </td>
+                      <td className="py-2 text-right font-normal text-navy">
+                        {formatEur(line.subtotalEur)}
+                      </td>
+                    </tr>
+                  ))}
+                  {quote.addOnLines.map((line) => (
+                    <tr
+                      key={line.label}
+                      className="border-b border-neutral-100 text-neutral-600"
+                    >
+                      <td className="py-2 pr-4 font-light">
+                        {line.label}
+                        {line.note ? (
+                          <span className="block text-xs text-neutral-400">
+                            {line.note}
+                          </span>
+                        ) : null}
+                      </td>
+                      <td className="py-2 text-right font-normal text-navy">
+                        {line.amountEur !== null ? formatEur(line.amountEur) : "—"}
+                      </td>
+                    </tr>
+                  ))}
+                  <tr>
+                    <td className="pt-3 pr-4 font-normal text-navy">
+                      {form.openEnded ? "Estimated first night" : "Estimated total"}
+                    </td>
+                    <td className="pt-3 text-right text-base font-normal text-navy">
+                      {formatEur(quote.estimatedTotalEur)}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <p className="mt-3 text-xs font-light text-neutral-400">
+                Excl. {Math.round(marina.vatRate * 100)}% VAT and utilities —
+                estimate, confirm with marina.
+              </p>
+            </div>
+          ) : (
+            <p className="mt-4 text-sm font-light text-neutral-500">
+              {Number(form.loa) > 0 && classifyBoatLength(Number(form.loa)) === null
+                ? "Your length is outside the standard berth classes — contact the marina for a quote."
+                : "Enter your arrival and departure dates and boat length to see a price estimate."}
+            </p>
+          )}
         </fieldset>
 
         {/* 5. Vessel status */}
@@ -940,9 +1132,19 @@ export default function RequestBerthForm({
         </fieldset>
 
         <div>
+          <p className="text-xs font-normal tracking-wide text-navy/60 uppercase">
+            Cancellation policy
+          </p>
+          <p className="mt-2 text-sm font-light text-neutral-600">
+            {marina.cancellationPolicy ??
+              "Cancellation terms are confirmed by the marina — ask when they reply to your enquiry."}
+          </p>
+          <p className="mt-4 text-sm font-light text-neutral-600">
+            This sends an enquiry; the marina confirms availability by email.
+          </p>
           <button
             type="submit"
-            className="bg-navy px-8 py-3 text-sm font-normal tracking-wide text-white hover:bg-navy-accent"
+            className="mt-6 bg-navy px-8 py-3 text-sm font-normal tracking-wide text-white hover:bg-navy-accent"
           >
             Send enquiry
           </button>

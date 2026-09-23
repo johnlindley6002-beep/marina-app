@@ -70,6 +70,69 @@ export function classifyBoatLength(lengthM: number): MarinaClass | null {
   return null;
 }
 
+// Beam (m) per class, per the official tariff's "Boca" column.
+export const CLASS_BEAM_RANGES: Record<MarinaClass, number> = {
+  I: 2.4,
+  IA: 2.5,
+  II: 3.2,
+  III: 3.8,
+  IV: 4.4,
+  V: 5.0,
+  VI: 5.5,
+  VIA: 6.0,
+  VII: 6.5,
+  VIII: 7.2,
+  IX: 10.0,
+};
+
+export function getMaxBeamM(): number {
+  return Math.max(...Object.values(CLASS_BEAM_RANGES));
+}
+
+export type BoatDimensions = { loa: number; beam: number; draft: number };
+
+export type BoatFitResult =
+  | { fits: true; marinaClass: MarinaClass }
+  | { fits: false; reason: "length" | "beam" | "draft" };
+
+// Checks a boat against the marina's REAL class range (up to 45m via
+// Class IX, the mega-yacht allocation) rather than the ~36m figure
+// used in the marina's general description text, which refers to the
+// standard-berth majority, not the marina's true upper limit.
+export function checkBoatFit(
+  marina: Marina,
+  dims: BoatDimensions
+): BoatFitResult {
+  if (dims.draft > marina.berths.maxDraftM) {
+    return { fits: false, reason: "draft" };
+  }
+  const marinaClass = classifyBoatLength(dims.loa);
+  if (!marinaClass) {
+    return { fits: false, reason: "length" };
+  }
+  if (dims.beam > CLASS_BEAM_RANGES[marinaClass]) {
+    return { fits: false, reason: "beam" };
+  }
+  return { fits: true, marinaClass };
+}
+
+export function boatFitsMarina(marina: Marina, dims: BoatDimensions): boolean {
+  return checkBoatFit(marina, dims).fits;
+}
+
+export type PriceBand = "€" | "€€" | "€€€";
+
+// Generic, not hardcoded per marina — buckets by the cheapest class's
+// low-season nightly rate.
+export function getPriceBand(marina: Marina): PriceBand {
+  const cheapest = Math.min(
+    ...MARINA_CLASS_ORDER.map((c) => marina.transientRates[c].low)
+  );
+  if (cheapest < 20) return "€";
+  if (cheapest < 40) return "€€";
+  return "€€€";
+}
+
 // High season is April-September; low season is the rest of the year,
 // per the official tariff's own definition.
 export function getSeason(date: Date): Season {
@@ -110,6 +173,155 @@ export const COUNTRY_FLAGS: Record<string, string> = {
   PT: "/images/flags/pt.svg",
 };
 
+export type Localized = { en: string; pt: string };
+export type Point = { x: number; y: number };
+
+export type FacilityIconKey =
+  | FacilityKey
+  | "reception"
+  | "showers"
+  | "heliport"
+  | "waste"
+  | "extras";
+
+export type FacilityDetail = {
+  id: string;
+  name: Localized;
+  icon: FacilityIconKey;
+  description: Localized;
+  details: Localized[];
+  // Approximate position in the marina's mapCanvas space, for the map to pin later.
+  mapPoint?: Point;
+};
+
+export type ServiceFees = {
+  pumpOutEur: number;
+  laundryWashEur: number;
+  laundryDryEur: number;
+  wasteDisposalEur: { min: number; max: number };
+  maxAmperage: number;
+  amperageOptions: number[];
+  fuelNote: string;
+};
+
+export const SEASON_LABELS: Record<Season, string> = {
+  low: "Low season (Jan–Mar, Oct–Dec)",
+  high: "High season (Apr–Sep)",
+};
+
+export type QuoteAddOns = {
+  shorePower: boolean;
+  water: boolean;
+  pumpOut: boolean;
+  fuel: boolean;
+  laundry: boolean;
+};
+
+export type QuoteLine = {
+  label: string;
+  amountEur: number | null;
+  note?: string;
+};
+
+export type Quote = {
+  marinaClass: MarinaClass;
+  nights: number;
+  berthLines: {
+    season: Season;
+    nights: number;
+    rateEur: number;
+    subtotalEur: number;
+  }[];
+  berthSubtotalEur: number;
+  addOnLines: QuoteLine[];
+  estimatedTotalEur: number;
+};
+
+function parseIsoDate(value: string): Date | null {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
+  if (!match) return null;
+  return new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]));
+}
+
+// Prices each night by its own season, so stays that cross a season
+// boundary are split correctly. Rates are ex-VAT, per the official tariff.
+export function calculateQuote(
+  marina: Marina,
+  input: { loa: number; arrival: string; departure: string },
+  addOns: QuoteAddOns
+): Quote | null {
+  const marinaClass = classifyBoatLength(input.loa);
+  const arrival = parseIsoDate(input.arrival);
+  const departure = parseIsoDate(input.departure);
+  if (!marinaClass || !arrival || !departure || departure <= arrival) {
+    return null;
+  }
+
+  const nightsBySeason: Record<Season, number> = { low: 0, high: 0 };
+  const cursor = new Date(arrival);
+  while (cursor < departure) {
+    nightsBySeason[getSeason(cursor)] += 1;
+    cursor.setDate(cursor.getDate() + 1);
+  }
+
+  const berthLines = (["low", "high"] as Season[])
+    .filter((season) => nightsBySeason[season] > 0)
+    .map((season) => {
+      const rateEur = marina.transientRates[marinaClass][season];
+      const nights = nightsBySeason[season];
+      return { season, nights, rateEur, subtotalEur: rateEur * nights };
+    });
+  const berthSubtotalEur = berthLines.reduce((s, l) => s + l.subtotalEur, 0);
+  const nights = nightsBySeason.low + nightsBySeason.high;
+
+  const fees = marina.serviceFees;
+  const addOnLines: QuoteLine[] = [];
+  if (addOns.shorePower) {
+    addOnLines.push({
+      label: "Shore power",
+      amountEur: null,
+      note: `Metered — billed on consumption (up to ${fees.maxAmperage} A)`,
+    });
+  }
+  if (addOns.water) {
+    addOnLines.push({
+      label: "Water",
+      amountEur: null,
+      note: "Metered — billed on consumption",
+    });
+  }
+  if (addOns.pumpOut) {
+    addOnLines.push({
+      label: "Pump-out",
+      amountEur: fees.pumpOutEur,
+      note: "Per operation",
+    });
+  }
+  if (addOns.fuel) {
+    addOnLines.push({ label: "Fuel", amountEur: null, note: fees.fuelNote });
+  }
+  if (addOns.laundry) {
+    addOnLines.push({
+      label: "Laundry",
+      amountEur: null,
+      note: `Wash €${fees.laundryWashEur.toFixed(2)} / dry €${fees.laundryDryEur.toFixed(2)} per load, tokens from reception`,
+    });
+  }
+
+  const estimatedTotalEur =
+    berthSubtotalEur +
+    addOnLines.reduce((s, l) => s + (l.amountEur ?? 0), 0);
+
+  return {
+    marinaClass,
+    nights,
+    berthLines,
+    berthSubtotalEur,
+    addOnLines,
+    estimatedTotalEur,
+  };
+}
+
 export type Marina = {
   id: string;
   name: string;
@@ -119,7 +331,12 @@ export type Marina = {
   location: string;
   address: string;
   coordinates: { lat: number; lng: number };
-  berths: { count: number; maxLengthM: number; maxDraftM: number };
+  berths: {
+    count: number;
+    maxLengthM: number;
+    maxDraftM: number;
+    minDepthM: number;
+  };
   opened: number;
   phone: string;
   email: string;
@@ -134,7 +351,251 @@ export type Marina = {
   gettingThere: { byCar: string; byTrain: string; byAir: string };
   arrivalInstructions: string;
   insuranceMinimumEur: number;
+  region: string;
+  outsideHoursInstructions: string;
+  entryNote: string;
+  protection: {
+    level: "sheltered" | "partial" | "exposed";
+    description: string;
+  };
+  photos: { src: string; alt: string; caption: string; credit?: string }[];
+  serviceFees: ServiceFees;
+  // null until the marina supplies its real terms.
+  cancellationPolicy: string | null;
+  facilityDetails: FacilityDetail[];
+  // Space the facility pins and wayfinding points are expressed in.
+  mapCanvas: { width: number; height: number };
+  wayfinding: { entrance: Point | null; reception: Point };
 };
+
+const CASCAIS_OFFICE_HOURS = { summer: "08:30–20:00", winter: "09:00–18:00" };
+const CASCAIS_VHF_CHANNEL = 9;
+const CASCAIS_MAX_AMPERAGE = 32;
+const CASCAIS_SERVICE_FEES: ServiceFees = {
+  pumpOutEur: 25,
+  laundryWashEur: 5,
+  laundryDryEur: 6.5,
+  wasteDisposalEur: { min: 8.9, max: 16.5 },
+  maxAmperage: CASCAIS_MAX_AMPERAGE,
+  amperageOptions: [16, 32],
+  // TODO: fuel prices not supplied — confirm with the marina.
+  fuelNote: "Diesel / petrol — price at the fuel dock",
+};
+
+// TODO (owner to supply): mapPoint for wifi, security, waste and extras;
+// wayfinding.entrance; cancellationPolicy; per-litre fuel prices.
+const CASCAIS_FACILITY_DETAILS: FacilityDetail[] = [
+  {
+    id: "reception",
+    name: { en: "Reception / Marina office", pt: "Receção / Escritório da marina" },
+    icon: "reception",
+    description: {
+      en: "The marina office in Casa de São Bernardo — your first stop on arrival.",
+      pt: "O escritório da marina na Casa de São Bernardo — a primeira paragem à chegada.",
+    },
+    details: [
+      {
+        en: `Summer ${CASCAIS_OFFICE_HOURS.summer} · Winter ${CASCAIS_OFFICE_HOURS.winter}`,
+        pt: `Verão ${CASCAIS_OFFICE_HOURS.summer} · Inverno ${CASCAIS_OFFICE_HOURS.winter}`,
+      },
+      {
+        en: `Hail on VHF channel ${CASCAIS_VHF_CHANNEL}`,
+        pt: `Contacto via VHF canal ${CASCAIS_VHF_CHANNEL}`,
+      },
+      {
+        en: "Cards, power/water adaptors and mail are handled here at check-in",
+        pt: "Cartões, adaptadores de eletricidade/água e correio são tratados aqui no check-in",
+      },
+    ],
+    mapPoint: { x: 1147, y: 545 },
+  },
+  {
+    id: "fuel",
+    name: { en: "Fuel dock", pt: "Posto de combustível" },
+    icon: "fuel",
+    description: {
+      en: "Diesel and petrol on the east fuel pier.",
+      pt: "Gasóleo e gasolina no cais de combustível, lado este.",
+    },
+    details: [
+      { en: "Daily 09:00–19:00", pt: "Diariamente 09:00–19:00" },
+      { en: "Diesel and petrol (RON95)", pt: "Gasóleo e gasolina (RON95)" },
+      { en: "Tel. +351 913 924 155", pt: "Tel. +351 913 924 155" },
+      { en: "East fuel pier", pt: "Cais de combustível, lado este" },
+    ],
+    mapPoint: { x: 1210, y: 655 },
+  },
+  {
+    id: "utilities",
+    name: { en: "Water & electricity", pt: "Água e eletricidade" },
+    icon: "power",
+    description: {
+      en: "Water and shore power are available at every berth.",
+      pt: "Água e eletricidade disponíveis em todos os postos de amarração.",
+    },
+    details: [
+      {
+        en: `Up to ${CASCAIS_MAX_AMPERAGE} A at every berth`,
+        pt: `Até ${CASCAIS_MAX_AMPERAGE} A em todos os postos`,
+      },
+      { en: "Adaptors available from reception", pt: "Adaptadores disponíveis na receção" },
+      { en: "Card access", pt: "Acesso por cartão" },
+      { en: "Metered and billed separately", pt: "Medido e faturado à parte" },
+    ],
+    mapPoint: { x: 760, y: 300 },
+  },
+  {
+    id: "showers",
+    name: { en: "Showers & WC", pt: "Duches e WC" },
+    icon: "showers",
+    description: {
+      en: "Shower and toilet facilities for visiting crews.",
+      pt: "Duches e instalações sanitárias para as tripulações visitantes.",
+    },
+    details: [
+      { en: "Card access", pt: "Acesso por cartão" },
+      { en: "In the facilities building", pt: "No edifício de serviços" },
+    ],
+    mapPoint: { x: 250, y: 200 },
+  },
+  {
+    id: "laundry",
+    name: { en: "Laundry", pt: "Lavandaria" },
+    icon: "laundry",
+    description: {
+      en: "Token-operated washers and driers.",
+      pt: "Máquinas de lavar e secar operadas por fichas.",
+    },
+    details: [
+      {
+        en: "Tokens 08:00–20:00 at the reception building",
+        pt: "Fichas das 08:00 às 20:00 no edifício da receção",
+      },
+      {
+        en: `Wash €${CASCAIS_SERVICE_FEES.laundryWashEur} · Dry €${CASCAIS_SERVICE_FEES.laundryDryEur.toFixed(2)}`,
+        pt: `Lavagem €${CASCAIS_SERVICE_FEES.laundryWashEur} · Secagem €${CASCAIS_SERVICE_FEES.laundryDryEur.toFixed(2)}`,
+      },
+    ],
+    mapPoint: { x: 250, y: 230 },
+  },
+  {
+    id: "pumpOut",
+    name: { en: "Pump-out", pt: "Recolha de águas residuais" },
+    icon: "pumpOut",
+    description: {
+      en: "Holding-tank pump-out service.",
+      pt: "Serviço de recolha de águas residuais.",
+    },
+    details: [
+      {
+        en: `€${CASCAIS_SERVICE_FEES.pumpOutEur} per operation`,
+        pt: `€${CASCAIS_SERVICE_FEES.pumpOutEur} por operação`,
+      },
+    ],
+    mapPoint: { x: 275, y: 600 },
+  },
+  {
+    id: "travelLift",
+    name: { en: "Travel lift & crane", pt: "Grua de pórtico e guindaste" },
+    icon: "travelLift",
+    description: {
+      en: "Lift-out, launching and hard-standing services in the technical area.",
+      pt: "Serviços de içar, lançar e estaleiro na zona técnica.",
+    },
+    details: [
+      { en: "70-tonne gantry travel lift", pt: "Grua de pórtico de 70 toneladas" },
+      { en: "2-tonne crane", pt: "Guindaste de 2 toneladas" },
+      { en: "Boat ramp", pt: "Rampa de varagem" },
+      { en: "Hull cleaning", pt: "Limpeza de casco" },
+      { en: "Technical area", pt: "Zona técnica" },
+    ],
+    mapPoint: { x: 275, y: 570 },
+  },
+  {
+    id: "dryStorage",
+    name: { en: "Dry / winter storage & repairs", pt: "Armazenamento a seco / invernal e reparações" },
+    icon: "dryStorage",
+    description: {
+      en: "Certified maintenance and out-of-water storage.",
+      pt: "Manutenção certificada e armazenamento fora de água.",
+    },
+    details: [
+      { en: "Certified maintenance", pt: "Manutenção certificada" },
+      { en: "Vessels up to 25 m", pt: "Embarcações até 25 m" },
+    ],
+    mapPoint: { x: 275, y: 600 },
+  },
+  {
+    id: "wifi",
+    name: { en: "Wifi", pt: "Wi-Fi" },
+    icon: "wifi",
+    description: {
+      en: "Wireless internet across the marina.",
+      pt: "Internet sem fios em toda a marina.",
+    },
+    details: [{ en: "Marina-wide coverage", pt: "Cobertura em toda a marina" }],
+  },
+  {
+    id: "security",
+    name: { en: "24-hour security", pt: "Segurança 24 horas" },
+    icon: "security24h",
+    description: {
+      en: "The marina is monitored around the clock.",
+      pt: "A marina é vigiada a toda a hora.",
+    },
+    details: [
+      { en: "Video surveillance", pt: "Videovigilância" },
+      { en: "Night watchman", pt: "Vigilante noturno" },
+    ],
+  },
+  {
+    id: "heliport",
+    name: { en: "Heliport", pt: "Heliporto" },
+    icon: "heliport",
+    description: {
+      en: "Helicopter landing area for safety and rescue.",
+      pt: "Zona de aterragem de helicópteros para segurança e salvamento.",
+    },
+    details: [
+      { en: "East side of the marina", pt: "Lado este da marina" },
+      { en: "Safety and rescue use", pt: "Uso de segurança e salvamento" },
+    ],
+    mapPoint: { x: 1290, y: 520 },
+  },
+  {
+    id: "waste",
+    name: { en: "Waste & recycling", pt: "Resíduos e reciclagem" },
+    icon: "waste",
+    description: {
+      en: "Recycling points and waste disposal for visiting boats.",
+      pt: "Pontos de reciclagem e recolha de resíduos para embarcações visitantes.",
+    },
+    details: [
+      { en: "Recycling points", pt: "Ecopontos" },
+      {
+        en: `Disposal €${CASCAIS_SERVICE_FEES.wasteDisposalEur.min.toFixed(2)}–€${CASCAIS_SERVICE_FEES.wasteDisposalEur.max.toFixed(2)} depending on volume`,
+        pt: `Recolha €${CASCAIS_SERVICE_FEES.wasteDisposalEur.min.toFixed(2)}–€${CASCAIS_SERVICE_FEES.wasteDisposalEur.max.toFixed(2)} consoante o volume`,
+      },
+    ],
+  },
+  {
+    id: "extras",
+    name: { en: "Extras & nearby", pt: "Extras e arredores" },
+    icon: "extras",
+    description: {
+      en: "Everyday extras on site and around the waterfront.",
+      pt: "Extras do dia a dia no local e junto à frente de mar.",
+    },
+    details: [
+      { en: "Bicycles", pt: "Bicicletas" },
+      { en: "Car rental", pt: "Aluguer de automóveis" },
+      { en: "Ice", pt: "Gelo" },
+      { en: "Shops, restaurants and café-bar", pt: "Lojas, restaurantes e café-bar" },
+      { en: "Parking (covered available)", pt: "Estacionamento (coberto disponível)" },
+      { en: "Dinghy dock", pt: "Cais para tenders" },
+    ],
+  },
+];
 
 export const marinas: Marina[] = [
   {
@@ -146,12 +607,12 @@ export const marinas: Marina[] = [
     location: "Cascais, Portuguese Riviera, ~35 km west of Lisbon",
     address: "Casa de São Bernardo, 2750-800 Cascais, Portugal",
     coordinates: { lat: 38.693, lng: -9.418 },
-    berths: { count: 650, maxLengthM: 36, maxDraftM: 6 },
+    berths: { count: 650, maxLengthM: 36, maxDraftM: 6, minDepthM: 6 },
     opened: 1999,
     phone: "+351 214 824 800",
     email: "info@marinacascais.pt",
-    vhfChannel: 9,
-    officeHours: { summer: "08:30–20:00", winter: "09:00–18:00" },
+    vhfChannel: CASCAIS_VHF_CHANNEL,
+    officeHours: CASCAIS_OFFICE_HOURS,
     description:
       "Marina de Cascais is a full-service marina on the Bay of Cascais, just five minutes from the town centre and the largest on the Portuguese Riviera. With around 650 berths for vessels up to 36 metres, it pairs sheltered, modern moorings with a complete range of nautical services alongside the restaurants and shops of the waterfront.",
     facilities: [
@@ -182,6 +643,38 @@ export const marinas: Marina[] = [
     arrivalInstructions:
       "On arrival, berth on the Reception pier and report to the marina office.",
     insuranceMinimumEur: 1_500_000,
+    region: "Lisbon Coast",
+    outsideHoursInstructions:
+      "Outside office hours, berth on the reception quay and report to the office.",
+    entryNote:
+      "Approach from the mouth of the Tejo, on the north side; the main entrance opens directly to the Atlantic.",
+    protection: {
+      level: "partial",
+      description:
+        "Well protected inside; exposed to strong SW/S conditions at the entrance.",
+    },
+    photos: [
+      {
+        src: "/images/photo-placeholder-marina.svg",
+        alt: "Placeholder photo of the marina basin",
+        caption: "The marina basin",
+      },
+      {
+        src: "/images/photo-placeholder-pontoons.svg",
+        alt: "Placeholder photo of the pontoons",
+        caption: "Pontoons and berths",
+      },
+      {
+        src: "/images/photo-placeholder-town.svg",
+        alt: "Placeholder photo of Cascais town",
+        caption: "Cascais town beyond",
+      },
+    ],
+    serviceFees: CASCAIS_SERVICE_FEES,
+    cancellationPolicy: null,
+    facilityDetails: CASCAIS_FACILITY_DETAILS,
+    mapCanvas: { width: 1400, height: 990 },
+    wayfinding: { entrance: null, reception: { x: 1147, y: 545 } },
   },
 ];
 
