@@ -32,8 +32,15 @@ export default function CountryPageContent({
               href={`/marinas/${marina.countrySlug}/${marina.id}`}
               className="group rounded-sm border border-neutral-200/80 bg-white p-8 transition-colors hover:border-navy/20 md:p-10"
             >
-              <h2 className="text-lg font-normal tracking-tight text-navy">
+              <h2 className="flex items-center gap-2 text-lg font-normal tracking-tight text-navy">
                 {marina.name}
+                {marina.clubBurgee ? (
+                  <img
+                    src={marina.clubBurgee.src}
+                    alt={marina.clubBurgee.name}
+                    className="h-4 w-auto"
+                  />
+                ) : null}
               </h2>
               <p className="mt-3 text-sm leading-relaxed font-light text-neutral-500">
                 {marina.location}
