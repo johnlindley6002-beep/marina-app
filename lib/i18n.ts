@@ -135,9 +135,6 @@ type Dictionary = {
     address: string;
   };
   facilities: { heading: string } & Record<FacilityKey, string>;
-  hero: {
-    photoLabel: string;
-  };
 };
 
 export const translations: Record<Locale, Dictionary> = {
@@ -298,9 +295,6 @@ export const translations: Record<Locale, Dictionary> = {
       dryStorage: "Dry storage",
       repairs: "Repairs",
     },
-    hero: {
-      photoLabel: "Photo",
-    },
   },
   pt: {
     nav: {
@@ -460,9 +454,6 @@ export const translations: Record<Locale, Dictionary> = {
       wifi: "Wifi",
       dryStorage: "Estacionamento em área técnica",
       repairs: "Reparações",
-    },
-    hero: {
-      photoLabel: "Foto",
     },
   },
 };

@@ -128,7 +128,7 @@ export type Marina = {
   description: string;
   facilities: FacilityKey[];
   heroImage: string;
-  credit: { text: string; url: string };
+  clubBurgee?: { src: string; name: string };
   transientRates: Record<MarinaClass, { low: number; high: number }>;
   vatRate: number;
   gettingThere: { byCar: string; byTrain: string; byAir: string };
@@ -167,10 +167,10 @@ export const marinas: Marina[] = [
       "dryStorage",
       "repairs",
     ],
-    heroImage: "/cascais-hero.jpg",
-    credit: {
-      text: "Vitor Oliveira / Wikimedia Commons, CC BY-SA 2.0",
-      url: "https://creativecommons.org/licenses/by-sa/2.0/",
+    heroImage: "/images/marina-cascais-logo.png",
+    clubBurgee: {
+      src: "/images/burgee-cn-cascais.svg",
+      name: "Clube Naval de Cascais",
     },
     transientRates: TRANSIENT_RATES,
     vatRate: 0.23,

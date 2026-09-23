@@ -54,35 +54,31 @@ export default function CascaisPageContent({
 
   return (
     <>
-      <section className="relative flex h-[50vh] min-h-[360px] items-end">
-        <Image
-          src={marina.heroImage}
-          alt={`${marina.name}, Portugal`}
-          fill
-          priority
-          sizes="100vw"
-          className="object-cover"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-navy/90 via-navy/30 to-navy/10" />
-        <div className="relative mx-auto w-full max-w-5xl px-6 pb-12 md:px-8">
-          <p className="flex items-center gap-2 text-xs font-normal tracking-[0.25em] text-white/60 uppercase">
+      <section className="bg-navy px-6 py-16 md:py-24">
+        <div className="mx-auto max-w-5xl text-center">
+          <p className="flex items-center justify-center gap-2 text-xs font-normal tracking-[0.25em] text-white/60 uppercase">
             <FlagIcon countryCode={marina.countryCode} className="h-3 w-auto" />
             {marina.country}
+            {marina.clubBurgee ? (
+              <>
+                <span className="text-white/30">·</span>
+                <img
+                  src={marina.clubBurgee.src}
+                  alt={marina.clubBurgee.name}
+                  className="h-4 w-auto"
+                />
+              </>
+            ) : null}
           </p>
-          <h1 className="mt-4 text-3xl font-normal tracking-tight text-white md:text-5xl">
-            {marina.name}
-          </h1>
-          <p className="mt-3 text-xs font-light text-white/50">
-            {t.hero.photoLabel}:{" "}
-            <a
-              href={marina.credit.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="underline underline-offset-2 hover:text-white/80"
-            >
-              {marina.credit.text}
-            </a>
-          </p>
+          <h1 className="sr-only">{marina.name}</h1>
+          <Image
+            src={marina.heroImage}
+            alt={`${marina.name} logo`}
+            width={575}
+            height={383}
+            priority
+            className="mx-auto mt-6 h-auto w-[220px] sm:w-[260px] md:w-[300px]"
+          />
         </div>
       </section>
 
