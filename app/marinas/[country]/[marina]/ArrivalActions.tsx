@@ -2,41 +2,32 @@
 
 import { useEffect, useState } from "react";
 import type { Marina } from "../../../../data/marinas";
-import {
-  loadBoatProfile,
-  loadBoats,
-  type SavedBoat,
-} from "../../../../lib/boatProfile";
+import { loadBoats } from "../../../../lib/boatProfile";
+import type { StayPlan } from "../../../../lib/stayPlan";
 
-const inputClass =
-  "mt-2 w-full border border-neutral-200 px-3 py-2 text-sm text-navy focus:border-navy/40 focus:outline-none";
-const labelClass = "text-xs font-normal tracking-wide text-navy/60 uppercase";
-
-type Props = { marina: Marina; selectedBerthId?: string | null };
+type Props = {
+  marina: Marina;
+  plan: StayPlan;
+  selectedBerthId?: string | null;
+};
 
 const dash = (value: string) => (value.trim() ? value : "—");
 
-export default function ArrivalActions({ marina, selectedBerthId }: Props) {
-  const [boat, setBoat] = useState<Omit<SavedBoat, "id">>({
-    name: "",
-    type: "",
-    loa: "",
-    beam: "",
-    draft: "",
-    flag: "",
-    homePort: "",
-  });
-  const [eta, setEta] = useState("");
+export default function ArrivalActions({ marina, plan, selectedBerthId }: Props) {
+  const [boatName, setBoatName] = useState("");
+  const [boatType, setBoatType] = useState("");
+  const [flag, setFlag] = useState("");
+  const [homePort, setHomePort] = useState("");
 
   useEffect(() => {
     const store = loadBoats();
     const active = store.boats.find((b) => b.id === store.activeId);
     if (active) {
-      setBoat(active);
-      return;
+      setBoatName(active.name);
+      setBoatType(active.type);
+      setFlag(active.flag);
+      setHomePort(active.homePort);
     }
-    const profile = loadBoatProfile();
-    setBoat((b) => ({ ...b, ...profile }));
   }, []);
 
   function openMail(subject: string, lines: string[]) {
@@ -47,12 +38,12 @@ export default function ArrivalActions({ marina, selectedBerthId }: Props) {
 
   function boatLines(): string[] {
     return [
-      `Boat: ${dash(boat.name)}${boat.type ? ` (${boat.type})` : ""}`,
-      `Length overall: ${dash(boat.loa)} m`,
-      `Beam: ${dash(boat.beam)} m`,
-      `Draft: ${dash(boat.draft)} m`,
-      `Flag: ${dash(boat.flag)}`,
-      `Home port: ${dash(boat.homePort)}`,
+      `Boat: ${dash(boatName)}${boatType ? ` (${boatType})` : ""}`,
+      `Length overall: ${dash(plan.loa)} m`,
+      `Beam: ${dash(plan.beam)} m`,
+      `Draft: ${dash(plan.draft)} m`,
+      `Flag: ${dash(flag)}`,
+      `Home port: ${dash(homePort)}`,
       `Berth: ${selectedBerthId ?? "not yet assigned"}`,
     ];
   }
@@ -62,7 +53,7 @@ export default function ArrivalActions({ marina, selectedBerthId }: Props) {
       hour: "2-digit",
       minute: "2-digit",
     });
-    openMail(`Arriving now — ${boat.name.trim() || "visiting vessel"}`, [
+    openMail(`Arriving now — ${boatName.trim() || "visiting vessel"}`, [
       `ARRIVING NOW — ${marina.name.toUpperCase()}`,
       "",
       `ETA: now (sent at ${now} local time)`,
@@ -74,10 +65,11 @@ export default function ArrivalActions({ marina, selectedBerthId }: Props) {
   }
 
   function digitalCheckIn() {
-    openMail(`Digital check-in — ${boat.name.trim() || "visiting vessel"}`, [
+    openMail(`Digital check-in — ${boatName.trim() || "visiting vessel"}`, [
       `DIGITAL CHECK-IN — ${marina.name.toUpperCase()}`,
       "",
-      `ETA: ${eta || "(to confirm)"}`,
+      `Arrival: ${plan.arrival || "(to confirm)"}`,
+      `ETA: ${plan.eta || "(to confirm)"}`,
       ...boatLines(),
       "",
       "SKIPPER",
@@ -94,30 +86,20 @@ export default function ArrivalActions({ marina, selectedBerthId }: Props) {
 
   return (
     <div className="mt-10 border-t border-neutral-200 pt-8">
-      <p className="text-xs font-normal tracking-wide text-navy/60 uppercase">
-        Arriving soon?
+      <h3 className="text-sm font-normal text-navy">Arriving today?</h3>
+      <p className="mt-2 text-sm font-light text-neutral-600">
+        Both open a pre-filled email to {marina.name} with your boat, plan and
+        selected berth. Digital check-in uses the ETA from the enquiry form
+        above. Nothing is sent until you press send.
       </p>
-      <p className="mt-2 text-sm font-light text-neutral-500">
-        Both buttons open a pre-filled email to {marina.name} using your saved
-        boat and any berth you selected. Nothing is sent until you press send.
-      </p>
-      <div className="mt-4 flex flex-wrap items-end gap-4">
+      <div className="mt-4 flex flex-wrap items-center gap-4">
         <button
           type="button"
           onClick={arrivingNow}
-          className="bg-navy px-6 py-3 text-sm font-normal tracking-wide text-white hover:bg-navy-accent"
+          className="border border-navy/30 px-6 py-3 text-sm font-normal tracking-wide text-navy hover:border-navy"
         >
           I&apos;m arriving now
         </button>
-        <label className="block text-sm">
-          <span className={labelClass}>ETA for check-in (optional)</span>
-          <input
-            type="time"
-            value={eta}
-            onChange={(e) => setEta(e.target.value)}
-            className={`${inputClass} max-w-[160px]`}
-          />
-        </label>
         <button
           type="button"
           onClick={digitalCheckIn}

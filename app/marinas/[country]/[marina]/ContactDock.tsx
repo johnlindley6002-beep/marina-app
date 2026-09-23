@@ -6,24 +6,10 @@ import { loadBoatProfile, loadBoats } from "../../../../lib/boatProfile";
 import { useLanguage } from "../../../components/LanguageProvider";
 import { telHref } from "./EmergencyNumbers";
 
-export default function ContactDock({ marina }: { marina: Marina }) {
+// The four general-contact options, shared by the compact floating phone
+// button and the light "Contact marina" link in the action zone.
+export function ContactList({ marina }: { marina: Marina }) {
   const { t } = useLanguage();
-  const [open, setOpen] = useState(false);
-  const buttonRef = useRef<HTMLButtonElement>(null);
-  const panelRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!open) return;
-    panelRef.current?.querySelector<HTMLElement>("a,button")?.focus();
-    function onKeyDown(event: KeyboardEvent) {
-      if (event.key === "Escape") {
-        setOpen(false);
-        buttonRef.current?.focus();
-      }
-    }
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, [open]);
 
   function messageMarina() {
     const store = loadBoats();
@@ -46,8 +32,53 @@ export default function ContactDock({ marina }: { marina: Marina }) {
     )}&body=${encodeURIComponent(lines.join("\n"))}`;
   }
 
-  const actionClass =
-    "flex items-center justify-between gap-4 border-b border-neutral-100 px-4 py-3 text-sm text-navy hover:bg-neutral-50";
+  const rowClass =
+    "flex items-center justify-between gap-4 border-b border-neutral-100 px-4 py-3 text-sm text-navy";
+
+  return (
+    <div>
+      <a href={telHref(marina.phone)} className={`${rowClass} hover:bg-neutral-50`}>
+        <span>{t.dock.call}</span>
+        <span className="font-normal">{marina.phone}</span>
+      </a>
+      <p className={rowClass}>
+        <span>{t.dock.vhf}</span>
+        <span className="font-normal">{marina.vhfChannel}</span>
+      </p>
+      <a href={`mailto:${marina.email}`} className={`${rowClass} hover:bg-neutral-50`}>
+        <span>{t.dock.email}</span>
+        <span className="font-normal">{marina.email}</span>
+      </a>
+      <button
+        type="button"
+        onClick={messageMarina}
+        className="w-full px-4 py-3 text-left text-sm font-normal text-navy hover:bg-neutral-50"
+      >
+        {t.dock.message}
+      </button>
+    </div>
+  );
+}
+
+// Small, unobtrusive phone button that stays reachable while scrolling.
+export default function ContactDock({ marina }: { marina: Marina }) {
+  const { t } = useLanguage();
+  const [open, setOpen] = useState(false);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    panelRef.current?.querySelector<HTMLElement>("a,button")?.focus();
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setOpen(false);
+        buttonRef.current?.focus();
+      }
+    }
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [open]);
 
   return (
     <div className="fixed right-4 bottom-4 z-40 flex flex-col items-end gap-2">
@@ -62,25 +93,7 @@ export default function ContactDock({ marina }: { marina: Marina }) {
           <p className="px-4 pt-4 pb-2 text-xs font-normal tracking-wide text-navy/60 uppercase">
             {t.dock.heading}
           </p>
-          <a href={telHref(marina.phone)} className={actionClass}>
-            <span>{t.dock.call}</span>
-            <span className="font-normal">{marina.phone}</span>
-          </a>
-          <p className={actionClass.replace("hover:bg-neutral-50", "")}>
-            <span>{t.dock.vhf}</span>
-            <span className="font-normal">{marina.vhfChannel}</span>
-          </p>
-          <a href={`mailto:${marina.email}`} className={actionClass}>
-            <span>{t.dock.email}</span>
-            <span className="font-normal">{marina.email}</span>
-          </a>
-          <button
-            type="button"
-            onClick={messageMarina}
-            className="w-full px-4 py-3 text-left text-sm font-normal text-navy hover:bg-neutral-50"
-          >
-            {t.dock.message}
-          </button>
+          <ContactList marina={marina} />
         </div>
       ) : null}
       <button
@@ -88,10 +101,28 @@ export default function ContactDock({ marina }: { marina: Marina }) {
         type="button"
         aria-expanded={open}
         aria-controls="contact-dock-panel"
+        aria-label={open ? t.dock.close : t.dock.open}
         onClick={() => setOpen((v) => !v)}
-        className="bg-navy px-5 py-3 text-sm font-normal tracking-wide text-white shadow-lg hover:bg-navy-accent"
+        className="flex h-11 w-11 items-center justify-center rounded-full bg-navy text-white shadow-lg hover:bg-navy-accent"
       >
-        {open ? t.dock.close : t.dock.open}
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={1.5}
+          className="h-5 w-5"
+          aria-hidden="true"
+        >
+          {open ? (
+            <path strokeLinecap="round" d="M6 6l12 12M18 6L6 18" />
+          ) : (
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2Z"
+            />
+          )}
+        </svg>
       </button>
     </div>
   );

@@ -62,6 +62,9 @@ type Props = {
   initialDeparture?: string;
   initialLength?: string;
   onBerthSelect?: (berthId: string | null) => void;
+  // Controlled mode: the parent owns the inputs, validation, price summary
+  // and contact CTA; the map only renders availability for these values.
+  controlled?: { arrival: string; departure: string; lengthM: string };
 };
 
 // Sums each night's actual season rate, rather than assuming the whole
@@ -96,6 +99,7 @@ export default function BerthAvailabilityMap({
   initialDeparture = "",
   initialLength = "",
   onBerthSelect,
+  controlled,
 }: Props) {
   const { t } = useLanguage();
   const [arrival, setArrival] = useState(initialArrival);
@@ -154,11 +158,15 @@ export default function BerthAvailabilityMap({
   // Auto-run the search once if we arrived here pre-filled from the
   // homepage search (e.g. /marinas/portugal/cascais?arrival=...).
   useEffect(() => {
+    if (controlled) {
+      runSearch(controlled.arrival, controlled.departure, controlled.lengthM);
+      return;
+    }
     if (initialArrival && initialDeparture && initialLength) {
       runSearch(initialArrival, initialDeparture, initialLength);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [controlled?.arrival, controlled?.departure, controlled?.lengthM]);
 
   const statusFor = (berth: Berth): BerthStatus => {
     if (!result) return "neutral";
@@ -182,14 +190,18 @@ export default function BerthAvailabilityMap({
   const selectedPrice =
     selectedBerth && result?.totalPrice != null ? result.totalPrice : null;
 
+  const arrivalValue = controlled ? controlled.arrival : arrival;
+  const departureValue = controlled ? controlled.departure : departure;
+  const lengthValue = controlled ? controlled.lengthM : length;
+
   const mailtoHref = (() => {
     const subject = t.berthSearch.mailSubject;
     const lines = [t.berthSearch.mailGreeting, "", t.berthSearch.mailIntro];
-    if (arrival && departure && length) {
+    if (arrivalValue && departureValue && lengthValue) {
       lines.push("");
-      lines.push(`${t.berthSearch.mailArrival}: ${arrival}`);
-      lines.push(`${t.berthSearch.mailDeparture}: ${departure}`);
-      lines.push(`${t.berthSearch.mailBoatLength}: ${length} m`);
+      lines.push(`${t.berthSearch.mailArrival}: ${arrivalValue}`);
+      lines.push(`${t.berthSearch.mailDeparture}: ${departureValue}`);
+      lines.push(`${t.berthSearch.mailBoatLength}: ${lengthValue} m`);
       if (selectedBerth) {
         lines.push(`${t.berthSearch.mailBerth}: ${selectedBerth.id}`);
       }
@@ -214,6 +226,7 @@ export default function BerthAvailabilityMap({
         {t.berthSearch.illustrative}
       </p>
 
+      {!controlled ? (
       <form onSubmit={handleSubmit} className="mt-6 grid gap-4 sm:grid-cols-4">
         <label className="block text-sm">
           <span className="text-xs font-normal tracking-wide text-navy/60 uppercase">
@@ -263,8 +276,9 @@ export default function BerthAvailabilityMap({
           </button>
         </div>
       </form>
+      ) : null}
 
-      {error ? (
+      {error && !controlled ? (
         <p className="mt-4 text-sm font-light text-red-600">{error}</p>
       ) : null}
 
@@ -286,7 +300,7 @@ export default function BerthAvailabilityMap({
         </p>
       ) : null}
 
-      {result && result.boatClass && totalNights > 0 ? (
+      {result && result.boatClass && totalNights > 0 && !controlled ? (
         <p className="mt-4 text-sm font-light text-neutral-500">
           {result.lowNights > 0 && result.highNights > 0
             ? t.berthSearch.seasonBoth(result.lowNights, result.highNights)
@@ -460,13 +474,13 @@ export default function BerthAvailabilityMap({
         </div>
       </div>
 
-      {!result ? (
+      {!result && !controlled ? (
         <p className="mt-6 text-sm font-light text-neutral-400">
           {t.berthSearch.hintBeforeSearch}
         </p>
       ) : null}
 
-      {selectedBerth && result?.boatClass && selectedPrice !== null ? (
+      {selectedBerth && result?.boatClass && selectedPrice !== null && !controlled ? (
         <div className="mt-6 border-t border-neutral-200 pt-6">
           <p className="text-sm font-light text-neutral-500">
             {t.berthSearch.priceBerthLine(
@@ -484,6 +498,7 @@ export default function BerthAvailabilityMap({
         </div>
       ) : null}
 
+      {!controlled ? (
       <div className="mt-6 border-t border-neutral-200 pt-6">
         <p className="text-sm font-light text-neutral-500">
           {t.berthSearch.ctaHeading(marinaName)}
@@ -495,6 +510,7 @@ export default function BerthAvailabilityMap({
           {t.berthSearch.ctaButton}
         </a>
       </div>
+      ) : null}
     </div>
   );
 }
