@@ -366,11 +366,15 @@ export type Marina = {
   // Space the facility pins and wayfinding points are expressed in.
   mapCanvas: { width: number; height: number };
   wayfinding: { entrance: Point | null; reception: Point };
+  vesselStatusNotes: { euReminders: string[]; internationalNotes: string[] };
+  preArrivalChecklist: string[];
 };
 
 const CASCAIS_OFFICE_HOURS = { summer: "08:30–20:00", winter: "09:00–18:00" };
 const CASCAIS_VHF_CHANNEL = 9;
 const CASCAIS_MAX_AMPERAGE = 32;
+const CASCAIS_OUTSIDE_HOURS =
+  "Outside office hours, berth on the reception quay and report to the office.";
 const CASCAIS_SERVICE_FEES: ServiceFees = {
   pumpOutEur: 25,
   laundryWashEur: 5,
@@ -644,8 +648,7 @@ export const marinas: Marina[] = [
       "On arrival, berth on the Reception pier and report to the marina office.",
     insuranceMinimumEur: 1_500_000,
     region: "Lisbon Coast",
-    outsideHoursInstructions:
-      "Outside office hours, berth on the reception quay and report to the office.",
+    outsideHoursInstructions: CASCAIS_OUTSIDE_HOURS,
     entryNote:
       "Approach from the mouth of the Tejo, on the north side; the main entrance opens directly to the Atlantic.",
     protection: {
@@ -675,6 +678,24 @@ export const marinas: Marina[] = [
     facilityDetails: CASCAIS_FACILITY_DETAILS,
     mapCanvas: { width: 1400, height: 990 },
     wayfinding: { entrance: null, reception: { x: 1147, y: 545 } },
+    vesselStatusNotes: {
+      euReminders: [
+        "Have your boat registration, insurance certificate (minimum €1.5 million cover) and the skipper's certificate of competence ready on arrival.",
+        "The TFB light/buoyage tax is due at the first port of entry.",
+      ],
+      internationalNotes: [
+        "Passports must be valid at least 3 months beyond your departure date.",
+        "Non-EU-flagged boats get 18 months Temporary Admission (customs).",
+        "EU-flagged boats should carry evidence of their VAT status.",
+        "Non-EU/Schengen crew are registered at the border under the EU Entry/Exit System (EES). ETIAS pre-authorisation is planned but may not yet be required — check the official EU website for the current rules.",
+      ],
+    },
+    preArrivalChecklist: [
+      "Fenders and lines ready",
+      "We moor stern-to",
+      `Hail the marina on VHF channel ${CASCAIS_VHF_CHANNEL}`,
+      CASCAIS_OUTSIDE_HOURS,
+    ],
   },
 ];
 

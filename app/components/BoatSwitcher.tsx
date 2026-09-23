@@ -9,9 +9,12 @@ import {
   type SavedBoat,
 } from "../../lib/boatProfile";
 
+const CHANGE_EVENT = "aldock-boats-changed";
+
 type Props = {
   // When provided, the saved-boat controls include "Save this boat".
   current?: Omit<SavedBoat, "id">;
+  heading?: string;
   onSelect: (boat: SavedBoat) => void;
 };
 
@@ -19,22 +22,30 @@ const inputClass =
   "mt-2 w-full border border-neutral-200 px-3 py-2 text-sm text-navy focus:border-navy/40 focus:outline-none";
 const labelClass = "text-xs font-normal tracking-wide text-navy/60 uppercase";
 
-export default function BoatSwitcher({ current, onSelect }: Props) {
+export default function BoatSwitcher({ current, heading, onSelect }: Props) {
   const [boats, setBoats] = useState<SavedBoat[]>([]);
   const [activeId, setActiveId] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
 
+  // Several switchers can be on one page, so they re-read storage when
+  // any of them changes it.
   useEffect(() => {
-    const store = loadBoats();
-    setBoats(store.boats);
-    setActiveId(store.activeId ?? "");
+    function refresh() {
+      const store = loadBoats();
+      setBoats(store.boats);
+      setActiveId(store.activeId ?? "");
+    }
+    refresh();
+    window.addEventListener(CHANGE_EVENT, refresh);
+    return () => window.removeEventListener(CHANGE_EVENT, refresh);
   }, []);
 
   function persist(nextBoats: SavedBoat[], nextActive: string) {
     setBoats(nextBoats);
     setActiveId(nextActive);
     saveBoats({ boats: nextBoats, activeId: nextActive || null });
+    window.dispatchEvent(new Event(CHANGE_EVENT));
   }
 
   function handleChange(id: string) {
@@ -85,7 +96,11 @@ export default function BoatSwitcher({ current, onSelect }: Props) {
       boat.id
     );
     setError(null);
-    setMessage(existing ? "Boat updated." : "Boat saved on this device.");
+    setMessage(
+      existing
+        ? "Boat and documents updated."
+        : "Boat and documents saved on this device."
+    );
   }
 
   function handleDelete() {
@@ -100,8 +115,17 @@ export default function BoatSwitcher({ current, onSelect }: Props) {
 
   if (boats.length === 0 && !current) return null;
 
+  const matchesSaved =
+    !!current &&
+    boats.some(
+      (b) => b.name.trim().toLowerCase() === current.name.trim().toLowerCase()
+    );
+
   return (
     <div className="mt-4 border border-neutral-200/80 bg-neutral-50 p-4">
+      {heading ? (
+        <p className="mb-3 text-sm font-normal text-navy">{heading}</p>
+      ) : null}
       <div className="flex flex-wrap items-end gap-3">
         {boats.length > 0 ? (
           <label className="block min-w-[200px] flex-1 text-sm">
@@ -128,7 +152,11 @@ export default function BoatSwitcher({ current, onSelect }: Props) {
             onClick={handleSave}
             className="border border-navy/30 px-4 py-2 text-sm font-normal tracking-wide text-navy hover:border-navy"
           >
-            Save this boat
+            {matchesSaved
+              ? "Update saved boat"
+              : boats.length > 0
+                ? "Save as new boat"
+                : "Save this boat"}
           </button>
         ) : null}
 

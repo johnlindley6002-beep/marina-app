@@ -8,9 +8,15 @@ import {
   type Marina,
   type Quote,
 } from "../../../../data/marinas";
-import { loadBoatProfile, loadBoats } from "../../../../lib/boatProfile";
+import {
+  EMPTY_DOCUMENTS,
+  loadBoatProfile,
+  loadBoats,
+  type BoatDocuments,
+} from "../../../../lib/boatProfile";
 import { COUNTRIES } from "../../../../lib/countries";
 import BoatSwitcher from "../../../components/BoatSwitcher";
+import DocumentWallet from "./DocumentWallet";
 
 type VesselType = "sail" | "motor" | "catamaran" | "other";
 type Amperage = string;
@@ -125,15 +131,11 @@ function validate(form: FormData): Errors {
     if (!form.nextPort.trim()) errors.nextPort = "Required";
     const hasCompleteCrewRow = form.crew.some(
       (c) =>
-        c.fullName.trim() &&
-        c.dateOfBirth &&
-        c.nationality &&
-        c.passportNumber.trim() &&
-        c.role.trim() &&
-        c.joinDate
+        c.fullName.trim() && c.nationality && c.role.trim()
     );
     if (!hasCompleteCrewRow) {
-      errors.crew = "Add at least one complete crew member";
+      errors.crew =
+        "Add at least one crew member with a name, nationality and role";
     }
   }
 
@@ -154,7 +156,8 @@ function buildSummary(
   form: FormData,
   marina: Marina,
   nights: number | null,
-  quote: Quote | null
+  quote: Quote | null,
+  docs: BoatDocuments | null
 ): string {
   const lines: string[] = [];
 
@@ -219,6 +222,23 @@ function buildSummary(
     lines.push("");
   }
 
+  if (docs) {
+    const docLines = [
+      docs.registrationNumber && `Registration number: ${docs.registrationNumber}`,
+      docs.insuranceProvider && `Insurance provider: ${docs.insuranceProvider}`,
+      docs.insurancePolicy && `Insurance policy: ${docs.insurancePolicy}`,
+      docs.insuranceExpiry && `Insurance expiry: ${docs.insuranceExpiry}`,
+      docs.competenceCertificate &&
+        `Competence certificate: ${docs.competenceCertificate}`,
+      docs.vhfLicence && `VHF licence: ${docs.vhfLicence}`,
+    ].filter(Boolean) as string[];
+    if (docLines.length > 0) {
+      lines.push("DOCUMENTS (originals to be shown on arrival)");
+      lines.push(...docLines);
+      lines.push("");
+    }
+  }
+
   lines.push("VESSEL STATUS");
   lines.push(
     `EU-flagged & EU/Schengen crew, arriving from another EU port: ${
@@ -233,9 +253,15 @@ function buildSummary(
       lines.push("");
       lines.push("CREW LIST");
       completeCrew.forEach((c, i) => {
-        lines.push(
-          `${i + 1}. ${c.fullName} — DOB ${c.dateOfBirth} — ${c.nationality} — Passport ${c.passportNumber} — ${c.role} — Joined ${c.joinDate}`
-        );
+        const parts = [
+          c.fullName,
+          c.dateOfBirth && `DOB ${c.dateOfBirth}`,
+          c.nationality,
+          c.passportNumber.trim() && `Passport ${c.passportNumber.trim()}`,
+          c.role.trim(),
+          c.joinDate && `Joined ${c.joinDate}`,
+        ].filter(Boolean);
+        lines.push(`${i + 1}. ${parts.join(" — ")}`);
       });
     }
   }
@@ -300,6 +326,8 @@ export default function RequestBerthForm({
     crew: [emptyCrewMember()],
   });
 
+  const [docs, setDocs] = useState<BoatDocuments>({ ...EMPTY_DOCUMENTS });
+  const [includeDocs, setIncludeDocs] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [errors, setErrors] = useState<Errors>({});
   const [summary, setSummary] = useState<string | null>(null);
@@ -319,6 +347,7 @@ export default function RequestBerthForm({
     const store = loadBoats();
     const active = store.boats.find((b) => b.id === store.activeId);
     if (active) {
+      setDocs(active.documents ?? { ...EMPTY_DOCUMENTS });
       const vesselType = (["sail", "motor", "catamaran", "other"] as const).find(
         (v) => v === active.type
       );
@@ -417,7 +446,7 @@ export default function RequestBerthForm({
     setErrors(validationErrors);
     if (Object.keys(validationErrors).length > 0) return;
 
-    const text = buildSummary(form, marina, nights, quote);
+    const text = buildSummary(form, marina, nights, quote, includeDocs ? docs : null);
     setSummary(text);
     setCopied(false);
 
@@ -545,8 +574,10 @@ export default function RequestBerthForm({
               draft: form.draft,
               flag: form.flagCountry,
               homePort: form.homePort,
+              documents: docs,
             }}
-            onSelect={(boat) =>
+            onSelect={(boat) => {
+              setDocs(boat.documents ?? { ...EMPTY_DOCUMENTS });
               setForm((f) => ({
                 ...f,
                 boatName: boat.name,
@@ -558,8 +589,8 @@ export default function RequestBerthForm({
                 draft: boat.draft,
                 flagCountry: boat.flag,
                 homePort: boat.homePort,
-              }))
-            }
+              }));
+            }}
           />
           <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <label className="block text-sm">
@@ -972,10 +1003,11 @@ export default function RequestBerthForm({
           {errors.euStatus ? <p className={errorClass}>{errors.euStatus}</p> : null}
 
           {form.euStatus === "yes" ? (
-            <p className="mt-4 text-sm font-light text-neutral-500">
-              Have your boat registration, insurance certificate, and
-              skipper&apos;s certificate of competence ready on arrival.
-            </p>
+            <div className="mt-4 space-y-1 text-sm font-light text-neutral-500">
+              {marina.vesselStatusNotes.euReminders.map((note) => (
+                <p key={note}>{note}</p>
+              ))}
+            </div>
           ) : null}
 
           {form.euStatus === "no" ? (
@@ -1015,6 +1047,12 @@ export default function RequestBerthForm({
                   Crew list
                   <RequiredMark />
                 </p>
+                <p className="mt-2 text-xs font-light text-neutral-400">
+                  Required: name, nationality and role. Date of birth,
+                  passport number and join date are optional — passport
+                  numbers and other private details can be given to the
+                  marina staff in person instead.
+                </p>
                 <div className="mt-3 space-y-4">
                   {form.crew.map((member, index) => (
                     <div
@@ -1032,7 +1070,7 @@ export default function RequestBerthForm({
                       />
                       <input
                         type="date"
-                        aria-label="Date of birth"
+                        aria-label="Date of birth (optional)"
                         value={member.dateOfBirth}
                         onChange={(e) =>
                           updateCrew(index, { dateOfBirth: e.target.value })
@@ -1056,7 +1094,7 @@ export default function RequestBerthForm({
                       </select>
                       <input
                         type="text"
-                        placeholder="Passport number"
+                        placeholder="Passport number (optional)"
                         value={member.passportNumber}
                         onChange={(e) =>
                           updateCrew(index, { passportNumber: e.target.value })
@@ -1075,7 +1113,7 @@ export default function RequestBerthForm({
                       <div className="flex gap-2">
                         <input
                           type="date"
-                          aria-label="Join date"
+                          aria-label="Join date (optional)"
                           value={member.joinDate}
                           onChange={(e) =>
                             updateCrew(index, { joinDate: e.target.value })
@@ -1106,29 +1144,83 @@ export default function RequestBerthForm({
               </div>
 
               <div className="mt-6 space-y-1 text-xs font-light text-neutral-400">
-                <p>Passports must be valid at least 3 months beyond departure.</p>
-                <p>
-                  Non-EU-flagged boats get 18 months Temporary Admission
-                  (customs).
-                </p>
-                <p>EU boats should carry VAT-paid evidence.</p>
+                {marina.vesselStatusNotes.internationalNotes.map((note) => (
+                  <p key={note}>{note}</p>
+                ))}
               </div>
             </div>
           ) : null}
         </fieldset>
 
-        {/* 6. Documents reminder */}
+        {/* 6. Document wallet */}
         <fieldset>
           <legend className="text-xs font-normal tracking-[0.25em] text-navy/40 uppercase">
-            Documents to bring
+            Document wallet
           </legend>
-          <p className="mt-4 text-sm font-light leading-relaxed text-neutral-600">
-            Bring: boat registration (Portugal requires originals, not
-            laminated copies), proof of third-party insurance (min{" "}
-            {formatEurShort(marina.insuranceMinimumEur)}, certificate in
-            Portuguese if possible), and the skipper&apos;s certificate of
-            competence.
-          </p>
+          <DocumentWallet
+            documents={docs}
+            onChange={setDocs}
+            insuranceMinimumLabel={formatEurShort(marina.insuranceMinimumEur)}
+            arrival={form.arrival}
+            includeInEnquiry={includeDocs}
+            onIncludeChange={setIncludeDocs}
+          />
+          <BoatSwitcher
+            heading="Boats & documents — save this boat or switch to another"
+            current={{
+              name: form.boatName,
+              type: form.vesselType,
+              loa: form.loa,
+              beam: form.beam,
+              draft: form.draft,
+              flag: form.flagCountry,
+              homePort: form.homePort,
+              documents: docs,
+            }}
+            onSelect={(boat) => {
+              setDocs(boat.documents ?? { ...EMPTY_DOCUMENTS });
+              setForm((f) => ({
+                ...f,
+                boatName: boat.name,
+                vesselType:
+                  (["sail", "motor", "catamaran", "other"] as const).find(
+                    (v) => v === boat.type
+                  ) ?? "",
+                loa: boat.loa,
+                beam: boat.beam,
+                draft: boat.draft,
+                flagCountry: boat.flag,
+                homePort: boat.homePort,
+              }));
+            }}
+          />
+        </fieldset>
+
+        {/* 7. Pre-arrival checklist */}
+        <fieldset>
+          <legend className="text-xs font-normal tracking-[0.25em] text-navy/40 uppercase">
+            Pre-arrival checklist
+          </legend>
+          <ul className="mt-4 space-y-2">
+            {marina.preArrivalChecklist.map((item) => (
+              <li
+                key={item}
+                className="flex items-start gap-2 text-sm font-light text-neutral-600"
+              >
+                <svg
+                  viewBox="0 0 20 20"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={1.5}
+                  className="mt-0.5 h-4 w-4 shrink-0 text-navy"
+                  aria-hidden="true"
+                >
+                  <path d="M4 10.5l4 4 8-9" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+                {item}
+              </li>
+            ))}
+          </ul>
         </fieldset>
 
         <div>

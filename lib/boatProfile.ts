@@ -1,5 +1,23 @@
 export type BoatProfile = { loa: string; beam: string; draft: string };
 
+export type BoatDocuments = {
+  registrationNumber: string;
+  insuranceProvider: string;
+  insurancePolicy: string;
+  insuranceExpiry: string;
+  competenceCertificate: string;
+  vhfLicence: string;
+};
+
+export const EMPTY_DOCUMENTS: BoatDocuments = {
+  registrationNumber: "",
+  insuranceProvider: "",
+  insurancePolicy: "",
+  insuranceExpiry: "",
+  competenceCertificate: "",
+  vhfLicence: "",
+};
+
 export type SavedBoat = {
   id: string;
   name: string;
@@ -9,6 +27,7 @@ export type SavedBoat = {
   draft: string;
   flag: string;
   homePort: string;
+  documents?: BoatDocuments;
 };
 
 export type BoatStore = { boats: SavedBoat[]; activeId: string | null };
@@ -69,6 +88,14 @@ export function loadBoats(): BoatStore {
             draft: str(b.draft),
             flag: str(b.flag),
             homePort: str(b.homePort),
+            documents: {
+              registrationNumber: str(b.documents?.registrationNumber),
+              insuranceProvider: str(b.documents?.insuranceProvider),
+              insurancePolicy: str(b.documents?.insurancePolicy),
+              insuranceExpiry: str(b.documents?.insuranceExpiry),
+              competenceCertificate: str(b.documents?.competenceCertificate),
+              vhfLicence: str(b.documents?.vhfLicence),
+            },
           }))
       : [];
     const activeId =
