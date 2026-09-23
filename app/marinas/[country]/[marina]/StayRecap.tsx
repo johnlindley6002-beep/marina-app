@@ -1,0 +1,231 @@
+"use client";
+
+import { useEffect, useMemo, useState } from "react";
+import {
+  calculateQuote,
+  SEASON_LABELS,
+  type Marina,
+} from "../../../../data/marinas";
+import {
+  loadLastEnquiry,
+  TRIP_CHANGED_EVENT,
+  type LastEnquiry,
+} from "../../../../lib/tripStore";
+import WriteReviewButton from "./WriteReviewButton";
+
+const inputClass =
+  "mt-2 w-full border border-neutral-200 px-3 py-2 text-sm text-navy focus:border-navy/40 focus:outline-none";
+const labelClass = "text-xs font-normal tracking-wide text-navy/60 uppercase";
+const eur = (n: number) => `€${n.toFixed(2)}`;
+
+export default function StayRecap({
+  marina,
+  onRebook,
+}: {
+  marina: Marina;
+  onRebook: () => void;
+}) {
+  const [enquiry, setEnquiry] = useState<LastEnquiry | null>(null);
+  const [departure, setDeparture] = useState("");
+  const [departTime, setDepartTime] = useState("");
+
+  useEffect(() => {
+    function refresh() {
+      const saved = loadLastEnquiry();
+      const mine = saved && saved.marinaId === marina.id ? saved : null;
+      setEnquiry(mine);
+      if (mine) {
+        setDeparture((d) => d || mine.departure);
+        setDepartTime((t) => t || mine.etd);
+      }
+    }
+    refresh();
+    window.addEventListener(TRIP_CHANGED_EVENT, refresh);
+    return () => window.removeEventListener(TRIP_CHANGED_EVENT, refresh);
+  }, [marina.id]);
+
+  const quote = useMemo(() => {
+    if (!enquiry || !departure) return null;
+    return calculateQuote(
+      marina,
+      { loa: Number(enquiry.loa), arrival: enquiry.arrival, departure },
+      {
+        shorePower: enquiry.services.shorePower,
+        water: enquiry.services.water,
+        pumpOut: enquiry.services.pumpOut,
+        fuel: enquiry.services.fuel,
+        laundry: enquiry.services.laundry,
+      }
+    );
+  }, [enquiry, departure, marina]);
+
+  if (!enquiry) return null;
+
+  const today = new Date().toISOString().slice(0, 10);
+  const stayEnded = !!departure && departure < today;
+
+  function notifyDeparture() {
+    if (!enquiry) return;
+    const body = [
+      `DEPARTURE NOTICE — ${marina.name.toUpperCase()}`,
+      "",
+      `Boat: ${enquiry.boatName || "—"}`,
+      `Berth: ${enquiry.berthId || "—"}`,
+      `Departure: ${departure || "—"}${departTime ? ` at ${departTime}` : ""}`,
+      "",
+      "Thank you for the stay.",
+    ].join("\n");
+    window.location.href = `mailto:${marina.email}?subject=${encodeURIComponent(
+      `Departure notice — ${enquiry.boatName || "visiting vessel"}`
+    )}&body=${encodeURIComponent(body)}`;
+  }
+
+  return (
+    <section className="bg-neutral-50 px-6 py-16 md:px-8 md:py-24">
+      <div className="mx-auto max-w-5xl">
+        <p className="text-xs font-normal tracking-[0.25em] text-navy/60 uppercase">
+          Your stay &amp; departure
+        </p>
+        <p className="mt-2 max-w-2xl text-sm font-light text-neutral-600">
+          Based on your last enquiry ({enquiry.arrival}
+          {enquiry.boatName ? `, ${enquiry.boatName}` : ""}), saved on this
+          device.
+        </p>
+
+        <div className="mt-6 grid gap-6 md:grid-cols-2">
+          <div className="border border-neutral-200 bg-white p-6">
+            <h3 className="text-sm font-normal text-navy">
+              Settle-up estimate
+            </h3>
+            <div className="mt-3 grid grid-cols-2 gap-3">
+              <label className="block text-sm">
+                <span className={labelClass}>Departure date</span>
+                <input
+                  type="date"
+                  value={departure}
+                  onChange={(e) => setDeparture(e.target.value)}
+                  className={inputClass}
+                />
+              </label>
+              <label className="block text-sm">
+                <span className={labelClass}>Departure time</span>
+                <input
+                  type="time"
+                  value={departTime}
+                  onChange={(e) => setDepartTime(e.target.value)}
+                  className={inputClass}
+                />
+              </label>
+            </div>
+
+            {quote ? (
+              <table className="mt-4 w-full border-collapse text-left text-sm">
+                <tbody>
+                  {quote.berthLines.map((line) => (
+                    <tr
+                      key={line.season}
+                      className="border-b border-neutral-100 text-neutral-600"
+                    >
+                      <td className="py-2 pr-4 font-light">
+                        {line.nights} × {eur(line.rateEur)}
+                        <span className="block text-xs text-neutral-500">
+                          Class {quote.marinaClass} · {SEASON_LABELS[line.season]}
+                        </span>
+                      </td>
+                      <td className="py-2 text-right font-normal text-navy">
+                        {eur(line.subtotalEur)}
+                      </td>
+                    </tr>
+                  ))}
+                  {quote.addOnLines.map((line) => (
+                    <tr
+                      key={line.label}
+                      className="border-b border-neutral-100 text-neutral-600"
+                    >
+                      <td className="py-2 pr-4 font-light">
+                        {line.label}
+                        {line.note ? (
+                          <span className="block text-xs text-neutral-500">
+                            {line.note}
+                          </span>
+                        ) : null}
+                      </td>
+                      <td className="py-2 text-right font-normal text-navy">
+                        {line.amountEur !== null ? eur(line.amountEur) : "—"}
+                      </td>
+                    </tr>
+                  ))}
+                  <tr>
+                    <td className="pt-3 font-normal text-navy">
+                      Estimated total
+                    </td>
+                    <td className="pt-3 text-right text-base font-normal text-navy">
+                      {eur(quote.estimatedTotalEur)}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            ) : (
+              <p className="mt-4 text-sm font-light text-neutral-600">
+                Choose a departure date after your arrival to see the estimate.
+              </p>
+            )}
+            <p className="mt-3 text-xs font-light text-neutral-500">
+              Estimate only, excl. {Math.round(marina.vatRate * 100)}% VAT and
+              utilities. The final total is confirmed by the marina — nothing is
+              billed through this site.
+            </p>
+          </div>
+
+          <div className="space-y-6">
+            <div className="border border-neutral-200 bg-white p-6">
+              <h3 className="text-sm font-normal text-navy">
+                Leaving? Let the marina know
+              </h3>
+              <p className="mt-2 text-sm font-light text-neutral-600">
+                Opens a pre-filled email with your boat, berth and departure
+                date and time.
+              </p>
+              <button
+                type="button"
+                onClick={notifyDeparture}
+                className="mt-4 bg-navy px-6 py-3 text-sm font-normal tracking-wide text-white hover:bg-navy-accent"
+              >
+                Notify departure
+              </button>
+            </div>
+
+            <div className="border border-neutral-200 bg-white p-6">
+              <h3 className="text-sm font-normal text-navy">Coming back?</h3>
+              <p className="mt-2 text-sm font-light text-neutral-600">
+                Start a new enquiry with the same boat and services. Dates are
+                left blank.
+              </p>
+              <button
+                type="button"
+                onClick={onRebook}
+                className="mt-4 border border-navy/30 px-6 py-3 text-sm font-normal tracking-wide text-navy hover:border-navy"
+              >
+                Rebook this stay
+              </button>
+            </div>
+
+            {stayEnded ? (
+              <div className="border border-neutral-200 bg-white p-6">
+                <h3 className="text-sm font-normal text-navy">
+                  How was your stay?
+                </h3>
+                <div className="mt-3">
+                  <WriteReviewButton
+                    marina={marina}
+                    label="Review your stay"
+                  />
+                </div>
+              </div>
+            ) : null}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}

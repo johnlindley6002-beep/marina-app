@@ -2,7 +2,10 @@
 
 import { useEffect, useRef, useState } from "react";
 import type { FacilityDetail } from "../../../../data/marinas";
+import { contentLocale } from "../../../../lib/i18n";
+import { renderLengthTokens } from "../../../../lib/units";
 import { useLanguage } from "../../../components/LanguageProvider";
+import { useUnits } from "../../../components/UnitsProvider";
 import FacilityIcon from "./facility-icons";
 
 export default function FacilitiesGrid({
@@ -11,6 +14,9 @@ export default function FacilitiesGrid({
   facilities: FacilityDetail[];
 }) {
   const { locale } = useLanguage();
+  const cl = contentLocale(locale);
+  const { units } = useUnits();
+  const dialogRef = useRef<HTMLDivElement>(null);
   const [openId, setOpenId] = useState<string | null>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
   const triggerRef = useRef<HTMLElement | null>(null);
@@ -23,7 +29,24 @@ export default function FacilitiesGrid({
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     function onKeyDown(event: KeyboardEvent) {
-      if (event.key === "Escape") setOpenId(null);
+      if (event.key === "Escape") {
+        setOpenId(null);
+        return;
+      }
+      if (event.key !== "Tab" || !dialogRef.current) return;
+      const focusable = dialogRef.current.querySelectorAll<HTMLElement>(
+        "button, a[href], input, select, textarea"
+      );
+      if (focusable.length === 0) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
     }
     window.addEventListener("keydown", onKeyDown);
     return () => {
@@ -40,6 +63,7 @@ export default function FacilitiesGrid({
           <button
             key={facility.id}
             type="button"
+            aria-haspopup="dialog"
             onClick={(e) => {
               triggerRef.current = e.currentTarget;
               setOpenId(facility.id);
@@ -48,7 +72,7 @@ export default function FacilitiesGrid({
           >
             <FacilityIcon facility={facility.icon} className="h-6 w-6 text-navy" />
             <span className="text-sm font-light text-neutral-600">
-              {facility.name[locale]}
+              {facility.name[cl]}
             </span>
           </button>
         ))}
@@ -60,6 +84,7 @@ export default function FacilitiesGrid({
           onClick={() => setOpenId(null)}
         >
           <div
+            ref={dialogRef}
             role="dialog"
             aria-modal="true"
             aria-labelledby="facility-dialog-title"
@@ -73,7 +98,7 @@ export default function FacilitiesGrid({
                   id="facility-dialog-title"
                   className="text-lg font-normal tracking-tight text-navy"
                 >
-                  {open.name[locale]}
+                  {open.name[cl]}
                 </h3>
               </div>
               <button
@@ -81,18 +106,18 @@ export default function FacilitiesGrid({
                 type="button"
                 onClick={() => setOpenId(null)}
                 aria-label="Close"
-                className="-mt-1 -mr-2 px-2 py-1 text-2xl leading-none text-neutral-400 hover:text-navy"
+                className="-mt-1 -mr-2 px-2 py-1 text-2xl leading-none text-neutral-500 hover:text-navy"
               >
                 ×
               </button>
             </div>
             <p className="mt-4 text-sm leading-relaxed font-light text-neutral-600">
-              {open.description[locale]}
+              {open.description[cl]}
             </p>
             <ul className="mt-4 space-y-2 border-t border-neutral-200 pt-4">
               {open.details.map((detail, i) => (
                 <li key={i} className="text-sm font-light text-neutral-600">
-                  {detail[locale]}
+                  {renderLengthTokens(detail[cl], units)}
                 </li>
               ))}
             </ul>

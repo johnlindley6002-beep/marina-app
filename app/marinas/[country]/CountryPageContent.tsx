@@ -12,6 +12,11 @@ import {
 } from "../../../data/marinas";
 import { loadBoatProfile, saveBoatProfile } from "../../../lib/boatProfile";
 import BoatSwitcher from "../../components/BoatSwitcher";
+import FavouriteButton from "../../components/FavouriteButton";
+import LengthInput from "../../components/LengthInput";
+import { useUnits } from "../../components/UnitsProvider";
+import { withUnit } from "../../../lib/units";
+import Image from "next/image";
 import { useLanguage } from "../../components/LanguageProvider";
 
 const inputClass =
@@ -26,6 +31,7 @@ export default function CountryPageContent({
   countryName: string;
 }) {
   const { t } = useLanguage();
+  const { units } = useUnits();
 
   const [region, setRegion] = useState("");
   const [priceBand, setPriceBand] = useState<PriceBand | "">("");
@@ -94,7 +100,7 @@ export default function CountryPageContent({
     <section className="px-6 py-24 md:py-32">
       <div className="mx-auto max-w-5xl">
         <div className="text-center">
-          <p className="text-xs font-normal tracking-[0.25em] text-navy/40 uppercase">
+          <p className="text-xs font-normal tracking-[0.25em] text-navy/60 uppercase">
             {countryName}
           </p>
           <h1 className="mt-4 text-3xl font-normal tracking-tight text-navy md:text-4xl">
@@ -144,39 +150,30 @@ export default function CountryPageContent({
             </label>
 
             <label className="block text-sm">
-              <span className={labelClass}>Boat length (m)</span>
-              <input
-                type="number"
-                min="0"
-                step="0.1"
-                value={loa}
-                onChange={(e) => setLoa(e.target.value)}
+              <span className={labelClass}>{withUnit("Boat length (m)", units)}</span>
+              <LengthInput
+                valueM={loa}
+                onChangeM={setLoa}
                 className={inputClass}
               />
             </label>
 
             <div className="grid grid-cols-2 gap-2">
               <label className="block text-sm">
-                <span className={labelClass}>Beam (m)</span>
-                <input
-                  type="number"
-                  min="0"
-                  step="0.1"
-                  value={beam}
-                  onChange={(e) => setBeam(e.target.value)}
-                  className={inputClass}
-                />
+                <span className={labelClass}>{withUnit("Beam (m)", units)}</span>
+                <LengthInput
+                valueM={beam}
+                onChangeM={setBeam}
+                className={inputClass}
+              />
               </label>
               <label className="block text-sm">
-                <span className={labelClass}>Draft (m)</span>
-                <input
-                  type="number"
-                  min="0"
-                  step="0.1"
-                  value={draft}
-                  onChange={(e) => setDraft(e.target.value)}
-                  className={inputClass}
-                />
+                <span className={labelClass}>{withUnit("Draft (m)", units)}</span>
+                <LengthInput
+                valueM={draft}
+                onChangeM={setDraft}
+                className={inputClass}
+              />
               </label>
             </div>
           </div>
@@ -210,28 +207,37 @@ export default function CountryPageContent({
         ) : (
           <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {filtered.map((marina) => (
-              <Link
-                key={marina.id}
-                href={`/marinas/${marina.countrySlug}/${marina.id}`}
-                className="group rounded-sm border border-neutral-200/80 bg-white p-8 transition-colors hover:border-navy/20 md:p-10"
-              >
-                <h2 className="flex items-center gap-2 text-lg font-normal tracking-tight text-navy">
-                  {marina.name}
-                  {marina.clubBurgee ? (
-                    <img
-                      src={marina.clubBurgee.src}
-                      alt={marina.clubBurgee.name}
-                      className="h-4 w-auto"
-                    />
-                  ) : null}
-                </h2>
-                <p className="mt-3 text-sm leading-relaxed font-light text-neutral-500">
-                  {marina.location}
-                </p>
-                <p className="mt-4 text-sm font-light text-navy/50 group-hover:text-navy">
-                  {t.countryPage.viewMarina}
-                </p>
-              </Link>
+              <div key={marina.id} className="relative">
+                <Link
+                  href={`/marinas/${marina.countrySlug}/${marina.id}`}
+                  className="group block rounded-sm border border-neutral-200/80 bg-white p-8 transition-colors hover:border-navy/20 md:p-10"
+                >
+                  <h2 className="flex items-center gap-2 text-lg font-normal tracking-tight text-navy">
+                    {marina.name}
+                    {marina.clubBurgee ? (
+                      <Image
+                        src={marina.clubBurgee.src}
+                        alt={marina.clubBurgee.name}
+                        width={1772}
+                        height={1063}
+                        className="h-4 w-auto"
+                      />
+                    ) : null}
+                  </h2>
+                  <p className="mt-3 text-sm leading-relaxed font-light text-neutral-600">
+                    {marina.location}
+                  </p>
+                  <p className="mt-4 text-sm font-light text-navy/70 group-hover:text-navy">
+                    {t.countryPage.viewMarina}
+                  </p>
+                </Link>
+                <FavouriteButton
+                  marinaId={marina.id}
+                  countrySlug={marina.countrySlug}
+                  marinaName={marina.name}
+                  className="absolute right-4 bottom-4"
+                />
+              </div>
             ))}
           </div>
         )}

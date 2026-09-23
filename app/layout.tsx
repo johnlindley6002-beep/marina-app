@@ -4,6 +4,8 @@ import { Titillium_Web } from "next/font/google";
 import "./globals.css";
 import Footer from "./components/Footer";
 import { LanguageProvider } from "./components/LanguageProvider";
+import ServiceWorkerRegister from "./components/ServiceWorkerRegister";
+import { UnitsProvider } from "./components/UnitsProvider";
 
 const Navbar = dynamic(() => import("./components/Navbar"));
 
@@ -35,10 +37,21 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${titillium.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col font-sans">
+        <a
+          href="#main"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[100] focus:bg-white focus:px-4 focus:py-2 focus:text-navy"
+        >
+          Skip to content
+        </a>
         <LanguageProvider>
-          <Navbar />
-          <div className="flex-1">{children}</div>
-          <Footer />
+          <UnitsProvider>
+            <Navbar />
+            <div id="main" tabIndex={-1} className="flex-1 outline-none">
+              {children}
+            </div>
+            <Footer />
+            <ServiceWorkerRegister />
+          </UnitsProvider>
         </LanguageProvider>
       </body>
     </html>

@@ -8,7 +8,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { translations, type Locale } from "../../lib/i18n";
+import { LOCALES, translations, type Locale } from "../../lib/i18n";
 
 type LanguageContextValue = {
   locale: Locale;
@@ -26,13 +26,17 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     try {
       const stored = window.localStorage.getItem(STORAGE_KEY);
-      if (stored === "en" || stored === "pt") {
-        setLocaleState(stored);
+      if (stored && (LOCALES as string[]).includes(stored)) {
+        setLocaleState(stored as Locale);
       }
     } catch {
       // localStorage unavailable (private browsing, etc) — default stands.
     }
   }, []);
+
+  useEffect(() => {
+    document.documentElement.lang = locale;
+  }, [locale]);
 
   const setLocale = (next: Locale) => {
     setLocaleState(next);

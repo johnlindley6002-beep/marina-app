@@ -1,6 +1,14 @@
 import type { FacilityKey } from "../data/marinas";
 
-export type Locale = "en" | "pt";
+export type Locale = "en" | "pt" | "fr" | "de" | "es" | "it";
+
+export const LOCALES: Locale[] = ["en", "pt", "fr", "de", "es", "it"];
+
+// Locales that have full marina prose / facility text (see marinaContent
+// and data/marinas.ts). Others fall back to English for that content.
+export function contentLocale(locale: Locale): "en" | "pt" {
+  return locale === "pt" ? "pt" : "en";
+}
 
 type Dictionary = {
   nav: {
@@ -135,9 +143,21 @@ type Dictionary = {
     address: string;
   };
   facilities: { heading: string } & Record<FacilityKey, string>;
+  language: { label: string };
+  units: { label: string; metric: string; imperial: string };
+  dock: {
+    open: string;
+    close: string;
+    heading: string;
+    call: string;
+    vhf: string;
+    email: string;
+    message: string;
+  };
+  favourites: { save: string; saved: string; savedHeading: string };
 };
 
-export const translations: Record<Locale, Dictionary> = {
+const baseTranslations: Record<"en" | "pt", Dictionary> = {
   en: {
     nav: {
       home: "Home",
@@ -294,6 +314,22 @@ export const translations: Record<Locale, Dictionary> = {
       wifi: "Wifi",
       dryStorage: "Dry storage",
       repairs: "Repairs",
+    },
+    language: { label: "Language" },
+    units: { label: "Units", metric: "Metres", imperial: "Feet" },
+    dock: {
+      open: "Contact marina",
+      close: "Close",
+      heading: "Contact the marina",
+      call: "Call",
+      vhf: "VHF channel",
+      email: "Email",
+      message: "Message the marina",
+    },
+    favourites: {
+      save: "Save marina",
+      saved: "Saved",
+      savedHeading: "Your saved marinas",
     },
   },
   pt: {
@@ -455,7 +491,385 @@ export const translations: Record<Locale, Dictionary> = {
       dryStorage: "Estacionamento em área técnica",
       repairs: "Reparações",
     },
+    language: { label: "Idioma" },
+    units: { label: "Unidades", metric: "Metros", imperial: "Pés" },
+    dock: {
+      open: "Contactar a marina",
+      close: "Fechar",
+      heading: "Contactar a marina",
+      call: "Ligar",
+      vhf: "Canal VHF",
+      email: "Email",
+      message: "Enviar mensagem à marina",
+    },
+    favourites: {
+      save: "Guardar marina",
+      saved: "Guardada",
+      savedHeading: "As suas marinas guardadas",
+    },
   },
+};
+
+type DeepPartial<T> = T extends (...args: never[]) => unknown
+  ? T
+  : T extends object
+    ? { [K in keyof T]?: DeepPartial<T[K]> }
+    : T;
+
+function mergeDictionary(
+  base: Dictionary,
+  override: DeepPartial<Dictionary>
+): Dictionary {
+  const merge = (b: unknown, o: unknown): unknown => {
+    if (o === undefined) return b;
+    if (
+      o &&
+      b &&
+      typeof o === "object" &&
+      typeof b === "object" &&
+      !Array.isArray(o)
+    ) {
+      const result: Record<string, unknown> = { ...(b as object) };
+      for (const key of Object.keys(o)) {
+        result[key] = merge(
+          (b as Record<string, unknown>)[key],
+          (o as Record<string, unknown>)[key]
+        );
+      }
+      return result;
+    }
+    return o;
+  };
+  return merge(base, override) as Dictionary;
+}
+
+// TODO(i18n): FR / DE / ES / IT cover navigation, footer, home CTAs, the
+// search labels, rate-table headings and the new contact/units/favourites
+// labels. Everything else falls back to English until fully translated.
+// TODO(i18n): nautical wording (berth, VHF, transient rates) should get a
+// native-speaker check.
+const fr: DeepPartial<Dictionary> = {
+  nav: {
+    home: "Accueil",
+    marinas: "Marinas",
+    aboutUs: "À propos",
+    contact: "Contact",
+    search: "Rechercher",
+    openMenu: "Ouvrir le menu",
+    closeMenu: "Fermer le menu",
+  },
+  footer: {
+    tagline: "Réservations de marina, simplifiées.",
+    company: "Société",
+    product: "Produit",
+    contact: "Contact",
+    aboutUs: "À propos",
+    marinas: "Marinas",
+    copyright: (year) => `© ${year} aldock. Tous droits réservés.`,
+  },
+  home: {
+    tagline: "Réservations de marina, simplifiées.",
+    valueProp:
+      "Trouvez et réservez un emplacement dans les marinas du Portugal.",
+    browseMarinas: "Ou parcourez les marinas",
+  },
+  homeSearch: {
+    arrival: "Arrivée",
+    departure: "Départ",
+    boatLength: "Longueur du bateau (m)",
+    searchButton: "Rechercher un emplacement",
+  },
+  marinasList: {
+    eyebrow: "Marinas",
+    heading: "Choisissez un pays",
+    viewMarinas: "Voir les marinas →",
+  },
+  countryPage: {
+    heading: (country) => `Marinas : ${country}`,
+    viewMarina: "Voir la marina →",
+  },
+  breadcrumbs: { marinas: "Marinas" },
+  berthSearch: {
+    heading: "Trouver un emplacement",
+    arrival: "Arrivée",
+    departure: "Départ",
+    boatLength: "Longueur du bateau (m)",
+    searchButton: "Rechercher",
+    illustrative:
+      "La disponibilité des emplacements affichée est à titre indicatif pour le moment.",
+    ctaButton: "Contacter la marina",
+  },
+  rates: {
+    eyebrow: "Tarifs",
+    heading: "Tarifs des places de passage",
+    colClass: "Classe",
+    colLength: "Longueur",
+    colLow: "Basse saison €/nuit",
+    colHigh: "Haute saison €/nuit",
+  },
+  contact: { heading: "Contact", phone: "Téléphone", email: "E-mail" },
+  facilities: { heading: "Services et équipements" },
+  language: { label: "Langue" },
+  units: { label: "Unités", metric: "Mètres", imperial: "Pieds" },
+  dock: {
+    open: "Contacter la marina",
+    close: "Fermer",
+    heading: "Contacter la marina",
+    call: "Appeler",
+    vhf: "Canal VHF",
+    email: "E-mail",
+    message: "Écrire à la marina",
+  },
+  favourites: {
+    save: "Enregistrer la marina",
+    saved: "Enregistrée",
+    savedHeading: "Vos marinas enregistrées",
+  },
+};
+
+const de: DeepPartial<Dictionary> = {
+  nav: {
+    home: "Startseite",
+    marinas: "Marinas",
+    aboutUs: "Über uns",
+    contact: "Kontakt",
+    search: "Suche",
+    openMenu: "Menü öffnen",
+    closeMenu: "Menü schließen",
+  },
+  footer: {
+    tagline: "Marina-Buchungen, einfach gemacht.",
+    company: "Unternehmen",
+    product: "Produkt",
+    contact: "Kontakt",
+    aboutUs: "Über uns",
+    marinas: "Marinas",
+    copyright: (year) => `© ${year} aldock. Alle Rechte vorbehalten.`,
+  },
+  home: {
+    tagline: "Marina-Buchungen, einfach gemacht.",
+    valueProp:
+      "Finden und buchen Sie einen Liegeplatz in Portugals Marinas.",
+    browseMarinas: "Oder Marinas durchsuchen",
+  },
+  homeSearch: {
+    arrival: "Ankunft",
+    departure: "Abreise",
+    boatLength: "Bootslänge (m)",
+    searchButton: "Liegeplätze suchen",
+  },
+  marinasList: {
+    eyebrow: "Marinas",
+    heading: "Land wählen",
+    viewMarinas: "Marinas ansehen →",
+  },
+  countryPage: {
+    heading: (country) => `Marinas in ${country}`,
+    viewMarina: "Marina ansehen →",
+  },
+  breadcrumbs: { marinas: "Marinas" },
+  berthSearch: {
+    heading: "Liegeplatz finden",
+    arrival: "Ankunft",
+    departure: "Abreise",
+    boatLength: "Bootslänge (m)",
+    searchButton: "Suchen",
+    illustrative:
+      "Die angezeigte Liegeplatzverfügbarkeit ist vorerst nur beispielhaft.",
+    ctaButton: "Marina kontaktieren",
+  },
+  rates: {
+    eyebrow: "Preise",
+    heading: "Preise für Gastliegeplätze",
+    colClass: "Klasse",
+    colLength: "Längenbereich",
+    colLow: "Nebensaison €/Nacht",
+    colHigh: "Hauptsaison €/Nacht",
+  },
+  contact: { heading: "Kontakt", phone: "Telefon", email: "E-Mail" },
+  facilities: { heading: "Ausstattung und Service" },
+  language: { label: "Sprache" },
+  units: { label: "Einheiten", metric: "Meter", imperial: "Fuß" },
+  dock: {
+    open: "Marina kontaktieren",
+    close: "Schließen",
+    heading: "Marina kontaktieren",
+    call: "Anrufen",
+    vhf: "UKW-Kanal",
+    email: "E-Mail",
+    message: "Marina anschreiben",
+  },
+  favourites: {
+    save: "Marina merken",
+    saved: "Gemerkt",
+    savedHeading: "Ihre gemerkten Marinas",
+  },
+};
+
+const es: DeepPartial<Dictionary> = {
+  nav: {
+    home: "Inicio",
+    marinas: "Marinas",
+    aboutUs: "Sobre nosotros",
+    contact: "Contacto",
+    search: "Buscar",
+    openMenu: "Abrir menú",
+    closeMenu: "Cerrar menú",
+  },
+  footer: {
+    tagline: "Reservas de marina, simplificadas.",
+    company: "Empresa",
+    product: "Producto",
+    contact: "Contacto",
+    aboutUs: "Sobre nosotros",
+    marinas: "Marinas",
+    copyright: (year) => `© ${year} aldock. Todos los derechos reservados.`,
+  },
+  home: {
+    tagline: "Reservas de marina, simplificadas.",
+    valueProp: "Encuentra y reserva un amarre en las marinas de Portugal.",
+    browseMarinas: "O explora las marinas",
+  },
+  homeSearch: {
+    arrival: "Llegada",
+    departure: "Salida",
+    boatLength: "Eslora del barco (m)",
+    searchButton: "Buscar amarres",
+  },
+  marinasList: {
+    eyebrow: "Marinas",
+    heading: "Elige un país",
+    viewMarinas: "Ver marinas →",
+  },
+  countryPage: {
+    heading: (country) => `Marinas en ${country}`,
+    viewMarina: "Ver marina →",
+  },
+  breadcrumbs: { marinas: "Marinas" },
+  berthSearch: {
+    heading: "Encontrar un amarre",
+    arrival: "Llegada",
+    departure: "Salida",
+    boatLength: "Eslora del barco (m)",
+    searchButton: "Buscar",
+    illustrative:
+      "La disponibilidad de amarres mostrada es meramente ilustrativa por ahora.",
+    ctaButton: "Contactar con la marina",
+  },
+  rates: {
+    eyebrow: "Tarifas",
+    heading: "Tarifas de amarre en tránsito",
+    colClass: "Clase",
+    colLength: "Rango de eslora",
+    colLow: "Temporada baja €/noche",
+    colHigh: "Temporada alta €/noche",
+  },
+  contact: { heading: "Contacto", phone: "Teléfono", email: "Correo electrónico" },
+  facilities: { heading: "Instalaciones y servicios" },
+  language: { label: "Idioma" },
+  units: { label: "Unidades", metric: "Metros", imperial: "Pies" },
+  dock: {
+    open: "Contactar con la marina",
+    close: "Cerrar",
+    heading: "Contactar con la marina",
+    call: "Llamar",
+    vhf: "Canal VHF",
+    email: "Correo electrónico",
+    message: "Escribir a la marina",
+  },
+  favourites: {
+    save: "Guardar marina",
+    saved: "Guardada",
+    savedHeading: "Tus marinas guardadas",
+  },
+};
+
+const it: DeepPartial<Dictionary> = {
+  nav: {
+    home: "Home",
+    marinas: "Marine",
+    aboutUs: "Chi siamo",
+    contact: "Contatti",
+    search: "Cerca",
+    openMenu: "Apri il menu",
+    closeMenu: "Chiudi il menu",
+  },
+  footer: {
+    tagline: "Prenotazioni in marina, semplificate.",
+    company: "Azienda",
+    product: "Prodotto",
+    contact: "Contatti",
+    aboutUs: "Chi siamo",
+    marinas: "Marine",
+    copyright: (year) => `© ${year} aldock. Tutti i diritti riservati.`,
+  },
+  home: {
+    tagline: "Prenotazioni in marina, semplificate.",
+    valueProp:
+      "Trova e prenota un posto barca nelle marine del Portogallo.",
+    browseMarinas: "Oppure sfoglia le marine",
+  },
+  homeSearch: {
+    arrival: "Arrivo",
+    departure: "Partenza",
+    boatLength: "Lunghezza della barca (m)",
+    searchButton: "Cerca posti barca",
+  },
+  marinasList: {
+    eyebrow: "Marine",
+    heading: "Scegli un paese",
+    viewMarinas: "Vedi le marine →",
+  },
+  countryPage: {
+    heading: (country) => `Marine in ${country}`,
+    viewMarina: "Vedi la marina →",
+  },
+  breadcrumbs: { marinas: "Marine" },
+  berthSearch: {
+    heading: "Trova un posto barca",
+    arrival: "Arrivo",
+    departure: "Partenza",
+    boatLength: "Lunghezza della barca (m)",
+    searchButton: "Cerca",
+    illustrative:
+      "La disponibilità dei posti barca mostrata è per ora solo indicativa.",
+    ctaButton: "Contatta la marina",
+  },
+  rates: {
+    eyebrow: "Tariffe",
+    heading: "Tariffe posti barca di transito",
+    colClass: "Classe",
+    colLength: "Intervallo di lunghezza",
+    colLow: "Bassa stagione €/notte",
+    colHigh: "Alta stagione €/notte",
+  },
+  contact: { heading: "Contatti", phone: "Telefono", email: "E-mail" },
+  facilities: { heading: "Servizi e strutture" },
+  language: { label: "Lingua" },
+  units: { label: "Unità", metric: "Metri", imperial: "Piedi" },
+  dock: {
+    open: "Contatta la marina",
+    close: "Chiudi",
+    heading: "Contatta la marina",
+    call: "Chiama",
+    vhf: "Canale VHF",
+    email: "E-mail",
+    message: "Scrivi alla marina",
+  },
+  favourites: {
+    save: "Salva marina",
+    saved: "Salvata",
+    savedHeading: "Le tue marine salvate",
+  },
+};
+
+export const translations: Record<Locale, Dictionary> = {
+  en: baseTranslations.en,
+  pt: baseTranslations.pt,
+  fr: mergeDictionary(baseTranslations.en, fr),
+  de: mergeDictionary(baseTranslations.en, de),
+  es: mergeDictionary(baseTranslations.en, es),
+  it: mergeDictionary(baseTranslations.en, it),
 };
 
 // Marina-specific prose, bilingual. Structured per marina id so more

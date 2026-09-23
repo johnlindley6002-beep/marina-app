@@ -23,7 +23,7 @@ export default function PhotoStrip({ photos }: { photos: Photo[] }) {
           <figcaption className="mt-2 text-sm font-light text-neutral-500">
             {photo.caption}
             {photo.credit ? (
-              <span className="block text-xs text-neutral-400">
+              <span className="block text-xs text-neutral-500">
                 {photo.credit}
               </span>
             ) : null}

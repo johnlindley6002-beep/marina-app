@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { COUNTRY_FLAGS } from "../../data/marinas";
 
 export default function FlagIcon({
@@ -10,12 +11,13 @@ export default function FlagIcon({
   const src = COUNTRY_FLAGS[countryCode];
   if (!src) return null;
 
-  // eslint-disable-next-line @next/next/no-img-element
   return (
-    <img
+    <Image
       src={src}
       alt=""
       aria-hidden
+      width={900}
+      height={600}
       className={`inline-block rounded-[1px] align-middle ${className}`}
     />
   );

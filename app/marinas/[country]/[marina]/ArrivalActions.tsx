@@ -94,7 +94,7 @@ export default function ArrivalActions({ marina, selectedBerthId }: Props) {
 
   return (
     <div className="mt-10 border-t border-neutral-200 pt-8">
-      <p className="text-xs font-normal tracking-wide text-navy/40 uppercase">
+      <p className="text-xs font-normal tracking-wide text-navy/60 uppercase">
         Arriving soon?
       </p>
       <p className="mt-2 text-sm font-light text-neutral-500">

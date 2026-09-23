@@ -7,13 +7,21 @@ import {
   CLASS_LENGTH_RANGES,
   MARINA_CLASS_ORDER,
 } from "../../../../data/marinas";
-import { marinaContent } from "../../../../lib/i18n";
+import { contentLocale, marinaContent } from "../../../../lib/i18n";
+import { formatLength, toDisplay } from "../../../../lib/units";
 import BerthAvailabilityMap from "./BerthAvailabilityMap";
 import RequestBerthForm from "./RequestBerthForm";
 import BoatFitCheck from "./BoatFitCheck";
 import PhotoStrip from "./PhotoStrip";
 import ArrivalActions from "./ArrivalActions";
 import FacilitiesGrid from "./FacilitiesGrid";
+import TrustSection from "./TrustSection";
+import EmergencyNumbers from "./EmergencyNumbers";
+import OfflineCard from "./OfflineCard";
+import StayRecap from "./StayRecap";
+import ContactDock from "./ContactDock";
+import FavouriteButton from "../../../components/FavouriteButton";
+import { useUnits } from "../../../components/UnitsProvider";
 import Breadcrumbs from "../../../components/Breadcrumbs";
 import FlagIcon from "../../../components/FlagIcon";
 import { useLanguage } from "../../../components/LanguageProvider";
@@ -76,40 +84,54 @@ export default function CascaisPageContent({
   const { t, locale } = useLanguage();
   const content = marinaContent[marina.id as keyof typeof marinaContent];
   const [selectedBerthId, setSelectedBerthId] = useState<string | null>(null);
+  const [rebookToken, setRebookToken] = useState(0);
+  const { units, label: unit } = useUnits();
+  const cl = contentLocale(locale);
 
-  const description = content?.description[locale] ?? marina.description;
+  const description = content?.description[cl] ?? marina.description;
   const arrivalInstructions =
-    content?.arrivalInstructions[locale] ?? marina.arrivalInstructions;
+    content?.arrivalInstructions[cl] ?? marina.arrivalInstructions;
   const gettingThere = {
-    byCar: content?.gettingThere.byCar[locale] ?? marina.gettingThere.byCar,
+    byCar: content?.gettingThere.byCar[cl] ?? marina.gettingThere.byCar,
     byTrain:
-      content?.gettingThere.byTrain[locale] ?? marina.gettingThere.byTrain,
-    byAir: content?.gettingThere.byAir[locale] ?? marina.gettingThere.byAir,
+      content?.gettingThere.byTrain[cl] ?? marina.gettingThere.byTrain,
+    byAir: content?.gettingThere.byAir[cl] ?? marina.gettingThere.byAir,
   };
 
   function formatLengthRange(minM: number, maxM: number) {
-    return minM === 0 ? t.rates.upTo(maxM) : `${minM}–${maxM} m`;
+    return minM === 0
+      ? t.rates.upTo(toDisplay(maxM, units)).replace(/ m$/, ` ${unit}`)
+      : `${toDisplay(minM, units)}–${toDisplay(maxM, units)} ${unit}`;
   }
 
   return (
     <>
-      <section className="bg-navy px-6 py-16 md:py-24">
+      <section className="on-navy bg-navy px-6 py-16 md:py-24">
         <div className="mx-auto max-w-5xl text-center">
           <p className="flex items-center justify-center gap-2 text-xs font-normal tracking-[0.25em] text-white/60 uppercase">
             <FlagIcon countryCode={marina.countryCode} className="h-3 w-auto" />
             {marina.country}
             {marina.clubBurgee ? (
               <>
-                <span className="text-white/30">·</span>
-                <img
+                <span className="text-white/60">·</span>
+                <Image
                   src={marina.clubBurgee.src}
                   alt={marina.clubBurgee.name}
+                  width={1772}
+                  height={1063}
                   className="h-4 w-auto"
                 />
               </>
             ) : null}
           </p>
           <h1 className="sr-only">{marina.name}</h1>
+          <FavouriteButton
+            marinaId={marina.id}
+            countrySlug={marina.countrySlug}
+            marinaName={marina.name}
+            tone="light"
+            className="mt-4"
+          />
           <Image
             src={marina.heroImage}
             alt={`${marina.name} logo`}
@@ -133,12 +155,12 @@ export default function CascaisPageContent({
 
       <section className="px-6 py-12 md:px-8 md:py-16">
         <div className="mx-auto max-w-5xl">
-          <p className="text-xs font-normal tracking-[0.25em] text-navy/40 uppercase">
+          <p className="text-xs font-normal tracking-[0.25em] text-navy/60 uppercase">
             Approach &amp; entry
           </p>
           <div className="mt-6 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
             <div>
-              <p className="text-xs font-normal tracking-wide text-navy/40 uppercase">
+              <p className="text-xs font-normal tracking-wide text-navy/60 uppercase">
                 VHF channel
               </p>
               <p className="mt-2 text-sm font-light text-neutral-600">
@@ -146,7 +168,7 @@ export default function CascaisPageContent({
               </p>
             </div>
             <div>
-              <p className="text-xs font-normal tracking-wide text-navy/40 uppercase">
+              <p className="text-xs font-normal tracking-wide text-navy/60 uppercase">
                 Office hours
               </p>
               <p className="mt-2 text-sm font-light text-neutral-600">
@@ -156,15 +178,15 @@ export default function CascaisPageContent({
               </p>
             </div>
             <div>
-              <p className="text-xs font-normal tracking-wide text-navy/40 uppercase">
+              <p className="text-xs font-normal tracking-wide text-navy/60 uppercase">
                 Minimum depth
               </p>
               <p className="mt-2 text-sm font-light text-neutral-600">
-                {marina.berths.minDepthM.toFixed(1)} m
+                {formatLength(marina.berths.minDepthM, units, 1)}
               </p>
             </div>
             <div>
-              <p className="text-xs font-normal tracking-wide text-navy/40 uppercase">
+              <p className="text-xs font-normal tracking-wide text-navy/60 uppercase">
                 Outside office hours
               </p>
               <p className="mt-2 text-sm font-light text-neutral-600">
@@ -177,7 +199,7 @@ export default function CascaisPageContent({
           </p>
           <div className="mt-6">
             <ProtectionTag protection={marina.protection} />
-            <p className="mt-2 text-xs font-light text-neutral-400">
+            <p className="mt-2 text-xs font-light text-neutral-500">
               {marina.protection.description} General guide only — not a live
               forecast.
             </p>
@@ -194,7 +216,7 @@ export default function CascaisPageContent({
 
       <section className="px-6 pb-12 md:px-8 md:pb-16">
         <div className="mx-auto max-w-5xl">
-          <p className="mb-4 text-xs font-normal tracking-[0.25em] text-navy/40 uppercase">
+          <p className="mb-4 text-xs font-normal tracking-[0.25em] text-navy/60 uppercase">
             Photos
           </p>
           <PhotoStrip photos={marina.photos} />
@@ -219,6 +241,7 @@ export default function CascaisPageContent({
       <section className="px-6 pb-16 md:px-8">
         <div className="mx-auto max-w-5xl">
           <RequestBerthForm
+            rebookToken={rebookToken}
             marina={marina}
             initialArrival={initialArrival}
             initialDeparture={initialDeparture}
@@ -228,9 +251,14 @@ export default function CascaisPageContent({
         </div>
       </section>
 
+      <StayRecap
+        marina={marina}
+        onRebook={() => setRebookToken((n) => n + 1)}
+      />
+
       <section className="px-6 py-16 md:px-8 md:py-24">
         <div className="mx-auto max-w-5xl">
-          <p className="text-xs font-normal tracking-[0.25em] text-navy/40 uppercase">
+          <p className="text-xs font-normal tracking-[0.25em] text-navy/60 uppercase">
             {t.rates.eyebrow}
           </p>
           <h2 className="mt-4 text-2xl font-normal tracking-tight text-navy">
@@ -239,7 +267,7 @@ export default function CascaisPageContent({
           <div className="mt-6 overflow-x-auto">
             <table className="w-full min-w-[480px] border-collapse text-left text-sm">
               <thead>
-                <tr className="border-b border-neutral-200 text-xs font-normal tracking-wide text-navy/40 uppercase">
+                <tr className="border-b border-neutral-200 text-xs font-normal tracking-wide text-navy/60 uppercase">
                   <th className="py-3 pr-4">{t.rates.colClass}</th>
                   <th className="py-3 pr-4">{t.rates.colLength}</th>
                   <th className="py-3 pr-4">{t.rates.colLow}</th>
@@ -273,7 +301,7 @@ export default function CascaisPageContent({
               </tbody>
             </table>
           </div>
-          <p className="mt-4 text-xs font-light text-neutral-400">
+          <p className="mt-4 text-xs font-light text-neutral-500">
             {t.rates.caption(Math.round(marina.vatRate * 100))}
           </p>
         </div>
@@ -281,7 +309,7 @@ export default function CascaisPageContent({
 
       <section className="bg-neutral-50 px-6 py-16 md:px-8 md:py-24">
         <div className="mx-auto max-w-5xl">
-          <p className="text-xs font-normal tracking-[0.25em] text-navy/40 uppercase">
+          <p className="text-xs font-normal tracking-[0.25em] text-navy/60 uppercase">
             {t.about.eyebrow}
           </p>
           <p className="mt-4 max-w-3xl text-base leading-relaxed font-light text-neutral-600 md:text-lg">
@@ -290,14 +318,16 @@ export default function CascaisPageContent({
         </div>
       </section>
 
+      <TrustSection marina={marina} />
+
       <section className="px-6 py-16 md:px-8 md:py-24">
         <div className="mx-auto max-w-5xl">
-          <p className="text-xs font-normal tracking-wide text-navy/40 uppercase">
+          <p className="text-xs font-normal tracking-wide text-navy/60 uppercase">
             {t.contact.heading}
           </p>
           <div className="mt-6 grid gap-8 sm:grid-cols-2">
             <div>
-              <p className="text-xs font-normal tracking-wide text-navy/40 uppercase">
+              <p className="text-xs font-normal tracking-wide text-navy/60 uppercase">
                 {t.contact.phone}
               </p>
               <p className="mt-2 text-sm font-light text-neutral-600">
@@ -305,7 +335,7 @@ export default function CascaisPageContent({
               </p>
             </div>
             <div>
-              <p className="text-xs font-normal tracking-wide text-navy/40 uppercase">
+              <p className="text-xs font-normal tracking-wide text-navy/60 uppercase">
                 {t.contact.email}
               </p>
               <p className="mt-2 text-sm font-light text-neutral-600">
@@ -318,12 +348,12 @@ export default function CascaisPageContent({
 
       <section className="bg-neutral-50 px-6 py-16 md:px-8 md:py-24">
         <div className="mx-auto max-w-5xl">
-          <p className="text-xs font-normal tracking-wide text-navy/40 uppercase">
+          <p className="text-xs font-normal tracking-wide text-navy/60 uppercase">
             {t.visiting.heading}
           </p>
           <div className="mt-6 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
             <div>
-              <p className="text-xs font-normal tracking-wide text-navy/40 uppercase">
+              <p className="text-xs font-normal tracking-wide text-navy/60 uppercase">
                 {t.visiting.hailing}
               </p>
               <p className="mt-2 text-sm font-light text-neutral-600">
@@ -331,7 +361,7 @@ export default function CascaisPageContent({
               </p>
             </div>
             <div>
-              <p className="text-xs font-normal tracking-wide text-navy/40 uppercase">
+              <p className="text-xs font-normal tracking-wide text-navy/60 uppercase">
                 {t.visiting.officeHours}
               </p>
               <p className="mt-2 text-sm font-light text-neutral-600">
@@ -341,7 +371,7 @@ export default function CascaisPageContent({
               </p>
             </div>
             <div>
-              <p className="text-xs font-normal tracking-wide text-navy/40 uppercase">
+              <p className="text-xs font-normal tracking-wide text-navy/60 uppercase">
                 {t.visiting.onArrival}
               </p>
               <p className="mt-2 text-sm font-light text-neutral-600">
@@ -349,7 +379,7 @@ export default function CascaisPageContent({
               </p>
             </div>
             <div>
-              <p className="text-xs font-normal tracking-wide text-navy/40 uppercase">
+              <p className="text-xs font-normal tracking-wide text-navy/60 uppercase">
                 {t.visiting.byCar}
               </p>
               <p className="mt-2 text-sm font-light text-neutral-600">
@@ -357,7 +387,7 @@ export default function CascaisPageContent({
               </p>
             </div>
             <div>
-              <p className="text-xs font-normal tracking-wide text-navy/40 uppercase">
+              <p className="text-xs font-normal tracking-wide text-navy/60 uppercase">
                 {t.visiting.byTrain}
               </p>
               <p className="mt-2 text-sm font-light text-neutral-600">
@@ -365,7 +395,7 @@ export default function CascaisPageContent({
               </p>
             </div>
             <div>
-              <p className="text-xs font-normal tracking-wide text-navy/40 uppercase">
+              <p className="text-xs font-normal tracking-wide text-navy/60 uppercase">
                 {t.visiting.byAir}
               </p>
               <p className="mt-2 text-sm font-light text-neutral-600">
@@ -373,19 +403,19 @@ export default function CascaisPageContent({
               </p>
             </div>
             <div>
-              <p className="text-xs font-normal tracking-wide text-navy/40 uppercase">
+              <p className="text-xs font-normal tracking-wide text-navy/60 uppercase">
                 {t.visiting.maxLength}
               </p>
               <p className="mt-2 text-sm font-light text-neutral-600">
-                {marina.berths.maxLengthM} m
+                {formatLength(marina.berths.maxLengthM, units)}
               </p>
             </div>
             <div>
-              <p className="text-xs font-normal tracking-wide text-navy/40 uppercase">
+              <p className="text-xs font-normal tracking-wide text-navy/60 uppercase">
                 {t.visiting.maxDraft}
               </p>
               <p className="mt-2 text-sm font-light text-neutral-600">
-                {marina.berths.maxDraftM} m
+                {formatLength(marina.berths.maxDraftM, units)}
               </p>
             </div>
           </div>
@@ -394,12 +424,12 @@ export default function CascaisPageContent({
 
       <section className="bg-neutral-50 px-6 py-16 md:px-8 md:py-24">
         <div className="mx-auto max-w-5xl">
-          <p className="text-xs font-normal tracking-wide text-navy/40 uppercase">
+          <p className="text-xs font-normal tracking-wide text-navy/60 uppercase">
             {t.keyFacts.heading}
           </p>
           <div className="mt-6 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
             <div>
-              <p className="text-xs font-normal tracking-wide text-navy/40 uppercase">
+              <p className="text-xs font-normal tracking-wide text-navy/60 uppercase">
                 {t.keyFacts.berths}
               </p>
               <p className="mt-2 text-lg font-normal text-navy">
@@ -407,23 +437,23 @@ export default function CascaisPageContent({
               </p>
             </div>
             <div>
-              <p className="text-xs font-normal tracking-wide text-navy/40 uppercase">
+              <p className="text-xs font-normal tracking-wide text-navy/60 uppercase">
                 {t.keyFacts.maxLength}
               </p>
               <p className="mt-2 text-lg font-normal text-navy">
-                {marina.berths.maxLengthM} m
+                {formatLength(marina.berths.maxLengthM, units)}
               </p>
             </div>
             <div>
-              <p className="text-xs font-normal tracking-wide text-navy/40 uppercase">
+              <p className="text-xs font-normal tracking-wide text-navy/60 uppercase">
                 {t.keyFacts.maxDraft}
               </p>
               <p className="mt-2 text-lg font-normal text-navy">
-                {marina.berths.maxDraftM} m
+                {formatLength(marina.berths.maxDraftM, units)}
               </p>
             </div>
             <div>
-              <p className="text-xs font-normal tracking-wide text-navy/40 uppercase">
+              <p className="text-xs font-normal tracking-wide text-navy/60 uppercase">
                 {t.keyFacts.coordinates}
               </p>
               <p className="mt-2 text-sm font-light text-neutral-600">
@@ -431,7 +461,7 @@ export default function CascaisPageContent({
               </p>
             </div>
             <div className="sm:col-span-2 lg:col-span-4">
-              <p className="text-xs font-normal tracking-wide text-navy/40 uppercase">
+              <p className="text-xs font-normal tracking-wide text-navy/60 uppercase">
                 {t.keyFacts.address}
               </p>
               <p className="mt-2 text-sm font-light text-neutral-600">
@@ -444,12 +474,16 @@ export default function CascaisPageContent({
 
       <section className="px-6 py-16 md:px-8 md:py-24">
         <div className="mx-auto max-w-5xl">
-          <p className="text-xs font-normal tracking-wide text-navy/40 uppercase">
+          <p className="text-xs font-normal tracking-wide text-navy/60 uppercase">
             {t.facilities.heading}
           </p>
           <FacilitiesGrid facilities={marina.facilityDetails} />
         </div>
       </section>
+
+      <EmergencyNumbers marina={marina} />
+      <OfflineCard marina={marina} />
+      <ContactDock marina={marina} />
     </>
   );
 }

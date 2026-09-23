@@ -4,10 +4,14 @@ import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { marinas } from "../../data/marinas";
 import { useLanguage } from "./LanguageProvider";
+import LengthInput from "./LengthInput";
+import { useUnits } from "./UnitsProvider";
+import { withUnit } from "../../lib/units";
 
 export default function HomeBerthSearch() {
   const router = useRouter();
   const { t } = useLanguage();
+  const { units } = useUnits();
   const [arrival, setArrival] = useState("");
   const [departure, setDeparture] = useState("");
   const [length, setLength] = useState("");
@@ -54,17 +58,14 @@ export default function HomeBerthSearch() {
       />
 
       <label className="sr-only" htmlFor="home-length">
-        {t.homeSearch.boatLength}
+        {withUnit(t.homeSearch.boatLength, units)}
       </label>
-      <input
-        id="home-length"
-        type="number"
-        min="1"
-        step="0.1"
-        value={length}
-        onChange={(event) => setLength(event.target.value)}
-        placeholder={t.homeSearch.boatLength}
-        className="bg-white px-3 py-3 text-sm text-navy placeholder:text-neutral-400 focus:outline-none"
+      <LengthInput
+        valueM={length}
+        onChangeM={setLength}
+        placeholder={withUnit(t.homeSearch.boatLength, units)}
+        ariaLabel={withUnit(t.homeSearch.boatLength, units)}
+        className="bg-white px-3 py-3 text-sm text-navy placeholder:text-neutral-500 focus:outline-none"
       />
 
       <button

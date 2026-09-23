@@ -79,7 +79,7 @@ export default function HomeContent() {
         className="defer-paint scroll-mt-28 bg-white px-6 py-24 md:py-32"
       >
         <div className="mx-auto max-w-2xl text-center">
-          <p className="text-xs font-normal tracking-[0.25em] text-navy/40 uppercase">
+          <p className="text-xs font-normal tracking-[0.25em] text-navy/60 uppercase">
             {t.home.aboutEyebrow}
           </p>
           <h2 className="mt-4 text-3xl font-normal tracking-tight text-navy md:text-4xl">
@@ -97,7 +97,7 @@ export default function HomeContent() {
       >
         <div className="mx-auto max-w-5xl">
           <div className="text-center">
-            <p className="text-xs font-normal tracking-[0.25em] text-navy/40 uppercase">
+            <p className="text-xs font-normal tracking-[0.25em] text-navy/60 uppercase">
               {t.home.exploreEyebrow}
             </p>
             <h2 className="mt-4 text-3xl font-normal tracking-tight text-navy md:text-4xl">
@@ -141,7 +141,7 @@ export default function HomeContent() {
         className="defer-paint scroll-mt-28 bg-navy px-6 py-24 md:py-32"
       >
         <div className="mx-auto max-w-2xl text-center">
-          <p className="text-xs font-normal tracking-[0.25em] text-white/40 uppercase">
+          <p className="text-xs font-normal tracking-[0.25em] text-white/60 uppercase">
             {t.home.contactEyebrow}
           </p>
           <h2 className="mt-4 text-3xl font-normal tracking-tight text-white md:text-4xl">

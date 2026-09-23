@@ -75,7 +75,7 @@ export default function Footer() {
         </div>
 
         <div>
-          <p className="text-xs font-normal tracking-[0.25em] text-white/40 uppercase">
+          <p className="text-xs font-normal tracking-[0.25em] text-white/60 uppercase">
             {t.footer.company}
           </p>
           <ul className="mt-4 space-y-3">
@@ -93,7 +93,7 @@ export default function Footer() {
         </div>
 
         <div>
-          <p className="text-xs font-normal tracking-[0.25em] text-white/40 uppercase">
+          <p className="text-xs font-normal tracking-[0.25em] text-white/60 uppercase">
             {t.footer.product}
           </p>
           <ul className="mt-4 space-y-3">
@@ -108,7 +108,7 @@ export default function Footer() {
               </li>
             ))}
           </ul>
-          <p className="mt-6 text-xs font-normal tracking-[0.25em] text-white/40 uppercase">
+          <p className="mt-6 text-xs font-normal tracking-[0.25em] text-white/60 uppercase">
             {t.footer.contact}
           </p>
           {marina ? (
@@ -132,7 +132,7 @@ export default function Footer() {
       </div>
 
       <div className="border-t border-white/10 px-6 py-6 md:px-8">
-        <p className="mx-auto max-w-6xl text-xs font-light text-white/40">
+        <p className="mx-auto max-w-6xl text-xs font-light text-white/60">
           {t.footer.copyright(new Date().getFullYear())}
         </p>
       </div>

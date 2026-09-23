@@ -322,6 +322,42 @@ export function calculateQuote(
   };
 }
 
+export type ReviewCategory =
+  | "hospitality"
+  | "cleanliness"
+  | "services"
+  | "shops";
+
+export const REVIEW_CATEGORY_LABELS: Record<ReviewCategory, string> = {
+  hospitality: "Hospitality",
+  cleanliness: "Cleanliness",
+  services: "Services",
+  shops: "Shops nearby",
+};
+
+export type Review = {
+  author: string;
+  date: string;
+  rating: number;
+  text: string;
+  response?: string;
+};
+
+// Real reviews need a backend. Until then this is seed data; set
+// isSample to false only when the figures come from real boaters.
+export type Reviews = {
+  isSample: boolean;
+  overall: number;
+  count: number;
+  categories: Record<ReviewCategory, number>;
+  items: Review[];
+};
+
+export type NearbyPlace = { name: string; description: string };
+export type Badge = { label: string; year?: number };
+export type EmergencyPhone = { label: string; number: string };
+export type VhfChannelInfo = { channel: number; label: string };
+
 export type Marina = {
   id: string;
   name: string;
@@ -368,6 +404,12 @@ export type Marina = {
   wayfinding: { entrance: Point | null; reception: Point };
   vesselStatusNotes: { euReminders: string[]; internationalNotes: string[] };
   preArrivalChecklist: string[];
+  planImage: { src: string; alt: string };
+  reviews: Reviews;
+  nearby: NearbyPlace[];
+  // Only badges listed here are rendered — never claim one that isn't confirmed.
+  badges: Badge[];
+  emergency: { phones: EmergencyPhone[]; vhf: VhfChannelInfo[] };
 };
 
 const CASCAIS_OFFICE_HOURS = { summer: "08:30–20:00", winter: "09:00–18:00" };
@@ -525,7 +567,8 @@ const CASCAIS_FACILITY_DETAILS: FacilityDetail[] = [
     },
     details: [
       { en: "Certified maintenance", pt: "Manutenção certificada" },
-      { en: "Vessels up to 25 m", pt: "Embarcações até 25 m" },
+      // {{m:N}} is rendered in the visitor's chosen length unit.
+      { en: "Vessels up to {{m:25}}", pt: "Embarcações até {{m:25}}" },
     ],
     mapPoint: { x: 275, y: 600 },
   },
@@ -696,6 +739,91 @@ export const marinas: Marina[] = [
       `Hail the marina on VHF channel ${CASCAIS_VHF_CHANNEL}`,
       CASCAIS_OUTSIDE_HOURS,
     ],
+    planImage: {
+      src: "/images/cascais-marina-plan.webp",
+      alt: "Official plan of Marina de Cascais showing the pontoons and quays",
+    },
+    // PLACEHOLDER: sample ratings and reviews, not from real boaters.
+    // Replace with real data once a reviews backend exists.
+    reviews: {
+      isSample: true,
+      overall: 4.6,
+      count: 4,
+      categories: {
+        hospitality: 4.8,
+        cleanliness: 4.6,
+        services: 4.4,
+        shops: 4.5,
+      },
+      items: [
+        {
+          author: "S.",
+          date: "2026-08-14",
+          rating: 5,
+          text: "Easy hail on channel 9 and the staff met us on the pontoon. Showers spotless, and the old town is a five-minute walk.",
+          response:
+            "Thank you — we look forward to welcoming you back to Cascais.",
+        },
+        {
+          author: "M.",
+          date: "2026-07-29",
+          rating: 5,
+          text: "Well protected inside. We used the fuel dock and laundry, both simple and quick.",
+        },
+        {
+          author: "J.",
+          date: "2026-06-21",
+          rating: 4,
+          text: "Great location and services. It can get bumpy at the entrance when the southwesterly picks up, so time your arrival.",
+        },
+        {
+          author: "R.",
+          date: "2026-05-09",
+          rating: 4,
+          text: "Handy for the train to Lisbon. Plenty of cafés and shops around the marina.",
+        },
+      ],
+    },
+    nearby: [
+      {
+        name: "Boca do Inferno",
+        description:
+          "Dramatic sea-cliff chasm west of town where the Atlantic surges into the rock.",
+      },
+      {
+        name: "Santa Marta Lighthouse & Museum",
+        description:
+          "A small lighthouse museum on the waterfront by the marina.",
+      },
+      {
+        name: "The Cidadela",
+        description:
+          "The historic fortress by the marina, now an art centre with restaurants and galleries.",
+      },
+      {
+        name: "Cascais old town & beaches",
+        description:
+          "Shops, cafés and sandy beaches a short walk from the pontoons.",
+      },
+      {
+        name: "Train to Lisbon",
+        description: "About 40 minutes from Cascais station to central Lisbon.",
+      },
+    ],
+    // TODO (owner): add confirmed badges, e.g. { label: "Blue Flag", year: 2026 }.
+    badges: [],
+    // TODO (owner): confirm and add the GNR / Polícia Marítima / harbour
+    // numbers as further phones entries; unset numbers are never shown.
+    emergency: {
+      phones: [
+        { label: "Marina office", number: "+351 214 824 800" },
+        { label: "National emergency", number: "112" },
+      ],
+      vhf: [
+        { channel: CASCAIS_VHF_CHANNEL, label: "Marina de Cascais" },
+        { channel: 16, label: "International distress and calling" },
+      ],
+    },
   },
 ];
 

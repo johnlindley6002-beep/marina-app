@@ -40,7 +40,7 @@ export default function DocumentWallet({
         documents themselves must be shown on arrival — only the text is stored
         here, in this browser.
       </p>
-      <p className="mt-2 text-xs font-light text-neutral-400">
+      <p className="mt-2 text-xs font-light text-neutral-500">
         Bring: boat registration (Portugal requires originals, not laminated
         copies), proof of third-party insurance (min {insuranceMinimumLabel},
         certificate in Portuguese if possible), and the skipper&apos;s

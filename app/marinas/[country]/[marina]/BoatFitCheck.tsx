@@ -4,6 +4,8 @@ import { useEffect, useState, type FormEvent } from "react";
 import { checkBoatFit, type Marina } from "../../../../data/marinas";
 import { loadBoatProfile, saveBoatProfile } from "../../../../lib/boatProfile";
 import BoatSwitcher from "../../../components/BoatSwitcher";
+import LengthInput from "../../../components/LengthInput";
+import { useUnits } from "../../../components/UnitsProvider";
 
 const inputClass =
   "mt-2 w-full border border-neutral-200 px-3 py-2 text-sm text-navy focus:border-navy/40 focus:outline-none";
@@ -14,6 +16,7 @@ type Result =
   | { fits: false; reason: "length" | "beam" | "draft" };
 
 export default function BoatFitCheck({ marina }: { marina: Marina }) {
+  const { label: unit } = useUnits();
   const [loa, setLoa] = useState("");
   const [beam, setBeam] = useState("");
   const [draft, setDraft] = useState("");
@@ -42,7 +45,7 @@ export default function BoatFitCheck({ marina }: { marina: Marina }) {
       beamNum <= 0 ||
       draftNum <= 0
     ) {
-      setError("Enter your boat's length, beam, and draft in metres.");
+      setError("Enter your boat's length, beam, and draft.");
       setResult(null);
       return;
     }
@@ -77,47 +80,38 @@ export default function BoatFitCheck({ marina }: { marina: Marina }) {
       <form onSubmit={handleSubmit} className="mt-6 grid gap-4 sm:grid-cols-4">
         <label className="block text-sm">
           <span className={labelClass}>
-            Length overall (m)
-            <span className="text-red-500"> *</span>
+            Length overall ({unit})
+            <span className="text-red-600"> *</span>
           </span>
-          <input
-            type="number"
-            min="0"
-            step="0.1"
-            value={loa}
-            onChange={(e) => setLoa(e.target.value)}
-            className={inputClass}
-          />
+          <LengthInput
+                valueM={loa}
+                onChangeM={setLoa}
+                className={inputClass}
+              />
         </label>
 
         <label className="block text-sm">
           <span className={labelClass}>
-            Beam (m)
-            <span className="text-red-500"> *</span>
+            Beam ({unit})
+            <span className="text-red-600"> *</span>
           </span>
-          <input
-            type="number"
-            min="0"
-            step="0.1"
-            value={beam}
-            onChange={(e) => setBeam(e.target.value)}
-            className={inputClass}
-          />
+          <LengthInput
+                valueM={beam}
+                onChangeM={setBeam}
+                className={inputClass}
+              />
         </label>
 
         <label className="block text-sm">
           <span className={labelClass}>
-            Draft (m)
-            <span className="text-red-500"> *</span>
+            Draft ({unit})
+            <span className="text-red-600"> *</span>
           </span>
-          <input
-            type="number"
-            min="0"
-            step="0.1"
-            value={draft}
-            onChange={(e) => setDraft(e.target.value)}
-            className={inputClass}
-          />
+          <LengthInput
+                valueM={draft}
+                onChangeM={setDraft}
+                className={inputClass}
+              />
         </label>
 
         <div className="flex items-end">

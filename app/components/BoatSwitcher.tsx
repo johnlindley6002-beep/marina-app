@@ -164,7 +164,7 @@ export default function BoatSwitcher({ current, heading, onSelect }: Props) {
           <button
             type="button"
             onClick={handleDelete}
-            className="px-2 py-2 text-sm font-normal text-neutral-400 hover:text-red-600"
+            className="px-2 py-2 text-sm font-normal text-neutral-500 hover:text-red-600"
           >
             Remove
           </button>
@@ -177,7 +177,7 @@ export default function BoatSwitcher({ current, heading, onSelect }: Props) {
       {message ? (
         <p className="mt-2 text-xs font-light text-neutral-500">{message}</p>
       ) : null}
-      <p className="mt-2 text-xs font-light text-neutral-400">
+      <p className="mt-2 text-xs font-light text-neutral-500">
         Boats are stored only in this browser — no account needed.
       </p>
     </div>

@@ -17,6 +17,9 @@ import {
 import { COUNTRIES } from "../../../../lib/countries";
 import BoatSwitcher from "../../../components/BoatSwitcher";
 import DocumentWallet from "./DocumentWallet";
+import LengthInput from "../../../components/LengthInput";
+import { useUnits } from "../../../components/UnitsProvider";
+import { loadLastEnquiry, saveLastEnquiry } from "../../../../lib/tripStore";
 
 type VesselType = "sail" | "motor" | "catamaran" | "other";
 type Amperage = string;
@@ -276,7 +279,7 @@ const labelClass =
 const errorClass = "mt-1 text-xs font-light text-red-600";
 
 function RequiredMark() {
-  return <span className="text-red-500"> *</span>;
+  return <span className="text-red-600"> *</span>;
 }
 
 type Props = {
@@ -285,6 +288,7 @@ type Props = {
   initialDeparture?: string;
   initialLength?: string;
   selectedBerthId?: string | null;
+  rebookToken?: number;
 };
 
 export default function RequestBerthForm({
@@ -293,7 +297,9 @@ export default function RequestBerthForm({
   initialDeparture = "",
   initialLength = "",
   selectedBerthId,
+  rebookToken = 0,
 }: Props) {
+  const { label: unit } = useUnits();
   const [form, setForm] = useState<FormData>({
     arrival: initialArrival,
     eta: "",
@@ -372,6 +378,41 @@ export default function RequestBerthForm({
     }));
   }, []);
 
+  // "Rebook this stay": same boat and services as the last enquiry, dates blank.
+  useEffect(() => {
+    if (rebookToken === 0) return;
+    const last = loadLastEnquiry();
+    if (last && last.marinaId === marina.id) {
+      setSubmitted(false);
+      setErrors({});
+      setSummary(null);
+      setForm((f) => ({
+        ...f,
+        arrival: "",
+        eta: "",
+        departure: "",
+        etd: "",
+        openEnded: false,
+        boatName: last.boatName,
+        vesselType:
+          (["sail", "motor", "catamaran", "other"] as const).find(
+            (v) => v === last.vesselType
+          ) ?? "",
+        loa: last.loa,
+        beam: last.beam,
+        draft: last.draft,
+        flagCountry: last.flag,
+        homePort: last.homePort,
+        berthId: "",
+        ...last.services,
+        amperage: last.services.amperage,
+      }));
+    }
+    document
+      .getElementById("request-berth")
+      ?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [rebookToken, marina.id]);
+
   useEffect(() => {
     if (submitted) setErrors(validate(form));
   }, [form, submitted]);
@@ -447,6 +488,35 @@ export default function RequestBerthForm({
     if (Object.keys(validationErrors).length > 0) return;
 
     const text = buildSummary(form, marina, nights, quote, includeDocs ? docs : null);
+    saveLastEnquiry({
+      marinaId: marina.id,
+      countrySlug: marina.countrySlug,
+      marinaName: marina.name,
+      savedAt: new Date().toISOString(),
+      arrival: form.arrival,
+      eta: form.eta,
+      departure: form.openEnded ? "" : form.departure,
+      etd: form.openEnded ? "" : form.etd,
+      openEnded: form.openEnded,
+      boatName: form.boatName,
+      vesselType: form.vesselType,
+      loa: form.loa,
+      beam: form.beam,
+      draft: form.draft,
+      flag: form.flagCountry,
+      homePort: form.homePort,
+      berthId: form.berthId,
+      services: {
+        shorePower: form.shorePower,
+        amperage: form.amperage,
+        water: form.water,
+        helpMooring: form.helpMooring,
+        helpSlipping: form.helpSlipping,
+        pumpOut: form.pumpOut,
+        fuel: form.fuel,
+        laundry: form.laundry,
+      },
+    });
     setSummary(text);
     setCopied(false);
 
@@ -468,7 +538,10 @@ export default function RequestBerthForm({
   }
 
   return (
-    <div className="rounded-sm border border-neutral-200/80 bg-white p-8 md:p-10">
+    <div
+      id="request-berth"
+      className="scroll-mt-24 rounded-sm border border-neutral-200/80 bg-white p-8 md:p-10"
+    >
       <h2 className="text-lg font-normal tracking-tight text-navy">
         Request a berth
       </h2>
@@ -480,7 +553,7 @@ export default function RequestBerthForm({
       <form onSubmit={handleSubmit} className="mt-8 space-y-12">
         {/* 1. Your visit */}
         <fieldset>
-          <legend className="text-xs font-normal tracking-[0.25em] text-navy/40 uppercase">
+          <legend className="text-xs font-normal tracking-[0.25em] text-navy/60 uppercase">
             Your visit
           </legend>
           <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -522,7 +595,7 @@ export default function RequestBerthForm({
                 value={form.departure}
                 onChange={(e) => setField("departure", e.target.value)}
                 disabled={form.openEnded}
-                className={`${inputClass} disabled:bg-neutral-50 disabled:text-neutral-400`}
+                className={`${inputClass} disabled:bg-neutral-50 disabled:text-neutral-500`}
               />
               {errors.departure ? <p className={errorClass}>{errors.departure}</p> : null}
             </label>
@@ -537,7 +610,7 @@ export default function RequestBerthForm({
                 value={form.etd}
                 onChange={(e) => setField("etd", e.target.value)}
                 disabled={form.openEnded}
-                className={`${inputClass} disabled:bg-neutral-50 disabled:text-neutral-400`}
+                className={`${inputClass} disabled:bg-neutral-50 disabled:text-neutral-500`}
               />
               {errors.etd ? <p className={errorClass}>{errors.etd}</p> : null}
             </label>
@@ -562,7 +635,7 @@ export default function RequestBerthForm({
 
         {/* 2. Your boat */}
         <fieldset>
-          <legend className="text-xs font-normal tracking-[0.25em] text-navy/40 uppercase">
+          <legend className="text-xs font-normal tracking-[0.25em] text-navy/60 uppercase">
             Your boat
           </legend>
           <BoatSwitcher
@@ -628,7 +701,7 @@ export default function RequestBerthForm({
               </select>
               {errors.vesselType ? <p className={errorClass}>{errors.vesselType}</p> : null}
               {form.vesselType === "catamaran" ? (
-                <p className="mt-1 text-xs font-light text-neutral-400">
+                <p className="mt-1 text-xs font-light text-neutral-500">
                   Catamarans may need a wider, pricier berth.
                 </p>
               ) : null}
@@ -636,18 +709,15 @@ export default function RequestBerthForm({
 
             <label className="block text-sm">
               <span className={labelClass}>
-                Length overall (m)
+                Length overall ({unit})
                 <RequiredMark />
               </span>
-              <input
-                type="number"
-                min="0"
-                step="0.1"
-                value={form.loa}
-                onChange={(e) => setField("loa", e.target.value)}
+              <LengthInput
+                valueM={form.loa}
+                onChangeM={(v) => setField("loa", v)}
                 className={inputClass}
               />
-              <p className="mt-1 text-xs font-light text-neutral-400">
+              <p className="mt-1 text-xs font-light text-neutral-500">
                 Including bowsprit, davits, dinghy
               </p>
               {errors.loa ? <p className={errorClass}>{errors.loa}</p> : null}
@@ -655,15 +725,12 @@ export default function RequestBerthForm({
 
             <label className="block text-sm">
               <span className={labelClass}>
-                Beam (m)
+                Beam ({unit})
                 <RequiredMark />
               </span>
-              <input
-                type="number"
-                min="0"
-                step="0.1"
-                value={form.beam}
-                onChange={(e) => setField("beam", e.target.value)}
+              <LengthInput
+                valueM={form.beam}
+                onChangeM={(v) => setField("beam", v)}
                 className={inputClass}
               />
               {errors.beam ? <p className={errorClass}>{errors.beam}</p> : null}
@@ -671,15 +738,12 @@ export default function RequestBerthForm({
 
             <label className="block text-sm">
               <span className={labelClass}>
-                Draft (m)
+                Draft ({unit})
                 <RequiredMark />
               </span>
-              <input
-                type="number"
-                min="0"
-                step="0.1"
-                value={form.draft}
-                onChange={(e) => setField("draft", e.target.value)}
+              <LengthInput
+                valueM={form.draft}
+                onChangeM={(v) => setField("draft", v)}
                 className={inputClass}
               />
               {errors.draft ? <p className={errorClass}>{errors.draft}</p> : null}
@@ -714,7 +778,7 @@ export default function RequestBerthForm({
                 placeholder="e.g. I-4"
                 className={inputClass}
               />
-              <p className="mt-1 text-xs font-light text-neutral-400">
+              <p className="mt-1 text-xs font-light text-neutral-500">
                 Auto-filled if you selected one above
               </p>
             </label>
@@ -723,7 +787,7 @@ export default function RequestBerthForm({
 
         {/* 3. Skipper & contact */}
         <fieldset>
-          <legend className="text-xs font-normal tracking-[0.25em] text-navy/40 uppercase">
+          <legend className="text-xs font-normal tracking-[0.25em] text-navy/60 uppercase">
             Skipper &amp; contact
           </legend>
           <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -799,7 +863,7 @@ export default function RequestBerthForm({
 
         {/* 4. Services needed */}
         <fieldset>
-          <legend className="text-xs font-normal tracking-[0.25em] text-navy/40 uppercase">
+          <legend className="text-xs font-normal tracking-[0.25em] text-navy/60 uppercase">
             Services needed
           </legend>
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
@@ -887,7 +951,7 @@ export default function RequestBerthForm({
               Laundry
             </label>
           </div>
-          <p className="mt-4 text-xs font-light text-neutral-400">
+          <p className="mt-4 text-xs font-light text-neutral-500">
             Power and water are metered and charged separately from the berth
             fee.
           </p>
@@ -895,7 +959,7 @@ export default function RequestBerthForm({
 
         {/* Price estimate */}
         <fieldset>
-          <legend className="text-xs font-normal tracking-[0.25em] text-navy/40 uppercase">
+          <legend className="text-xs font-normal tracking-[0.25em] text-navy/60 uppercase">
             Your estimate
           </legend>
           {quote ? (
@@ -915,7 +979,7 @@ export default function RequestBerthForm({
                     >
                       <td className="py-2 pr-4 font-light">
                         {line.nights} × {formatEur(line.rateEur)}
-                        <span className="block text-xs text-neutral-400">
+                        <span className="block text-xs text-neutral-500">
                           {SEASON_LABELS[line.season]}
                         </span>
                       </td>
@@ -932,7 +996,7 @@ export default function RequestBerthForm({
                       <td className="py-2 pr-4 font-light">
                         {line.label}
                         {line.note ? (
-                          <span className="block text-xs text-neutral-400">
+                          <span className="block text-xs text-neutral-500">
                             {line.note}
                           </span>
                         ) : null}
@@ -952,7 +1016,7 @@ export default function RequestBerthForm({
                   </tr>
                 </tbody>
               </table>
-              <p className="mt-3 text-xs font-light text-neutral-400">
+              <p className="mt-3 text-xs font-light text-neutral-500">
                 Excl. {Math.round(marina.vatRate * 100)}% VAT and utilities —
                 estimate, confirm with marina.
               </p>
@@ -968,7 +1032,7 @@ export default function RequestBerthForm({
 
         {/* 5. Vessel status */}
         <fieldset>
-          <legend className="text-xs font-normal tracking-[0.25em] text-navy/40 uppercase">
+          <legend className="text-xs font-normal tracking-[0.25em] text-navy/60 uppercase">
             Vessel status
           </legend>
           <p className="mt-4 text-sm font-light text-neutral-600">
@@ -1047,7 +1111,7 @@ export default function RequestBerthForm({
                   Crew list
                   <RequiredMark />
                 </p>
-                <p className="mt-2 text-xs font-light text-neutral-400">
+                <p className="mt-2 text-xs font-light text-neutral-500">
                   Required: name, nationality and role. Date of birth,
                   passport number and join date are optional — passport
                   numbers and other private details can be given to the
@@ -1124,7 +1188,7 @@ export default function RequestBerthForm({
                           type="button"
                           onClick={() => removeCrewRow(index)}
                           disabled={form.crew.length === 1}
-                          className="px-2 text-xs font-normal text-neutral-400 hover:text-red-600 disabled:cursor-not-allowed disabled:opacity-40"
+                          className="px-2 text-xs font-normal text-neutral-500 hover:text-red-600 disabled:cursor-not-allowed disabled:opacity-40"
                           aria-label="Remove crew member"
                         >
                           Remove
@@ -1143,7 +1207,7 @@ export default function RequestBerthForm({
                 </button>
               </div>
 
-              <div className="mt-6 space-y-1 text-xs font-light text-neutral-400">
+              <div className="mt-6 space-y-1 text-xs font-light text-neutral-500">
                 {marina.vesselStatusNotes.internationalNotes.map((note) => (
                   <p key={note}>{note}</p>
                 ))}
@@ -1154,7 +1218,7 @@ export default function RequestBerthForm({
 
         {/* 6. Document wallet */}
         <fieldset>
-          <legend className="text-xs font-normal tracking-[0.25em] text-navy/40 uppercase">
+          <legend className="text-xs font-normal tracking-[0.25em] text-navy/60 uppercase">
             Document wallet
           </legend>
           <DocumentWallet
@@ -1198,7 +1262,7 @@ export default function RequestBerthForm({
 
         {/* 7. Pre-arrival checklist */}
         <fieldset>
-          <legend className="text-xs font-normal tracking-[0.25em] text-navy/40 uppercase">
+          <legend className="text-xs font-normal tracking-[0.25em] text-navy/60 uppercase">
             Pre-arrival checklist
           </legend>
           <ul className="mt-4 space-y-2">
@@ -1248,7 +1312,7 @@ export default function RequestBerthForm({
           <h3 className="text-sm font-normal tracking-tight text-navy">
             Enquiry summary
           </h3>
-          <p className="mt-2 text-xs font-light text-neutral-400">
+          <p className="mt-2 text-xs font-light text-neutral-500">
             Your email app should have opened with this pre-filled. If it
             didn&apos;t, copy the text below and send it manually.
           </p>

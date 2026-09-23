@@ -2,7 +2,9 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import { LOCALES } from "../../lib/i18n";
 import { useLanguage } from "./LanguageProvider";
+import { useUnits } from "./UnitsProvider";
 
 function SearchIcon() {
   return (
@@ -22,23 +24,62 @@ function SearchIcon() {
 }
 
 function LanguageToggle({ className = "" }: { className?: string }) {
-  const { locale, setLocale } = useLanguage();
+  const { locale, setLocale, t } = useLanguage();
   return (
-    <span className={`flex items-center gap-1.5 ${className}`}>
+    <span
+      role="group"
+      aria-label={t.language.label}
+      className={`flex items-center gap-1.5 ${className}`}
+    >
+      {LOCALES.map((code, index) => (
+        <span key={code} className="flex items-center gap-1.5">
+          {index > 0 ? <span className="text-white/60">/</span> : null}
+          <button
+            type="button"
+            lang={code}
+            aria-pressed={locale === code}
+            onClick={() => setLocale(code)}
+            className={
+              locale === code
+                ? "text-white"
+                : "text-white/70 hover:text-white"
+            }
+          >
+            {code.toUpperCase()}
+          </button>
+        </span>
+      ))}
+    </span>
+  );
+}
+
+function UnitToggle({ className = "" }: { className?: string }) {
+  const { units, setUnits } = useUnits();
+  const { t } = useLanguage();
+  return (
+    <span
+      role="group"
+      aria-label={t.units.label}
+      className={`flex items-center gap-1.5 ${className}`}
+    >
       <button
         type="button"
-        onClick={() => setLocale("en")}
-        className={locale === "en" ? "text-white" : "text-white/50 hover:text-white/80"}
+        aria-pressed={units === "metric"}
+        aria-label={t.units.metric}
+        onClick={() => setUnits("metric")}
+        className={units === "metric" ? "text-white" : "text-white/70 hover:text-white"}
       >
-        EN
+        m
       </button>
-      <span className="text-white/50">/</span>
+      <span className="text-white/60">/</span>
       <button
         type="button"
-        onClick={() => setLocale("pt")}
-        className={locale === "pt" ? "text-white" : "text-white/50 hover:text-white/80"}
+        aria-pressed={units === "imperial"}
+        aria-label={t.units.imperial}
+        onClick={() => setUnits("imperial")}
+        className={units === "imperial" ? "text-white" : "text-white/70 hover:text-white"}
       >
-        PT
+        ft
       </button>
     </span>
   );
@@ -91,6 +132,7 @@ export default function Navbar() {
             >
               <SearchIcon />
             </button>
+            <UnitToggle />
             <LanguageToggle />
           </div>
 
@@ -173,6 +215,7 @@ export default function Navbar() {
               >
                 <SearchIcon />
               </button>
+              <UnitToggle className="text-sm" />
               <LanguageToggle className="text-sm" />
             </div>
           </nav>
