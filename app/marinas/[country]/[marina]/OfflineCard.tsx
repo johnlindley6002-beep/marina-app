@@ -12,7 +12,13 @@ import { formatLength } from "../../../../lib/units";
 import { useUnits } from "../../../components/UnitsProvider";
 import { telHref } from "./EmergencyNumbers";
 
-export default function OfflineCard({ marina }: { marina: Marina }) {
+export default function OfflineCard({
+  marina,
+  embedded = false,
+}: {
+  marina: Marina;
+  embedded?: boolean;
+}) {
   const { units } = useUnits();
   const [enquiry, setEnquiry] = useState<LastEnquiry | null>(null);
   const [online, setOnline] = useState(true);
@@ -37,13 +43,15 @@ export default function OfflineCard({ marina }: { marina: Marina }) {
     };
   }, [marina.id]);
 
+  const Heading = embedded ? "h3" : "h2";
+
   return (
-    <section className="section px-5 md:px-8">
+    <div className={embedded ? "hairline-top mt-12 pt-8" : "section px-5 md:px-8"}>
       <div className="mx-auto max-w-5xl">
         <div className="flex flex-wrap items-baseline justify-between gap-3">
-          <h2 className="type-heading type-h2 text-ink">
+          <Heading className={`type-heading text-ink ${embedded ? "type-h3" : "type-h2"}`}>
             Offline essentials
-          </h2>
+          </Heading>
           <p
             role="status"
             className={`text-xs font-medium ${online ? "text-ink/70" : "text-ink"}`}
@@ -132,6 +140,6 @@ export default function OfflineCard({ marina }: { marina: Marina }) {
           </div>
         </div>
       </div>
-    </section>
+    </div>
   );
 }

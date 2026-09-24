@@ -222,7 +222,7 @@ const baseTranslations: Record<"en" | "pt", Dictionary> = {
       marinas: "Marinas",
     },
     berthSearch: {
-      heading: "Find a berth",
+      heading: "Available berths",
       subheading: (marinaName) =>
         `Check simulated availability at ${marinaName}.`,
       illustrative: "Berth availability shown is illustrative for now.",
@@ -396,7 +396,7 @@ const baseTranslations: Record<"en" | "pt", Dictionary> = {
       marinas: "Marinas",
     },
     berthSearch: {
-      heading: "Encontrar uma amarração",
+      heading: "Amarrações disponíveis",
       subheading: (marinaName) =>
         `Consulte a disponibilidade simulada de amarrações em ${marinaName}.`,
       illustrative:
@@ -608,7 +608,7 @@ const es: DeepPartial<Dictionary> = {
   },
   breadcrumbs: { marinas: "Marinas" },
   berthSearch: {
-    heading: "Encuentra tu amarre",
+    heading: "Amarres disponibles",
     arrival: "Llegada",
     departure: "Salida",
     boatLength: "Eslora total (m)",
@@ -702,7 +702,7 @@ const fr: DeepPartial<Dictionary> = {
   },
   breadcrumbs: { marinas: "Marinas" },
   berthSearch: {
-    heading: "Trouver une place de port",
+    heading: "Places de port disponibles",
     arrival: "Arrivée",
     departure: "Départ",
     boatLength: "Longueur hors tout (m)",

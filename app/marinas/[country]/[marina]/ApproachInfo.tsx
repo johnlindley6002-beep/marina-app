@@ -8,6 +8,7 @@ import { useUnits } from "../../../components/UnitsProvider";
 import ContactBlock from "./ContactBlock";
 import EmergencyNumbers from "./EmergencyNumbers";
 import GoogleReviewsBlock from "./GoogleReviewsBlock";
+import OfflineCard from "./OfflineCard";
 
 const PROTECTION_LABELS: Record<Marina["protection"]["level"], string> = {
   sheltered: "Sheltered",
@@ -169,6 +170,7 @@ export default function ApproachInfo({
         </div>
 
         <GoogleReviewsBlock marina={marina} />
+        <OfflineCard marina={marina} embedded />
       </div>
     </section>
   );

@@ -15,8 +15,7 @@ import PlanYourStay from "./PlanYourStay";
 import PriceEstimate from "./PriceEstimate";
 import KeyFactsStrip from "./KeyFactsStrip";
 import ApproachInfo from "./ApproachInfo";
-import PhotoStrip from "./PhotoStrip";
-import NearbyPlaces from "./NearbyPlaces";
+import AboutMarina from "./AboutMarina";
 import Breadcrumbs from "../../../components/Breadcrumbs";
 import ChartLinework from "../../../components/ChartLinework";
 import FavouriteButton from "../../../components/FavouriteButton";
@@ -34,10 +33,21 @@ const BerthAvailabilityMap = dynamic(() => import("./BerthAvailabilityMap"), {
     />
   ),
 });
-const ActionZone = dynamic(() => import("./ActionZone"));
+// The enquiry form is the heaviest client piece. It loads after first paint,
+// and its measured height is reserved (with the anchor id) so nothing shifts.
+const RequestBerthForm = dynamic(() => import("./RequestBerthForm"), {
+  ssr: false,
+  loading: () => (
+    <div
+      id="request-berth"
+      className="surface-lift scroll-mt-24 min-h-[226rem] md:min-h-[133rem]"
+      aria-hidden="true"
+    />
+  ),
+});
+const ArrivalActions = dynamic(() => import("./ArrivalActions"));
 const FacilitiesGrid = dynamic(() => import("./FacilitiesGrid"));
 const StayRecap = dynamic(() => import("./StayRecap"));
-const OfflineCard = dynamic(() => import("./OfflineCard"));
 const ContactDock = dynamic(() => import("./ContactDock"));
 
 type Props = {
@@ -92,7 +102,6 @@ export default function CascaisPageContent({
   const mapArrival = useDeferredValue(plan.arrival);
   const mapDeparture = useDeferredValue(effectiveDeparture(plan));
   const mapLength = useDeferredValue(plan.loa);
-  const realPhotos = marina.photos.filter((photo) => !photo.placeholder);
 
   const description = content?.description[cl] ?? marina.description;
   const arrivalInstructions =
@@ -107,7 +116,15 @@ export default function CascaisPageContent({
     <>
       <section className="on-ink section relative isolate overflow-hidden bg-gradient-to-br from-ink to-ink-2 px-5">
         <ChartLinework className="absolute inset-0 -z-10 h-full w-full text-paper opacity-[0.07]" />
-        <div className="mx-auto max-w-5xl text-center">
+        <FavouriteButton
+          marinaId={marina.id}
+          countrySlug={marina.countrySlug}
+          marinaName={marina.name}
+          tone="light"
+          variant="ghost"
+          className="absolute top-4 right-4 md:top-6 md:right-6"
+        />
+        <div className="mx-auto max-w-5xl pt-10 text-center sm:pt-0">
           <p className="flex items-center justify-center gap-2 text-sm text-stone">
             <FlagIcon countryCode={marina.countryCode} className="h-3 w-auto" />
             {marina.country}
@@ -125,13 +142,6 @@ export default function CascaisPageContent({
             ) : null}
           </p>
           <h1 className="sr-only">{marina.name}</h1>
-          <FavouriteButton
-            marinaId={marina.id}
-            countrySlug={marina.countrySlug}
-            marinaName={marina.name}
-            tone="light"
-            className="mt-4"
-          />
           <Image
             src={marina.heroImage}
             alt={`${marina.name} logo`}
@@ -139,7 +149,7 @@ export default function CascaisPageContent({
             height={383}
             loading="eager"
             fetchPriority="high"
-            className="mx-auto mt-6 h-auto w-[220px] sm:w-[260px] md:w-[300px]"
+            className="mx-auto mt-8 h-auto w-[300px] sm:w-[380px] md:w-[440px]"
           />
           <a
             href="#plan-your-stay"
@@ -160,23 +170,19 @@ export default function CascaisPageContent({
         />
       </div>
 
-      <KeyFactsStrip marina={marina} description={description} />
+      <KeyFactsStrip marina={marina} />
 
       <section
         id="plan-your-stay"
         className="section-tight scroll-mt-24 px-5 md:px-8"
       >
-        <div className="mx-auto max-w-5xl">
+        <div className="mx-auto max-w-5xl space-y-10 md:space-y-14">
           <PlanYourStay
             marina={marina}
             plan={plan}
             onPlanChange={onPlanChange}
           />
-        </div>
-      </section>
 
-      <section className="px-5 pb-10 md:px-8 md:pb-14">
-        <div className="mx-auto max-w-5xl">
           <BerthAvailabilityMap
             marinaName={marina.name}
             marinaEmail={marina.email}
@@ -189,26 +195,46 @@ export default function CascaisPageContent({
               lengthM: mapLength,
             }}
           />
+
+          <div id="price-estimate" className="scroll-mt-24">
+            <PriceEstimate
+              marina={marina}
+              plan={plan}
+              onPlanChange={onPlanChange}
+              selectedBerthId={selectedBerthId}
+            />
+          </div>
+
+          <RequestBerthForm
+            marina={marina}
+            plan={plan}
+            onPlanChange={onPlanChange}
+            selectedBerthId={selectedBerthId}
+            rebookToken={rebookToken}
+          />
+
+          <div>
+            <ArrivalActions
+              marina={marina}
+              plan={plan}
+              selectedBerthId={selectedBerthId}
+            />
+            <StayRecap
+              embedded
+              marina={marina}
+              onRebook={() => setRebookToken((n) => n + 1)}
+            />
+            <div className="hairline-top mt-10 pt-6">
+              <a
+                href="#contact-details"
+                className="inline-flex min-h-11 items-center text-ink underline underline-offset-4 hover:text-ink-2"
+              >
+                General question? See the contact details
+              </a>
+            </div>
+          </div>
         </div>
       </section>
-
-      <section id="price-estimate" className="section-tight scroll-mt-24 px-5 md:px-8">
-        <PriceEstimate
-          marina={marina}
-          plan={plan}
-          onPlanChange={onPlanChange}
-          selectedBerthId={selectedBerthId}
-        />
-      </section>
-
-      {realPhotos.length > 0 ? (
-        <section className="px-5 pb-10 md:px-8 md:pb-14">
-          <div className="mx-auto max-w-5xl">
-            <h2 className="type-heading type-h2 mb-6 text-ink">Photos</h2>
-            <PhotoStrip photos={realPhotos} />
-          </div>
-        </section>
-      ) : null}
 
       <ApproachInfo
         marina={marina}
@@ -225,7 +251,7 @@ export default function CascaisPageContent({
         </div>
       </section>
 
-      <NearbyPlaces marina={marina} />
+      <AboutMarina marina={marina} description={description} />
 
       <section className="px-5 pb-10 md:px-8 md:pb-14">
         <div className="hairline-top mx-auto flex max-w-5xl flex-col gap-4 pt-8 sm:flex-row sm:items-center sm:justify-between">
@@ -241,19 +267,6 @@ export default function CascaisPageContent({
         </div>
       </section>
 
-      <ActionZone
-        marina={marina}
-        plan={plan}
-        onPlanChange={onPlanChange}
-        selectedBerthId={selectedBerthId}
-        rebookToken={rebookToken}
-      />
-
-      <StayRecap
-        marina={marina}
-        onRebook={() => setRebookToken((n) => n + 1)}
-      />
-      <OfflineCard marina={marina} />
       <ContactDock marina={marina} />
     </>
   );

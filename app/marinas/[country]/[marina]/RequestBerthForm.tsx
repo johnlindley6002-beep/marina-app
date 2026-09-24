@@ -17,6 +17,11 @@ import {
 import { COUNTRIES } from "../../../../lib/countries";
 import BoatSwitcher from "../../../components/BoatSwitcher";
 import DocumentWallet from "./DocumentWallet";
+import VesselUseFields, {
+  isCommercialUse,
+  VESSEL_USE_LABELS,
+  type VesselUseValues,
+} from "./VesselUseFields";
 import { useUnits } from "../../../components/UnitsProvider";
 import { loadLastEnquiry, saveLastEnquiry } from "../../../../lib/tripStore";
 import { effectiveDeparture, PLAN_KEYS, type StayPlan } from "../../../../lib/stayPlan";
@@ -26,7 +31,10 @@ type VesselType = "sail" | "motor" | "catamaran" | "other";
 type Amperage = string;
 type EuStatus = "yes" | "no" | "";
 
+type PersonType = "crew" | "guest";
+
 type CrewMember = {
+  personType: PersonType;
   fullName: string;
   dateOfBirth: string;
   nationality: string;
@@ -36,6 +44,7 @@ type CrewMember = {
 };
 
 const emptyCrewMember = (): CrewMember => ({
+  personType: "crew",
   fullName: "",
   dateOfBirth: "",
   nationality: "",
@@ -78,7 +87,7 @@ type FormData = {
   lastPort: string;
   nextPort: string;
   crew: CrewMember[];
-};
+} & VesselUseValues;
 
 const VESSEL_TYPE_LABELS: Record<VesselType, string> = {
   sail: "Sail",
@@ -129,6 +138,38 @@ function validate(form: FormData): Errors {
     errors.amperage = "Choose a shore power amperage in Price estimate & extras.";
   }
 
+  if (!form.vesselUse) {
+    errors.vesselUse =
+      "Choose how the vessel will be used: private pleasure, charter or commercial.";
+  } else if (isCommercialUse(form.vesselUse)) {
+    if (!form.operatingEntity.trim()) {
+      errors.operatingEntity = "Enter the charter operator or owning company name.";
+    }
+    if (!form.companyRegistration.trim()) {
+      errors.companyRegistration = "Enter the company registration or VAT (NIF) number.";
+    }
+    if (form.vesselUse !== "bareboat") {
+      if (!form.contractName.trim()) {
+        errors.contractName = "Enter the name of the responsible contracting party.";
+      }
+      if (!form.contractRole.trim()) {
+        errors.contractRole = "Enter their role, for example operator or company representative.";
+      }
+    }
+    if (!form.insuranceConfirmed) {
+      errors.insuranceConfirmed =
+        "Tick to confirm commercial third-party liability insurance is in place.";
+    }
+    if (form.vesselUse === "crewed") {
+      if (!(Number(form.professionalCrewCount) >= 1)) {
+        errors.professionalCrewCount = "Enter how many professional crew are on board (1 or more).";
+      }
+      if (!(Number(form.guestCount) >= 1)) {
+        errors.guestCount = "Enter how many guests or passengers are on board (1 or more).";
+      }
+    }
+  }
+
   if (!form.euStatus) errors.euStatus = "Answer Yes or No so the marina knows which paperwork applies.";
   if (form.euStatus === "no") {
     if (!form.lastPort.trim()) errors.lastPort = "Enter the port you are arriving from.";
@@ -139,7 +180,7 @@ function validate(form: FormData): Errors {
     );
     if (!hasCompleteCrewRow) {
       errors.crew =
-        "Add at least one crew member with a name, nationality and role";
+        "Add at least one crew member with a name, nationality and role.";
     }
   }
 
@@ -243,6 +284,28 @@ function buildSummary(
     }
   }
 
+  lines.push("VESSEL USE");
+  lines.push(`Use: ${form.vesselUse ? VESSEL_USE_LABELS[form.vesselUse] : ""}`);
+  lines.push("");
+  if (isCommercialUse(form.vesselUse)) {
+    lines.push("COMMERCIAL / CHARTER DETAILS");
+    lines.push(`Operating entity: ${form.operatingEntity.trim()}`);
+    lines.push(`Company registration / VAT (NIF): ${form.companyRegistration.trim()}`);
+    lines.push(
+      `Responsible contracting party: ${
+        form.vesselUse === "bareboat"
+          ? `${form.skipperName.trim()} (bareboat charterer, skipper)`
+          : `${form.contractName.trim()} (${form.contractRole.trim()})`
+      }`
+    );
+    lines.push("Commercial third-party liability insurance: confirmed");
+    if (form.vesselUse === "crewed") {
+      lines.push(`Professional crew on board: ${form.professionalCrewCount}`);
+      lines.push(`Guests / passengers on board: ${form.guestCount}`);
+    }
+    lines.push("");
+  }
+
   lines.push("VESSEL STATUS");
   lines.push(
     `EU-flagged & EU/Schengen crew, arriving from another EU port: ${
@@ -253,20 +316,35 @@ function buildSummary(
     lines.push(`Last port: ${form.lastPort}`);
     lines.push(`Next port: ${form.nextPort}`);
     const completeCrew = form.crew.filter((c) => c.fullName.trim());
-    if (completeCrew.length > 0) {
+    const crewLine = (c: CrewMember, i: number) => {
+      const parts = [
+        c.fullName,
+        c.dateOfBirth && `DOB ${c.dateOfBirth}`,
+        c.nationality,
+        c.passportNumber.trim() && `Passport ${c.passportNumber.trim()}`,
+        c.role.trim(),
+        c.joinDate && `Joined ${c.joinDate}`,
+      ].filter(Boolean);
+      return `${i + 1}. ${parts.join(" - ")}`;
+    };
+    if (form.vesselUse === "crewed") {
+      // Crew and guests are listed separately: immigration treats them differently.
+      const groups: [string, PersonType][] = [
+        ["PROFESSIONAL CREW", "crew"],
+        ["GUESTS / PASSENGERS", "guest"],
+      ];
+      groups.forEach(([title, type]) => {
+        const list = completeCrew.filter((c) => c.personType === type);
+        if (list.length > 0) {
+          lines.push("");
+          lines.push(title);
+          list.forEach((c, i) => lines.push(crewLine(c, i)));
+        }
+      });
+    } else if (completeCrew.length > 0) {
       lines.push("");
       lines.push("CREW LIST");
-      completeCrew.forEach((c, i) => {
-        const parts = [
-          c.fullName,
-          c.dateOfBirth && `DOB ${c.dateOfBirth}`,
-          c.nationality,
-          c.passportNumber.trim() && `Passport ${c.passportNumber.trim()}`,
-          c.role.trim(),
-          c.joinDate && `Joined ${c.joinDate}`,
-        ].filter(Boolean);
-        lines.push(`${i + 1}. ${parts.join(" - ")}`);
-      });
+      completeCrew.forEach((c, i) => lines.push(crewLine(c, i)));
     }
   }
 
@@ -329,6 +407,14 @@ export default function RequestBerthForm({
     lastPort: "",
     nextPort: "",
     crew: [emptyCrewMember()],
+    vesselUse: "private",
+    operatingEntity: "",
+    companyRegistration: "",
+    contractName: "",
+    contractRole: "",
+    insuranceConfirmed: false,
+    professionalCrewCount: "",
+    guestCount: "",
   });
 
   // Dates, dimensions, ETA/ETD and priced extras live in the shared plan;
@@ -495,6 +581,13 @@ export default function RequestBerthForm({
     form.fuel,
     form.laundry,
   ]);
+
+  const listedCrew = form.crew.filter(
+    (c) => c.fullName.trim() && c.personType === "crew"
+  ).length;
+  const listedGuests = form.crew.filter(
+    (c) => c.fullName.trim() && c.personType === "guest"
+  ).length;
 
   const planErrorLabels: string[] = [];
   if (errors.arrival || errors.departure) planErrorLabels.push("dates");
@@ -942,9 +1035,22 @@ export default function RequestBerthForm({
         {/* 5. Vessel status */}
         <fieldset>
           <legend className="type-heading text-xl text-ink">
-            Vessel status
+            Vessel use and status
           </legend>
-          <p className="mt-4 text-sm text-ink/75">
+          <div className="mt-4">
+            <VesselUseFields
+              values={form}
+              errors={errors}
+              skipperName={form.skipperName}
+              notes={marina.vesselStatusNotes.commercialUseNotes}
+              disclaimer={marina.vesselStatusNotes.commercialUseDisclaimer}
+              onChange={(key, value) =>
+                setForm((f) => ({ ...f, [key]: value }))
+              }
+            />
+          </div>
+          <div className="hairline-top mt-8 pt-6" />
+          <p className="text-sm text-ink/75">
             Is your vessel EU-flagged AND is all crew EU/Schengen, arriving
             from another EU port?
             <RequiredMark />
@@ -1033,9 +1139,16 @@ export default function RequestBerthForm({
 
               <div className="mt-6">
                 <p className={labelClass}>
-                  Crew list
+                  {form.vesselUse === "crewed" ? "Crew and guest list" : "Crew list"}
                   <RequiredMark />
                 </p>
+                {form.vesselUse === "crewed" ? (
+                  <p className="mt-2 text-xs text-ink/75">
+                    List professional crew and guests or passengers separately:
+                    choose the type for each person. Border control treats them
+                    differently.
+                  </p>
+                ) : null}
                 <p className="mt-2 text-xs text-ink/70">
                   Required: name, nationality and role. Date of birth,
                   passport number and join date are optional. Passport
@@ -1048,6 +1161,21 @@ export default function RequestBerthForm({
                       key={index}
                       className="grid gap-3 border border-hairline p-4 sm:grid-cols-2 lg:grid-cols-6"
                     >
+                      {form.vesselUse === "crewed" ? (
+                        <select
+                          aria-label="Type of person"
+                          value={member.personType}
+                          onChange={(e) =>
+                            updateCrew(index, {
+                              personType: e.target.value as PersonType,
+                            })
+                          }
+                          className={`${inputClass} mt-0 sm:col-span-2 lg:col-span-6`}
+                        >
+                          <option value="crew">Professional crew</option>
+                          <option value="guest">Guest or passenger</option>
+                        </select>
+                      ) : null}
                       <input
                         type="text"
                         placeholder="Full name"
@@ -1132,12 +1260,29 @@ export default function RequestBerthForm({
                   onClick={addCrewRow}
                   className="mt-3 text-sm font-medium text-ink underline underline-offset-4 hover:text-ink-2"
                 >
-                  + Add crew member
+                  {form.vesselUse === "crewed" ? "+ Add person" : "+ Add crew member"}
                 </button>
+                {form.vesselUse === "crewed" &&
+                (listedCrew !== Number(form.professionalCrewCount) ||
+                  listedGuests !== Number(form.guestCount)) &&
+                (form.professionalCrewCount || form.guestCount) ? (
+                  <p className="mt-2 text-xs text-ink/70">
+                    Your list shows {listedCrew} professional crew and{" "}
+                    {listedGuests} {listedGuests === 1 ? "guest" : "guests"}, while you entered{" "}
+                    {form.professionalCrewCount || 0} and {form.guestCount || 0}{" "}
+                    above. Please check the numbers match.
+                  </p>
+                ) : null}
               </div>
 
               <div className="mt-6 space-y-1 text-xs text-ink/70">
-                {marina.vesselStatusNotes.internationalNotes.map((note) => (
+                {[
+                  ...marina.vesselStatusNotes.internationalNotes.slice(0, 1),
+                  isCommercialUse(form.vesselUse)
+                    ? marina.vesselStatusNotes.temporaryAdmission.commercial
+                    : marina.vesselStatusNotes.temporaryAdmission.private,
+                  ...marina.vesselStatusNotes.internationalNotes.slice(1),
+                ].map((note) => (
                   <p key={note}>{note}</p>
                 ))}
               </div>

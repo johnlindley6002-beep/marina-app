@@ -76,7 +76,7 @@ export default function PriceEstimate({
   return (
     <div className="mx-auto max-w-5xl">
       <h2 className="type-heading type-h2 text-ink">
-        Price estimate &amp; extras
+        Your estimate
       </h2>
 
       <fieldset className="mt-6">

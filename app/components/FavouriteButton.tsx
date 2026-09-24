@@ -14,6 +14,7 @@ type Props = {
   marinaName: string;
   className?: string;
   tone?: "light" | "dark";
+  variant?: "plain" | "ghost";
 };
 
 export default function FavouriteButton({
@@ -22,6 +23,7 @@ export default function FavouriteButton({
   marinaName,
   className = "",
   tone = "dark",
+  variant = "plain",
 }: Props) {
   const { t } = useLanguage();
   const [saved, setSaved] = useState(false);
@@ -39,6 +41,14 @@ export default function FavouriteButton({
     tone === "light"
       ? "text-white hover:text-white"
       : "text-ink hover:text-ink-2";
+  const ghost =
+    variant === "ghost"
+      ? `rounded-full border px-4 ${
+          tone === "light"
+            ? "border-white/40 hover:border-white"
+            : "border-ink/30 hover:border-ink"
+        }`
+      : "";
 
   return (
     <button
@@ -46,7 +56,7 @@ export default function FavouriteButton({
       aria-pressed={saved}
       aria-label={`${saved ? t.favourites.saved : t.favourites.save}: ${marinaName}`}
       onClick={() => toggleFavourite({ marinaId, countrySlug, marinaName })}
-      className={`inline-flex min-h-11 items-center gap-2 text-sm ${colour} ${className}`}
+      className={`inline-flex min-h-11 items-center gap-2 text-sm ${colour} ${ghost} ${className}`}
     >
       <svg
         viewBox="0 0 24 24"

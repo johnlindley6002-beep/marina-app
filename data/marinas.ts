@@ -385,7 +385,15 @@ export type Marina = {
   // Space the facility pins and wayfinding points are expressed in.
   mapCanvas: { width: number; height: number };
   wayfinding: { entrance: Point | null; reception: Point };
-  vesselStatusNotes: { euReminders: string[]; internationalNotes: string[] };
+  vesselStatusNotes: {
+    euReminders: string[];
+    // Shown in this order with the Temporary Admission note after the first.
+    internationalNotes: string[];
+    temporaryAdmission: { private: string; commercial: string };
+    // Shown when the vessel use is charter or commercial. General guidance only.
+    commercialUseNotes: string[];
+    commercialUseDisclaimer: string;
+  };
   preArrivalChecklist: string[];
   planImage: { src: string; alt: string };
   // Optional photo for cards and the homepage feature; none supplied yet.
@@ -400,6 +408,7 @@ export type Marina = {
 const CASCAIS_OFFICE_HOURS = { summer: "08:30–20:00", winter: "09:00–18:00" };
 const CASCAIS_VHF_CHANNEL = 9;
 const CASCAIS_MAX_AMPERAGE = 32;
+const CASCAIS_VAT_RATE = 0.23;
 const CASCAIS_OUTSIDE_HOURS =
   "Outside office hours, berth on the reception quay and report to the office.";
 const CASCAIS_SERVICE_FEES: ServiceFees = {
@@ -666,7 +675,7 @@ export const marinas: Marina[] = [
       name: "Clube Naval de Cascais",
     },
     transientRates: TRANSIENT_RATES,
-    vatRate: 0.23,
+    vatRate: CASCAIS_VAT_RATE,
     gettingThere: {
       byCar: "Via the A5 motorway, Cascais exit",
       byTrain: "Cascais train station, then a short walk to the marina",
@@ -718,10 +727,21 @@ export const marinas: Marina[] = [
       ],
       internationalNotes: [
         "Passports must be valid at least 3 months beyond your departure date.",
-        "Non-EU-flagged boats get 18 months Temporary Admission (customs).",
         "EU-flagged boats should carry evidence of their VAT status.",
         "Non-EU/Schengen crew are registered at the border under the EU Entry/Exit System (EES). ETIAS pre-authorisation is planned but may not yet be required, so check the official EU website for the current rules.",
       ],
+      temporaryAdmission: {
+        private: "Non-EU-flagged boats get 18 months Temporary Admission (customs).",
+        commercial:
+          "Temporary Admission (18 months) is for private use only and does not apply to chartered or commercial vessels.",
+      },
+      commercialUseNotes: [
+        `Commercial charter is subject to VAT on the charter fee (Portugal ${Math.round(CASCAIS_VAT_RATE * 100)}%), not the 18-month Temporary Admission private scheme.`,
+        "A chartered non-EU-flagged vessel cannot use Temporary Admission; Portuguese customs may request proof of Union goods status (VAT-paid evidence and possibly a T2L document).",
+        "Bring the operating entity's commercial insurance and the vessel's registration and licence.",
+      ],
+      commercialUseDisclaimer:
+        "General guidance only, not legal advice. Confirm the rules with Portuguese customs or the marina.",
     },
     preArrivalChecklist: [
       "Fenders and lines ready",

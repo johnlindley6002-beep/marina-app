@@ -20,9 +20,11 @@ const eur = (n: number) => `€${n.toFixed(2)}`;
 export default function StayRecap({
   marina,
   onRebook,
+  embedded = false,
 }: {
   marina: Marina;
   onRebook: () => void;
+  embedded?: boolean;
 }) {
   const [enquiry, setEnquiry] = useState<LastEnquiry | null>(null);
   const [departure, setDeparture] = useState("");
@@ -76,12 +78,14 @@ export default function StayRecap({
     )}&body=${encodeURIComponent(body)}`;
   }
 
+  const Heading = embedded ? "h3" : "h2";
+
   return (
-    <section className="bg-paper-deep section px-5 md:px-8">
+    <div className={embedded ? "hairline-top mt-12 pt-8" : "bg-paper-deep section px-5 md:px-8"}>
       <div className="mx-auto max-w-5xl">
-        <h2 className="type-heading type-h2 text-ink">
+        <Heading className={`type-heading text-ink ${embedded ? "type-h3" : "type-h2"}`}>
           Your stay &amp; departure
-        </h2>
+        </Heading>
         <p className="mt-2 max-w-2xl text-sm text-ink/75">
           Based on your last enquiry ({enquiry.arrival}
           {enquiry.boatName ? `, ${enquiry.boatName}` : ""}), saved on this
@@ -208,6 +212,6 @@ export default function StayRecap({
           </div>
         </div>
       </div>
-    </section>
+    </div>
   );
 }
