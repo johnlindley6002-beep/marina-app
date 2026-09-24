@@ -3,7 +3,7 @@
 import type { Marina } from "../../../../data/marinas";
 import { useLanguage } from "../../../components/LanguageProvider";
 import NearbyPlaces from "./NearbyPlaces";
-import PhotoStrip from "./PhotoStrip";
+import PhotoGallery from "./PhotoGallery";
 
 type Props = {
   marina: Marina;
@@ -34,7 +34,7 @@ export default function AboutMarina({ marina, description }: Props) {
         {photos.length > 0 ? (
           <div className="hairline-top mt-12 pt-8">
             <h3 className="type-heading type-h3 mb-6 text-ink">Photos</h3>
-            <PhotoStrip photos={photos} />
+            <PhotoGallery photos={photos} />
           </div>
         ) : null}
 

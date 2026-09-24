@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  checkBoatFit,
   getSeason,
   SEASON_LABELS,
   type Marina,
@@ -13,6 +12,7 @@ import BoatSwitcher from "../../../components/BoatSwitcher";
 import { useBoats } from "../../../components/BoatProvider";
 import LengthInput from "../../../components/LengthInput";
 import { useUnits } from "../../../components/UnitsProvider";
+import StayDecisionSummary from "./StayDecisionSummary";
 
 const inputClass =
   "mt-2 w-full border border-hairline px-3 py-2 text-sm text-ink focus:border-ink focus:outline-none disabled:bg-paper-deep disabled:text-ink/70";
@@ -68,13 +68,15 @@ export default function PlanYourStay({ marina, plan, onPlanChange }: Props) {
     (Number(plan.loa) !== Number(activeBoat.loa) ||
       Number(plan.beam) !== Number(activeBoat.beam) ||
       Number(plan.draft) !== Number(activeBoat.draft));
-  const fit = dimsComplete
-    ? checkBoatFit(marina, {
-        loa: dim(plan.loa),
-        beam: dim(plan.beam),
-        draft: dim(plan.draft),
-      })
-    : null;
+  const stayLine = datesValid
+    ? plan.openEnded
+      ? "Open-ended stay, priced and searched per night."
+      : nights > 0 && nightsBySeason.low > 0 && nightsBySeason.high > 0
+        ? `${nights} nights, spanning both seasons (${nightsBySeason.low} low, ${nightsBySeason.high} high).`
+        : `${nights} night${nights === 1 ? "" : "s"}, ${
+            SEASON_LABELS[nightsBySeason.high > 0 ? "high" : "low"]
+          }.`
+    : "Enter your arrival and departure dates.";
 
   return (
     <div className="surface-lift p-6 sm:p-8 md:p-10">
@@ -236,44 +238,12 @@ export default function PlanYourStay({ marina, plan, onPlanChange }: Props) {
         Open-ended stay (no departure date yet)
       </label>
 
-      <div
-        className="mt-6 space-y-2 border-t border-hairline pt-6"
-        aria-live="polite"
-      >
-        <p className="text-sm text-ink/75">
-          <span className={labelClass}>Stay: </span>
-          {datesValid
-            ? plan.openEnded
-              ? "Open-ended stay, priced and searched per night."
-              : nights > 0 && nightsBySeason.low > 0 && nightsBySeason.high > 0
-                ? `${nights} nights, spanning both seasons (${nightsBySeason.low} low, ${nightsBySeason.high} high).`
-                : `${nights} night${nights === 1 ? "" : "s"} - ${
-                    SEASON_LABELS[nightsBySeason.high > 0 ? "high" : "low"]
-                  }.`
-            : "Enter your arrival and departure dates."}
-        </p>
-        <p className="text-sm text-ink/75">
-          <span className={labelClass}>Will my boat fit? </span>
-          {fit === null ? (
-            "Enter length, beam and draft to check."
-          ) : fit.fits ? (
-            <span className="font-medium text-ink">
-              Fits: Class {fit.marinaClass} berths available.
-              {fit.marinaClass === "IX"
-                ? " This is the mega-yacht allocation on the outer pontoon."
-                : ""}
-            </span>
-          ) : (
-            <span className="font-medium text-ink">
-              {fit.reason === "length"
-                ? "Too long for standard berths, so contact the marina."
-                : fit.reason === "beam"
-                  ? "Beam exceeds the standard berth for your length, so contact the marina."
-                  : "Too deep for standard berths, so contact the marina."}
-            </span>
-          )}
-        </p>
-      </div>
+      <StayDecisionSummary
+        marina={marina}
+        plan={plan}
+        datesValid={datesValid}
+        stayLine={stayLine}
+      />
     </div>
   );
 }

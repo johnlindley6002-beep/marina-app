@@ -9,6 +9,7 @@ import {
 import { formatLength } from "../../lib/units";
 import FavouriteButton from "./FavouriteButton";
 import { useLanguage } from "./LanguageProvider";
+import ProtectionIndicator from "./ProtectionIndicator";
 import { useUnits } from "./UnitsProvider";
 
 type Props = {
@@ -87,6 +88,12 @@ export default function MarinaRow({
               <dt className="text-sm text-ink/70">{t.results.from}</dt>
               <dd className="tabular font-medium text-ink">
                 €{cheapest.toFixed(2)}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-sm text-ink/70">Protection</dt>
+              <dd className="font-medium text-ink">
+                <ProtectionIndicator protection={marina.protection} />
               </dd>
             </div>
           </dl>

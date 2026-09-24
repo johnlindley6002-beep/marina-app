@@ -9,6 +9,8 @@ export const siteConfig: {
   // Short, plain description of how the site handles data. Have it checked
   // before launch.
   privacyNote: string;
+  // Copy for the at-a-glance summary in Plan your stay.
+  decision: { availabilityNote: string };
   // Copy for the My boat area.
   hub: {
     intro: string;
@@ -22,6 +24,10 @@ export const siteConfig: {
   googleReviewsMinCount: 15,
   privacyNote:
     "aldock has no accounts. Boat details, saved marinas and your last enquiry are stored only in this browser. When you send an enquiry, your own email app sends it straight to the marina and aldock does not receive a copy. Passport numbers and other private details are optional and can be given to staff in person.",
+  decision: {
+    availabilityNote:
+      "Illustrative, not live. The marina confirms availability by email.",
+  },
   hub: {
     intro:
       "Save your boat once and every form on aldock fills itself in. Everything here is kept on this device only.",

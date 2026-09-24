@@ -1,6 +1,8 @@
 "use client";
 
+import type { ReactNode } from "react";
 import type { Marina } from "../../../../data/marinas";
+import ProtectionIndicator from "../../../components/ProtectionIndicator";
 import { formatLength } from "../../../../lib/units";
 import { useLanguage } from "../../../components/LanguageProvider";
 import { useUnits } from "../../../components/UnitsProvider";
@@ -9,7 +11,7 @@ export default function KeyFactsStrip({ marina }: { marina: Marina }) {
   const { t } = useLanguage();
   const { units } = useUnits();
 
-  const facts: { label: string; value: string }[] = [
+  const facts: { label: string; value: ReactNode }[] = [
     {
       label: t.keyFacts.maxLength,
       value: formatLength(marina.berths.maxLengthM, units),
@@ -23,6 +25,10 @@ export default function KeyFactsStrip({ marina }: { marina: Marina }) {
       value: formatLength(marina.berths.minDepthM, units, 1),
     },
     { label: "VHF", value: `Ch ${marina.vhfChannel}` },
+    {
+      label: "Protection",
+      value: <ProtectionIndicator protection={marina.protection} />,
+    },
     { label: "Location", value: marina.location },
   ];
 
@@ -30,7 +36,7 @@ export default function KeyFactsStrip({ marina }: { marina: Marina }) {
     <section className="bg-paper-deep section-tight px-5 md:px-8">
       <div className="mx-auto max-w-5xl">
         <h2 className="sr-only">{t.keyFacts.heading}</h2>
-        <dl className="grid grid-cols-2 gap-x-6 gap-y-5 sm:grid-cols-3 lg:grid-cols-[repeat(4,auto)_minmax(0,1.6fr)]">
+        <dl className="grid grid-cols-2 gap-x-6 gap-y-5 sm:grid-cols-3 lg:grid-cols-[repeat(5,auto)_minmax(0,1.6fr)]">
           {facts.map((fact) => (
             <div
               key={fact.label}

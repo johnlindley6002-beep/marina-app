@@ -4,47 +4,12 @@ import type { Marina } from "../../../../data/marinas";
 import { siteConfig } from "../../../../data/site";
 import { formatLength } from "../../../../lib/units";
 import { useLanguage } from "../../../components/LanguageProvider";
+import ProtectionIndicator from "../../../components/ProtectionIndicator";
 import { useUnits } from "../../../components/UnitsProvider";
 import ContactBlock from "./ContactBlock";
 import EmergencyNumbers from "./EmergencyNumbers";
 import GoogleReviewsBlock from "./GoogleReviewsBlock";
 import OfflineCard from "./OfflineCard";
-
-const PROTECTION_LABELS: Record<Marina["protection"]["level"], string> = {
-  sheltered: "Sheltered",
-  partial: "Partially protected",
-  exposed: "Exposed",
-};
-
-const PROTECTION_BADGE_CLASSES: Record<Marina["protection"]["level"], string> = {
-  sheltered: "border-ink/30 bg-ink/5 text-ink",
-  partial: "border-brass bg-brass/15 text-ink",
-  exposed: "border-error/50 bg-error/10 text-error",
-};
-
-function ProtectionTag({ protection }: { protection: Marina["protection"] }) {
-  return (
-    <div
-      className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm ${PROTECTION_BADGE_CLASSES[protection.level]}`}
-    >
-      <svg
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth={1.5}
-        className="h-4 w-4 shrink-0"
-        aria-hidden="true"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          d="M3 15c1.5 1.2 3 1.2 4.5 0s3-1.2 4.5 0 3 1.2 4.5 0 3-1.2 4.5 0M3 19c1.5 1.2 3 1.2 4.5 0s3-1.2 4.5 0 3 1.2 4.5 0 3-1.2 4.5 0M12 3v9m0 0-3-3m3 3 3-3"
-        />
-      </svg>
-      <span className="font-medium">{PROTECTION_LABELS[protection.level]}</span>
-    </div>
-  );
-}
 
 function formatCoordinates(lat: number, lng: number) {
   const latLabel = lat >= 0 ? "N" : "S";
@@ -99,12 +64,11 @@ export default function ApproachInfo({
 
         <p className="measure mt-6 text-ink/75">{marina.entryNote}</p>
 
-        <div className="mt-6">
-          <ProtectionTag protection={marina.protection} />
-          <p className="mt-2 text-sm text-ink/70">
-            {marina.protection.description} General guide only, not a live
-            forecast.
-          </p>
+        <div className="mt-8">
+          <p className={labelClass}>Protection</p>
+          <div className="mt-2">
+            <ProtectionIndicator protection={marina.protection} size="full" />
+          </div>
         </div>
 
         <div className="mt-8">

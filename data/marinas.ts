@@ -688,6 +688,9 @@ export const marinas: Marina[] = [
     outsideHoursInstructions: CASCAIS_OUTSIDE_HOURS,
     entryNote:
       "Approach from the mouth of the Tejo, on the north side; the main entrance opens directly to the Atlantic.",
+    // TODO (owner): confirm this rating with the marina or local pilots. It is
+    // a general judgement, not measured data. level is sheltered (Well
+    // protected), partial (Moderate) or exposed (Exposed).
     protection: {
       level: "partial",
       description:
