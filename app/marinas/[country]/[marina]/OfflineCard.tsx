@@ -38,7 +38,7 @@ export default function OfflineCard({ marina }: { marina: Marina }) {
   }, [marina.id]);
 
   return (
-    <section className="px-6 py-16 md:px-8 md:py-24">
+    <section className="section px-5 md:px-8">
       <div className="mx-auto max-w-5xl">
         <div className="flex flex-wrap items-baseline justify-between gap-3">
           <h2 className="type-heading type-h2 text-ink">
@@ -46,7 +46,7 @@ export default function OfflineCard({ marina }: { marina: Marina }) {
           </h2>
           <p
             role="status"
-            className={`text-xs font-medium ${online ? "text-ink/70" : "text-amber-800"}`}
+            className={`text-xs font-medium ${online ? "text-ink/70" : "text-ink"}`}
           >
             {online ? "Online" : "You're offline, showing saved details"}
           </p>
@@ -63,7 +63,7 @@ export default function OfflineCard({ marina }: { marina: Marina }) {
               <li>
                 <a
                   href={telHref(marina.phone)}
-                  className="font-medium text-ink underline underline-offset-4"
+                  className="inline-flex min-h-11 items-center font-medium text-ink underline underline-offset-4"
                 >
                   {marina.phone}
                 </a>
@@ -71,7 +71,7 @@ export default function OfflineCard({ marina }: { marina: Marina }) {
               <li>
                 <a
                   href={`mailto:${marina.email}`}
-                  className="text-ink underline underline-offset-4"
+                  className="inline-flex min-h-11 items-center text-ink underline underline-offset-4"
                 >
                   {marina.email}
                 </a>
@@ -82,7 +82,7 @@ export default function OfflineCard({ marina }: { marina: Marina }) {
                   href={marina.planImage.src}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-ink underline underline-offset-4"
+                  className="inline-flex min-h-11 items-center text-ink underline underline-offset-4"
                 >
                   Open the marina plan (image)
                 </a>
@@ -118,7 +118,7 @@ export default function OfflineCard({ marina }: { marina: Marina }) {
                 <button
                   type="button"
                   onClick={clearLastEnquiry}
-                  className="mt-4 text-sm text-ink/70 underline underline-offset-4 hover:text-red-600"
+                  className="mt-2 inline-flex min-h-11 items-center text-sm text-ink/70 underline underline-offset-4 hover:text-error"
                 >
                   Clear saved enquiry
                 </button>

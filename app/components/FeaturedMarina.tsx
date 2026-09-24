@@ -67,7 +67,7 @@ export default function FeaturedMarina() {
   ];
 
   return (
-    <section className="px-5 py-20 md:px-8 md:py-28">
+    <section className="section px-5 md:px-8">
       <div className="mx-auto max-w-6xl">
         <h2 className="type-heading type-h2 text-ink">
           {t.home.featuredHeading}
@@ -102,7 +102,7 @@ export default function FeaturedMarina() {
 
             <Link
               href={`/marinas/${flagship.countrySlug}/${flagship.id}`}
-              className="mt-10 inline-block text-lg text-ink underline decoration-brass decoration-2 underline-offset-[8px] hover:decoration-ink"
+              className="mt-8 inline-flex min-h-11 items-center text-lg text-ink underline decoration-brass decoration-2 underline-offset-[8px] hover:decoration-ink"
             >
               {t.countryPage.viewMarina}
             </Link>

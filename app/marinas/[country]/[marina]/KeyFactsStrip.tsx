@@ -30,7 +30,7 @@ export default function KeyFactsStrip({ marina, description }: Props) {
   ];
 
   return (
-    <section className="bg-paper-deep px-6 py-10 md:px-8 md:py-14">
+    <section className="bg-paper-deep section-tight px-5 md:px-8">
       <div className="mx-auto max-w-5xl">
         <h2 className="sr-only">{t.keyFacts.heading}</h2>
         <dl className="grid grid-cols-2 gap-x-6 gap-y-5 sm:grid-cols-3 lg:grid-cols-6">

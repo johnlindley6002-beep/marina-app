@@ -9,15 +9,17 @@ import { UnitsProvider } from "./components/UnitsProvider";
 
 const Navbar = dynamic(() => import("./components/Navbar"));
 
+// Latin covers English, Portuguese, Spanish and French, so the extended
+// subset (about 170 KB more on the wire) is not loaded.
 const archivo = Archivo({
-  subsets: ["latin", "latin-ext"],
+  subsets: ["latin"],
   axes: ["wdth"],
   variable: "--font-archivo",
   display: "swap",
 });
 
 const inter = Inter({
-  subsets: ["latin", "latin-ext"],
+  subsets: ["latin"],
   variable: "--font-inter",
   display: "swap",
 });
@@ -53,9 +55,9 @@ export default function RootLayout({
         <LanguageProvider>
           <UnitsProvider>
             <Navbar />
-            <div id="main" tabIndex={-1} className="flex-1 outline-none">
+            <main id="main" tabIndex={-1} className="flex-1 outline-none">
               {children}
-            </div>
+            </main>
             <Footer />
             <ServiceWorkerRegister />
           </UnitsProvider>

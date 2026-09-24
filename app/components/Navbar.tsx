@@ -29,13 +29,13 @@ export default function Navbar() {
   return (
     <header className="sticky top-0 z-50 border-b border-paper/10 bg-ink text-paper">
       <div className="mx-auto flex h-16 max-w-6xl items-center gap-10 px-5 md:px-8">
-        <Link href="/" onClick={closeMenu} aria-label="aldock" className="block">
+        <Link href="/" onClick={closeMenu} aria-label="aldock" className="flex min-h-11 items-center">
           <Image
             src="/images/aldock-wordmark.png"
             alt="aldock"
             width={407}
             height={108}
-            priority
+            loading="eager"
             className="h-5 w-auto"
           />
         </Link>
@@ -62,7 +62,7 @@ export default function Navbar() {
           aria-label={menuOpen ? t.nav.closeMenu : t.nav.openMenu}
           aria-expanded={menuOpen}
           onClick={() => setMenuOpen((open) => !open)}
-          className="ml-auto flex h-10 w-10 items-center justify-center md:hidden"
+          className="ml-auto flex h-11 w-11 items-center justify-center md:hidden"
         >
           <span className="flex w-5 flex-col gap-1.5" aria-hidden="true">
             <span

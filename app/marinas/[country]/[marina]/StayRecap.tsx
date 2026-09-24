@@ -11,7 +11,6 @@ import {
   TRIP_CHANGED_EVENT,
   type LastEnquiry,
 } from "../../../../lib/tripStore";
-import WriteReviewButton from "./WriteReviewButton";
 
 const inputClass =
   "mt-2 w-full border border-hairline px-3 py-2 text-sm text-ink focus:border-ink focus:outline-none";
@@ -61,9 +60,6 @@ export default function StayRecap({
 
   if (!enquiry) return null;
 
-  const today = new Date().toISOString().slice(0, 10);
-  const stayEnded = !!departure && departure < today;
-
   function notifyDeparture() {
     if (!enquiry) return;
     const body = [
@@ -81,7 +77,7 @@ export default function StayRecap({
   }
 
   return (
-    <section className="bg-paper-deep px-6 py-16 md:px-8 md:py-24">
+    <section className="bg-paper-deep section px-5 md:px-8">
       <div className="mx-auto max-w-5xl">
         <h2 className="type-heading type-h2 text-ink">
           Your stay &amp; departure
@@ -209,20 +205,6 @@ export default function StayRecap({
                 Rebook this stay
               </button>
             </div>
-
-            {stayEnded ? (
-              <div className="hairline-top pt-6">
-                <h3 className="text-sm font-medium text-ink">
-                  How was your stay?
-                </h3>
-                <div className="mt-3">
-                  <WriteReviewButton
-                    marina={marina}
-                    label="Review your stay"
-                  />
-                </div>
-              </div>
-            ) : null}
           </div>
         </div>
       </div>

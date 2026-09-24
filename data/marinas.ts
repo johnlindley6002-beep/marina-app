@@ -322,39 +322,16 @@ export function calculateQuote(
   };
 }
 
-export type ReviewCategory =
-  | "hospitality"
-  | "cleanliness"
-  | "services"
-  | "shops";
-
-export const REVIEW_CATEGORY_LABELS: Record<ReviewCategory, string> = {
-  hospitality: "Hospitality",
-  cleanliness: "Cleanliness",
-  services: "Services",
-  shops: "Shops nearby",
-};
-
-export type Review = {
-  author: string;
-  date: string;
-  rating: number;
-  text: string;
-  response?: string;
-};
-
-// Real reviews need a backend. Until then this is seed data; set
-// isSample to false only when the figures come from real boaters.
-export type Reviews = {
-  isSample: boolean;
-  overall: number;
-  count: number;
-  categories: Record<ReviewCategory, number>;
-  items: Review[];
+// Real Google rating data. All three values are entered by the owner from
+// the marina's Google listing; nothing here is invented. The block renders
+// only when reviewCount reaches siteConfig.googleReviewsMinCount.
+export type GoogleReviews = {
+  rating: number | null;
+  reviewCount: number | null;
+  googleUrl: string | null;
 };
 
 export type NearbyPlace = { name: string; description: string };
-export type Badge = { label: string; year?: number };
 export type EmergencyPhone = { label: string; number: string };
 export type VhfChannelInfo = { channel: number; label: string };
 
@@ -394,9 +371,15 @@ export type Marina = {
     level: "sheltered" | "partial" | "exposed";
     description: string;
   };
-  photos: { src: string; alt: string; caption: string; credit?: string }[];
+  // Photos flagged placeholder are never shown; add real ones without the flag.
+  photos: {
+    src: string;
+    alt: string;
+    caption: string;
+    credit?: string;
+    placeholder?: boolean;
+  }[];
   serviceFees: ServiceFees;
-  // null until the marina supplies its real terms.
   cancellationPolicy: string | null;
   facilityDetails: FacilityDetail[];
   // Space the facility pins and wayfinding points are expressed in.
@@ -409,10 +392,8 @@ export type Marina = {
   coverImage?: { src: string; alt: string };
   // Shown as the flagship on the homepage.
   featured?: boolean;
-  reviews: Reviews;
+  googleReviews: GoogleReviews;
   nearby: NearbyPlace[];
-  // Only badges listed here are rendered; never claim one that isn't confirmed.
-  badges: Badge[];
   emergency: { phones: EmergencyPhone[]; vhf: VhfChannelInfo[] };
 };
 
@@ -706,22 +687,27 @@ export const marinas: Marina[] = [
     photos: [
       {
         src: "/images/photo-placeholder-marina.svg",
+        placeholder: true,
         alt: "Placeholder photo of the marina basin",
         caption: "The marina basin",
       },
       {
         src: "/images/photo-placeholder-pontoons.svg",
+        placeholder: true,
         alt: "Placeholder photo of the pontoons",
         caption: "Pontoons and berths",
       },
       {
         src: "/images/photo-placeholder-town.svg",
+        placeholder: true,
         alt: "Placeholder photo of Cascais town",
         caption: "Cascais town beyond",
       },
     ],
     serviceFees: CASCAIS_SERVICE_FEES,
-    cancellationPolicy: null,
+    // TODO (owner): replace with the marina's real cancellation terms.
+    cancellationPolicy:
+      "Cancellation terms are set by Marina de Cascais. Sending an enquiry does not create a booking or take payment. The marina confirms availability and its cancellation terms by email before anything is agreed.",
     facilityDetails: CASCAIS_FACILITY_DETAILS,
     mapCanvas: { width: 1400, height: 990 },
     wayfinding: { entrance: null, reception: { x: 1147, y: 545 } },
@@ -748,47 +734,9 @@ export const marinas: Marina[] = [
       src: "/images/cascais-marina-plan.webp",
       alt: "Official plan of Marina de Cascais showing the pontoons and quays",
     },
-    // PLACEHOLDER: sample ratings and reviews, not from real boaters.
-    // Replace with real data once a reviews backend exists.
-    reviews: {
-      isSample: true,
-      overall: 4.6,
-      count: 4,
-      categories: {
-        hospitality: 4.8,
-        cleanliness: 4.6,
-        services: 4.4,
-        shops: 4.5,
-      },
-      items: [
-        {
-          author: "S.",
-          date: "2026-08-14",
-          rating: 5,
-          text: "Easy hail on channel 9 and the staff met us on the pontoon. Showers spotless, and the old town is a five-minute walk.",
-          response:
-            "Thank you, we look forward to welcoming you back to Cascais.",
-        },
-        {
-          author: "M.",
-          date: "2026-07-29",
-          rating: 5,
-          text: "Well protected inside. We used the fuel dock and laundry, both simple and quick.",
-        },
-        {
-          author: "J.",
-          date: "2026-06-21",
-          rating: 4,
-          text: "Great location and services. It can get bumpy at the entrance when the southwesterly picks up, so time your arrival.",
-        },
-        {
-          author: "R.",
-          date: "2026-05-09",
-          rating: 4,
-          text: "Handy for the train to Lisbon. Plenty of cafés and shops around the marina.",
-        },
-      ],
-    },
+    // TODO (owner): fill these three from the marina's Google listing.
+    // Leave null until real values exist; the block stays hidden.
+    googleReviews: { rating: null, reviewCount: null, googleUrl: null },
     nearby: [
       {
         name: "Boca do Inferno",
@@ -815,8 +763,6 @@ export const marinas: Marina[] = [
         description: "About 40 minutes from Cascais station to central Lisbon.",
       },
     ],
-    // TODO (owner): add confirmed badges, e.g. { label: "Blue Flag", year: 2026 }.
-    badges: [],
     // TODO (owner): confirm and add the GNR / Polícia Marítima / harbour
     // numbers as further phones entries; unset numbers are never shown.
     emergency: {

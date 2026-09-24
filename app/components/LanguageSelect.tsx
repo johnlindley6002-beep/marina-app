@@ -12,7 +12,7 @@ export default function LanguageSelect({ className = "" }: { className?: string 
       <select
         value={locale}
         onChange={(e) => setLocale(e.target.value as Locale)}
-        className="appearance-none rounded-full border border-stone/40 bg-transparent py-1.5 pr-9 pl-4 text-sm text-paper hover:border-stone/80 [&>option]:text-ink"
+        className="appearance-none rounded-full border border-stone/40 bg-transparent min-h-11 py-1.5 pr-9 pl-4 text-sm md:min-h-9 text-paper hover:border-stone/80 [&>option]:text-ink"
       >
         {LOCALES.map((code) => (
           <option key={code} value={code} lang={code}>

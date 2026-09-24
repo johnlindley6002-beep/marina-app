@@ -1,10 +1,8 @@
 "use client";
 
-import { useState } from "react";
 import type { Marina } from "../../../../data/marinas";
 import type { StayPlan } from "../../../../lib/stayPlan";
 import ArrivalActions from "./ArrivalActions";
-import { ContactList } from "./ContactDock";
 import RequestBerthForm from "./RequestBerthForm";
 
 type Props = {
@@ -22,10 +20,8 @@ export default function ActionZone({
   selectedBerthId,
   rebookToken,
 }: Props) {
-  const [contactOpen, setContactOpen] = useState(false);
-
   return (
-    <section className="px-6 py-16 md:px-8 md:py-24">
+    <section className="section px-5 md:px-8">
       <div className="mx-auto max-w-5xl">
         <RequestBerthForm
           marina={marina}
@@ -41,24 +37,13 @@ export default function ActionZone({
           selectedBerthId={selectedBerthId}
         />
 
-        <div className="mt-10 border-t border-hairline pt-8">
-          <button
-            type="button"
-            aria-expanded={contactOpen}
-            aria-controls="general-contact"
-            onClick={() => setContactOpen((v) => !v)}
-            className="text-sm font-medium text-ink underline underline-offset-4 hover:text-ink-2"
+        <div className="hairline-top mt-10 pt-6">
+          <a
+            href="#contact-details"
+            className="inline-flex min-h-11 items-center text-ink underline underline-offset-4 hover:text-ink-2"
           >
-            General question? Contact the marina
-          </button>
-          {contactOpen ? (
-            <div
-              id="general-contact"
-              className="surface-lift mt-4 max-w-sm"
-            >
-              <ContactList marina={marina} />
-            </div>
-          ) : null}
+            General question? See the contact details
+          </a>
         </div>
       </div>
     </section>

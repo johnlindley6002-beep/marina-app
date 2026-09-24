@@ -27,7 +27,7 @@ export default function UnitSegmented({ className = "" }: { className?: string }
             type="button"
             aria-pressed={active}
             onClick={() => setUnits(option.value)}
-            className={`rounded-full px-3.5 py-1 transition-colors ${
+            className={`min-h-11 rounded-full px-4 transition-colors md:min-h-9 ${
               active
                 ? "bg-brass font-medium text-ink"
                 : "text-stone hover:text-paper"

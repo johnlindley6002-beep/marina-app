@@ -152,7 +152,7 @@ export default function DestinationSearch({
         aria-expanded={filtersOpen}
         aria-controls={`${uid}-filters`}
         onClick={() => setFiltersOpen((v) => !v)}
-        className="mt-3 text-sm text-ink/70 underline underline-offset-4 hover:text-ink"
+        className="mt-1 inline-flex min-h-11 items-center text-sm text-ink/70 underline underline-offset-4 hover:text-ink"
       >
         {filtersOpen ? t.home.hideFilters : t.home.addFilters}
       </button>

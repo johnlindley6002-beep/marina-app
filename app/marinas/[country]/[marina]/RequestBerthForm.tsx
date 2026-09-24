@@ -92,47 +92,47 @@ type Errors = Partial<Record<keyof FormData, string>> & { crew?: string };
 function validate(form: FormData): Errors {
   const errors: Errors = {};
 
-  if (!form.arrival) errors.arrival = "Required";
-  if (!form.eta) errors.eta = "Required";
+  if (!form.arrival) errors.arrival = "Choose your arrival date in Plan your stay.";
+  if (!form.eta) errors.eta = "Enter your expected arrival time, for example 15:30.";
 
   if (!form.openEnded) {
-    if (!form.departure) errors.departure = "Required";
-    if (!form.etd) errors.etd = "Required";
+    if (!form.departure) errors.departure = "Choose your departure date in Plan your stay, or tick open-ended stay.";
+    if (!form.etd) errors.etd = "Enter your expected departure time, for example 10:00.";
     if (
       form.arrival &&
       form.departure &&
       new Date(form.departure) <= new Date(form.arrival)
     ) {
-      errors.departure = "Departure must be after arrival";
+      errors.departure = "Departure must be after arrival. Choose a later departure date in Plan your stay.";
     }
   }
 
-  if (!form.boatName.trim()) errors.boatName = "Required";
-  if (!form.vesselType) errors.vesselType = "Required";
-  if (!form.loa || Number(form.loa) <= 0) errors.loa = "Enter a positive number";
-  if (!form.beam || Number(form.beam) <= 0) errors.beam = "Enter a positive number";
-  if (!form.draft || Number(form.draft) <= 0) errors.draft = "Enter a positive number";
-  if (!form.flagCountry) errors.flagCountry = "Required";
+  if (!form.boatName.trim()) errors.boatName = "Enter your boat's name.";
+  if (!form.vesselType) errors.vesselType = "Choose a vessel type: sail, motor, catamaran or other.";
+  if (!form.loa || Number(form.loa) <= 0) errors.loa = "Enter your boat's length overall, for example 12.5.";
+  if (!form.beam || Number(form.beam) <= 0) errors.beam = "Enter your boat's beam, for example 4.2.";
+  if (!form.draft || Number(form.draft) <= 0) errors.draft = "Enter your boat's draft, for example 1.8.";
+  if (!form.flagCountry) errors.flagCountry = "Choose the country your boat is registered in.";
 
-  if (!form.skipperName.trim()) errors.skipperName = "Required";
-  if (!form.phone.trim()) errors.phone = "Required";
+  if (!form.skipperName.trim()) errors.skipperName = "Enter the skipper's full name.";
+  if (!form.phone.trim()) errors.phone = "Enter a phone number the marina can reach you on, including the country code.";
   if (!form.email.trim()) {
-    errors.email = "Required";
+    errors.email = "Enter your email address so the marina can reply.";
   } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
-    errors.email = "Enter a valid email address";
+    errors.email = "Enter an email address like name@example.com.";
   }
   if (!form.peopleOnBoard || Number(form.peopleOnBoard) <= 0) {
-    errors.peopleOnBoard = "Required";
+    errors.peopleOnBoard = "Enter how many people will be on board (1 or more).";
   }
 
   if (form.shorePower && !form.amperage) {
-    errors.amperage = "Choose an amperage";
+    errors.amperage = "Choose a shore power amperage in Price estimate & extras.";
   }
 
-  if (!form.euStatus) errors.euStatus = "Required";
+  if (!form.euStatus) errors.euStatus = "Answer Yes or No so the marina knows which paperwork applies.";
   if (form.euStatus === "no") {
-    if (!form.lastPort.trim()) errors.lastPort = "Required";
-    if (!form.nextPort.trim()) errors.nextPort = "Required";
+    if (!form.lastPort.trim()) errors.lastPort = "Enter the port you are arriving from.";
+    if (!form.nextPort.trim()) errors.nextPort = "Enter the port you are heading to next.";
     const hasCompleteCrewRow = form.crew.some(
       (c) =>
         c.fullName.trim() && c.nationality && c.role.trim()
@@ -277,10 +277,10 @@ const inputClass =
   "mt-2 w-full border border-hairline px-3 py-2 text-sm text-ink focus:border-ink focus:outline-none";
 const labelClass =
   "text-sm font-medium text-ink/80";
-const errorClass = "mt-1 text-xs text-red-600";
+const errorClass = "mt-1 text-xs text-error";
 
 function RequiredMark() {
-  return <span className="text-red-600"> *</span>;
+  return <span className="text-error"> *</span>;
 }
 
 type Props = {
@@ -363,6 +363,8 @@ export default function RequestBerthForm({
 
   const [docs, setDocs] = useState<BoatDocuments>({ ...EMPTY_DOCUMENTS });
   const [includeDocs, setIncludeDocs] = useState(false);
+  const formElRef = useRef<HTMLFormElement>(null);
+  const [submitTick, setSubmitTick] = useState(0);
   const [submitted, setSubmitted] = useState(false);
   const [errors, setErrors] = useState<Errors>({});
   const [summary, setSummary] = useState<string | null>(null);
@@ -446,6 +448,19 @@ export default function RequestBerthForm({
     if (submitted) setErrors(validate(form));
   }, [form, submitted]);
 
+  // After a failed submit, move focus to the first field that needs fixing,
+  // or to the note that points at the Plan panel.
+  useEffect(() => {
+    if (submitTick === 0) return;
+    const frame = requestAnimationFrame(() => {
+      const target =
+        formElRef.current?.querySelector<HTMLElement>('[aria-invalid="true"]') ??
+        formElRef.current?.querySelector<HTMLElement>('[role="alert"][tabindex]');
+      target?.focus();
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [submitTick]);
+
   const nights = useMemo(() => {
     if (form.openEnded || !form.arrival || !form.departure) return null;
     const a = new Date(form.arrival);
@@ -512,7 +527,10 @@ export default function RequestBerthForm({
     setSubmitted(true);
     const validationErrors = validate(form);
     setErrors(validationErrors);
-    if (Object.keys(validationErrors).length > 0) return;
+    if (Object.keys(validationErrors).length > 0) {
+      setSubmitTick((n) => n + 1);
+      return;
+    }
 
     const text = buildSummary(form, marina, nights, quote, includeDocs ? docs : null);
     saveLastEnquiry({
@@ -577,7 +595,7 @@ export default function RequestBerthForm({
         opens a pre-filled email. Nothing is submitted to a server.
       </p>
 
-      <form onSubmit={handleSubmit} className="mt-8 space-y-12">
+      <form ref={formElRef} onSubmit={handleSubmit} noValidate className="mt-8 space-y-12">
         {/* 1. Your visit */}
         <fieldset>
           <legend className="type-heading text-xl text-ink">
@@ -618,10 +636,16 @@ export default function RequestBerthForm({
               <input
                 type="time"
                 value={form.eta}
+                aria-invalid={!!errors.eta}
+                aria-describedby={errors.eta ? "err-eta" : undefined}
                 onChange={(e) => setField("eta", e.target.value)}
                 className={inputClass}
               />
-              {errors.eta ? <p className={errorClass}>{errors.eta}</p> : null}
+              {errors.eta ? (
+                <p id="err-eta" role="alert" className={errorClass}>
+                  {errors.eta}
+                </p>
+              ) : null}
             </label>
 
             <label className="block text-sm">
@@ -632,11 +656,17 @@ export default function RequestBerthForm({
               <input
                 type="time"
                 value={form.etd}
+                aria-invalid={!!errors.etd}
+                aria-describedby={errors.etd ? "err-etd" : undefined}
                 onChange={(e) => setField("etd", e.target.value)}
                 disabled={form.openEnded}
                 className={`${inputClass} disabled:bg-paper-deep disabled:text-ink/70`}
               />
-              {errors.etd ? <p className={errorClass}>{errors.etd}</p> : null}
+              {errors.etd ? (
+                <p id="err-etd" role="alert" className={errorClass}>
+                  {errors.etd}
+                </p>
+              ) : null}
             </label>
           </div>
         </fieldset>
@@ -682,10 +712,16 @@ export default function RequestBerthForm({
               <input
                 type="text"
                 value={form.boatName}
+                aria-invalid={!!errors.boatName}
+                aria-describedby={errors.boatName ? "err-boatName" : undefined}
                 onChange={(e) => setField("boatName", e.target.value)}
                 className={inputClass}
               />
-              {errors.boatName ? <p className={errorClass}>{errors.boatName}</p> : null}
+              {errors.boatName ? (
+                <p id="err-boatName" role="alert" className={errorClass}>
+                  {errors.boatName}
+                </p>
+              ) : null}
             </label>
 
             <label className="block text-sm">
@@ -695,6 +731,8 @@ export default function RequestBerthForm({
               </span>
               <select
                 value={form.vesselType}
+                aria-invalid={!!errors.vesselType}
+                aria-describedby={errors.vesselType ? "err-vesselType" : undefined}
                 onChange={(e) =>
                   setField("vesselType", e.target.value as VesselType | "")
                 }
@@ -707,7 +745,11 @@ export default function RequestBerthForm({
                   </option>
                 ))}
               </select>
-              {errors.vesselType ? <p className={errorClass}>{errors.vesselType}</p> : null}
+              {errors.vesselType ? (
+                <p id="err-vesselType" role="alert" className={errorClass}>
+                  {errors.vesselType}
+                </p>
+              ) : null}
               {form.vesselType === "catamaran" ? (
                 <p className="mt-1 text-xs text-ink/70">
                   Catamarans may need a wider, pricier berth.
@@ -722,6 +764,8 @@ export default function RequestBerthForm({
               </span>
               <select
                 value={form.flagCountry}
+                aria-invalid={!!errors.flagCountry}
+                aria-describedby={errors.flagCountry ? "err-flagCountry" : undefined}
                 onChange={(e) => setField("flagCountry", e.target.value)}
                 className={inputClass}
               >
@@ -732,7 +776,11 @@ export default function RequestBerthForm({
                   </option>
                 ))}
               </select>
-              {errors.flagCountry ? <p className={errorClass}>{errors.flagCountry}</p> : null}
+              {errors.flagCountry ? (
+                <p id="err-flagCountry" role="alert" className={errorClass}>
+                  {errors.flagCountry}
+                </p>
+              ) : null}
             </label>
 
             <label className="block text-sm">
@@ -765,10 +813,16 @@ export default function RequestBerthForm({
               <input
                 type="text"
                 value={form.skipperName}
+                aria-invalid={!!errors.skipperName}
+                aria-describedby={errors.skipperName ? "err-skipperName" : undefined}
                 onChange={(e) => setField("skipperName", e.target.value)}
                 className={inputClass}
               />
-              {errors.skipperName ? <p className={errorClass}>{errors.skipperName}</p> : null}
+              {errors.skipperName ? (
+                <p id="err-skipperName" role="alert" className={errorClass}>
+                  {errors.skipperName}
+                </p>
+              ) : null}
             </label>
 
             <label className="block text-sm">
@@ -779,10 +833,16 @@ export default function RequestBerthForm({
               <input
                 type="tel"
                 value={form.phone}
+                aria-invalid={!!errors.phone}
+                aria-describedby={errors.phone ? "err-phone" : undefined}
                 onChange={(e) => setField("phone", e.target.value)}
                 className={inputClass}
               />
-              {errors.phone ? <p className={errorClass}>{errors.phone}</p> : null}
+              {errors.phone ? (
+                <p id="err-phone" role="alert" className={errorClass}>
+                  {errors.phone}
+                </p>
+              ) : null}
             </label>
 
             <label className="block text-sm">
@@ -793,10 +853,16 @@ export default function RequestBerthForm({
               <input
                 type="email"
                 value={form.email}
+                aria-invalid={!!errors.email}
+                aria-describedby={errors.email ? "err-email" : undefined}
                 onChange={(e) => setField("email", e.target.value)}
                 className={inputClass}
               />
-              {errors.email ? <p className={errorClass}>{errors.email}</p> : null}
+              {errors.email ? (
+                <p id="err-email" role="alert" className={errorClass}>
+                  {errors.email}
+                </p>
+              ) : null}
             </label>
 
             <label className="block text-sm">
@@ -819,10 +885,16 @@ export default function RequestBerthForm({
                 min="1"
                 step="1"
                 value={form.peopleOnBoard}
+                aria-invalid={!!errors.peopleOnBoard}
+                aria-describedby={errors.peopleOnBoard ? "err-peopleOnBoard" : undefined}
                 onChange={(e) => setField("peopleOnBoard", e.target.value)}
                 className={inputClass}
               />
-              {errors.peopleOnBoard ? <p className={errorClass}>{errors.peopleOnBoard}</p> : null}
+              {errors.peopleOnBoard ? (
+                <p id="err-peopleOnBoard" role="alert" className={errorClass}>
+                  {errors.peopleOnBoard}
+                </p>
+              ) : null}
             </label>
           </div>
         </fieldset>
@@ -881,7 +953,7 @@ export default function RequestBerthForm({
             <button
               type="button"
               onClick={() => setField("euStatus", "yes")}
-              className={`px-6 py-2 text-sm font-medium ${
+              className={`min-h-11 px-6 text-sm font-medium ${
                 form.euStatus === "yes"
                   ? "bg-ink text-white"
                   : "border border-hairline text-ink/75 hover:border-ink/40"
@@ -892,7 +964,7 @@ export default function RequestBerthForm({
             <button
               type="button"
               onClick={() => setField("euStatus", "no")}
-              className={`px-6 py-2 text-sm font-medium ${
+              className={`min-h-11 px-6 text-sm font-medium ${
                 form.euStatus === "no"
                   ? "bg-ink text-white"
                   : "border border-hairline text-ink/75 hover:border-ink/40"
@@ -901,7 +973,11 @@ export default function RequestBerthForm({
               No
             </button>
           </div>
-          {errors.euStatus ? <p className={errorClass}>{errors.euStatus}</p> : null}
+          {errors.euStatus ? (
+                <p id="err-euStatus" role="alert" className={errorClass}>
+                  {errors.euStatus}
+                </p>
+              ) : null}
 
           {form.euStatus === "yes" ? (
             <div className="mt-4 space-y-1 text-sm text-ink/70">
@@ -922,10 +998,16 @@ export default function RequestBerthForm({
                   <input
                     type="text"
                     value={form.lastPort}
+                    aria-invalid={!!errors.lastPort}
+                    aria-describedby={errors.lastPort ? "err-lastPort" : undefined}
                     onChange={(e) => setField("lastPort", e.target.value)}
                     className={inputClass}
                   />
-                  {errors.lastPort ? <p className={errorClass}>{errors.lastPort}</p> : null}
+                  {errors.lastPort ? (
+                <p id="err-lastPort" role="alert" className={errorClass}>
+                  {errors.lastPort}
+                </p>
+              ) : null}
                 </label>
 
                 <label className="block text-sm">
@@ -936,10 +1018,16 @@ export default function RequestBerthForm({
                   <input
                     type="text"
                     value={form.nextPort}
+                    aria-invalid={!!errors.nextPort}
+                    aria-describedby={errors.nextPort ? "err-nextPort" : undefined}
                     onChange={(e) => setField("nextPort", e.target.value)}
                     className={inputClass}
                   />
-                  {errors.nextPort ? <p className={errorClass}>{errors.nextPort}</p> : null}
+                  {errors.nextPort ? (
+                <p id="err-nextPort" role="alert" className={errorClass}>
+                  {errors.nextPort}
+                </p>
+              ) : null}
                 </label>
               </div>
 
@@ -1025,7 +1113,7 @@ export default function RequestBerthForm({
                           type="button"
                           onClick={() => removeCrewRow(index)}
                           disabled={form.crew.length === 1}
-                          className="px-2 text-xs font-medium text-ink/70 hover:text-red-600 disabled:cursor-not-allowed disabled:opacity-40"
+                          className="px-2 text-xs font-medium text-ink/70 hover:text-error disabled:cursor-not-allowed disabled:opacity-40"
                           aria-label="Remove crew member"
                         >
                           Remove
@@ -1034,7 +1122,11 @@ export default function RequestBerthForm({
                     </div>
                   ))}
                 </div>
-                {errors.crew ? <p className={errorClass}>{errors.crew}</p> : null}
+                {errors.crew ? (
+                <p id="err-crew" role="alert" className={errorClass}>
+                  {errors.crew}
+                </p>
+              ) : null}
                 <button
                   type="button"
                   onClick={addCrewRow}
@@ -1098,7 +1190,7 @@ export default function RequestBerthForm({
         </fieldset>
 
         {planErrorLabels.length > 0 ? (
-          <p role="alert" className="text-sm text-red-600">
+          <p role="alert" tabIndex={-1} className="text-sm text-error">
             Please complete {planErrorLabels.join(" and ")} in{" "}
             <a href="#plan-your-stay" className="underline underline-offset-4">
               Plan your stay
@@ -1107,7 +1199,7 @@ export default function RequestBerthForm({
           </p>
         ) : null}
         {errors.amperage ? (
-          <p role="alert" className="text-sm text-red-600">
+          <p role="alert" className="text-sm text-error">
             Choose a shore power amperage in{" "}
             <a href="#price-estimate" className="underline underline-offset-4">
               Price estimate &amp; extras
@@ -1126,6 +1218,13 @@ export default function RequestBerthForm({
           </p>
           <p className="mt-4 text-sm text-ink/75">
             This sends an enquiry; the marina confirms availability by email.
+          </p>
+          <p className="mt-2 text-sm text-ink/70">
+            Your details go only to the marina, by email.{" "}
+            <a href="#privacy" className="underline underline-offset-4">
+              Read the privacy note
+            </a>
+            .
           </p>
           <button
             type="submit"

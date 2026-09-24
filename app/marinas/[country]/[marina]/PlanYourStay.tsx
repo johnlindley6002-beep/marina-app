@@ -15,10 +15,10 @@ import { useUnits } from "../../../components/UnitsProvider";
 const inputClass =
   "mt-2 w-full border border-hairline px-3 py-2 text-sm text-ink focus:border-ink focus:outline-none disabled:bg-paper-deep disabled:text-ink/70";
 const labelClass = "text-sm font-medium text-ink/80";
-const errorClass = "mt-1 text-xs text-red-600";
+const errorClass = "mt-1 text-xs text-error";
 
 function RequiredMark() {
-  return <span className="text-red-600"> *</span>;
+  return <span className="text-error"> *</span>;
 }
 
 function parseIso(value: string): Date | null {
@@ -56,7 +56,7 @@ export default function PlanYourStay({ marina, plan, onPlanChange }: Props) {
 
   const dim = (v: string) => Number(v);
   const dimError = (v: string) =>
-    v !== "" && !(dim(v) > 0) ? "Enter a positive number" : null;
+    v !== "" && !(dim(v) > 0) ? "Enter a number greater than 0, for example 12.5." : null;
   const dimsComplete =
     dim(plan.loa) > 0 && dim(plan.beam) > 0 && dim(plan.draft) > 0;
   const fit = dimsComplete
@@ -108,10 +108,13 @@ export default function PlanYourStay({ marina, plan, onPlanChange }: Props) {
             disabled={plan.openEnded}
             onChange={(e) => onPlanChange({ departure: e.target.value })}
             aria-invalid={datesInvalid}
+            aria-describedby={datesInvalid ? "err-plan-departure" : undefined}
             className={inputClass}
           />
           {datesInvalid ? (
-            <p className={errorClass}>Departure must be after arrival</p>
+            <p id="err-plan-departure" role="alert" className={errorClass}>
+              Departure must be after arrival. Choose a later departure date.
+            </p>
           ) : null}
         </label>
 
@@ -123,13 +126,17 @@ export default function PlanYourStay({ marina, plan, onPlanChange }: Props) {
           <LengthInput
             valueM={plan.loa}
             onChangeM={(v) => onPlanChange({ loa: v })}
+            invalid={!!dimError(plan.loa)}
+            describedBy={dimError(plan.loa) ? "err-plan-loa" : undefined}
             className={inputClass}
           />
           <p className="mt-1 text-xs text-ink/70">
             Including bowsprit, davits, dinghy
           </p>
           {dimError(plan.loa) ? (
-            <p className={errorClass}>{dimError(plan.loa)}</p>
+            <p id="err-plan-loa" role="alert" className={errorClass}>
+              {dimError(plan.loa)}
+            </p>
           ) : null}
         </label>
 
@@ -141,10 +148,14 @@ export default function PlanYourStay({ marina, plan, onPlanChange }: Props) {
           <LengthInput
             valueM={plan.beam}
             onChangeM={(v) => onPlanChange({ beam: v })}
+            invalid={!!dimError(plan.beam)}
+            describedBy={dimError(plan.beam) ? "err-plan-beam" : undefined}
             className={inputClass}
           />
           {dimError(plan.beam) ? (
-            <p className={errorClass}>{dimError(plan.beam)}</p>
+            <p id="err-plan-beam" role="alert" className={errorClass}>
+              {dimError(plan.beam)}
+            </p>
           ) : null}
         </label>
 
@@ -156,10 +167,14 @@ export default function PlanYourStay({ marina, plan, onPlanChange }: Props) {
           <LengthInput
             valueM={plan.draft}
             onChangeM={(v) => onPlanChange({ draft: v })}
+            invalid={!!dimError(plan.draft)}
+            describedBy={dimError(plan.draft) ? "err-plan-draft" : undefined}
             className={inputClass}
           />
           {dimError(plan.draft) ? (
-            <p className={errorClass}>{dimError(plan.draft)}</p>
+            <p id="err-plan-draft" role="alert" className={errorClass}>
+              {dimError(plan.draft)}
+            </p>
           ) : null}
         </label>
       </div>

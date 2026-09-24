@@ -1,7 +1,8 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import Image from "next/image";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useDeferredValue, useEffect, useState } from "react";
 import type { Marina } from "../../../../data/marinas";
 import { loadBoatProfile, saveBoatProfile } from "../../../../lib/boatProfile";
 import { contentLocale, marinaContent } from "../../../../lib/i18n";
@@ -10,23 +11,34 @@ import {
   effectiveDeparture,
   type StayPlan,
 } from "../../../../lib/stayPlan";
-import BerthAvailabilityMap from "./BerthAvailabilityMap";
 import PlanYourStay from "./PlanYourStay";
 import PriceEstimate from "./PriceEstimate";
 import KeyFactsStrip from "./KeyFactsStrip";
 import ApproachInfo from "./ApproachInfo";
-import ActionZone from "./ActionZone";
 import PhotoStrip from "./PhotoStrip";
-import FacilitiesGrid from "./FacilitiesGrid";
-import TrustSection from "./TrustSection";
-import OfflineCard from "./OfflineCard";
-import StayRecap from "./StayRecap";
-import ContactDock from "./ContactDock";
+import NearbyPlaces from "./NearbyPlaces";
 import Breadcrumbs from "../../../components/Breadcrumbs";
 import ChartLinework from "../../../components/ChartLinework";
 import FavouriteButton from "../../../components/FavouriteButton";
 import FlagIcon from "../../../components/FlagIcon";
 import { useLanguage } from "../../../components/LanguageProvider";
+
+// Below-the-fold pieces load as separate chunks, after first paint. They are
+// still rendered on the server, so nothing shifts when they arrive.
+const BerthAvailabilityMap = dynamic(() => import("./BerthAvailabilityMap"), {
+  ssr: false,
+  loading: () => (
+    <div
+      className="surface-lift min-h-[27rem] md:min-h-[48.5rem]"
+      aria-hidden="true"
+    />
+  ),
+});
+const ActionZone = dynamic(() => import("./ActionZone"));
+const FacilitiesGrid = dynamic(() => import("./FacilitiesGrid"));
+const StayRecap = dynamic(() => import("./StayRecap"));
+const OfflineCard = dynamic(() => import("./OfflineCard"));
+const ContactDock = dynamic(() => import("./ContactDock"));
 
 type Props = {
   marina: Marina;
@@ -75,6 +87,13 @@ export default function CascaisPageContent({
     }
   }, [plan.loa, plan.beam, plan.draft]);
 
+  // The map redraws hundreds of berths, so it follows the inputs a beat behind
+  // to keep typing responsive.
+  const mapArrival = useDeferredValue(plan.arrival);
+  const mapDeparture = useDeferredValue(effectiveDeparture(plan));
+  const mapLength = useDeferredValue(plan.loa);
+  const realPhotos = marina.photos.filter((photo) => !photo.placeholder);
+
   const description = content?.description[cl] ?? marina.description;
   const arrivalInstructions =
     content?.arrivalInstructions[cl] ?? marina.arrivalInstructions;
@@ -86,7 +105,7 @@ export default function CascaisPageContent({
 
   return (
     <>
-      <section className="on-ink relative isolate overflow-hidden bg-gradient-to-br from-ink to-ink-2 px-6 py-16 md:py-24">
+      <section className="on-ink section relative isolate overflow-hidden bg-gradient-to-br from-ink to-ink-2 px-5">
         <ChartLinework className="absolute inset-0 -z-10 h-full w-full text-paper opacity-[0.07]" />
         <div className="mx-auto max-w-5xl text-center">
           <p className="flex items-center justify-center gap-2 text-sm text-stone">
@@ -118,13 +137,20 @@ export default function CascaisPageContent({
             alt={`${marina.name} logo`}
             width={575}
             height={383}
-            priority
+            loading="eager"
+            fetchPriority="high"
             className="mx-auto mt-6 h-auto w-[220px] sm:w-[260px] md:w-[300px]"
           />
+          <a
+            href="#plan-your-stay"
+            className="mt-8 inline-flex min-h-12 items-center rounded-[3px] bg-brass px-8 text-base font-medium text-ink transition-[filter] hover:brightness-105"
+          >
+            Request a berth
+          </a>
         </div>
       </section>
 
-      <div className="mx-auto max-w-5xl px-6 py-4 text-ink/70 md:px-8">
+      <div className="mx-auto max-w-5xl px-5 py-4 text-ink/70 md:px-8">
         <Breadcrumbs
           items={[
             { label: t.breadcrumbs.marinas, href: "/marinas" },
@@ -138,7 +164,7 @@ export default function CascaisPageContent({
 
       <section
         id="plan-your-stay"
-        className="scroll-mt-24 px-6 py-12 md:px-8 md:py-16"
+        className="section-tight scroll-mt-24 px-5 md:px-8"
       >
         <div className="mx-auto max-w-5xl">
           <PlanYourStay
@@ -149,7 +175,7 @@ export default function CascaisPageContent({
         </div>
       </section>
 
-      <section className="px-6 pb-12 md:px-8 md:pb-16">
+      <section className="px-5 pb-10 md:px-8 md:pb-14">
         <div className="mx-auto max-w-5xl">
           <BerthAvailabilityMap
             marinaName={marina.name}
@@ -158,15 +184,15 @@ export default function CascaisPageContent({
             vatRate={marina.vatRate}
             onBerthSelect={setSelectedBerthId}
             controlled={{
-              arrival: plan.arrival,
-              departure: effectiveDeparture(plan),
-              lengthM: plan.loa,
+              arrival: mapArrival,
+              departure: mapDeparture,
+              lengthM: mapLength,
             }}
           />
         </div>
       </section>
 
-      <section id="price-estimate" className="scroll-mt-24 px-6 py-12 md:px-8 md:py-16">
+      <section id="price-estimate" className="section-tight scroll-mt-24 px-5 md:px-8">
         <PriceEstimate
           marina={marina}
           plan={plan}
@@ -175,14 +201,14 @@ export default function CascaisPageContent({
         />
       </section>
 
-      <section className="px-6 pb-12 md:px-8 md:pb-16">
-        <div className="mx-auto max-w-5xl">
-          <h2 className="type-heading type-h2 mb-6 text-ink">
-            Photos
-          </h2>
-          <PhotoStrip photos={marina.photos} />
-        </div>
-      </section>
+      {realPhotos.length > 0 ? (
+        <section className="px-5 pb-10 md:px-8 md:pb-14">
+          <div className="mx-auto max-w-5xl">
+            <h2 className="type-heading type-h2 mb-6 text-ink">Photos</h2>
+            <PhotoStrip photos={realPhotos} />
+          </div>
+        </section>
+      ) : null}
 
       <ApproachInfo
         marina={marina}
@@ -190,7 +216,7 @@ export default function CascaisPageContent({
         gettingThere={gettingThere}
       />
 
-      <section className="bg-paper-deep px-6 py-16 md:px-8 md:py-24">
+      <section className="section bg-paper-deep px-5 md:px-8">
         <div className="mx-auto max-w-5xl">
           <h2 className="type-heading type-h2 text-ink">
             {t.facilities.heading}
@@ -199,7 +225,21 @@ export default function CascaisPageContent({
         </div>
       </section>
 
-      <TrustSection marina={marina} />
+      <NearbyPlaces marina={marina} />
+
+      <section className="px-5 pb-10 md:px-8 md:pb-14">
+        <div className="hairline-top mx-auto flex max-w-5xl flex-col gap-4 pt-8 sm:flex-row sm:items-center sm:justify-between">
+          <p className="type-heading type-h3 text-ink">
+            Ready to plan your visit?
+          </p>
+          <a
+            href="#request-berth"
+            className="inline-flex min-h-12 items-center justify-center rounded-[3px] bg-brass px-8 text-base font-medium text-ink transition-[filter] hover:brightness-105"
+          >
+            Request a berth
+          </a>
+        </div>
+      </section>
 
       <ActionZone
         marina={marina}

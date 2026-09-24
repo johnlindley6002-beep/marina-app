@@ -38,21 +38,21 @@ export default function SavedMarinas() {
           >
             <Link
               href={`/marinas/${favourite.countrySlug}/${favourite.marinaId}`}
-              className="font-medium text-ink underline underline-offset-4"
+              className="inline-flex min-h-11 items-center font-medium text-ink underline underline-offset-4"
             >
               {favourite.marinaName}
             </Link>
             <span className="flex items-center gap-4">
               <Link
                 href={`/marinas/${favourite.countrySlug}/${favourite.marinaId}#request-berth`}
-                className="text-ink hover:underline"
+                className="inline-flex min-h-11 items-center text-ink hover:underline"
               >
                 New enquiry
               </Link>
               <button
                 type="button"
                 onClick={() => toggleFavourite(favourite)}
-                className="text-ink/70 hover:text-red-600"
+                className="inline-flex min-h-11 items-center text-ink/70 hover:text-error"
               >
                 Remove
               </button>

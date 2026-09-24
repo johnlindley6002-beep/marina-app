@@ -107,8 +107,8 @@ export default function PriceEstimate({
                   ))}
                 </select>
                 {amperageError && !plan.amperage ? (
-                  <p className="mt-1 text-xs text-red-600">
-                    Choose an amperage
+                  <p className="mt-1 text-xs text-error">
+                    Choose a shore power amperage, for example 16A or 32A.
                   </p>
                 ) : null}
               </div>

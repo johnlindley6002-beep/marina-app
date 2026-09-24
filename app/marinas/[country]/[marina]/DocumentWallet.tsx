@@ -84,7 +84,7 @@ export default function DocumentWallet({
             className={inputClass}
           />
           {expiresBeforeArrival ? (
-            <p className="mt-1 text-xs text-amber-700">
+            <p className="mt-1 text-xs text-error">
               This expires before your arrival date.
             </p>
           ) : null}

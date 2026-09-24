@@ -25,7 +25,7 @@ export default function EmergencyNumbers({
               <span className="text-ink/75">{phone.label}</span>
               <a
                 href={telHref(phone.number)}
-                className="font-medium text-ink underline underline-offset-4"
+                className="inline-flex min-h-11 items-center font-medium text-ink underline underline-offset-4"
               >
                 {phone.number}
               </a>
@@ -53,7 +53,7 @@ export default function EmergencyNumbers({
 
   if (embedded) return <div className="mt-12">{body}</div>;
   return (
-    <section className="px-6 py-16 md:px-8 md:py-24">
+    <section className="section px-5 md:px-8">
       <div className="mx-auto max-w-5xl">{body}</div>
     </section>
   );

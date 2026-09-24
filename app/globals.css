@@ -16,6 +16,9 @@
     0 1px 0 color-mix(in srgb, var(--ink) 8%, transparent),
     0 24px 48px -28px rgb(10 26 47 / 0.45);
 
+  /* Error and warning text. Deep enough to pass contrast on paper and white. */
+  --error: #b3261e;
+
   --background: var(--paper);
   --foreground: var(--ink);
 
@@ -34,6 +37,7 @@
   --color-stone: var(--stone);
   --color-brass: var(--brass);
   --color-hairline: var(--hairline);
+  --color-error: var(--error);
   --color-navy: var(--ink);
   --color-navy-accent: var(--ink-2);
   --font-sans: var(--font-inter), system-ui, sans-serif;
@@ -105,6 +109,39 @@ p {
   color: var(--ink);
   border-radius: 4px;
   box-shadow: var(--lift);
+}
+
+/* One vertical rhythm for page sections. */
+.section {
+  padding-block: clamp(3.5rem, 2.2rem + 5vw, 6.5rem);
+}
+
+.section-tight {
+  padding-block: clamp(2.5rem, 1.6rem + 3vw, 4rem);
+}
+
+/* Comfortable touch targets and iOS-safe input text on phones. */
+#main input:not([type="checkbox"]):not([type="radio"]),
+#main select {
+  min-height: 2.75rem;
+}
+
+input[type="checkbox"] {
+  width: 1.125rem;
+  height: 1.125rem;
+  accent-color: var(--ink);
+}
+
+label:has(> input[type="checkbox"]) {
+  min-height: 2.75rem;
+}
+
+@media (max-width: 639px) {
+  #main input,
+  #main select,
+  #main textarea {
+    font-size: 1rem;
+  }
 }
 
 .hairline-top {

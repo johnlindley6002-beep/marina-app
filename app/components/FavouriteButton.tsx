@@ -46,7 +46,7 @@ export default function FavouriteButton({
       aria-pressed={saved}
       aria-label={`${saved ? t.favourites.saved : t.favourites.save}: ${marinaName}`}
       onClick={() => toggleFavourite({ marinaId, countrySlug, marinaName })}
-      className={`inline-flex items-center gap-2 text-sm ${colour} ${className}`}
+      className={`inline-flex min-h-11 items-center gap-2 text-sm ${colour} ${className}`}
     >
       <svg
         viewBox="0 0 24 24"

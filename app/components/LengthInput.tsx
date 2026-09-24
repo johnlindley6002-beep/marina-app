@@ -11,6 +11,8 @@ type Props = {
   className?: string;
   placeholder?: string;
   ariaLabel?: string;
+  invalid?: boolean;
+  describedBy?: string;
 };
 
 export default function LengthInput({
@@ -19,6 +21,8 @@ export default function LengthInput({
   className,
   placeholder,
   ariaLabel,
+  invalid,
+  describedBy,
 }: Props) {
   const { units } = useUnits();
   const [text, setText] = useState(() => metresToInput(valueM, units));
@@ -41,6 +45,8 @@ export default function LengthInput({
       value={text}
       placeholder={placeholder}
       aria-label={ariaLabel}
+      aria-invalid={invalid || undefined}
+      aria-describedby={describedBy}
       className={className}
       onChange={(e) => {
         const next = e.target.value;

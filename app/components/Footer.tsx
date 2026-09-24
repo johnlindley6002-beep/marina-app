@@ -38,7 +38,7 @@ export default function Footer() {
               <li key={link.href}>
                 <Link
                   href={link.href}
-                  className="text-sm text-stone transition-colors hover:text-paper"
+                  className="inline-flex min-h-11 items-center text-sm text-stone transition-colors hover:text-paper"
                 >
                   {link.label}
                 </Link>
@@ -54,13 +54,13 @@ export default function Footer() {
               <p>{marina.address}</p>
               <a
                 href={`tel:${marina.phone.replace(/\s+/g, "")}`}
-                className="block transition-colors hover:text-paper"
+                className="flex min-h-11 items-center transition-colors hover:text-paper"
               >
                 {marina.phone}
               </a>
               <a
                 href={`mailto:${marina.email}`}
-                className="block transition-colors hover:text-paper"
+                className="flex min-h-11 items-center transition-colors hover:text-paper"
               >
                 {marina.email}
               </a>

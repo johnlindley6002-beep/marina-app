@@ -1,10 +1,13 @@
 "use client";
 
 import type { Marina } from "../../../../data/marinas";
+import { siteConfig } from "../../../../data/site";
 import { formatLength } from "../../../../lib/units";
 import { useLanguage } from "../../../components/LanguageProvider";
 import { useUnits } from "../../../components/UnitsProvider";
+import ContactBlock from "./ContactBlock";
 import EmergencyNumbers from "./EmergencyNumbers";
+import GoogleReviewsBlock from "./GoogleReviewsBlock";
 
 const PROTECTION_LABELS: Record<Marina["protection"]["level"], string> = {
   sheltered: "Sheltered",
@@ -13,9 +16,9 @@ const PROTECTION_LABELS: Record<Marina["protection"]["level"], string> = {
 };
 
 const PROTECTION_BADGE_CLASSES: Record<Marina["protection"]["level"], string> = {
-  sheltered: "border-emerald-200 bg-emerald-50 text-emerald-700",
-  partial: "border-amber-200 bg-amber-50 text-amber-800",
-  exposed: "border-red-200 bg-red-50 text-red-700",
+  sheltered: "border-ink/30 bg-ink/5 text-ink",
+  partial: "border-brass bg-brass/15 text-ink",
+  exposed: "border-error/50 bg-error/10 text-error",
 };
 
 function ProtectionTag({ protection }: { protection: Marina["protection"] }) {
@@ -55,7 +58,7 @@ type Props = {
 };
 
 const labelClass = "text-sm font-medium text-ink/80";
-const valueClass = "mt-2 text-sm text-ink/75";
+const valueClass = "mt-2 text-ink/75";
 
 export default function ApproachInfo({
   marina,
@@ -66,7 +69,7 @@ export default function ApproachInfo({
   const { units } = useUnits();
 
   return (
-    <section className="px-6 py-16 md:px-8 md:py-24">
+    <section id="practical-info" className="section scroll-mt-20 px-5 md:px-8">
       <div className="mx-auto max-w-5xl">
         <h2 className="type-heading type-h2 text-ink">
           Approach &amp; practical info
@@ -93,14 +96,13 @@ export default function ApproachInfo({
           </div>
         </div>
 
-        <p className="mt-6 max-w-3xl text-sm leading-relaxed text-ink/75">
-          {marina.entryNote}
-        </p>
+        <p className="measure mt-6 text-ink/75">{marina.entryNote}</p>
 
         <div className="mt-6">
           <ProtectionTag protection={marina.protection} />
-          <p className="mt-2 text-xs text-ink/70">
-            {marina.protection.description} General guide only, not a live forecast.
+          <p className="mt-2 text-sm text-ink/70">
+            {marina.protection.description} General guide only, not a live
+            forecast.
           </p>
         </div>
 
@@ -108,16 +110,13 @@ export default function ApproachInfo({
           <p className={labelClass}>{t.visiting.onArrival}</p>
           <ul className="mt-3 space-y-2">
             {[arrivalInstructions, ...marina.preArrivalChecklist].map((item) => (
-              <li
-                key={item}
-                className="flex items-start gap-2 text-sm text-ink/75"
-              >
+              <li key={item} className="flex items-start gap-2 text-ink/75">
                 <svg
                   viewBox="0 0 20 20"
                   fill="none"
                   stroke="currentColor"
                   strokeWidth={1.5}
-                  className="mt-0.5 h-4 w-4 shrink-0 text-ink"
+                  className="mt-1 h-4 w-4 shrink-0 text-ink"
                   aria-hidden="true"
                 >
                   <path
@@ -132,7 +131,7 @@ export default function ApproachInfo({
           </ul>
         </div>
 
-        <div className="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
           <div>
             <p className={labelClass}>{t.visiting.byCar}</p>
             <p className={valueClass}>{gettingThere.byCar}</p>
@@ -146,18 +145,30 @@ export default function ApproachInfo({
             <p className={valueClass}>{gettingThere.byAir}</p>
           </div>
           <div>
-            <p className={labelClass}>{t.keyFacts.address}</p>
-            <p className={valueClass}>{marina.address}</p>
-          </div>
-          <div>
             <p className={labelClass}>{t.keyFacts.coordinates}</p>
-            <p className={valueClass}>
+            <p className={`${valueClass} tabular`}>
               {formatCoordinates(marina.coordinates.lat, marina.coordinates.lng)}
             </p>
           </div>
         </div>
 
+        <ContactBlock marina={marina} />
         <EmergencyNumbers marina={marina} embedded />
+
+        <div className="hairline-top mt-12 grid gap-8 pt-8 md:grid-cols-2 md:gap-12">
+          <div id="cancellation">
+            <h3 className="type-heading type-h3 text-ink">Cancellation policy</h3>
+            <p className="measure mt-3 text-ink/75">
+              {marina.cancellationPolicy}
+            </p>
+          </div>
+          <div id="privacy" className="scroll-mt-24">
+            <h3 className="type-heading type-h3 text-ink">Privacy</h3>
+            <p className="measure mt-3 text-ink/75">{siteConfig.privacyNote}</p>
+          </div>
+        </div>
+
+        <GoogleReviewsBlock marina={marina} />
       </div>
     </section>
   );
