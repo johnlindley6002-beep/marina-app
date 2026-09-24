@@ -1,17 +1,22 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, type ReactNode } from "react";
 import {
   calculateQuote,
   classifyBoatLength,
   CLASS_LENGTH_RANGES,
+  getDemandFlag,
+  getFuelNote,
+  getFuelUpdated,
   MARINA_CLASS_ORDER,
   SEASON_LABELS,
   type Marina,
 } from "../../../../data/marinas";
+import { siteConfig } from "../../../../data/site";
 import { effectiveDeparture, type StayPlan } from "../../../../lib/stayPlan";
 import { toDisplay } from "../../../../lib/units";
 import { useLanguage } from "../../../components/LanguageProvider";
+import LastUpdated from "../../../components/LastUpdated";
 import { useUnits } from "../../../components/UnitsProvider";
 
 const inputClass =
@@ -59,18 +64,34 @@ export default function PriceEstimate({
       : `${toDisplay(minM, units)}–${toDisplay(maxM, units)} ${unit}`;
   }
 
-  const check = (
+  const fees = marina.serviceFees;
+  const demandNote = quote
+    ? getDemandFlag(marina, plan.arrival, effectiveDeparture(plan))
+    : null;
+
+  // One modular row per extra: a real checkbox, its price hint, and the fee
+  // folds into the breakdown below as soon as it is ticked.
+  const extraRow = (
+    key: "shorePower" | "water" | "pumpOut" | "fuel" | "laundry",
     label: string,
-    key: "water" | "pumpOut" | "fuel" | "laundry"
+    hint: ReactNode,
+    more?: ReactNode
   ) => (
-    <label className="flex items-center gap-2 text-sm text-ink/75">
-      <input
-        type="checkbox"
-        checked={plan[key]}
-        onChange={(e) => onPlanChange({ [key]: e.target.checked })}
-      />
-      {label}
-    </label>
+    <div className="hairline-top pt-3">
+      <label className="flex items-start gap-3 text-sm">
+        <input
+          type="checkbox"
+          checked={plan[key]}
+          onChange={(e) => onPlanChange({ [key]: e.target.checked })}
+          className="mt-1"
+        />
+        <span>
+          <span className="font-medium text-ink">{label}</span>
+          <span className="block text-xs text-ink/70">{hint}</span>
+        </span>
+      </label>
+      {more}
+    </div>
   );
 
   return (
@@ -81,18 +102,16 @@ export default function PriceEstimate({
 
       <fieldset className="mt-6">
         <legend className={labelClass}>Extras</legend>
-        <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          <div>
-            <label className="flex items-center gap-2 text-sm text-ink/75">
-              <input
-                type="checkbox"
-                checked={plan.shorePower}
-                onChange={(e) => onPlanChange({ shorePower: e.target.checked })}
-              />
-              Shore power
-            </label>
-            {plan.shorePower ? (
-              <div className="mt-2 ml-6">
+        <p className="mt-1 text-xs text-ink/70">
+          Pick what you need. Each one is added to the breakdown below.
+        </p>
+        <div className="mt-3 grid gap-x-8 gap-y-3 sm:grid-cols-2">
+          {extraRow(
+            "shorePower",
+            "Shore power",
+            `Metered, billed on consumption (up to ${fees.maxAmperage} A)`,
+            plan.shorePower ? (
+              <div className="mt-2 ml-7">
                 <select
                   value={plan.amperage}
                   aria-label="Shore power amperage"
@@ -100,7 +119,7 @@ export default function PriceEstimate({
                   className={`${inputClass} mt-0`}
                 >
                   <option value="">Amperage…</option>
-                  {marina.serviceFees.amperageOptions.map((amps) => (
+                  {fees.amperageOptions.map((amps) => (
                     <option key={amps} value={String(amps)}>
                       {amps}A
                     </option>
@@ -112,17 +131,24 @@ export default function PriceEstimate({
                   </p>
                 ) : null}
               </div>
-            ) : null}
-          </div>
-          {check("Water", "water")}
-          {check("Pump-out", "pumpOut")}
-          {check("Fuel on arrival", "fuel")}
-          {check("Laundry", "laundry")}
+            ) : null
+          )}
+          {extraRow("water", "Water", "Metered, billed on consumption")}
+          {extraRow("pumpOut", "Pump-out", `${eur(fees.pumpOutEur)} per operation`)}
+          {extraRow(
+            "fuel",
+            "Fuel on arrival",
+            <>
+              {getFuelNote(marina)}
+              <LastUpdated date={getFuelUpdated(marina)} className="mt-0.5 block" />
+            </>
+          )}
+          {extraRow(
+            "laundry",
+            "Laundry",
+            `Wash ${eur(fees.laundryWashEur)}, dry ${eur(fees.laundryDryEur)} per load, tokens from reception`
+          )}
         </div>
-        <p className="mt-3 text-xs text-ink/70">
-          Power and water are metered and charged separately from the berth
-          fee.
-        </p>
       </fieldset>
 
       <div className="mt-8" aria-live="polite">
@@ -132,9 +158,18 @@ export default function PriceEstimate({
               Class {quote.marinaClass} berth ·{" "}
               {plan.openEnded
                 ? "nightly rate (open-ended stay)"
-                : `${quote.nights} night${quote.nights === 1 ? "" : "s"}`}
+                : `${quote.nights} night${quote.nights === 1 ? "" : "s"}`}{" "}
+              ·{" "}
+              {quote.berthLines.length > 1
+                ? "both seasons"
+                : SEASON_LABELS[quote.berthLines[0].season]}
               {selectedBerthId ? ` · Berth ${selectedBerthId}` : ""}
             </p>
+            {demandNote ? (
+              <p className="mt-2 max-w-xl border-l-2 border-brass pl-3 text-sm text-ink/75">
+                {demandNote}
+              </p>
+            ) : null}
             <table className="mt-3 w-full max-w-xl border-collapse text-left text-sm">
               <tbody>
                 {quote.berthLines.map((line) => (
@@ -143,7 +178,8 @@ export default function PriceEstimate({
                     className="border-b border-hairline text-ink/75"
                   >
                     <td className="py-2 pr-4 ">
-                      {line.nights} × {eur(line.rateEur)}
+                      {line.nights} night{line.nights === 1 ? "" : "s"} at{" "}
+                      {eur(line.rateEur)} per night
                       <span className="block text-xs text-ink/70">
                         {SEASON_LABELS[line.season]}
                       </span>
@@ -153,6 +189,14 @@ export default function PriceEstimate({
                     </td>
                   </tr>
                 ))}
+                {quote.berthLines.length > 1 || quote.addOnLines.length > 0 ? (
+                  <tr className="border-b border-hairline text-ink/75">
+                    <td className="py-2 pr-4">Berth subtotal</td>
+                    <td className="py-2 text-right font-medium text-ink">
+                      {eur(quote.berthSubtotalEur)}
+                    </td>
+                  </tr>
+                ) : null}
                 {quote.addOnLines.map((line) => (
                   <tr
                     key={line.label}
@@ -182,8 +226,20 @@ export default function PriceEstimate({
               </tbody>
             </table>
             <p className="mt-3 text-xs text-ink/70">
-              Excl. {Math.round(marina.vatRate * 100)}% VAT and utilities (estimate, confirm with the marina).
+              Excl. {Math.round(marina.vatRate * 100)}% VAT and utilities, estimate,
+              confirm with the marina.
             </p>
+            <div className="mt-6">
+              <a
+                href="#request-berth"
+                className="inline-flex min-h-12 items-center rounded-[3px] bg-brass px-8 text-base font-medium text-ink transition-[filter] hover:brightness-105"
+              >
+                Request a berth
+              </a>
+              <p className="mt-2 text-sm text-ink/75">
+                {siteConfig.decision.requestNote}
+              </p>
+            </div>
           </>
         ) : (
           <p className="text-sm text-ink/75">

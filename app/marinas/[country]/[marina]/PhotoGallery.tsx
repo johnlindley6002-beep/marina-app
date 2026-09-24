@@ -2,7 +2,15 @@
 
 import dynamic from "next/dynamic";
 import Image from "next/image";
-import { useRef, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 
 export type Photo = { src: string; alt: string; caption: string; credit?: string };
 
@@ -11,6 +19,64 @@ const Lightbox = dynamic(() => import("./Lightbox"), { ssr: false });
 
 // Tiles shown before the rest move into the viewer only.
 const MAX_TILES = 5;
+
+type GalleryContextValue = { count: number; open: (index?: number) => void };
+
+const GalleryContext = createContext<GalleryContextValue>({
+  count: 0,
+  open: () => {},
+});
+
+export function useGallery() {
+  return useContext(GalleryContext);
+}
+
+// Owns the one lightbox on the page, so the hero and the gallery below open
+// the same viewer.
+export function GalleryProvider({
+  photos,
+  children,
+}: {
+  photos: Photo[];
+  children: ReactNode;
+}) {
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
+  const opener = useRef<HTMLElement | null>(null);
+
+  const open = useCallback(
+    (index = 0) => {
+      if (photos.length === 0) return;
+      opener.current = document.activeElement as HTMLElement | null;
+      setOpenIndex(index);
+    },
+    [photos.length]
+  );
+
+  function close() {
+    setOpenIndex(null);
+    const target = opener.current;
+    setTimeout(() => target?.focus(), 0);
+  }
+
+  const value = useMemo(
+    () => ({ count: photos.length, open }),
+    [photos.length, open]
+  );
+
+  return (
+    <GalleryContext.Provider value={value}>
+      {children}
+      {openIndex !== null ? (
+        <Lightbox
+          photos={photos}
+          index={openIndex}
+          onIndexChange={setOpenIndex}
+          onClose={close}
+        />
+      ) : null}
+    </GalleryContext.Provider>
+  );
+}
 
 // Layout per photo count. Mobile is a swipeable row; from md up it is a
 // mosaic with a fixed height, so no image can move the page.
@@ -30,25 +96,13 @@ function gridClass(count: number): string {
 }
 
 export default function PhotoGallery({ photos }: { photos: Photo[] }) {
-  const [openIndex, setOpenIndex] = useState<number | null>(null);
-  const opener = useRef<HTMLElement | null>(null);
+  const { open } = useGallery();
 
   if (photos.length === 0) return null;
 
   const tiles = photos.slice(0, MAX_TILES);
   const count = tiles.length;
   const hiddenCount = photos.length - tiles.length;
-
-  function open(index: number) {
-    opener.current = document.activeElement as HTMLElement | null;
-    setOpenIndex(index);
-  }
-
-  function close() {
-    setOpenIndex(null);
-    const target = opener.current;
-    setTimeout(() => target?.focus(), 0);
-  }
 
   return (
     <div>
@@ -98,15 +152,6 @@ export default function PhotoGallery({ photos }: { photos: Photo[] }) {
       >
         {photos.length === 1 ? "View photo" : `View all ${photos.length} photos`}
       </button>
-
-      {openIndex !== null ? (
-        <Lightbox
-          photos={photos}
-          index={openIndex}
-          onIndexChange={setOpenIndex}
-          onClose={close}
-        />
-      ) : null}
     </div>
   );
 }

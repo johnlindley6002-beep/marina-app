@@ -10,7 +10,7 @@ export const siteConfig: {
   // before launch.
   privacyNote: string;
   // Copy for the at-a-glance summary in Plan your stay.
-  decision: { availabilityNote: string };
+  decision: { availabilityNote: string; requestNote: string };
   // Copy for the My boat area.
   hub: {
     intro: string;
@@ -27,6 +27,8 @@ export const siteConfig: {
   decision: {
     availabilityNote:
       "Illustrative, not live. The marina confirms availability by email.",
+    requestNote:
+      "This sends an enquiry; the marina confirms availability by email.",
   },
   hub: {
     intro:

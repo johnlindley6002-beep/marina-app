@@ -140,6 +140,49 @@ export function getSeason(date: Date): Season {
   return month >= 4 && month <= 9 ? "high" : "low";
 }
 
+// The fuel wording for the estimate: the marina's own per-litre prices when it
+// has supplied them, otherwise the general note.
+export function getFuelNote(marina: Marina): string {
+  const { diesel, ron95 } = marina.fuelPrices;
+  const parts: string[] = [];
+  if (diesel.value !== null) parts.push(`Diesel €${diesel.value.toFixed(3)}/L`);
+  if (ron95.value !== null) parts.push(`RON 95 €${ron95.value.toFixed(3)}/L`);
+  return parts.length > 0
+    ? `${parts.join(", ")}, billed at the fuel dock`
+    : marina.serviceFees.fuelNote;
+}
+
+// The oldest confirmation date among the fuel prices on file, so the "Updated"
+// line never looks fresher than the least recent price. Null if none is dated.
+export function getFuelUpdated(marina: Marina): string | null {
+  const dates = [marina.fuelPrices.diesel, marina.fuelPrices.ron95]
+    .filter((entry) => entry.value !== null && entry.lastUpdated)
+    .map((entry) => entry.lastUpdated as string)
+    .sort();
+  return dates[0] ?? null;
+}
+
+// Returns the marina's busy-period note when any night of the stay falls in a
+// busy month, otherwise null. A static indicator from data, not surge pricing.
+export function getDemandFlag(
+  marina: Marina,
+  arrival: string,
+  departure: string
+): string | null {
+  if (!marina.demand) return null;
+  const from = parseIsoDate(arrival);
+  const to = parseIsoDate(departure);
+  if (!from || !to || to <= from) return null;
+  const cursor = new Date(from);
+  while (cursor < to) {
+    if (marina.demand.busyMonths.includes(cursor.getMonth() + 1)) {
+      return marina.demand.note;
+    }
+    cursor.setDate(cursor.getDate() + 1);
+  }
+  return null;
+}
+
 export type FacilityKey =
   | "fuel"
   | "water"
@@ -298,7 +341,7 @@ export function calculateQuote(
     });
   }
   if (addOns.fuel) {
-    addOnLines.push({ label: "Fuel", amountEur: null, note: fees.fuelNote });
+    addOnLines.push({ label: "Fuel", amountEur: null, note: getFuelNote(marina) });
   }
   if (addOns.laundry) {
     addOnLines.push({
@@ -331,6 +374,26 @@ export type GoogleReviews = {
   googleUrl: string | null;
 };
 
+// A marina-maintained value that changes over time, with the date it was last
+// confirmed (ISO, YYYY-MM-DD, or null until known). Reuse this shape for any
+// value that should show an "Updated" date, such as hours or service prices.
+//
+// How these values are refreshed: either by a future integration with the
+// marina's own system, or by the marina emailing us updates that we apply to
+// this data entry by hand. Nothing here is fetched live.
+export type Timestamped<T> = { value: T; lastUpdated: string | null };
+
+// Fuel prices in euros per litre. Leave value null until the marina confirms
+// a current price, and set lastUpdated to the date it was confirmed.
+export type FuelPrices = {
+  diesel: Timestamped<number | null>;
+  ron95: Timestamped<number | null>;
+};
+
+// Static busy-period flag for display only. It never changes a price.
+// busyMonths uses 1 (January) to 12 (December).
+export type DemandInfo = { busyMonths: number[]; note: string };
+
 export type NearbyPlace = { name: string; description: string };
 export type EmergencyPhone = { label: string; number: string };
 export type VhfChannelInfo = { channel: number; label: string };
@@ -357,7 +420,12 @@ export type Marina = {
   officeHours: { summer: string; winter: string };
   description: string;
   facilities: FacilityKey[];
-  heroImage: string;
+  // The marina's wordmark, shown over the hero and used for the social preview
+  // until a hero photo exists.
+  wordmark: string;
+  // Full-bleed hero photo. Leave null until a real photo is supplied; the hero
+  // reserves the same space with a styled placeholder, so nothing shifts.
+  heroImage: { src: string; alt: string } | null;
   clubBurgee?: { src: string; name: string };
   transientRates: Record<MarinaClass, { low: number; high: number }>;
   vatRate: number;
@@ -401,6 +469,8 @@ export type Marina = {
   // Shown as the flagship on the homepage.
   featured?: boolean;
   googleReviews: GoogleReviews;
+  fuelPrices: FuelPrices;
+  demand: DemandInfo | null;
   nearby: NearbyPlace[];
   emergency: { phones: EmergencyPhone[]; vhf: VhfChannelInfo[] };
 };
@@ -418,12 +488,12 @@ const CASCAIS_SERVICE_FEES: ServiceFees = {
   wasteDisposalEur: { min: 8.9, max: 16.5 },
   maxAmperage: CASCAIS_MAX_AMPERAGE,
   amperageOptions: [16, 32],
-  // TODO: fuel prices not supplied, confirm with the marina.
+  // Shown when no per-litre price has been supplied (see fuelPrices).
   fuelNote: "Diesel / petrol, price at the fuel dock",
 };
 
 // TODO (owner to supply): mapPoint for wifi, security, waste and extras;
-// wayfinding.entrance; cancellationPolicy; per-litre fuel prices.
+// wayfinding.entrance; cancellationPolicy.
 const CASCAIS_FACILITY_DETAILS: FacilityDetail[] = [
   {
     id: "reception",
@@ -669,7 +739,9 @@ export const marinas: Marina[] = [
       "dryStorage",
       "repairs",
     ],
-    heroImage: "/images/marina-cascais-logo.png",
+    wordmark: "/images/marina-cascais-logo.png",
+    // TODO (owner): add the hero photo as { src: "/images/...", alt: "..." }.
+    heroImage: null,
     clubBurgee: {
       src: "/images/burgee-cn-cascais.svg",
       name: "Clube Naval de Cascais",
@@ -760,6 +832,18 @@ export const marinas: Marina[] = [
     // TODO (owner): fill these three from the marina's Google listing.
     // Leave null until real values exist; the block stays hidden.
     googleReviews: { rating: null, reviewCount: null, googleUrl: null },
+    // TODO (owner): fill in the fuel dock's current prices per litre and the
+    // date they were confirmed. Prices change often, so keep lastUpdated true.
+    // Do not estimate them.
+    fuelPrices: {
+      diesel: { value: null, lastUpdated: null },
+      ron95: { value: null, lastUpdated: null },
+    },
+    // TODO (owner): confirm the busy months and wording with the marina.
+    demand: {
+      busyMonths: [7, 8],
+      note: "Busy period: peak summer, so availability may be tighter.",
+    },
     nearby: [
       {
         name: "Boca do Inferno",

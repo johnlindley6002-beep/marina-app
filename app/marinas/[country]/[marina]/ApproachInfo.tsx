@@ -2,6 +2,7 @@
 
 import type { Marina } from "../../../../data/marinas";
 import { siteConfig } from "../../../../data/site";
+import { formatCoordinates } from "../../../../lib/geo";
 import { formatLength } from "../../../../lib/units";
 import { useLanguage } from "../../../components/LanguageProvider";
 import ProtectionIndicator from "../../../components/ProtectionIndicator";
@@ -10,12 +11,6 @@ import ContactBlock from "./ContactBlock";
 import EmergencyNumbers from "./EmergencyNumbers";
 import GoogleReviewsBlock from "./GoogleReviewsBlock";
 import OfflineCard from "./OfflineCard";
-
-function formatCoordinates(lat: number, lng: number) {
-  const latLabel = lat >= 0 ? "N" : "S";
-  const lngLabel = lng >= 0 ? "E" : "W";
-  return `${Math.abs(lat).toFixed(3)}° ${latLabel}, ${Math.abs(lng).toFixed(3)}° ${lngLabel}`;
-}
 
 type Props = {
   marina: Marina;

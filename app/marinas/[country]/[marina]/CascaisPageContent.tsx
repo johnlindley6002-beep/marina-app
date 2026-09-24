@@ -1,7 +1,6 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import Image from "next/image";
 import { useCallback, useDeferredValue, useEffect, useRef, useState } from "react";
 import type { Marina } from "../../../../data/marinas";
 import { loadBoatProfile, saveBoatProfile } from "../../../../lib/boatProfile";
@@ -12,15 +11,15 @@ import {
   type StayPlan,
 } from "../../../../lib/stayPlan";
 import { useBoats } from "../../../components/BoatProvider";
+import FuelPrices from "./FuelPrices";
+import MarinaHero from "./MarinaHero";
+import { GalleryProvider } from "./PhotoGallery";
 import PlanYourStay from "./PlanYourStay";
 import PriceEstimate from "./PriceEstimate";
 import KeyFactsStrip from "./KeyFactsStrip";
 import ApproachInfo from "./ApproachInfo";
 import AboutMarina from "./AboutMarina";
 import Breadcrumbs from "../../../components/Breadcrumbs";
-import ChartLinework from "../../../components/ChartLinework";
-import FavouriteButton from "../../../components/FavouriteButton";
-import FlagIcon from "../../../components/FlagIcon";
 import { useLanguage } from "../../../components/LanguageProvider";
 
 // Below-the-fold pieces load as separate chunks, after first paint. They are
@@ -136,53 +135,11 @@ export default function CascaisPageContent({
     byAir: content?.gettingThere.byAir[cl] ?? marina.gettingThere.byAir,
   };
 
+  const galleryPhotos = marina.photos.filter((photo) => !photo.placeholder);
+
   return (
-    <>
-      <section className="on-ink section relative isolate overflow-hidden bg-gradient-to-br from-ink to-ink-2 px-5">
-        <ChartLinework className="absolute inset-0 -z-10 h-full w-full text-paper opacity-[0.07]" />
-        <FavouriteButton
-          marinaId={marina.id}
-          countrySlug={marina.countrySlug}
-          marinaName={marina.name}
-          tone="light"
-          variant="ghost"
-          className="absolute top-4 right-4 md:top-6 md:right-6"
-        />
-        <div className="mx-auto max-w-5xl pt-10 text-center sm:pt-0">
-          <p className="flex items-center justify-center gap-2 text-sm text-stone">
-            <FlagIcon countryCode={marina.countryCode} className="h-3 w-auto" />
-            {marina.country}
-            {marina.clubBurgee ? (
-              <>
-                <span className="text-white/60">·</span>
-                <Image
-                  src={marina.clubBurgee.src}
-                  alt={marina.clubBurgee.name}
-                  width={1772}
-                  height={1063}
-                  className="h-4 w-auto"
-                />
-              </>
-            ) : null}
-          </p>
-          <h1 className="sr-only">{marina.name}</h1>
-          <Image
-            src={marina.heroImage}
-            alt={`${marina.name} logo`}
-            width={575}
-            height={383}
-            loading="eager"
-            fetchPriority="high"
-            className="mx-auto mt-8 h-auto w-[300px] sm:w-[380px] md:w-[440px]"
-          />
-          <a
-            href="#plan-your-stay"
-            className="mt-8 inline-flex min-h-12 items-center rounded-[3px] bg-brass px-8 text-base font-medium text-ink transition-[filter] hover:brightness-105"
-          >
-            Request a berth
-          </a>
-        </div>
-      </section>
+    <GalleryProvider photos={galleryPhotos}>
+      <MarinaHero marina={marina} />
 
       <div className="mx-auto max-w-5xl px-5 py-4 text-ink/70 md:px-8">
         <Breadcrumbs
@@ -272,6 +229,7 @@ export default function CascaisPageContent({
             {t.facilities.heading}
           </h2>
           <FacilitiesGrid facilities={marina.facilityDetails} />
+          <FuelPrices marina={marina} />
         </div>
       </section>
 
@@ -292,6 +250,6 @@ export default function CascaisPageContent({
       </section>
 
       <ContactDock marina={marina} />
-    </>
+    </GalleryProvider>
   );
 }

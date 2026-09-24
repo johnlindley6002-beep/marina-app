@@ -1,5 +1,6 @@
 "use client";
 
+import { siteConfig } from "../../../../data/site";
 import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import {
   calculateQuote,
@@ -1420,7 +1421,7 @@ export default function RequestBerthForm({
               "Cancellation terms are confirmed by the marina. Ask when they reply to your enquiry."}
           </p>
           <p className="mt-4 text-sm text-ink/75">
-            This sends an enquiry; the marina confirms availability by email.
+            {siteConfig.decision.requestNote}
           </p>
           <p className="mt-2 text-sm text-ink/70">
             Your details go only to the marina, by email.{" "}

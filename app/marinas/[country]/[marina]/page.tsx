@@ -24,7 +24,7 @@ export async function generateMetadata({
     openGraph: {
       title: `${marina.name} - aldock`,
       description: marina.description,
-      images: [marina.heroImage],
+      images: [marina.heroImage?.src ?? marina.wordmark],
     },
   };
 }
