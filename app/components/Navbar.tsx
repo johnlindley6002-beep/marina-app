@@ -3,20 +3,28 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import AccountMenu from "./AccountMenu";
+import { useAuth } from "./AuthProvider";
 import LanguageSelect from "./LanguageSelect";
+import ModeSwitch from "./ModeSwitch";
 import { useLanguage } from "./LanguageProvider";
 import UnitSegmented from "./UnitSegmented";
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const { t } = useLanguage();
+  const { user, mode } = useAuth();
 
-  const links = [
-    { href: "/marinas", label: t.nav.marinas },
-    { href: "/my-boat", label: t.nav.myBoat },
-    { href: "/#about", label: t.nav.aboutUs },
-    { href: "/#contact", label: t.nav.contact },
-  ];
+  // Owner mode has its own navigation, the way a host mode does elsewhere.
+  const ownerMode = !!user && mode === "owner";
+  const links = ownerMode
+    ? [{ href: "/owner", label: "My berth" }]
+    : [
+        { href: "/marinas", label: t.nav.marinas },
+        { href: "/my-boat", label: t.nav.myBoat },
+        { href: "/#about", label: t.nav.aboutUs },
+        { href: "/#contact", label: t.nav.contact },
+      ];
 
   useEffect(() => {
     document.body.style.overflow = menuOpen ? "hidden" : "";
@@ -54,8 +62,12 @@ export default function Navbar() {
         </nav>
 
         <div className="ml-auto hidden items-center gap-3 md:flex">
+          <div className="hidden lg:block">
+            <ModeSwitch />
+          </div>
           <UnitSegmented />
           <LanguageSelect />
+          <AccountMenu />
         </div>
 
         <button
@@ -93,7 +105,7 @@ export default function Navbar() {
                 key={link.href}
                 href={link.href}
                 onClick={closeMenu}
-                className="type-heading text-2xl text-paper"
+                className="type-heading flex min-h-11 items-center text-2xl text-paper"
               >
                 {link.label}
               </Link>
@@ -103,6 +115,7 @@ export default function Navbar() {
             <UnitSegmented />
             <LanguageSelect />
           </div>
+          <AccountMenu variant="inline" onNavigate={closeMenu} />
         </div>
       ) : null}
     </header>

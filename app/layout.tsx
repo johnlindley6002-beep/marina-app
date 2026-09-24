@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from "next";
 import dynamic from "next/dynamic";
 import { Archivo, Inter } from "next/font/google";
 import "./globals.css";
+import { AuthProvider } from "./components/AuthProvider";
+import DevPersonaSwitcher from "./components/DevPersonaSwitcher";
 import Footer from "./components/Footer";
 import { BoatProvider } from "./components/BoatProvider";
 import { LanguageProvider } from "./components/LanguageProvider";
@@ -56,12 +58,15 @@ export default function RootLayout({
         <LanguageProvider>
           <UnitsProvider>
             <BoatProvider>
-              <Navbar />
-              <main id="main" tabIndex={-1} className="flex-1 outline-none">
-                {children}
-              </main>
-              <Footer />
-              <ServiceWorkerRegister />
+              <AuthProvider>
+                <Navbar />
+                <main id="main" tabIndex={-1} className="flex-1 outline-none">
+                  {children}
+                </main>
+                <Footer />
+                <ServiceWorkerRegister />
+                <DevPersonaSwitcher />
+              </AuthProvider>
             </BoatProvider>
           </UnitsProvider>
         </LanguageProvider>
