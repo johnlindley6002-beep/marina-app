@@ -6,7 +6,7 @@ import { useAuth } from "./AuthProvider";
 import ModeSwitch from "./ModeSwitch";
 
 const itemClass =
-  "flex min-h-11 items-center text-paper transition-colors hover:text-brass";
+  "flex min-h-11 items-center text-paper transition-colors hover:text-stone";
 
 function MenuBody({
   onNavigate,

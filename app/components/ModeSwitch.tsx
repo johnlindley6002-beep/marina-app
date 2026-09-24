@@ -50,7 +50,9 @@ export default function ModeSwitch({
             onClick={() => choose(option.value)}
             className={`min-h-11 rounded-full px-4 transition-colors md:min-h-9 ${
               active
-                ? "bg-brass font-medium text-ink"
+                ? tone === "light"
+                  ? "bg-ink font-medium text-paper"
+                  : "bg-paper font-medium text-ink"
                 : tone === "light"
                   ? "text-ink/75 hover:text-ink"
                   : "text-stone hover:text-paper"

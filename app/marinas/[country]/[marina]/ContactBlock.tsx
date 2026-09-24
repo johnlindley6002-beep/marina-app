@@ -1,8 +1,9 @@
 import type { Marina } from "../../../../data/marinas";
+import ChartDivider from "../../../components/ChartDivider";
 import { telHref } from "./EmergencyNumbers";
 
 const itemLink =
-  "inline-flex min-h-11 items-center text-lg text-ink underline decoration-brass decoration-2 underline-offset-[6px]";
+  "inline-flex min-h-11 items-center text-lg text-ink underline decoration-current/50 decoration-1 underline-offset-[6px]";
 
 // The one prominent contact block: phone, VHF, email and postal address,
 // each reachable in one tap on a phone. All values come from the marina entry.
@@ -12,7 +13,8 @@ export default function ContactBlock({ marina }: { marina: Marina }) {
   )}`;
 
   return (
-    <div id="contact-details" className="hairline-top mt-12 scroll-mt-24 pt-8">
+    <div id="contact-details" className="mt-24 scroll-mt-24">
+      <ChartDivider className="mb-10" />
       <h3 className="type-heading type-h3 text-ink">Contact the marina</h3>
       <dl className="mt-6 grid gap-x-10 gap-y-6 sm:grid-cols-2">
         <div>

@@ -2,6 +2,9 @@
 // then the homepage hero renders as an ink gradient with chart linework.
 export const siteConfig: {
   heroImage: { src: string; alt: string } | null;
+  // A full-bleed resting band on the homepage, between the featured marina and
+  // About. No text goes over it. Leave null until a photo is supplied.
+  bandImage: { src: string; alt: string } | null;
   // TODO(owner): replace these placeholder company contact details.
   contact: { email: string; phone: string };
   // The Google reviews block is hidden until a marina has at least this many.
@@ -34,6 +37,7 @@ export const siteConfig: {
   };
 } = {
   heroImage: null,
+  bandImage: null,
   contact: { email: "hello@aldock.com", phone: "+1 (555) 123-4567" },
   googleReviewsMinCount: 15,
   privacyNote:

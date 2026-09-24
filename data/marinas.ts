@@ -426,6 +426,14 @@ export type Marina = {
   // Full-bleed hero photo. Leave null until a real photo is supplied; the hero
   // reserves the same space with a styled placeholder, so nothing shifts.
   heroImage: { src: string; alt: string } | null;
+  // Two full-bleed resting bands, each a pause with no text over it. Leave null
+  // until a real photo is supplied; the band keeps the same height either way.
+  bandImages: {
+    // Between the booking area and the practical information.
+    afterPlan: { src: string; alt: string } | null;
+    // Before the About section.
+    beforeAbout: { src: string; alt: string } | null;
+  };
   clubBurgee?: { src: string; name: string };
   transientRates: Record<MarinaClass, { low: number; high: number }>;
   vatRate: number;
@@ -742,6 +750,8 @@ export const marinas: Marina[] = [
     wordmark: "/images/marina-cascais-logo.png",
     // TODO (owner): add the hero photo as { src: "/images/...", alt: "..." }.
     heroImage: null,
+    // TODO (owner): add two calm, wide photos as { src: "/images/...", alt: "..." }.
+    bandImages: { afterPlan: null, beforeAbout: null },
     clubBurgee: {
       src: "/images/burgee-cn-cascais.svg",
       name: "Clube Naval de Cascais",

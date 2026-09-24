@@ -14,7 +14,7 @@ function Message({ title, body }: { title: string; body: string }) {
         <p className="measure mt-4 text-lg text-ink/75">{body}</p>
         <Link
           href="/marinas"
-          className="mt-6 inline-flex min-h-11 items-center text-ink underline decoration-brass decoration-2 underline-offset-[6px]"
+          className="mt-6 inline-flex min-h-11 items-center text-ink underline decoration-current/50 decoration-1 underline-offset-[6px]"
         >
           Back to marinas
         </Link>

@@ -103,7 +103,7 @@ export default function MarinaRow({
         <div className="flex items-center justify-end gap-6 sm:col-start-3 sm:row-start-1 sm:flex-col sm:items-end sm:justify-between">
           <span
             aria-hidden="true"
-            className="text-ink underline decoration-brass decoration-2 underline-offset-[6px]"
+            className="text-ink underline decoration-current/50 decoration-1 underline-offset-[6px]"
           >
             {t.countryPage.viewMarina}
           </span>

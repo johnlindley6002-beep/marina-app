@@ -2,7 +2,8 @@
 
 /* Design tokens: "nautical chart meets Atlantic hospitality".
    Ink and paper carry the page; stone draws the hairlines; brass is the
-   single accent (primary CTA, active states, one hero rule, map pins). */
+   single accent, used in only two roles: the primary action fill and the one
+   hairline rule in the hero. Everything else is ink, paper or stone. */
 :root {
   --ink: #0a1a2f;
   --ink-2: #16304f;
@@ -95,6 +96,17 @@ p {
   line-height: 1.25;
 }
 
+/* The one very large, quiet headline per major section. Booking headings keep
+   type-h2 and type-h3. */
+.type-statement {
+  font-family: var(--font-archivo), system-ui, sans-serif;
+  font-variation-settings: "wdth" 118;
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  line-height: 1.04;
+  font-size: clamp(2.4rem, 1.2rem + 4.6vw, 4.2rem);
+}
+
 .measure {
   max-width: 68ch;
 }
@@ -114,6 +126,12 @@ p {
 /* One vertical rhythm for page sections. */
 .section {
   padding-block: clamp(3.5rem, 2.2rem + 5vw, 6.5rem);
+}
+
+/* Discovery and storytelling sections breathe. The booking cluster keeps
+   .section-tight so the flow stays quick. */
+.section-editorial {
+  padding-block: clamp(6rem, 3.5rem + 9vw, 12rem);
 }
 
 .section-tight {
@@ -160,7 +178,7 @@ label:has(> input[type="checkbox"]) {
 header :focus-visible,
 footer :focus-visible,
 .on-ink :focus-visible {
-  outline-color: var(--brass);
+  outline-color: var(--paper);
 }
 
 .defer-paint {
@@ -196,6 +214,24 @@ footer :focus-visible,
 
 .hero-settle {
   animation: hero-settle 1.8s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+/* Reveal: elements settle in once as they enter the viewport. An element hides
+   itself (is-armed) only after the page has loaded, only when motion is
+   allowed, and only if it starts below the fold, so with no JavaScript, with
+   reduced motion, or on screen at load, everything is simply there. */
+@media (prefers-reduced-motion: no-preference) {
+  .reveal {
+    transition:
+      opacity 0.9s cubic-bezier(0.2, 0.7, 0.2, 1),
+      transform 0.9s cubic-bezier(0.2, 0.7, 0.2, 1);
+    transition-delay: var(--d, 0ms);
+  }
+
+  .reveal.is-armed:not(.is-in) {
+    opacity: 0;
+    transform: translateY(16px);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

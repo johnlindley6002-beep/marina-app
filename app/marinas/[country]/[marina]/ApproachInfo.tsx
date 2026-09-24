@@ -5,7 +5,9 @@ import { siteConfig } from "../../../../data/site";
 import { formatCoordinates } from "../../../../lib/geo";
 import { formatLength } from "../../../../lib/units";
 import { useLanguage } from "../../../components/LanguageProvider";
+import ChartDivider from "../../../components/ChartDivider";
 import Disclosure from "../../../components/Disclosure";
+import Reveal from "../../../components/Reveal";
 import ProtectionIndicator, {
   ProtectionWhy,
 } from "../../../components/ProtectionIndicator";
@@ -33,14 +35,19 @@ export default function ApproachInfo({
   const { units } = useUnits();
 
   return (
-    <section id="practical-info" className="section scroll-mt-20 px-5 md:px-8">
+    <section
+      id="practical-info"
+      className="section-editorial scroll-mt-20 px-5 md:px-8"
+    >
       <div className="mx-auto max-w-5xl">
-        <h2 className="type-heading type-h2 text-ink">
-          Approach &amp; practical info
-        </h2>
+        <Reveal>
+          <h2 className="type-statement text-ink">
+            Approach &amp; practical info
+          </h2>
+        </Reveal>
 
         {/* The four essentials */}
-        <div className="mt-6 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-12 grid gap-10 sm:grid-cols-2 md:mt-16 lg:grid-cols-4">
           <div>
             <p className={labelClass}>{t.visiting.hailing}</p>
             <p className={valueClass}>{t.visiting.vhfChannel(marina.vhfChannel)}</p>
@@ -70,7 +77,7 @@ export default function ApproachInfo({
           <ProtectionWhy protection={marina.protection} />
         </div>
 
-        <div className="mt-6 space-y-1">
+        <div className="mt-10 space-y-1">
           <Disclosure label="More arrival details" openLabel="Fewer arrival details">
             <div className="pt-2 pb-4">
               <p className="measure text-ink/75">{marina.entryNote}</p>
@@ -131,7 +138,8 @@ export default function ApproachInfo({
         <ContactBlock marina={marina} />
         <EmergencyNumbers marina={marina} embedded />
 
-        <div id="cancellation" className="hairline-top mt-12 scroll-mt-24 pt-8">
+        <div id="cancellation" className="mt-24 scroll-mt-24">
+          <ChartDivider className="mb-10" />
           <h3 className="type-heading type-h3 text-ink">Cancellation policy</h3>
           <p className="measure mt-3 text-ink/75">{marina.cancellationPolicy}</p>
           <Disclosure

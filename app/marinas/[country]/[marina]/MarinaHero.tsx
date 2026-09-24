@@ -1,8 +1,10 @@
 "use client";
 
 import Image from "next/image";
+import { useRef, type CSSProperties } from "react";
 import type { Marina } from "../../../../data/marinas";
 import { formatCoordinates, mapsUrlForCoordinates } from "../../../../lib/geo";
+import { useParallax } from "../../../../lib/useParallax";
 import ChartLinework from "../../../components/ChartLinework";
 import FavouriteButton from "../../../components/FavouriteButton";
 import FlagIcon from "../../../components/FlagIcon";
@@ -10,39 +12,55 @@ import ShareButton from "../../../components/ShareButton";
 import { useGallery } from "./PhotoGallery";
 
 const chipClass =
-  "inline-flex min-h-11 items-center gap-2 rounded-full border border-white/40 bg-ink/40 px-4 text-sm text-white transition-colors hover:border-white";
+  "inline-flex min-h-11 items-center gap-2 rounded-full border border-white/30 bg-ink/40 px-4 text-sm text-white transition-colors hover:border-white";
 
-// Full-bleed, photo-led hero. The height is fixed per breakpoint and is the
-// same with a photo or with the placeholder, so adding the photo later moves
-// nothing.
+const rise = (delay: number, duration = "0.7s"): CSSProperties =>
+  ({ "--d": `${delay}ms`, animationDuration: duration }) as CSSProperties;
+
+// Full-bleed, image-led hero with the name and wordmark over the picture. The
+// height is set in CSS and is the same with a photo or with the placeholder, so
+// adding the photo later moves nothing. The one orchestrated moment of the
+// site: the image settles, then the text and actions rise in.
 export default function MarinaHero({ marina }: { marina: Marina }) {
   const { count, open } = useGallery();
   const photo = marina.heroImage;
   const { lat, lng } = marina.coordinates;
 
+  const sectionRef = useRef<HTMLElement>(null);
+  const layerRef = useRef<HTMLDivElement>(null);
+  useParallax(sectionRef, layerRef, !!photo);
+
   return (
-    <section className="on-ink relative isolate h-[32rem] overflow-hidden bg-gradient-to-br from-ink to-ink-2 lg:h-[36rem]">
+    <section
+      ref={sectionRef}
+      className="on-ink relative isolate h-[88svh] max-h-[58rem] min-h-[42rem] overflow-hidden bg-gradient-to-br from-ink to-ink-2 lg:min-h-[36rem]"
+    >
       {photo ? (
         <>
-          <Image
-            src={photo.src}
-            alt={photo.alt}
-            fill
-            loading="eager"
-            fetchPriority="high"
-            sizes="100vw"
-            className="-z-20 object-cover"
-          />
+          <div
+            ref={layerRef}
+            className="absolute inset-0 -z-20 will-change-transform"
+          >
+            <Image
+              src={photo.src}
+              alt={photo.alt}
+              fill
+              loading="eager"
+              fetchPriority="high"
+              sizes="100vw"
+              className="hero-settle object-cover"
+            />
+          </div>
           <div
             aria-hidden="true"
-            className="absolute inset-0 -z-10 bg-gradient-to-b from-ink/70 via-ink/25 to-ink/85"
+            className="absolute inset-0 -z-10 bg-gradient-to-b from-ink/55 via-ink/20 to-ink/90"
           />
         </>
       ) : (
-        <ChartLinework className="absolute inset-0 -z-10 h-full w-full text-paper opacity-[0.07]" />
+        <ChartLinework className="absolute inset-0 -z-10 h-full w-full text-paper opacity-[0.09]" />
       )}
 
-      <div className="mx-auto flex h-full max-w-5xl flex-col justify-between px-5 py-6 md:px-8">
+      <div className="mx-auto flex h-full max-w-5xl flex-col justify-between px-5 py-6 md:px-8 md:py-8">
         <div className="flex items-center justify-between gap-4">
           <p className="flex items-center gap-2 text-sm text-white">
             <FlagIcon countryCode={marina.countryCode} className="h-3 w-auto" />
@@ -69,19 +87,37 @@ export default function MarinaHero({ marina }: { marina: Marina }) {
           />
         </div>
 
-        <div>
-          <h1 className="sr-only">{marina.name}</h1>
+        <div className="pb-2 md:pb-6">
+          <span
+            className="hero-rise mb-6 block h-px w-16 bg-brass"
+            style={rise(0)}
+          />
           <Image
             src={marina.wordmark}
-            alt={`${marina.name} logo`}
+            alt=""
             width={575}
             height={383}
             loading="eager"
-            fetchPriority={photo ? "auto" : "high"}
-            className="h-auto w-[180px] sm:w-[260px] md:w-[300px]"
+            className="hero-rise -mt-10 -mb-8 -ml-[48px] h-auto w-[200px] max-w-none sm:-mt-[52px] sm:-mb-[50px] sm:-ml-[62px] sm:w-[260px]"
+            style={rise(80)}
           />
+          <h1
+            className="type-statement hero-rise measure mt-5 max-w-3xl text-paper"
+            style={rise(160, "0.5s")}
+          >
+            {marina.name}
+          </h1>
+          <p
+            className="hero-rise mt-4 max-w-md text-stone"
+            style={rise(260)}
+          >
+            {marina.location}
+          </p>
 
-          <div className="mt-5 flex flex-wrap items-center gap-3">
+          <div
+            className="hero-rise mt-8 flex flex-wrap items-center gap-3"
+            style={rise(340)}
+          >
             <a
               href="#plan-your-stay"
               className="inline-flex min-h-12 items-center rounded-[3px] bg-brass px-8 text-base font-medium text-ink transition-[filter] hover:brightness-105"
@@ -125,7 +161,7 @@ export default function MarinaHero({ marina }: { marina: Marina }) {
           </div>
 
           {!photo ? (
-            <p className="mt-4 text-xs text-white/70">Marina photo coming soon</p>
+            <p className="mt-6 text-xs text-white/70">Marina photo coming soon</p>
           ) : null}
         </div>
       </div>

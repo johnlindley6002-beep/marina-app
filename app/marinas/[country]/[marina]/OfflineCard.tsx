@@ -1,5 +1,6 @@
 "use client";
 
+import ChartDivider from "../../../components/ChartDivider";
 import { useEffect, useState } from "react";
 import type { Marina } from "../../../../data/marinas";
 import {
@@ -46,7 +47,8 @@ export default function OfflineCard({
   const Heading = embedded ? "h3" : "h2";
 
   return (
-    <div className={embedded ? "hairline-top mt-12 pt-8" : "section px-5 md:px-8"}>
+    <div className={embedded ? "mt-24" : "section px-5 md:px-8"}>
+      {embedded ? <ChartDivider className="mb-10" /> : null}
       <div className="mx-auto max-w-5xl">
         <div className="flex flex-wrap items-baseline justify-between gap-3">
           <Heading className={`type-heading text-ink ${embedded ? "type-h3" : "type-h2"}`}>

@@ -1,4 +1,5 @@
 import type { Marina } from "../../../../data/marinas";
+import ChartDivider from "../../../components/ChartDivider";
 
 export const telHref = (number: string) => `tel:${number.replace(/[^\d+]/g, "")}`;
 
@@ -51,7 +52,14 @@ export default function EmergencyNumbers({
     </>
   );
 
-  if (embedded) return <div className="mt-12">{body}</div>;
+  if (embedded) {
+    return (
+      <div className="mt-24">
+        <ChartDivider className="mb-10" />
+        {body}
+      </div>
+    );
+  }
   return (
     <section className="section px-5 md:px-8">
       <div className="mx-auto max-w-5xl">{body}</div>

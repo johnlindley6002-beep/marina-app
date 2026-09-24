@@ -91,7 +91,7 @@ export default function MyBoatContent() {
               <button
                 type="button"
                 onClick={() => setEditing("new")}
-                className="inline-flex min-h-11 items-center text-ink underline decoration-brass decoration-2 underline-offset-[6px]"
+                className="inline-flex min-h-11 items-center text-ink underline decoration-current/50 decoration-1 underline-offset-[6px]"
               >
                 Add a boat
               </button>
@@ -150,7 +150,7 @@ export default function MyBoatContent() {
                               setActiveId(boat.id);
                               flash(`${boat.name} is now your active boat.`);
                             }}
-                            className="inline-flex min-h-11 items-center text-ink underline decoration-brass decoration-2 underline-offset-[6px]"
+                            className="inline-flex min-h-11 items-center text-ink underline decoration-current/50 decoration-1 underline-offset-[6px]"
                           >
                             Use this boat
                           </button>

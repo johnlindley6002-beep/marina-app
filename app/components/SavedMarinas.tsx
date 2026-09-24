@@ -67,7 +67,7 @@ export default function SavedMarinas({
               <span className="flex flex-wrap items-center gap-x-4">
                 <Link
                   href={`/marinas/${favourite.countrySlug}/${favourite.marinaId}#request-berth`}
-                  className="inline-flex min-h-11 items-center text-ink underline decoration-brass decoration-2 underline-offset-[6px]"
+                  className="inline-flex min-h-11 items-center text-ink underline decoration-current/50 decoration-1 underline-offset-[6px]"
                 >
                   Start an enquiry
                 </Link>

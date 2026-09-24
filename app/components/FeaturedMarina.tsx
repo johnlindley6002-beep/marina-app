@@ -5,9 +5,11 @@ import Link from "next/link";
 import { marinas, type Marina } from "../../data/marinas";
 import { contentLocale, marinaContent } from "../../lib/i18n";
 import { formatLength } from "../../lib/units";
+import ChartDivider from "./ChartDivider";
 import ChartLinework from "./ChartLinework";
 import { useLanguage } from "./LanguageProvider";
 import MarinaRow from "./MarinaRow";
+import Reveal from "./Reveal";
 import { useUnits } from "./UnitsProvider";
 
 function formatCoordinates(lat: number, lng: number) {
@@ -37,7 +39,7 @@ function Plate({ marina }: { marina: Marina }) {
       <ChartLinework className="absolute inset-0 -z-10 h-full w-full text-paper opacity-[0.12]" />
       <span
         aria-hidden="true"
-        className="absolute top-[46%] left-[52%] h-3 w-3 rounded-full bg-brass ring-8 ring-brass/25"
+        className="absolute top-[46%] left-[52%] h-3 w-3 rounded-full bg-paper ring-8 ring-paper/25"
       />
       <p className="tabular absolute bottom-5 left-6 text-sm text-stone">
         {formatCoordinates(marina.coordinates.lat, marina.coordinates.lng)}
@@ -67,15 +69,16 @@ export default function FeaturedMarina() {
   ];
 
   return (
-    <section className="section px-5 md:px-8">
+    <section className="section-editorial px-5 md:px-8">
       <div className="mx-auto max-w-6xl">
-        <h2 className="type-heading type-h2 text-ink">
-          {t.home.featuredHeading}
-        </h2>
+        <Reveal>
+          <h2 className="type-statement text-ink">{t.home.featuredHeading}</h2>
+        </Reveal>
+        <ChartDivider className="mt-12 md:mt-16" />
 
-        <div className="mt-10 grid gap-10 lg:grid-cols-[1.05fr_1fr] lg:items-center lg:gap-20">
-          <div>
-            <h3 className="type-display flex flex-wrap items-center gap-x-4 text-ink [font-size:clamp(2rem,1.2rem+3.2vw,3.4rem)]">
+        <div className="mt-12 grid gap-12 md:mt-16 lg:grid-cols-[1.05fr_1fr] lg:items-center lg:gap-24">
+          <Reveal>
+            <h3 className="type-heading flex flex-wrap items-center gap-x-4 text-3xl text-ink">
               {flagship.name}
               {flagship.clubBurgee ? (
                 <Image
@@ -87,7 +90,7 @@ export default function FeaturedMarina() {
                 />
               ) : null}
             </h3>
-            <p className="measure mt-6 text-lg text-ink/75">{description}</p>
+            <p className="measure mt-6 text-ink/75">{description}</p>
 
             <dl className="mt-8 grid max-w-md grid-cols-3">
               {facts.map((fact) => (
@@ -102,17 +105,17 @@ export default function FeaturedMarina() {
 
             <Link
               href={`/marinas/${flagship.countrySlug}/${flagship.id}`}
-              className="mt-8 inline-flex min-h-11 items-center text-lg text-ink underline decoration-brass decoration-2 underline-offset-[8px] hover:decoration-ink"
+              className="mt-8 inline-flex min-h-11 items-center text-lg text-ink underline decoration-current/50 decoration-1 underline-offset-[8px] hover:decoration-ink"
             >
               {t.countryPage.viewMarina}
             </Link>
-          </div>
+          </Reveal>
 
           <Plate marina={flagship} />
         </div>
 
         {others.length > 0 ? (
-          <div className="mt-20">
+          <div className="mt-24">
             <h3 className="type-heading type-h3 text-ink">
               {t.home.moreMarinas}
             </h3>

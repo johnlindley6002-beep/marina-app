@@ -39,7 +39,7 @@ export default function DevPersonaSwitcher() {
                     aria-pressed={selected}
                     onClick={() => signInAs(persona.userId)}
                     className={`flex min-h-11 w-full flex-col items-start justify-center rounded-[3px] px-3 text-left transition-colors ${
-                      selected ? "bg-brass text-ink" : "hover:bg-paper/10"
+                      selected ? "bg-paper text-ink" : "hover:bg-paper/10"
                     }`}
                   >
                     <span className="font-medium">{persona.label}</span>

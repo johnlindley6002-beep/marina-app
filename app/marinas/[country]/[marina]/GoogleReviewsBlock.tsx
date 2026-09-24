@@ -1,5 +1,6 @@
 import type { Marina } from "../../../../data/marinas";
 import { getGoogleReviewsSummary } from "../../../../lib/googleReviews";
+import ChartDivider from "../../../components/ChartDivider";
 
 // Real Google rating information, shown as information only. It renders
 // nothing unless the marina has real values and enough reviews (see
@@ -9,7 +10,8 @@ export default function GoogleReviewsBlock({ marina }: { marina: Marina }) {
   if (!summary) return null;
 
   return (
-    <div className="hairline-top mt-12 pt-8">
+    <div className="mt-24">
+      <ChartDivider className="mb-10" />
       <h3 className="type-heading type-h3 text-ink">Google reviews</h3>
       <p className="mt-4 text-ink">
         <span className="type-heading tabular text-3xl">
@@ -23,7 +25,7 @@ export default function GoogleReviewsBlock({ marina }: { marina: Marina }) {
         href={summary.googleUrl}
         target="_blank"
         rel="noopener noreferrer"
-        className="mt-4 inline-flex min-h-11 items-center text-ink underline decoration-brass decoration-2 underline-offset-[6px]"
+        className="mt-4 inline-flex min-h-11 items-center text-ink underline decoration-current/50 decoration-1 underline-offset-[6px]"
       >
         Read reviews on Google
         <span className="sr-only"> (opens in a new tab)</span>

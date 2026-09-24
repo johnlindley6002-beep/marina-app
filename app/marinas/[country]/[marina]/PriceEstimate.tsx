@@ -183,7 +183,7 @@ export default function PriceEstimate({
               {selectedBerthId ? ` · Berth ${selectedBerthId}` : ""}
             </p>
             {demandNote ? (
-              <p className="mt-2 max-w-xl border-l-2 border-brass pl-3 text-sm text-ink/75">
+              <p className="mt-2 max-w-xl border-l-2 border-ink/40 pl-3 text-sm text-ink/75">
                 {demandNote}
               </p>
             ) : null}

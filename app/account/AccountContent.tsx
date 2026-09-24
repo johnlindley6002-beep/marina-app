@@ -189,7 +189,7 @@ function AccountBody() {
             </p>
             <Link
               href="/owner"
-              className="mt-4 inline-flex min-h-11 items-center text-ink underline decoration-brass decoration-2 underline-offset-[6px]"
+              className="mt-4 inline-flex min-h-11 items-center text-ink underline decoration-current/50 decoration-1 underline-offset-[6px]"
             >
               Go to My berth
             </Link>

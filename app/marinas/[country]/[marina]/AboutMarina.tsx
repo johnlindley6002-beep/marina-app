@@ -2,7 +2,9 @@
 
 import type { Marina } from "../../../../data/marinas";
 import { useLanguage } from "../../../components/LanguageProvider";
+import ChartDivider from "../../../components/ChartDivider";
 import Disclosure from "../../../components/Disclosure";
+import Reveal from "../../../components/Reveal";
 import NearbyPlaces from "./NearbyPlaces";
 import PhotoGallery from "./PhotoGallery";
 
@@ -16,19 +18,23 @@ export default function AboutMarina({ marina, description }: Props) {
   const photos = marina.photos.filter((photo) => !photo.placeholder);
 
   return (
-    <section className="section px-5 md:px-8">
+    <section className="section-editorial px-5 md:px-8">
       <div className="mx-auto max-w-5xl">
-        <h2 className="type-heading type-h2 text-ink">About {marina.name}</h2>
-        <Disclosure
-          previewLines={2}
-          label="Read more"
-          openLabel="Show less"
-          className="measure mt-6"
-        >
-          <p className="text-lg text-ink/75">{description}</p>
-        </Disclosure>
+        <Reveal>
+          <h2 className="type-statement text-ink">About {marina.name}</h2>
+        </Reveal>
+        <Reveal delay={120}>
+          <Disclosure
+            previewLines={2}
+            label="Read more"
+            openLabel="Show less"
+            className="measure mt-12 md:mt-16"
+          >
+            <p className="text-ink/75">{description}</p>
+          </Disclosure>
+        </Reveal>
 
-        <dl className="mt-6">
+        <dl className="mt-10">
           <div>
             <dt className="text-sm font-medium text-ink/80">
               {t.keyFacts.berths}
@@ -40,7 +46,8 @@ export default function AboutMarina({ marina, description }: Props) {
         </dl>
 
         {photos.length > 0 ? (
-          <div className="hairline-top mt-12 pt-8">
+          <div className="mt-24">
+            <ChartDivider className="mb-10" />
             <h3 className="type-heading type-h3 mb-6 text-ink">Photos</h3>
             <PhotoGallery photos={photos} />
           </div>
