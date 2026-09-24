@@ -13,6 +13,7 @@ export default function Navbar() {
 
   const links = [
     { href: "/marinas", label: t.nav.marinas },
+    { href: "/my-boat", label: t.nav.myBoat },
     { href: "/#about", label: t.nav.aboutUs },
     { href: "/#contact", label: t.nav.contact },
   ];

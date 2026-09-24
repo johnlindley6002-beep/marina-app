@@ -10,7 +10,16 @@ import {
 } from "../../lib/tripStore";
 import { useLanguage } from "./LanguageProvider";
 
-export default function SavedMarinas() {
+type Props = {
+  // On the My boat page the list always shows, with an explanation when empty.
+  showEmpty?: boolean;
+  headingLevel?: "h2" | "h3";
+};
+
+export default function SavedMarinas({
+  showEmpty = false,
+  headingLevel = "h2",
+}: Props) {
   const { t } = useLanguage();
   const [favourites, setFavourites] = useState<Favourite[]>([]);
 
@@ -20,46 +29,61 @@ export default function SavedMarinas() {
     }
     refresh();
     window.addEventListener(TRIP_CHANGED_EVENT, refresh);
-    return () => window.removeEventListener(TRIP_CHANGED_EVENT, refresh);
+    window.addEventListener("storage", refresh);
+    return () => {
+      window.removeEventListener(TRIP_CHANGED_EVENT, refresh);
+      window.removeEventListener("storage", refresh);
+    };
   }, []);
 
-  if (favourites.length === 0) return null;
+  if (favourites.length === 0 && !showEmpty) return null;
+
+  const Heading = headingLevel;
 
   return (
-    <div className="mt-12 hairline-top pt-6">
-      <h2 className="type-heading text-xl text-ink">
+    <div className="hairline-top mt-12 pt-6">
+      <Heading className="type-heading type-h3 text-ink">
         {t.favourites.savedHeading}
-      </h2>
-      <ul className="mt-4 space-y-3">
-        {favourites.map((favourite) => (
-          <li
-            key={favourite.marinaId}
-            className="flex flex-wrap items-center justify-between gap-3 text-sm"
-          >
-            <Link
-              href={`/marinas/${favourite.countrySlug}/${favourite.marinaId}`}
-              className="inline-flex min-h-11 items-center font-medium text-ink underline underline-offset-4"
+      </Heading>
+
+      {favourites.length === 0 ? (
+        <p className="measure mt-3 text-ink/75">
+          No saved marinas yet. Use &quot;Save marina&quot; on a marina page and
+          it will appear here.
+        </p>
+      ) : (
+        <ul className="mt-4">
+          {favourites.map((favourite) => (
+            <li
+              key={favourite.marinaId}
+              className="hairline-top flex flex-wrap items-center justify-between gap-x-6 text-sm first:border-t-0"
             >
-              {favourite.marinaName}
-            </Link>
-            <span className="flex items-center gap-4">
               <Link
-                href={`/marinas/${favourite.countrySlug}/${favourite.marinaId}#request-berth`}
-                className="inline-flex min-h-11 items-center text-ink hover:underline"
+                href={`/marinas/${favourite.countrySlug}/${favourite.marinaId}`}
+                className="inline-flex min-h-11 items-center text-base font-medium text-ink underline underline-offset-4"
               >
-                New enquiry
+                {favourite.marinaName}
               </Link>
-              <button
-                type="button"
-                onClick={() => toggleFavourite(favourite)}
-                className="inline-flex min-h-11 items-center text-ink/70 hover:text-error"
-              >
-                Remove
-              </button>
-            </span>
-          </li>
-        ))}
-      </ul>
+              <span className="flex flex-wrap items-center gap-x-4">
+                <Link
+                  href={`/marinas/${favourite.countrySlug}/${favourite.marinaId}#request-berth`}
+                  className="inline-flex min-h-11 items-center text-ink underline decoration-brass decoration-2 underline-offset-[6px]"
+                >
+                  Start an enquiry
+                </Link>
+                <button
+                  type="button"
+                  onClick={() => toggleFavourite(favourite)}
+                  className="inline-flex min-h-11 items-center text-ink/70 hover:text-error"
+                >
+                  Remove
+                  <span className="sr-only"> {favourite.marinaName}</span>
+                </button>
+              </span>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }

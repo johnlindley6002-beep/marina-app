@@ -1,8 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import type { Marina } from "../../../../data/marinas";
-import { loadBoats } from "../../../../lib/boatProfile";
+import { useBoats } from "../../../components/BoatProvider";
 import type { StayPlan } from "../../../../lib/stayPlan";
 
 type Props = {
@@ -14,21 +13,11 @@ type Props = {
 const dash = (value: string) => (value.trim() ? value : "-");
 
 export default function ArrivalActions({ marina, plan, selectedBerthId }: Props) {
-  const [boatName, setBoatName] = useState("");
-  const [boatType, setBoatType] = useState("");
-  const [flag, setFlag] = useState("");
-  const [homePort, setHomePort] = useState("");
-
-  useEffect(() => {
-    const store = loadBoats();
-    const active = store.boats.find((b) => b.id === store.activeId);
-    if (active) {
-      setBoatName(active.name);
-      setBoatType(active.type);
-      setFlag(active.flag);
-      setHomePort(active.homePort);
-    }
-  }, []);
+  const { activeBoat } = useBoats();
+  const boatName = activeBoat?.name ?? "";
+  const boatType = activeBoat?.type ?? "";
+  const flag = activeBoat?.flag ?? "";
+  const homePort = activeBoat?.homePort ?? "";
 
   function openMail(subject: string, lines: string[]) {
     window.location.href = `mailto:${marina.email}?subject=${encodeURIComponent(

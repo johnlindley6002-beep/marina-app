@@ -11,11 +11,11 @@ import {
 import {
   EMPTY_DOCUMENTS,
   loadBoatProfile,
-  loadBoats,
   type BoatDocuments,
 } from "../../../../lib/boatProfile";
 import { COUNTRIES } from "../../../../lib/countries";
 import BoatSwitcher from "../../../components/BoatSwitcher";
+import { useBoats } from "../../../components/BoatProvider";
 import DocumentWallet from "./DocumentWallet";
 import VesselUseFields, {
   isCommercialUse,
@@ -464,36 +464,75 @@ export default function RequestBerthForm({
     }
   }, [selectedBerthId]);
 
-  // Pre-fill from the saved boat (or the last dimensions typed elsewhere),
-  // only into fields the visitor hasn't filled from the search above.
+  // Pre-fill from the active boat: into empty fields on first load, and over
+  // the boat details when the visitor switches boats (here or in My boat).
+  const { ready: boatsReady, activeBoat, skipper: savedSkipper, saveSkipper } =
+    useBoats();
+  const appliedBoatId = useRef<string | null | undefined>(undefined);
+  const skipperApplied = useRef(false);
+  const [rememberSkipper, setRememberSkipper] = useState(false);
+
   useEffect(() => {
-    const store = loadBoats();
-    const active = store.boats.find((b) => b.id === store.activeId);
-    if (active) {
-      setDocs(active.documents ?? { ...EMPTY_DOCUMENTS });
-      const vesselType = (["sail", "motor", "catamaran", "other"] as const).find(
-        (v) => v === active.type
+    if (!boatsReady) return;
+    const id = activeBoat?.id ?? null;
+    const first = appliedBoatId.current === undefined;
+    if (!first && appliedBoatId.current === id) return;
+    appliedBoatId.current = id;
+
+    if (activeBoat) {
+      setDocs(activeBoat.documents ?? { ...EMPTY_DOCUMENTS });
+      const vesselType =
+        (["sail", "motor", "catamaran", "other"] as const).find(
+          (v) => v === activeBoat.type
+        ) ?? "";
+      setForm((f) =>
+        first
+          ? {
+              ...f,
+              boatName: f.boatName || activeBoat.name,
+              vesselType: f.vesselType || vesselType,
+              loa: f.loa || activeBoat.loa,
+              beam: f.beam || activeBoat.beam,
+              draft: f.draft || activeBoat.draft,
+              flagCountry: f.flagCountry || activeBoat.flag,
+              homePort: f.homePort || activeBoat.homePort,
+            }
+          : {
+              ...f,
+              boatName: activeBoat.name,
+              vesselType,
+              loa: activeBoat.loa,
+              beam: activeBoat.beam,
+              draft: activeBoat.draft,
+              flagCountry: activeBoat.flag,
+              homePort: activeBoat.homePort,
+            }
       );
+    } else if (first) {
+      const profile = loadBoatProfile();
       setForm((f) => ({
         ...f,
-        boatName: f.boatName || active.name,
-        vesselType: f.vesselType || vesselType || "",
-        loa: f.loa || active.loa,
-        beam: f.beam || active.beam,
-        draft: f.draft || active.draft,
-        flagCountry: f.flagCountry || active.flag,
-        homePort: f.homePort || active.homePort,
+        loa: f.loa || profile.loa,
+        beam: f.beam || profile.beam,
+        draft: f.draft || profile.draft,
       }));
-      return;
     }
-    const profile = loadBoatProfile();
-    setForm((f) => ({
-      ...f,
-      loa: f.loa || profile.loa,
-      beam: f.beam || profile.beam,
-      draft: f.draft || profile.draft,
-    }));
-  }, []);
+  }, [boatsReady, activeBoat, setForm]);
+
+  // The skipper's saved contact details fill empty fields once.
+  useEffect(() => {
+    if (!boatsReady || skipperApplied.current) return;
+    skipperApplied.current = true;
+    if (savedSkipper.name || savedSkipper.phone || savedSkipper.email) {
+      setRememberSkipper(true);
+      setForm((f) => ({
+        ...f,
+        skipperName: f.skipperName || savedSkipper.name,
+        phone: f.phone || savedSkipper.phone,
+        email: f.email || savedSkipper.email,
+      }));
+    }
+  }, [boatsReady, savedSkipper, setForm]);
 
   // "Rebook this stay": same boat and services as the last enquiry, dates blank.
   useEffect(() => {
@@ -626,6 +665,13 @@ export default function RequestBerthForm({
     }
 
     const text = buildSummary(form, marina, nights, quote, includeDocs ? docs : null);
+    if (rememberSkipper) {
+      saveSkipper({
+        name: form.skipperName.trim(),
+        phone: form.phone.trim(),
+        email: form.email.trim(),
+      });
+    }
     saveLastEnquiry({
       marinaId: marina.id,
       countrySlug: marina.countrySlug,
@@ -990,6 +1036,18 @@ export default function RequestBerthForm({
               ) : null}
             </label>
           </div>
+          <label className="mt-4 flex items-start gap-3 text-sm text-ink/75">
+            <input
+              type="checkbox"
+              checked={rememberSkipper}
+              onChange={(e) => setRememberSkipper(e.target.checked)}
+              className="mt-1"
+            />
+            <span>
+              Remember my name, phone and email on this device for next time.
+              You can change or remove them in My boat.
+            </span>
+          </label>
         </fieldset>
 
         {/* 4. Assistance */}

@@ -8,7 +8,9 @@ import {
   type Season,
 } from "../../../../data/marinas";
 import { effectiveDeparture, type StayPlan } from "../../../../lib/stayPlan";
+import Link from "next/link";
 import BoatSwitcher from "../../../components/BoatSwitcher";
+import { useBoats } from "../../../components/BoatProvider";
 import LengthInput from "../../../components/LengthInput";
 import { useUnits } from "../../../components/UnitsProvider";
 
@@ -34,6 +36,7 @@ type Props = {
 
 export default function PlanYourStay({ marina, plan, onPlanChange }: Props) {
   const { label: unit } = useUnits();
+  const { boats, activeBoat, saveBoat } = useBoats();
 
   const arrivalDate = parseIso(plan.arrival);
   const departureDate = parseIso(effectiveDeparture(plan));
@@ -59,6 +62,12 @@ export default function PlanYourStay({ marina, plan, onPlanChange }: Props) {
     v !== "" && !(dim(v) > 0) ? "Enter a number greater than 0, for example 12.5." : null;
   const dimsComplete =
     dim(plan.loa) > 0 && dim(plan.beam) > 0 && dim(plan.draft) > 0;
+  const boatSizesDiffer =
+    !!activeBoat &&
+    (plan.loa !== "" || plan.beam !== "" || plan.draft !== "") &&
+    (Number(plan.loa) !== Number(activeBoat.loa) ||
+      Number(plan.beam) !== Number(activeBoat.beam) ||
+      Number(plan.draft) !== Number(activeBoat.draft));
   const fit = dimsComplete
     ? checkBoatFit(marina, {
         loa: dim(plan.loa),
@@ -82,6 +91,45 @@ export default function PlanYourStay({ marina, plan, onPlanChange }: Props) {
           onPlanChange({ loa: boat.loa, beam: boat.beam, draft: boat.draft })
         }
       />
+
+      {activeBoat ? (
+        boatSizesDiffer ? (
+          <p className="mt-3 text-sm text-ink/75">
+            These sizes differ from {activeBoat.name}&apos;s saved sizes.{" "}
+            {dimsComplete ? (
+              <button
+                type="button"
+                onClick={() =>
+                  saveBoat({
+                    ...activeBoat,
+                    loa: plan.loa,
+                    beam: plan.beam,
+                    draft: plan.draft,
+                  })
+                }
+                className="inline-flex min-h-11 items-center font-medium text-ink underline underline-offset-4"
+              >
+                Update saved boat
+              </button>
+            ) : null}
+          </p>
+        ) : (
+          <p className="mt-3 text-sm text-ink/70">
+            Using your saved boat, {activeBoat.name}.{" "}
+            <Link href="/my-boat" className="underline underline-offset-4">
+              Manage in My boat
+            </Link>
+          </p>
+        )
+      ) : boats.length === 0 ? (
+        <p className="mt-3 text-sm text-ink/70">
+          Save your boat in{" "}
+          <Link href="/my-boat" className="underline underline-offset-4">
+            My boat
+          </Link>{" "}
+          and these sizes fill in next time.
+        </p>
+      ) : null}
 
       <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
         <label className="block text-sm">

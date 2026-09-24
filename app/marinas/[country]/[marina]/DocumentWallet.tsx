@@ -10,17 +10,18 @@ type Props = {
   documents: BoatDocuments;
   onChange: (documents: BoatDocuments) => void;
   insuranceMinimumLabel: string;
-  arrival: string;
-  includeInEnquiry: boolean;
-  onIncludeChange: (include: boolean) => void;
+  arrival?: string;
+  // Omit both to use the wallet on its own (the My boat page).
+  includeInEnquiry?: boolean;
+  onIncludeChange?: (include: boolean) => void;
 };
 
 export default function DocumentWallet({
   documents,
   onChange,
   insuranceMinimumLabel,
-  arrival,
-  includeInEnquiry,
+  arrival = "",
+  includeInEnquiry = false,
   onIncludeChange,
 }: Props) {
   function set<K extends keyof BoatDocuments>(key: K, value: string) {
@@ -109,14 +110,16 @@ export default function DocumentWallet({
         </label>
       </div>
 
-      <label className="mt-4 flex items-center gap-2 text-sm text-ink/75">
-        <input
-          type="checkbox"
-          checked={includeInEnquiry}
-          onChange={(e) => onIncludeChange(e.target.checked)}
-        />
-        Include these details in my enquiry email
-      </label>
+      {onIncludeChange ? (
+        <label className="mt-4 flex items-center gap-2 text-sm text-ink/75">
+          <input
+            type="checkbox"
+            checked={includeInEnquiry}
+            onChange={(e) => onIncludeChange(e.target.checked)}
+          />
+          Include these details in my enquiry email
+        </label>
+      ) : null}
     </div>
   );
 }

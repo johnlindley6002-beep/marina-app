@@ -2,7 +2,7 @@
 
 import dynamic from "next/dynamic";
 import Image from "next/image";
-import { useCallback, useDeferredValue, useEffect, useState } from "react";
+import { useCallback, useDeferredValue, useEffect, useRef, useState } from "react";
 import type { Marina } from "../../../../data/marinas";
 import { loadBoatProfile, saveBoatProfile } from "../../../../lib/boatProfile";
 import { contentLocale, marinaContent } from "../../../../lib/i18n";
@@ -11,6 +11,7 @@ import {
   effectiveDeparture,
   type StayPlan,
 } from "../../../../lib/stayPlan";
+import { useBoats } from "../../../components/BoatProvider";
 import PlanYourStay from "./PlanYourStay";
 import PriceEstimate from "./PriceEstimate";
 import KeyFactsStrip from "./KeyFactsStrip";
@@ -90,6 +91,29 @@ export default function CascaisPageContent({
       draft: p.draft || saved.draft,
     }));
   }, []);
+
+  // When the active boat changes (here or in My boat), its sizes replace the
+  // ones in the plan.
+  const { ready: boatsReady, activeBoat } = useBoats();
+  const seenBoat = useRef<string | null | undefined>(undefined);
+  useEffect(() => {
+    if (!boatsReady) return;
+    const id = activeBoat?.id ?? null;
+    if (seenBoat.current === undefined) {
+      seenBoat.current = id;
+      return;
+    }
+    if (seenBoat.current !== id) {
+      seenBoat.current = id;
+      if (activeBoat) {
+        onPlanChange({
+          loa: activeBoat.loa,
+          beam: activeBoat.beam,
+          draft: activeBoat.draft,
+        });
+      }
+    }
+  }, [boatsReady, activeBoat, onPlanChange]);
 
   useEffect(() => {
     if (plan.loa || plan.beam || plan.draft) {

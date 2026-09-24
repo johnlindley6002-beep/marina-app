@@ -3,6 +3,7 @@ import dynamic from "next/dynamic";
 import { Archivo, Inter } from "next/font/google";
 import "./globals.css";
 import Footer from "./components/Footer";
+import { BoatProvider } from "./components/BoatProvider";
 import { LanguageProvider } from "./components/LanguageProvider";
 import ServiceWorkerRegister from "./components/ServiceWorkerRegister";
 import { UnitsProvider } from "./components/UnitsProvider";
@@ -54,12 +55,14 @@ export default function RootLayout({
         </a>
         <LanguageProvider>
           <UnitsProvider>
-            <Navbar />
-            <main id="main" tabIndex={-1} className="flex-1 outline-none">
-              {children}
-            </main>
-            <Footer />
-            <ServiceWorkerRegister />
+            <BoatProvider>
+              <Navbar />
+              <main id="main" tabIndex={-1} className="flex-1 outline-none">
+                {children}
+              </main>
+              <Footer />
+              <ServiceWorkerRegister />
+            </BoatProvider>
           </UnitsProvider>
         </LanguageProvider>
       </body>

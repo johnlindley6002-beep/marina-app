@@ -109,11 +109,79 @@ export function loadBoats(): BoatStore {
   }
 }
 
-export function saveBoats(store: BoatStore): void {
+// Returns false when the browser refuses to store (private mode, blocked
+// storage), so callers can tell the visitor changes will not be kept.
+export function saveBoats(store: BoatStore): boolean {
   try {
     window.localStorage.setItem(BOATS_KEY, JSON.stringify(store));
+    return true;
   } catch {
-    // Storage unavailable: the UI works without persistence.
+    return false;
+  }
+}
+
+export const BOATS_STORAGE_KEY = BOATS_KEY;
+export const PROFILE_STORAGE_KEY = PROFILE_KEY;
+
+// The skipper's own contact details, stored once for every enquiry. Optional,
+// and only written when the visitor asks for it.
+export type Skipper = { name: string; phone: string; email: string };
+export const EMPTY_SKIPPER: Skipper = { name: "", phone: "", email: "" };
+const SKIPPER_KEY = "aldock-skipper";
+export const SKIPPER_STORAGE_KEY = SKIPPER_KEY;
+
+export function loadSkipper(): Skipper {
+  try {
+    const raw = window.localStorage.getItem(SKIPPER_KEY);
+    if (!raw) return { ...EMPTY_SKIPPER };
+    const parsed = JSON.parse(raw);
+    return {
+      name: str(parsed.name),
+      phone: str(parsed.phone),
+      email: str(parsed.email),
+    };
+  } catch {
+    return { ...EMPTY_SKIPPER };
+  }
+}
+
+export function saveSkipper(skipper: Skipper): boolean {
+  try {
+    window.localStorage.setItem(SKIPPER_KEY, JSON.stringify(skipper));
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export function isStorageAvailable(): boolean {
+  try {
+    const probe = "aldock-storage-probe";
+    window.localStorage.setItem(probe, "1");
+    window.localStorage.removeItem(probe);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+// Removes everything the site has saved about the visitor on this device:
+// boats and documents, skipper details, saved marinas and the last enquiry.
+// Display preferences (units, language) are kept.
+export function clearAllSavedData(): void {
+  const keys = [
+    BOATS_KEY,
+    PROFILE_KEY,
+    SKIPPER_KEY,
+    "aldock-favourites",
+    "aldock-last-enquiry",
+  ];
+  for (const key of keys) {
+    try {
+      window.localStorage.removeItem(key);
+    } catch {
+      // Nothing to remove if storage is unavailable.
+    }
   }
 }
 

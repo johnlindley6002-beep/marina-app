@@ -11,6 +11,7 @@ export default function Footer() {
 
   const links = [
     { href: "/marinas", label: t.footer.marinas },
+    { href: "/my-boat", label: t.nav.myBoat },
     { href: "/#about", label: t.footer.aboutUs },
     { href: "/#contact", label: t.footer.contact },
   ];

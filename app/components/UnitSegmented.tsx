@@ -4,7 +4,13 @@ import type { UnitSystem } from "../../lib/units";
 import { useLanguage } from "./LanguageProvider";
 import { useUnits } from "./UnitsProvider";
 
-export default function UnitSegmented({ className = "" }: { className?: string }) {
+export default function UnitSegmented({
+  className = "",
+  tone = "dark",
+}: {
+  className?: string;
+  tone?: "dark" | "light";
+}) {
   const { units, setUnits } = useUnits();
   const { t } = useLanguage();
 
@@ -17,7 +23,9 @@ export default function UnitSegmented({ className = "" }: { className?: string }
     <div
       role="group"
       aria-label={t.units.label}
-      className={`inline-flex rounded-full border border-stone/40 p-0.5 text-sm ${className}`}
+      className={`inline-flex rounded-full border p-0.5 text-sm ${
+        tone === "light" ? "border-ink/30" : "border-stone/40"
+      } ${className}`}
     >
       {options.map((option) => {
         const active = units === option.value;
@@ -30,7 +38,9 @@ export default function UnitSegmented({ className = "" }: { className?: string }
             className={`min-h-11 rounded-full px-4 transition-colors md:min-h-9 ${
               active
                 ? "bg-brass font-medium text-ink"
-                : "text-stone hover:text-paper"
+                : tone === "light"
+                  ? "text-ink/75 hover:text-ink"
+                  : "text-stone hover:text-paper"
             }`}
           >
             {option.label}

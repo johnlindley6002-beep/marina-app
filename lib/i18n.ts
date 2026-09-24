@@ -26,6 +26,7 @@ type Dictionary = {
     search: string;
     openMenu: string;
     closeMenu: string;
+    myBoat: string;
   };
   footer: {
     tagline: string;
@@ -173,6 +174,7 @@ const baseTranslations: Record<"en" | "pt", Dictionary> = {
       search: "Search",
       openMenu: "Open menu",
       closeMenu: "Close menu",
+      myBoat: "My boat",
     },
     footer: {
       tagline: "Marina bookings, simplified.",
@@ -346,6 +348,7 @@ const baseTranslations: Record<"en" | "pt", Dictionary> = {
       search: "Pesquisar",
       openMenu: "Abrir menu",
       closeMenu: "Fechar menu",
+      myBoat: "O meu barco",
     },
     footer: {
       tagline: "Reserve a sua amarração, sem complicações",
@@ -561,6 +564,7 @@ const es: DeepPartial<Dictionary> = {
     search: "Buscar",
     openMenu: "Abrir menú",
     closeMenu: "Cerrar menú",
+    myBoat: "Mi barco",
   },
   footer: {
     tagline: "Reserva tu amarre, sin complicaciones",
@@ -654,6 +658,7 @@ const fr: DeepPartial<Dictionary> = {
     search: "Rechercher",
     openMenu: "Ouvrir le menu",
     closeMenu: "Fermer le menu",
+    myBoat: "Mon bateau",
   },
   footer: {
     tagline: "Réservez votre place de port, en toute simplicité",

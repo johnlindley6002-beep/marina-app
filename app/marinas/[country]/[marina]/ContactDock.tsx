@@ -2,7 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import type { Marina } from "../../../../data/marinas";
-import { loadBoatProfile, loadBoats } from "../../../../lib/boatProfile";
+import { loadBoatProfile } from "../../../../lib/boatProfile";
+import { useBoats } from "../../../components/BoatProvider";
 import { useLanguage } from "../../../components/LanguageProvider";
 import { telHref } from "./EmergencyNumbers";
 
@@ -10,11 +11,10 @@ import { telHref } from "./EmergencyNumbers";
 // button and the light "Contact marina" link in the action zone.
 export function ContactList({ marina }: { marina: Marina }) {
   const { t } = useLanguage();
+  const { activeBoat: active } = useBoats();
 
   function messageMarina() {
-    const store = loadBoats();
-    const active = store.boats.find((b) => b.id === store.activeId);
-    const dims = active ?? loadBoatProfile();
+    const dims = loadBoatProfile();
     const lines = [
       "Hello,",
       "",

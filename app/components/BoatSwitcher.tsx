@@ -1,18 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import {
-  loadBoats,
-  newBoatId,
-  saveBoatProfile,
-  saveBoats,
-  type SavedBoat,
-} from "../../lib/boatProfile";
-
-const CHANGE_EVENT = "aldock-boats-changed";
+import Link from "next/link";
+import { useState } from "react";
+import type { SavedBoat } from "../../lib/boatProfile";
+import { formatLength } from "../../lib/units";
+import { useBoats } from "./BoatProvider";
+import { useUnits } from "./UnitsProvider";
 
 type Props = {
-  // When provided, the saved-boat controls include "Save this boat".
+  // When provided, the controls include "Save this boat".
   current?: Omit<SavedBoat, "id">;
   heading?: string;
   onSelect: (boat: SavedBoat) => void;
@@ -22,43 +18,24 @@ const inputClass =
   "mt-2 w-full border border-hairline px-3 py-2 text-sm text-ink focus:border-ink focus:outline-none";
 const labelClass = "text-sm font-medium text-ink/80";
 
+// Pick the active boat, and optionally save what is in the form as a boat.
+// The boats themselves live in BoatProvider; the full editor is /my-boat.
 export default function BoatSwitcher({ current, heading, onSelect }: Props) {
-  const [boats, setBoats] = useState<SavedBoat[]>([]);
-  const [activeId, setActiveId] = useState("");
+  const { boats, activeBoat, setActiveId, saveBoat } = useBoats();
+  const { units } = useUnits();
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
-
-  // Several switchers can be on one page, so they re-read storage when
-  // any of them changes it.
-  useEffect(() => {
-    function refresh() {
-      const store = loadBoats();
-      setBoats(store.boats);
-      setActiveId(store.activeId ?? "");
-    }
-    refresh();
-    window.addEventListener(CHANGE_EVENT, refresh);
-    return () => window.removeEventListener(CHANGE_EVENT, refresh);
-  }, []);
-
-  function persist(nextBoats: SavedBoat[], nextActive: string) {
-    setBoats(nextBoats);
-    setActiveId(nextActive);
-    saveBoats({ boats: nextBoats, activeId: nextActive || null });
-    window.dispatchEvent(new Event(CHANGE_EVENT));
-  }
 
   function handleChange(id: string) {
     setError(null);
     setMessage(null);
     if (!id) {
-      persist(boats, "");
+      setActiveId(null);
       return;
     }
     const boat = boats.find((b) => b.id === id);
     if (!boat) return;
-    persist(boats, id);
-    saveBoatProfile({ loa: boat.loa, beam: boat.beam, draft: boat.draft });
+    setActiveId(id);
     onSelect(boat);
   }
 
@@ -78,39 +55,19 @@ export default function BoatSwitcher({ current, heading, onSelect }: Props) {
       )
     ) {
       setMessage(null);
-      setError("Enter length, beam and draft to save this boat.");
+      setError("Enter the boat's length, beam and draft above, then save.");
       return;
     }
     const existing = boats.find(
       (b) => b.name.trim().toLowerCase() === name.toLowerCase()
     );
-    const boat: SavedBoat = {
-      ...current,
-      name,
-      id: existing?.id ?? newBoatId(),
-    };
-    persist(
-      existing
-        ? boats.map((b) => (b.id === boat.id ? boat : b))
-        : [...boats, boat],
-      boat.id
-    );
+    saveBoat({ ...current, name, id: existing?.id });
     setError(null);
     setMessage(
       existing
         ? "Boat and documents updated."
         : "Boat and documents saved on this device."
     );
-  }
-
-  function handleDelete() {
-    if (!activeId) return;
-    persist(
-      boats.filter((b) => b.id !== activeId),
-      ""
-    );
-    setError(null);
-    setMessage("Boat removed.");
   }
 
   if (boats.length === 0 && !current) return null;
@@ -131,7 +88,7 @@ export default function BoatSwitcher({ current, heading, onSelect }: Props) {
           <label className="block min-w-[200px] flex-1 text-sm">
             <span className={labelClass}>Saved boats</span>
             <select
-              value={activeId}
+              value={activeBoat?.id ?? ""}
               onChange={(e) => handleChange(e.target.value)}
               className={inputClass}
             >
@@ -139,7 +96,9 @@ export default function BoatSwitcher({ current, heading, onSelect }: Props) {
               {boats.map((boat) => (
                 <option key={boat.id} value={boat.id}>
                   {boat.name}
-                  {boat.loa ? ` - ${boat.loa} m` : ""}
+                  {Number(boat.loa) > 0
+                    ? ` - ${formatLength(Number(boat.loa), units)}`
+                    : ""}
                 </option>
               ))}
             </select>
@@ -160,22 +119,23 @@ export default function BoatSwitcher({ current, heading, onSelect }: Props) {
           </button>
         ) : null}
 
-        {activeId ? (
-          <button
-            type="button"
-            onClick={handleDelete}
-            className="min-h-11 px-2 text-sm font-medium text-ink/70 hover:text-error"
-          >
-            Remove
-          </button>
-        ) : null}
+        <Link
+          href="/my-boat"
+          className="inline-flex min-h-11 items-center px-2 text-sm font-medium text-ink underline underline-offset-4 hover:text-ink-2"
+        >
+          Manage boats
+        </Link>
       </div>
 
       {error ? (
-        <p className="mt-2 text-xs text-error">{error}</p>
+        <p role="alert" className="mt-2 text-xs text-error">
+          {error}
+        </p>
       ) : null}
       {message ? (
-        <p className="mt-2 text-xs text-ink/70">{message}</p>
+        <p role="status" className="mt-2 text-xs text-ink/70">
+          {message}
+        </p>
       ) : null}
       <p className="mt-2 text-xs text-ink/70">
         Boats are stored only in this browser, so no account is needed.

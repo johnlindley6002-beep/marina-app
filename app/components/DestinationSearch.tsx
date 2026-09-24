@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  useEffect,
   useId,
   useState,
   type FormEvent,
@@ -8,7 +9,8 @@ import {
 } from "react";
 import { useRouter } from "next/navigation";
 import { getSuggestions, type Suggestion } from "../../lib/marinaSearch";
-import { withUnit } from "../../lib/units";
+import { loadBoatProfile } from "../../lib/boatProfile";
+import { formatLength, withUnit } from "../../lib/units";
 import { useLanguage } from "./LanguageProvider";
 import LengthInput from "./LengthInput";
 import { useUnits } from "./UnitsProvider";
@@ -40,6 +42,14 @@ export default function DestinationSearch({
   );
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(-1);
+
+  // A saved boat's length fills in when none was given (the toggle label shows it).
+  useEffect(() => {
+    if (initial?.length) return;
+    const saved = loadBoatProfile().loa;
+    if (Number(saved) > 0) setLength((current) => current || saved);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const suggestions: Suggestion[] = open ? getSuggestions(q) : [];
 
@@ -154,7 +164,11 @@ export default function DestinationSearch({
         onClick={() => setFiltersOpen((v) => !v)}
         className="mt-1 inline-flex min-h-11 items-center text-sm text-ink/70 underline underline-offset-4 hover:text-ink"
       >
-        {filtersOpen ? t.home.hideFilters : t.home.addFilters}
+        {filtersOpen
+          ? t.home.hideFilters
+          : Number(length) > 0
+            ? `${t.home.addFilters} (${formatLength(Number(length), units)})`
+            : t.home.addFilters}
       </button>
 
       {filtersOpen ? (
