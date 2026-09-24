@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import MarinasResults from "./MarinasResults";
 
 export const metadata: Metadata = {
-  title: "Marinas — aldock",
+  title: "Marinas - aldock",
   description: "Find a marina by name, region or country.",
 };
 

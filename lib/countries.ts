@@ -1,4 +1,4 @@
-// Plain country names for select inputs — no flags/codes needed here,
+// Plain country names for select inputs, no flags/codes needed here,
 // just enough to populate a dropdown without an external dependency.
 export const COUNTRIES: string[] = [
   "Afghanistan", "Albania", "Algeria", "Andorra", "Angola",

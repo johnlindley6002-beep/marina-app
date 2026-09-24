@@ -65,7 +65,7 @@ export function saveBoatProfile(profile: BoatProfile): void {
   try {
     window.localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
   } catch {
-    // Storage unavailable — the UI works without persistence.
+    // Storage unavailable: the UI works without persistence.
   }
 }
 
@@ -113,7 +113,7 @@ export function saveBoats(store: BoatStore): void {
   try {
     window.localStorage.setItem(BOATS_KEY, JSON.stringify(store));
   } catch {
-    // Storage unavailable — the UI works without persistence.
+    // Storage unavailable: the UI works without persistence.
   }
 }
 

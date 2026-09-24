@@ -115,7 +115,7 @@ const CENTRE_SPINE_X = 680;
 // I, J, B, and K keep their REAL berth numbers, read directly off the
 // official plan. The other 12 pontoons use clean, representative
 // counts that shrink in the same proportion as the real plan, rather
-// than hand-tracing all ~650 berths — the goal is a proportionally
+// than hand-tracing all ~650 berths, because the goal is a proportionally
 // faithful, maintainable schematic, not a pixel-exact reproduction.
 //
 // PROVISIONAL: the real plan shows berth numbers but not size classes.

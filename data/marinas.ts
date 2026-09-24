@@ -122,7 +122,7 @@ export function boatFitsMarina(marina: Marina, dims: BoatDimensions): boolean {
 
 export type PriceBand = "€" | "€€" | "€€€";
 
-// Generic, not hardcoded per marina — buckets by the cheapest class's
+// Generic, not hardcoded per marina: buckets by the cheapest class's
 // low-season nightly rate.
 export function getPriceBand(marina: Marina): PriceBand {
   const cheapest = Math.min(
@@ -280,14 +280,14 @@ export function calculateQuote(
     addOnLines.push({
       label: "Shore power",
       amountEur: null,
-      note: `Metered — billed on consumption (up to ${fees.maxAmperage} A)`,
+      note: `Metered, billed on consumption (up to ${fees.maxAmperage} A)`,
     });
   }
   if (addOns.water) {
     addOnLines.push({
       label: "Water",
       amountEur: null,
-      note: "Metered — billed on consumption",
+      note: "Metered, billed on consumption",
     });
   }
   if (addOns.pumpOut) {
@@ -411,7 +411,7 @@ export type Marina = {
   featured?: boolean;
   reviews: Reviews;
   nearby: NearbyPlace[];
-  // Only badges listed here are rendered — never claim one that isn't confirmed.
+  // Only badges listed here are rendered; never claim one that isn't confirmed.
   badges: Badge[];
   emergency: { phones: EmergencyPhone[]; vhf: VhfChannelInfo[] };
 };
@@ -428,8 +428,8 @@ const CASCAIS_SERVICE_FEES: ServiceFees = {
   wasteDisposalEur: { min: 8.9, max: 16.5 },
   maxAmperage: CASCAIS_MAX_AMPERAGE,
   amperageOptions: [16, 32],
-  // TODO: fuel prices not supplied — confirm with the marina.
-  fuelNote: "Diesel / petrol — price at the fuel dock",
+  // TODO: fuel prices not supplied, confirm with the marina.
+  fuelNote: "Diesel / petrol, price at the fuel dock",
 };
 
 // TODO (owner to supply): mapPoint for wifi, security, waste and extras;
@@ -440,8 +440,8 @@ const CASCAIS_FACILITY_DETAILS: FacilityDetail[] = [
     name: { en: "Reception / Marina office", pt: "Receção / Escritório da marina" },
     icon: "reception",
     description: {
-      en: "The marina office in Casa de São Bernardo — your first stop on arrival.",
-      pt: "O escritório da marina na Casa de São Bernardo — a primeira paragem à chegada.",
+      en: "The marina office in Casa de São Bernardo, your first stop on arrival.",
+      pt: "O escritório da marina na Casa de São Bernardo, a primeira paragem à chegada.",
     },
     details: [
       {
@@ -734,7 +734,7 @@ export const marinas: Marina[] = [
         "Passports must be valid at least 3 months beyond your departure date.",
         "Non-EU-flagged boats get 18 months Temporary Admission (customs).",
         "EU-flagged boats should carry evidence of their VAT status.",
-        "Non-EU/Schengen crew are registered at the border under the EU Entry/Exit System (EES). ETIAS pre-authorisation is planned but may not yet be required — check the official EU website for the current rules.",
+        "Non-EU/Schengen crew are registered at the border under the EU Entry/Exit System (EES). ETIAS pre-authorisation is planned but may not yet be required, so check the official EU website for the current rules.",
       ],
     },
     preArrivalChecklist: [
@@ -767,7 +767,7 @@ export const marinas: Marina[] = [
           rating: 5,
           text: "Easy hail on channel 9 and the staff met us on the pontoon. Showers spotless, and the old town is a five-minute walk.",
           response:
-            "Thank you — we look forward to welcoming you back to Cascais.",
+            "Thank you, we look forward to welcoming you back to Cascais.",
         },
         {
           author: "M.",

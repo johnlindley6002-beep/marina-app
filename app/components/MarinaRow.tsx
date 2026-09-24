@@ -40,10 +40,7 @@ export default function MarinaRow({
       onMouseEnter={() => onHover?.(marina.id)}
       onMouseLeave={() => onHover?.(null)}
     >
-      <Link
-        href={`/marinas/${marina.countrySlug}/${marina.id}${search}`}
-        className="group grid gap-5 py-8 sm:grid-cols-[auto_1fr_auto] sm:items-start"
-      >
+      <div className="grid gap-5 py-8 sm:grid-cols-[auto_1fr_auto]">
         {marina.coverImage ? (
           <Image
             src={marina.coverImage.src}
@@ -56,7 +53,12 @@ export default function MarinaRow({
 
         <div className="min-w-0 sm:col-start-2">
           <h2 className="type-heading flex items-center gap-3 text-2xl text-ink">
-            {marina.name}
+            <Link
+              href={`/marinas/${marina.countrySlug}/${marina.id}${search}`}
+              className="after:absolute after:inset-0 after:content-['']"
+            >
+              {marina.name}
+            </Link>
             {marina.clubBurgee ? (
               <Image
                 src={marina.clubBurgee.src}
@@ -90,16 +92,22 @@ export default function MarinaRow({
           </dl>
         </div>
 
-        <span className="text-ink underline decoration-brass decoration-2 underline-offset-[6px] sm:col-start-3 sm:row-start-1">
-          {t.countryPage.viewMarina}
-        </span>
-      </Link>
-      <FavouriteButton
-        marinaId={marina.id}
-        countrySlug={marina.countrySlug}
-        marinaName={marina.name}
-        className="absolute right-0 bottom-6"
-      />
+        {/* Both actions are right-aligned inside the row on every screen size. */}
+        <div className="flex items-center justify-end gap-6 sm:col-start-3 sm:row-start-1 sm:flex-col sm:items-end sm:justify-between">
+          <span
+            aria-hidden="true"
+            className="text-ink underline decoration-brass decoration-2 underline-offset-[6px]"
+          >
+            {t.countryPage.viewMarina}
+          </span>
+          <FavouriteButton
+            marinaId={marina.id}
+            countrySlug={marina.countrySlug}
+            marinaName={marina.name}
+            className="relative z-10"
+          />
+        </div>
+      </div>
     </li>
   );
 }

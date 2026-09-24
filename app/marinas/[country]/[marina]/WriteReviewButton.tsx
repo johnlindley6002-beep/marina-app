@@ -22,7 +22,7 @@ export default function WriteReviewButton({
   function openMail() {
     const categories = Object.keys(REVIEW_CATEGORY_LABELS) as ReviewCategory[];
     const body = [
-      `REVIEW — ${marina.name.toUpperCase()}`,
+      `REVIEW - ${marina.name.toUpperCase()}`,
       "",
       "Overall rating (1–5): ",
       ...categories.map((c) => `${REVIEW_CATEGORY_LABELS[c]} (1–5): `),
@@ -34,7 +34,7 @@ export default function WriteReviewButton({
       "Date of stay (optional): ",
     ].join("\n");
     window.location.href = `mailto:${marina.email}?subject=${encodeURIComponent(
-      `Review — ${marina.name}`
+      `Review - ${marina.name}`
     )}&body=${encodeURIComponent(body)}`;
   }
 

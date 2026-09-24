@@ -67,16 +67,16 @@ export default function StayRecap({
   function notifyDeparture() {
     if (!enquiry) return;
     const body = [
-      `DEPARTURE NOTICE — ${marina.name.toUpperCase()}`,
+      `DEPARTURE NOTICE - ${marina.name.toUpperCase()}`,
       "",
-      `Boat: ${enquiry.boatName || "—"}`,
-      `Berth: ${enquiry.berthId || "—"}`,
-      `Departure: ${departure || "—"}${departTime ? ` at ${departTime}` : ""}`,
+      `Boat: ${enquiry.boatName || "-"}`,
+      `Berth: ${enquiry.berthId || "-"}`,
+      `Departure: ${departure || "-"}${departTime ? ` at ${departTime}` : ""}`,
       "",
       "Thank you for the stay.",
     ].join("\n");
     window.location.href = `mailto:${marina.email}?subject=${encodeURIComponent(
-      `Departure notice — ${enquiry.boatName || "visiting vessel"}`
+      `Departure notice - ${enquiry.boatName || "visiting vessel"}`
     )}&body=${encodeURIComponent(body)}`;
   }
 
@@ -151,7 +151,7 @@ export default function StayRecap({
                         ) : null}
                       </td>
                       <td className="py-2 text-right font-medium text-ink">
-                        {line.amountEur !== null ? eur(line.amountEur) : "—"}
+                        {line.amountEur !== null ? eur(line.amountEur) : "-"}
                       </td>
                     </tr>
                   ))}
@@ -172,7 +172,7 @@ export default function StayRecap({
             )}
             <p className="mt-3 text-xs text-ink/70">
               Estimate only, excl. {Math.round(marina.vatRate * 100)}% VAT and
-              utilities. The final total is confirmed by the marina — nothing is
+              utilities. The final total is confirmed by the marina. Nothing is
               billed through this site.
             </p>
           </div>

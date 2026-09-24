@@ -116,7 +116,7 @@ export default function FeaturedMarina() {
             <h3 className="type-heading type-h3 text-ink">
               {t.home.moreMarinas}
             </h3>
-            <ul className="mt-4">
+            <ul className="mt-4 max-w-3xl">
               {others.map((marina) => (
                 <MarinaRow key={marina.id} marina={marina} />
               ))}

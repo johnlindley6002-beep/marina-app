@@ -165,7 +165,7 @@ function buildSummary(
 ): string {
   const lines: string[] = [];
 
-  lines.push(`BERTH ENQUIRY — ${marina.name.toUpperCase()}`);
+  lines.push(`BERTH ENQUIRY - ${marina.name.toUpperCase()}`);
   lines.push("");
 
   lines.push("YOUR VISIT");
@@ -211,7 +211,7 @@ function buildSummary(
   }
 
   if (quote) {
-    lines.push("ESTIMATE (excl. VAT and utilities — to be confirmed by the marina)");
+    lines.push("ESTIMATE (excl. VAT and utilities, to be confirmed by the marina)");
     lines.push(`Berth class: ${quote.marinaClass}`);
     quote.berthLines.forEach((l) =>
       lines.push(
@@ -220,7 +220,7 @@ function buildSummary(
     );
     quote.addOnLines.forEach((l) => {
       const parts = [l.amountEur !== null ? formatEur(l.amountEur) : "", l.note ?? ""];
-      lines.push(`${l.label}: ${parts.filter(Boolean).join(" — ")}`);
+      lines.push(`${l.label}: ${parts.filter(Boolean).join(" - ")}`);
     });
     lines.push(`Estimated total: ${formatEur(quote.estimatedTotalEur)}`);
     lines.push("");
@@ -265,7 +265,7 @@ function buildSummary(
           c.role.trim(),
           c.joinDate && `Joined ${c.joinDate}`,
         ].filter(Boolean);
-        lines.push(`${i + 1}. ${parts.join(" — ")}`);
+        lines.push(`${i + 1}. ${parts.join(" - ")}`);
       });
     }
   }
@@ -548,7 +548,7 @@ export default function RequestBerthForm({
     setCopied(false);
 
     const mailto = `mailto:${marina.email}?subject=${encodeURIComponent(
-      "Berth enquiry — Marina de Cascais"
+      "Berth enquiry - Marina de Cascais"
     )}&body=${encodeURIComponent(text)}`;
     window.location.href = mailto;
   }
@@ -560,7 +560,7 @@ export default function RequestBerthForm({
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
-      // Clipboard API unavailable — nothing more we can do here.
+      // Clipboard API unavailable: nothing more we can do here.
     }
   }
 
@@ -574,7 +574,7 @@ export default function RequestBerthForm({
       </h2>
       <p className="mt-2 text-sm text-ink/70">
         Send {marina.name} everything they need to confirm your visit. This
-        opens a pre-filled email — nothing is submitted to a server.
+        opens a pre-filled email. Nothing is submitted to a server.
       </p>
 
       <form onSubmit={handleSubmit} className="mt-8 space-y-12">
@@ -586,7 +586,7 @@ export default function RequestBerthForm({
           <p className="mt-4 text-sm text-ink/75">
             <span className={labelClass}>Your stay: </span>
             {form.arrival
-              ? `${form.arrival} → ${form.openEnded ? "open-ended" : form.departure || "—"}`
+              ? `${form.arrival} → ${form.openEnded ? "open-ended" : form.departure || "-"}`
               : "not set yet"}
             {nights ? ` · ${nights} night${nights === 1 ? "" : "s"}` : ""}
             {Number(form.loa) > 0
@@ -607,7 +607,7 @@ export default function RequestBerthForm({
             >
               Plan your stay
             </a>{" "}
-            above — edit them there.
+            above to edit them.
           </p>
           <div className="mt-4 grid max-w-md gap-4 sm:grid-cols-2">
             <label className="block text-sm">
@@ -950,7 +950,7 @@ export default function RequestBerthForm({
                 </p>
                 <p className="mt-2 text-xs text-ink/70">
                   Required: name, nationality and role. Date of birth,
-                  passport number and join date are optional — passport
+                  passport number and join date are optional. Passport
                   numbers and other private details can be given to the
                   marina staff in person instead.
                 </p>
@@ -1067,7 +1067,7 @@ export default function RequestBerthForm({
             onIncludeChange={setIncludeDocs}
           />
           <BoatSwitcher
-            heading="Boats & documents — save this boat or switch to another"
+            heading="Boats & documents: save this boat or switch to another"
             current={{
               name: form.boatName,
               type: form.vesselType,
@@ -1122,7 +1122,7 @@ export default function RequestBerthForm({
           </p>
           <p className="mt-2 text-sm text-ink/75">
             {marina.cancellationPolicy ??
-              "Cancellation terms are confirmed by the marina — ask when they reply to your enquiry."}
+              "Cancellation terms are confirmed by the marina. Ask when they reply to your enquiry."}
           </p>
           <p className="mt-4 text-sm text-ink/75">
             This sends an enquiry; the marina confirms availability by email.

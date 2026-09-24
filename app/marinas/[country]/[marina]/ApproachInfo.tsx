@@ -100,8 +100,7 @@ export default function ApproachInfo({
         <div className="mt-6">
           <ProtectionTag protection={marina.protection} />
           <p className="mt-2 text-xs text-ink/70">
-            {marina.protection.description} General guide only — not a live
-            forecast.
+            {marina.protection.description} General guide only, not a live forecast.
           </p>
         </div>
 

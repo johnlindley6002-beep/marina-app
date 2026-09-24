@@ -30,7 +30,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
         setLocaleState(stored as Locale);
       }
     } catch {
-      // localStorage unavailable (private browsing, etc) — default stands.
+      // localStorage unavailable (private browsing, etc): default stands.
     }
   }, []);
 
@@ -43,7 +43,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     try {
       window.localStorage.setItem(STORAGE_KEY, next);
     } catch {
-      // Ignore — nothing to persist to, session state still updates.
+      // Ignore: nothing to persist to, session state still updates.
     }
   };
 

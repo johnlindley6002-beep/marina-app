@@ -167,7 +167,7 @@ export default function PriceEstimate({
                       ) : null}
                     </td>
                     <td className="py-2 text-right font-medium text-ink">
-                      {line.amountEur !== null ? eur(line.amountEur) : "—"}
+                      {line.amountEur !== null ? eur(line.amountEur) : "-"}
                     </td>
                   </tr>
                 ))}
@@ -182,14 +182,13 @@ export default function PriceEstimate({
               </tbody>
             </table>
             <p className="mt-3 text-xs text-ink/70">
-              Excl. {Math.round(marina.vatRate * 100)}% VAT and utilities —
-              estimate, confirm with marina.
+              Excl. {Math.round(marina.vatRate * 100)}% VAT and utilities (estimate, confirm with the marina).
             </p>
           </>
         ) : (
           <p className="text-sm text-ink/75">
             {loa > 0 && classifyBoatLength(loa) === null
-              ? "Your length is outside the standard berth classes — contact the marina for a quote."
+              ? "Your length is outside the standard berth classes, so contact the marina for a quote."
               : "Enter your dates and boat length above to see a price estimate."}
           </p>
         )}

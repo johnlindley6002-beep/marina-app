@@ -34,8 +34,7 @@ export default function TrustSection({ marina }: { marina: Marina }) {
               role="note"
               className="mt-3 inline-block border border-amber-300 bg-amber-50 px-3 py-1 text-xs font-medium text-amber-800"
             >
-              Sample ratings and reviews — illustrative examples, not from real
-              boaters yet.
+              Sample ratings and reviews: illustrative examples, not from real boaters yet.
             </p>
           ) : null}
 

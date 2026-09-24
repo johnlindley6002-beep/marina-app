@@ -14,7 +14,7 @@ export async function generateMetadata({
   const marinas = getMarinasByCountry(country);
   const countryName = marinas[0]?.country ?? country;
   return {
-    title: `Marinas in ${countryName} — aldock`,
+    title: `Marinas in ${countryName} - aldock`,
   };
 }
 

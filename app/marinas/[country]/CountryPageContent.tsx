@@ -196,10 +196,10 @@ export default function CountryPageContent({
 
         {filtered.length === 0 ? (
           <p className="measure mt-10 text-ink/75">
-            No marinas match these filters — try loosening them.
+            No marinas match these filters. Try loosening them.
           </p>
         ) : (
-          <ul className="mt-10">
+          <ul className="mt-10 max-w-3xl">
             {filtered.map((marina) => (
               <MarinaRow key={marina.id} marina={marina} />
             ))}

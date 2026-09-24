@@ -139,7 +139,7 @@ export default function BoatSwitcher({ current, heading, onSelect }: Props) {
               {boats.map((boat) => (
                 <option key={boat.id} value={boat.id}>
                   {boat.name}
-                  {boat.loa ? ` — ${boat.loa} m` : ""}
+                  {boat.loa ? ` - ${boat.loa} m` : ""}
                 </option>
               ))}
             </select>
@@ -178,7 +178,7 @@ export default function BoatSwitcher({ current, heading, onSelect }: Props) {
         <p className="mt-2 text-xs text-ink/70">{message}</p>
       ) : null}
       <p className="mt-2 text-xs text-ink/70">
-        Boats are stored only in this browser — no account needed.
+        Boats are stored only in this browser, so no account is needed.
       </p>
     </div>
   );

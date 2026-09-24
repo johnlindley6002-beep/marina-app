@@ -48,7 +48,7 @@ export default function OfflineCard({ marina }: { marina: Marina }) {
             role="status"
             className={`text-xs font-medium ${online ? "text-ink/70" : "text-amber-800"}`}
           >
-            {online ? "Online" : "You're offline — showing saved details"}
+            {online ? "Online" : "You're offline, showing saved details"}
           </p>
         </div>
         <p className="mt-2 max-w-2xl text-sm text-ink/75">
@@ -108,7 +108,7 @@ export default function OfflineCard({ marina }: { marina: Marina }) {
                       : `${enquiry.departure}${enquiry.etd ? ` (ETD ${enquiry.etd})` : ""}`}
                   </li>
                   <li>
-                    Boat: {enquiry.boatName || "—"}
+                    Boat: {enquiry.boatName || "-"}
                     {Number(enquiry.loa) > 0
                       ? `, ${formatLength(Number(enquiry.loa), units)}`
                       : ""}

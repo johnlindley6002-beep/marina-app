@@ -5,7 +5,7 @@ import { inputToMetres, metresToInput } from "../../lib/units";
 import { useUnits } from "./UnitsProvider";
 
 type Props = {
-  // Always metres, as a string — the same shape the rest of the app stores.
+  // Always metres, as a string, the same shape the rest of the app stores.
   valueM: string;
   onChangeM: (metres: string) => void;
   className?: string;
@@ -25,7 +25,7 @@ export default function LengthInput({
   const synced = useRef({ m: valueM, u: units });
 
   // Re-derive the visible text only when the value changed from outside
-  // (saved boat, storage load) or the unit changed — not while typing.
+  // (saved boat, storage load) or the unit changed, not while typing.
   useEffect(() => {
     if (synced.current.m !== valueM || synced.current.u !== units) {
       setText(metresToInput(valueM, units));

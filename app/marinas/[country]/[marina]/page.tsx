@@ -19,10 +19,10 @@ export async function generateMetadata({
   const marina = getMarina(country, marinaId);
   if (!marina) return {};
   return {
-    title: `${marina.name} — aldock`,
+    title: `${marina.name} - aldock`,
     description: marina.description,
     openGraph: {
-      title: `${marina.name} — aldock`,
+      title: `${marina.name} - aldock`,
       description: marina.description,
       images: [marina.heroImage],
     },

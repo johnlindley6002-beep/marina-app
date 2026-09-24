@@ -1,16 +1,14 @@
 import type { FacilityKey } from "../data/marinas";
 
-export type Locale = "en" | "pt" | "fr" | "de" | "es" | "it";
+export type Locale = "en" | "pt" | "es" | "fr";
 
-export const LOCALES: Locale[] = ["en", "pt", "fr", "de", "es", "it"];
+export const LOCALES: Locale[] = ["en", "pt", "es", "fr"];
 
 export const LOCALE_NAMES: Record<Locale, string> = {
   en: "English",
   pt: "Português",
-  fr: "Français",
-  de: "Deutsch",
   es: "Español",
-  it: "Italiano",
+  fr: "Français",
 };
 
 // Locales that have full marina prose / facility text (see marinaContent
@@ -191,7 +189,7 @@ const baseTranslations: Record<"en" | "pt", Dictionary> = {
       browseMarinas: "Or browse marinas",
       aboutHeading: "A marina experience, reimagined",
       aboutBody:
-        "aldock brings clarity to marina management — from berth reservations to guest communications. We believe booking a slip should feel as calm as a morning on the water.",
+        "aldock brings clarity to marina management, from berth reservations to guest communications. We believe booking a slip should feel as calm as a morning on the water.",
       contactHeading: "Get in touch",
       contactBody:
         "Questions about berths, bookings, or partnerships? We'd love to hear from you.",
@@ -237,12 +235,12 @@ const baseTranslations: Record<"en" | "pt", Dictionary> = {
       errorDates: "Choose an arrival and departure date.",
       errorDeparture: "Departure must be after arrival.",
       noClass: (cls) =>
-        `No Class ${cls} berths modeled yet in this schematic — larger vessel classes are coming in a future pass.`,
-      noAvailable: "No available berths match your dates — try different dates.",
+        `No Class ${cls} berths modeled yet in this schematic. Larger vessel classes are coming in a future pass.`,
+      noAvailable: "No available berths match your dates. Try different dates.",
       noFit:
-        "No berth class fits a vessel this length in our current tariff (max 45 m) — please contact the marina directly.",
+        "No berth class fits a vessel this length in our current tariff (max 45 m). Please contact the marina directly.",
       seasonBoth: (low, high) =>
-        `Your stay spans both seasons — ${low} night${low === 1 ? "" : "s"} low season, ${high} night${high === 1 ? "" : "s"} high season.`,
+        `Your stay spans both seasons: ${low} night${low === 1 ? "" : "s"} low season, ${high} night${high === 1 ? "" : "s"} high season.`,
       seasonHigh: "Your dates fall in high season (Apr–Sep).",
       seasonLow: "Your dates fall in low season (Jan–Mar & Oct–Dec).",
       legendAvailable: "Available & fits",
@@ -254,10 +252,10 @@ const baseTranslations: Record<"en" | "pt", Dictionary> = {
       priceBerthLine: (id, cls, nights) =>
         `Berth ${id} · Class ${cls} · ${nights} night${nights === 1 ? "" : "s"}`,
       vatNote: (rate) =>
-        `+ ${rate}% VAT and utilities — estimate, confirm with marina.`,
+        `+ ${rate}% VAT and utilities. Estimate, confirm with marina.`,
       ctaHeading: (marinaName) => `Questions about a berth at ${marinaName}?`,
       ctaButton: "Contact marina",
-      mailSubject: "Berth request — Marina de Cascais",
+      mailSubject: "Berth request - Marina de Cascais",
       mailGreeting: "Hello,",
       mailIntro:
         "I'd like to enquire about berth availability at Marina de Cascais.",
@@ -344,32 +342,32 @@ const baseTranslations: Record<"en" | "pt", Dictionary> = {
       home: "Início",
       marinas: "Marinas",
       aboutUs: "Sobre nós",
-      contact: "Contacto",
+      contact: "Contactos",
       search: "Pesquisar",
       openMenu: "Abrir menu",
       closeMenu: "Fechar menu",
     },
     footer: {
-      tagline: "Reservas de marina, simplificadas.",
+      tagline: "Reserve a sua amarração, sem complicações",
       company: "Empresa",
       product: "Produto",
-      contact: "Contacto",
+      contact: "Contactos",
       aboutUs: "Sobre nós",
       marinas: "Marinas",
       copyright: (year) => `© ${year} aldock. Todos os direitos reservados.`,
     },
     home: {
-      tagline: "Reservas de marina, simplificadas.",
+      tagline: "Reserve a sua amarração, sem complicações",
       valueProp:
-        "Encontre e reserve um lugar de amarração nas marinas de Portugal.",
+        "Encontre e reserve a sua amarração nas marinas de Portugal.",
       browseMarinas: "Ou explore as marinas",
-      aboutHeading: "Uma experiência de marina, reinventada",
+      aboutHeading: "A reserva de amarração, reinventada",
       aboutBody:
-        "A aldock traz clareza à gestão de marinas — desde reservas de lugares de amarração até à comunicação com os visitantes. Acreditamos que reservar um lugar deve ser tão tranquilo como uma manhã em água calma.",
+        "A aldock traz clareza à reserva de amarrações e à comunicação com quem visita a marina. Acreditamos que reservar um lugar deve ser tão sereno como uma manhã em águas calmas.",
       contactHeading: "Fale connosco",
       contactBody:
-        "Dúvidas sobre lugares de amarração, reservas ou parcerias? Adoraríamos ouvi-lo.",
-      destinationLabel: "Para onde vai?",
+        "Dúvidas sobre amarrações, reservas ou parcerias? Teremos todo o gosto em ajudar.",
+      destinationLabel: "Para onde navega?",
       destinationPlaceholder: "Marina, região ou país",
       addFilters: "Adicionar datas e comprimento",
       hideFilters: "Ocultar datas e comprimento",
@@ -381,14 +379,14 @@ const baseTranslations: Record<"en" | "pt", Dictionary> = {
       heading: "Marinas",
       forQuery: (query) => `Marinas para “${query}”`,
       count: (n) => `${n} ${n === 1 ? "marina" : "marinas"}`,
-      none: "Nenhuma marina corresponde à pesquisa. Experimente uma marina, região ou país.",
+      none: "Nenhuma marina corresponde à pesquisa. Experimente uma marina, uma região ou um país.",
       from: "desde",
     },
     homeSearch: {
       arrival: "Chegada",
       departure: "Partida",
-      boatLength: "Comprimento do barco (m)",
-      searchButton: "Procurar lugares",
+      boatLength: "Comprimento fora a fora (m)",
+      searchButton: "Procurar amarrações",
     },
     countryPage: {
       heading: (country) => `Marinas em ${country}`,
@@ -398,73 +396,76 @@ const baseTranslations: Record<"en" | "pt", Dictionary> = {
       marinas: "Marinas",
     },
     berthSearch: {
-      heading: "Encontrar um lugar de amarração",
+      heading: "Encontrar uma amarração",
       subheading: (marinaName) =>
-        `Consulte a disponibilidade simulada em ${marinaName}.`,
-      illustrative: "A disponibilidade apresentada é meramente ilustrativa, por agora.",
+        `Consulte a disponibilidade simulada de amarrações em ${marinaName}.`,
+      illustrative:
+        "A disponibilidade de amarrações apresentada é meramente ilustrativa, por agora.",
       arrival: "Chegada",
       departure: "Partida",
-      boatLength: "Comprimento do barco (m)",
-      lengthPlaceholder: "ex. 7",
+      boatLength: "Comprimento fora a fora (m)",
+      lengthPlaceholder: "ex.: 7",
       searchButton: "Procurar",
       errorLength: "Indique o comprimento do seu barco em metros.",
-      errorDates: "Escolha uma data de chegada e de partida.",
+      errorDates: "Escolha uma data de chegada e uma de partida.",
       errorDeparture: "A partida deve ser posterior à chegada.",
       noClass: (cls) =>
-        `Ainda não existem lugares da Classe ${cls} neste esquema — classes de embarcações maiores serão adicionadas brevemente.`,
-      noAvailable: "Não há lugares disponíveis para estas datas — tente outras datas.",
+        `Ainda não há amarrações da Classe ${cls} neste esquema. As classes de embarcações maiores serão adicionadas em breve.`,
+      noAvailable:
+        "Não há amarrações disponíveis para estas datas. Experimente outras datas.",
       noFit:
-        "Nenhuma classe de lugar é adequada a uma embarcação com este comprimento no nosso tarifário atual (máx. 45 m) — contacte a marina diretamente.",
+        "Nenhuma classe de amarração serve uma embarcação com este comprimento no tarifário atual (máx. 45 m). Contacte a marina diretamente.",
       seasonBoth: (low, high) =>
-        `A sua estadia abrange as duas épocas — ${low} noite${low === 1 ? "" : "s"} em época baixa, ${high} noite${high === 1 ? "" : "s"} em época alta.`,
-      seasonHigh: "As suas datas correspondem à época alta (abr.–set.).",
-      seasonLow: "As suas datas correspondem à época baixa (jan.–mar. e out.–dez.).",
-      legendAvailable: "Disponível e compatível",
-      legendOccupied: "Ocupado",
-      legendUnfit: "Não compatível com o seu barco",
+        `A sua estadia abrange as duas épocas: ${low} noite${low === 1 ? "" : "s"} em época baixa e ${high} noite${high === 1 ? "" : "s"} em época alta.`,
+      seasonHigh: "As suas datas caem na época alta (abr.–set.).",
+      seasonLow: "As suas datas caem na época baixa (jan.–mar. e out.–dez.).",
+      legendAvailable: "Disponível e adequada",
+      legendOccupied: "Ocupada",
+      legendUnfit: "Não serve o seu barco",
       legendNeutral: "Ainda sem pesquisa",
       hintBeforeSearch:
-        "Indique as suas datas e o comprimento do barco e pesquise para ver a disponibilidade.",
+        "Indique as datas e o comprimento do barco e pesquise para ver a disponibilidade.",
       priceBerthLine: (id, cls, nights) =>
-        `Lugar ${id} · Classe ${cls} · ${nights} noite${nights === 1 ? "" : "s"}`,
+        `Amarração ${id} · Classe ${cls} · ${nights} noite${nights === 1 ? "" : "s"}`,
       vatNote: (rate) =>
-        `+ ${rate}% de IVA e consumos — estimativa, a confirmar com a marina.`,
-      ctaHeading: (marinaName) => `Tem dúvidas sobre um lugar em ${marinaName}?`,
+        `+ IVA (${rate}%) e consumos. Valor estimado, a confirmar com a marina.`,
+      ctaHeading: (marinaName) =>
+        `Dúvidas sobre uma amarração em ${marinaName}?`,
       ctaButton: "Contactar a marina",
-      mailSubject: "Pedido de lugar de amarração — Marina de Cascais",
+      mailSubject: "Pedido de amarração - Marina de Cascais",
       mailGreeting: "Boa tarde,",
       mailIntro:
-        "Gostaria de saber mais sobre a disponibilidade de lugares na Marina de Cascais.",
+        "Gostaria de saber mais sobre a disponibilidade de amarrações na Marina de Cascais.",
       mailArrival: "Chegada",
       mailDeparture: "Partida",
-      mailBoatLength: "Comprimento do barco",
-      mailBerth: "Lugar de interesse",
-      mailSignoff: "Obrigado,",
+      mailBoatLength: "Comprimento fora a fora",
+      mailBerth: "Amarração pretendida",
+      mailSignoff: "Com os melhores cumprimentos,",
     },
     rates: {
       eyebrow: "Tarifário",
       heading: "Tarifas de trânsito",
       colClass: "Classe",
-      colLength: "Intervalo de comprimento",
+      colLength: "Comprimento",
       colLow: "Época baixa €/noite",
       colHigh: "Época alta €/noite",
       caption: (vat) =>
-        `Tarifas base por noite, sem IVA (${vat}%) nem consumos. Época: baixa = jan.–mar. e out.–dez.; alta = abr.–set.`,
+        `Tarifas base por noite, sem IVA (${vat}%) nem consumos. Época baixa: jan.–mar. e out.–dez. Época alta: abr.–set.`,
       upTo: (max) => `Até ${max} m`,
     },
     about: {
       eyebrow: "Sobre",
     },
     contact: {
-      heading: "Contacto",
+      heading: "Contactos",
       phone: "Telefone",
       email: "Email",
     },
     visiting: {
       heading: "Visitar a marina",
-      hailing: "Chamada rádio",
+      hailing: "Contacto rádio",
       vhfChannel: (n) => `Canal VHF ${n}`,
-      officeHours: "Horário de funcionamento",
+      officeHours: "Horário do escritório",
       summer: "Verão",
       winter: "Inverno",
       onArrival: "À chegada",
@@ -475,7 +476,7 @@ const baseTranslations: Record<"en" | "pt", Dictionary> = {
       maxDraft: "Calado máximo",
     },
     keyFacts: {
-      heading: "Dados principais",
+      heading: "Dados essenciais",
       berths: "Lugares de amarração",
       maxLength: "Comprimento máximo",
       maxDraft: "Calado máximo",
@@ -489,10 +490,10 @@ const baseTranslations: Record<"en" | "pt", Dictionary> = {
       power: "Eletricidade",
       travelLift: "Pórtico de 70 toneladas",
       crane: "Grua",
-      pumpOut: "Pump-out",
+      pumpOut: "Recolha de águas residuais",
       laundry: "Lavandaria",
       security24h: "Segurança 24 horas",
-      wifi: "Wifi",
+      wifi: "Wi-Fi",
       dryStorage: "Estacionamento em área técnica",
       repairs: "Reparações",
     },
@@ -548,187 +549,9 @@ function mergeDictionary(
   return merge(base, override) as Dictionary;
 }
 
-// TODO(i18n): FR / DE / ES / IT cover navigation, footer, home CTAs, the
-// search labels, rate-table headings and the new contact/units/favourites
-// labels. Everything else falls back to English until fully translated.
-// TODO(i18n): nautical wording (berth, VHF, transient rates) should get a
-// native-speaker check.
-const fr: DeepPartial<Dictionary> = {
-  nav: {
-    home: "Accueil",
-    marinas: "Marinas",
-    aboutUs: "À propos",
-    contact: "Contact",
-    search: "Rechercher",
-    openMenu: "Ouvrir le menu",
-    closeMenu: "Fermer le menu",
-  },
-  footer: {
-    tagline: "Réservations de marina, simplifiées.",
-    company: "Société",
-    product: "Produit",
-    contact: "Contact",
-    aboutUs: "À propos",
-    marinas: "Marinas",
-    copyright: (year) => `© ${year} aldock. Tous droits réservés.`,
-  },
-  home: {
-    tagline: "Réservations de marina, simplifiées.",
-    valueProp:
-      "Trouvez et réservez un emplacement dans les marinas du Portugal.",
-    browseMarinas: "Ou parcourez les marinas",
-    destinationLabel: "Où allez-vous ?",
-    destinationPlaceholder: "Marina, région ou pays",
-    addFilters: "Ajouter dates et longueur",
-    hideFilters: "Masquer dates et longueur",
-    findMarinas: "Trouver des marinas",
-    featuredHeading: "Marina à la une",
-    moreMarinas: "Autres marinas",
-  },
-  results: {
-    heading: "Marinas",
-    forQuery: (query) => `Marinas pour « ${query} »`,
-    count: (n) => `${n} ${n === 1 ? "marina" : "marinas"}`,
-    none: "Aucune marina ne correspond. Essayez une marina, une région ou un pays.",
-    from: "dès",
-  },
-  homeSearch: {
-    arrival: "Arrivée",
-    departure: "Départ",
-    boatLength: "Longueur du bateau (m)",
-    searchButton: "Rechercher un emplacement",
-  },
-  countryPage: {
-    heading: (country) => `Marinas : ${country}`,
-    viewMarina: "Voir la marina →",
-  },
-  breadcrumbs: { marinas: "Marinas" },
-  berthSearch: {
-    heading: "Trouver un emplacement",
-    arrival: "Arrivée",
-    departure: "Départ",
-    boatLength: "Longueur du bateau (m)",
-    searchButton: "Rechercher",
-    illustrative:
-      "La disponibilité des emplacements affichée est à titre indicatif pour le moment.",
-    ctaButton: "Contacter la marina",
-  },
-  rates: {
-    eyebrow: "Tarifs",
-    heading: "Tarifs des places de passage",
-    colClass: "Classe",
-    colLength: "Longueur",
-    colLow: "Basse saison €/nuit",
-    colHigh: "Haute saison €/nuit",
-  },
-  contact: { heading: "Contact", phone: "Téléphone", email: "E-mail" },
-  facilities: { heading: "Services et équipements" },
-  language: { label: "Langue" },
-  units: { label: "Unités", metric: "Mètres", imperial: "Pieds" },
-  dock: {
-    open: "Contacter la marina",
-    close: "Fermer",
-    heading: "Contacter la marina",
-    call: "Appeler",
-    vhf: "Canal VHF",
-    email: "E-mail",
-    message: "Écrire à la marina",
-  },
-  favourites: {
-    save: "Enregistrer la marina",
-    saved: "Enregistrée",
-    savedHeading: "Vos marinas enregistrées",
-  },
-};
-
-const de: DeepPartial<Dictionary> = {
-  nav: {
-    home: "Startseite",
-    marinas: "Marinas",
-    aboutUs: "Über uns",
-    contact: "Kontakt",
-    search: "Suche",
-    openMenu: "Menü öffnen",
-    closeMenu: "Menü schließen",
-  },
-  footer: {
-    tagline: "Marina-Buchungen, einfach gemacht.",
-    company: "Unternehmen",
-    product: "Produkt",
-    contact: "Kontakt",
-    aboutUs: "Über uns",
-    marinas: "Marinas",
-    copyright: (year) => `© ${year} aldock. Alle Rechte vorbehalten.`,
-  },
-  home: {
-    tagline: "Marina-Buchungen, einfach gemacht.",
-    valueProp:
-      "Finden und buchen Sie einen Liegeplatz in Portugals Marinas.",
-    browseMarinas: "Oder Marinas durchsuchen",
-    destinationLabel: "Wohin soll es gehen?",
-    destinationPlaceholder: "Marina, Region oder Land",
-    addFilters: "Daten und Bootslänge hinzufügen",
-    hideFilters: "Daten und Bootslänge ausblenden",
-    findMarinas: "Marinas finden",
-    featuredHeading: "Empfohlene Marina",
-    moreMarinas: "Weitere Marinas",
-  },
-  results: {
-    heading: "Marinas",
-    forQuery: (query) => `Marinas für „${query}“`,
-    count: (n) => `${n} ${n === 1 ? "Marina" : "Marinas"}`,
-    none: "Keine Marina passt zur Suche. Versuchen Sie eine Marina, Region oder ein Land.",
-    from: "ab",
-  },
-  homeSearch: {
-    arrival: "Ankunft",
-    departure: "Abreise",
-    boatLength: "Bootslänge (m)",
-    searchButton: "Liegeplätze suchen",
-  },
-  countryPage: {
-    heading: (country) => `Marinas in ${country}`,
-    viewMarina: "Marina ansehen →",
-  },
-  breadcrumbs: { marinas: "Marinas" },
-  berthSearch: {
-    heading: "Liegeplatz finden",
-    arrival: "Ankunft",
-    departure: "Abreise",
-    boatLength: "Bootslänge (m)",
-    searchButton: "Suchen",
-    illustrative:
-      "Die angezeigte Liegeplatzverfügbarkeit ist vorerst nur beispielhaft.",
-    ctaButton: "Marina kontaktieren",
-  },
-  rates: {
-    eyebrow: "Preise",
-    heading: "Preise für Gastliegeplätze",
-    colClass: "Klasse",
-    colLength: "Längenbereich",
-    colLow: "Nebensaison €/Nacht",
-    colHigh: "Hauptsaison €/Nacht",
-  },
-  contact: { heading: "Kontakt", phone: "Telefon", email: "E-Mail" },
-  facilities: { heading: "Ausstattung und Service" },
-  language: { label: "Sprache" },
-  units: { label: "Einheiten", metric: "Meter", imperial: "Fuß" },
-  dock: {
-    open: "Marina kontaktieren",
-    close: "Schließen",
-    heading: "Marina kontaktieren",
-    call: "Anrufen",
-    vhf: "UKW-Kanal",
-    email: "E-Mail",
-    message: "Marina anschreiben",
-  },
-  favourites: {
-    save: "Marina merken",
-    saved: "Gemerkt",
-    savedHeading: "Ihre gemerkten Marinas",
-  },
-};
-
+// TODO(i18n): ES and FR cover navigation, footer, home, search, rates
+// headings, results and the shared contact/units/favourites labels.
+// Everything else falls back to English until fully translated.
 const es: DeepPartial<Dictionary> = {
   nav: {
     home: "Inicio",
@@ -740,7 +563,7 @@ const es: DeepPartial<Dictionary> = {
     closeMenu: "Cerrar menú",
   },
   footer: {
-    tagline: "Reservas de marina, simplificadas.",
+    tagline: "Reserva tu amarre, sin complicaciones",
     company: "Empresa",
     product: "Producto",
     contact: "Contacto",
@@ -749,10 +572,16 @@ const es: DeepPartial<Dictionary> = {
     copyright: (year) => `© ${year} aldock. Todos los derechos reservados.`,
   },
   home: {
-    tagline: "Reservas de marina, simplificadas.",
-    valueProp: "Encuentra y reserva un amarre en las marinas de Portugal.",
+    tagline: "Reserva tu amarre, sin complicaciones",
+    valueProp: "Encuentra y reserva tu amarre en las marinas de Portugal.",
     browseMarinas: "O explora las marinas",
-    destinationLabel: "¿A dónde vas?",
+    aboutHeading: "La reserva de amarres, reinventada",
+    aboutBody:
+      "aldock aporta claridad a la reserva de amarres y a la comunicación con quienes visitan la marina. Creemos que reservar un amarre debería ser tan tranquilo como una mañana en aguas calmas.",
+    contactHeading: "Hablemos",
+    contactBody:
+      "¿Dudas sobre amarres, reservas o colaboraciones? Estaremos encantados de ayudarte.",
+    destinationLabel: "¿Hacia dónde navegas?",
     destinationPlaceholder: "Marina, región o país",
     addFilters: "Añadir fechas y eslora",
     hideFilters: "Ocultar fechas y eslora",
@@ -764,13 +593,13 @@ const es: DeepPartial<Dictionary> = {
     heading: "Marinas",
     forQuery: (query) => `Marinas para «${query}»`,
     count: (n) => `${n} ${n === 1 ? "marina" : "marinas"}`,
-    none: "Ninguna marina coincide con la búsqueda. Prueba con una marina, región o país.",
+    none: "Ninguna marina coincide con tu búsqueda. Prueba con una marina, una región o un país.",
     from: "desde",
   },
   homeSearch: {
     arrival: "Llegada",
     departure: "Salida",
-    boatLength: "Eslora del barco (m)",
+    boatLength: "Eslora total (m)",
     searchButton: "Buscar amarres",
   },
   countryPage: {
@@ -779,20 +608,20 @@ const es: DeepPartial<Dictionary> = {
   },
   breadcrumbs: { marinas: "Marinas" },
   berthSearch: {
-    heading: "Encontrar un amarre",
+    heading: "Encuentra tu amarre",
     arrival: "Llegada",
     departure: "Salida",
-    boatLength: "Eslora del barco (m)",
+    boatLength: "Eslora total (m)",
     searchButton: "Buscar",
     illustrative:
-      "La disponibilidad de amarres mostrada es meramente ilustrativa por ahora.",
+      "La disponibilidad de amarres que se muestra es solo ilustrativa por ahora.",
     ctaButton: "Contactar con la marina",
   },
   rates: {
     eyebrow: "Tarifas",
-    heading: "Tarifas de amarre en tránsito",
+    heading: "Tarifas de tránsito",
     colClass: "Clase",
-    colLength: "Rango de eslora",
+    colLength: "Eslora",
     colLow: "Temporada baja €/noche",
     colHigh: "Temporada alta €/noche",
   },
@@ -816,101 +645,105 @@ const es: DeepPartial<Dictionary> = {
   },
 };
 
-const it: DeepPartial<Dictionary> = {
+const fr: DeepPartial<Dictionary> = {
   nav: {
-    home: "Home",
-    marinas: "Marine",
-    aboutUs: "Chi siamo",
-    contact: "Contatti",
-    search: "Cerca",
-    openMenu: "Apri il menu",
-    closeMenu: "Chiudi il menu",
+    home: "Accueil",
+    marinas: "Marinas",
+    aboutUs: "À propos",
+    contact: "Contact",
+    search: "Rechercher",
+    openMenu: "Ouvrir le menu",
+    closeMenu: "Fermer le menu",
   },
   footer: {
-    tagline: "Prenotazioni in marina, semplificate.",
-    company: "Azienda",
-    product: "Prodotto",
-    contact: "Contatti",
-    aboutUs: "Chi siamo",
-    marinas: "Marine",
-    copyright: (year) => `© ${year} aldock. Tutti i diritti riservati.`,
+    tagline: "Réservez votre place de port, en toute simplicité",
+    company: "Société",
+    product: "Produit",
+    contact: "Contact",
+    aboutUs: "À propos",
+    marinas: "Marinas",
+    copyright: (year) => `© ${year} aldock. Tous droits réservés.`,
   },
   home: {
-    tagline: "Prenotazioni in marina, semplificate.",
+    tagline: "Réservez votre place de port, en toute simplicité",
     valueProp:
-      "Trova e prenota un posto barca nelle marine del Portogallo.",
-    browseMarinas: "Oppure sfoglia le marine",
-    destinationLabel: "Dove stai andando?",
-    destinationPlaceholder: "Marina, regione o paese",
-    addFilters: "Aggiungi date e lunghezza",
-    hideFilters: "Nascondi date e lunghezza",
-    findMarinas: "Trova marine",
-    featuredHeading: "Marina in evidenza",
-    moreMarinas: "Altre marine",
+      "Trouvez et réservez votre place de port dans les marinas du Portugal.",
+    browseMarinas: "Ou parcourez les marinas",
+    aboutHeading: "La réservation de place de port, réinventée",
+    aboutBody:
+      "aldock apporte de la clarté à la réservation des places de port et aux échanges avec les plaisanciers de passage. Nous pensons que réserver une place devrait être aussi paisible qu'un matin sur une eau calme.",
+    contactHeading: "Parlons-en",
+    contactBody:
+      "Une question sur une place de port, une réservation ou un partenariat ? Nous serons ravis de vous répondre.",
+    destinationLabel: "Où faites-vous route ?",
+    destinationPlaceholder: "Marina, région ou pays",
+    addFilters: "Ajouter dates et longueur",
+    hideFilters: "Masquer dates et longueur",
+    findMarinas: "Trouver une marina",
+    featuredHeading: "Marina à la une",
+    moreMarinas: "Autres marinas",
   },
   results: {
-    heading: "Marine",
-    forQuery: (query) => `Marine per «${query}»`,
-    count: (n) => `${n} ${n === 1 ? "marina" : "marine"}`,
-    none: "Nessuna marina corrisponde alla ricerca. Prova con una marina, una regione o un paese.",
-    from: "da",
+    heading: "Marinas",
+    forQuery: (query) => `Marinas pour « ${query} »`,
+    count: (n) => `${n} ${n === 1 ? "marina" : "marinas"}`,
+    none: "Aucune marina ne correspond à votre recherche. Essayez une marina, une région ou un pays.",
+    from: "dès",
   },
   homeSearch: {
-    arrival: "Arrivo",
-    departure: "Partenza",
-    boatLength: "Lunghezza della barca (m)",
-    searchButton: "Cerca posti barca",
+    arrival: "Arrivée",
+    departure: "Départ",
+    boatLength: "Longueur hors tout (m)",
+    searchButton: "Chercher une place",
   },
   countryPage: {
-    heading: (country) => `Marine in ${country}`,
-    viewMarina: "Vedi la marina →",
+    heading: (country) => `Marinas : ${country}`,
+    viewMarina: "Voir la marina →",
   },
-  breadcrumbs: { marinas: "Marine" },
+  breadcrumbs: { marinas: "Marinas" },
   berthSearch: {
-    heading: "Trova un posto barca",
-    arrival: "Arrivo",
-    departure: "Partenza",
-    boatLength: "Lunghezza della barca (m)",
-    searchButton: "Cerca",
+    heading: "Trouver une place de port",
+    arrival: "Arrivée",
+    departure: "Départ",
+    boatLength: "Longueur hors tout (m)",
+    searchButton: "Chercher",
     illustrative:
-      "La disponibilità dei posti barca mostrata è per ora solo indicativa.",
-    ctaButton: "Contatta la marina",
+      "La disponibilité des places affichée est donnée à titre indicatif pour le moment.",
+    ctaButton: "Contacter la capitainerie",
   },
   rates: {
-    eyebrow: "Tariffe",
-    heading: "Tariffe posti barca di transito",
+    eyebrow: "Tarifs",
+    heading: "Tarifs de passage",
     colClass: "Classe",
-    colLength: "Intervallo di lunghezza",
-    colLow: "Bassa stagione €/notte",
-    colHigh: "Alta stagione €/notte",
+    colLength: "Longueur",
+    colLow: "Basse saison, €/nuit",
+    colHigh: "Haute saison, €/nuit",
   },
-  contact: { heading: "Contatti", phone: "Telefono", email: "E-mail" },
-  facilities: { heading: "Servizi e strutture" },
-  language: { label: "Lingua" },
-  units: { label: "Unità", metric: "Metri", imperial: "Piedi" },
+  contact: { heading: "Contact", phone: "Téléphone", email: "E-mail" },
+  facilities: { heading: "Services et équipements" },
+  language: { label: "Langue" },
+  units: { label: "Unités", metric: "Mètres", imperial: "Pieds" },
   dock: {
-    open: "Contatta la marina",
-    close: "Chiudi",
-    heading: "Contatta la marina",
-    call: "Chiama",
-    vhf: "Canale VHF",
+    open: "Contacter la capitainerie",
+    close: "Fermer",
+    heading: "Contacter la capitainerie",
+    call: "Appeler",
+    vhf: "Canal VHF",
     email: "E-mail",
-    message: "Scrivi alla marina",
+    message: "Écrire à la capitainerie",
   },
   favourites: {
-    save: "Salva marina",
-    saved: "Salvata",
-    savedHeading: "Le tue marine salvate",
+    save: "Enregistrer la marina",
+    saved: "Enregistrée",
+    savedHeading: "Vos marinas enregistrées",
   },
 };
 
 export const translations: Record<Locale, Dictionary> = {
   en: baseTranslations.en,
   pt: baseTranslations.pt,
-  fr: mergeDictionary(baseTranslations.en, fr),
-  de: mergeDictionary(baseTranslations.en, de),
   es: mergeDictionary(baseTranslations.en, es),
-  it: mergeDictionary(baseTranslations.en, it),
+  fr: mergeDictionary(baseTranslations.en, fr),
 };
 
 // Marina-specific prose, bilingual. Structured per marina id so more

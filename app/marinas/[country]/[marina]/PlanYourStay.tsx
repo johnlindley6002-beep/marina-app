@@ -181,10 +181,10 @@ export default function PlanYourStay({ marina, plan, onPlanChange }: Props) {
           <span className={labelClass}>Stay: </span>
           {datesValid
             ? plan.openEnded
-              ? "Open-ended — priced and searched per night."
+              ? "Open-ended stay, priced and searched per night."
               : nights > 0 && nightsBySeason.low > 0 && nightsBySeason.high > 0
-                ? `${nights} nights — spans both seasons (${nightsBySeason.low} low, ${nightsBySeason.high} high).`
-                : `${nights} night${nights === 1 ? "" : "s"} — ${
+                ? `${nights} nights, spanning both seasons (${nightsBySeason.low} low, ${nightsBySeason.high} high).`
+                : `${nights} night${nights === 1 ? "" : "s"} - ${
                     SEASON_LABELS[nightsBySeason.high > 0 ? "high" : "low"]
                   }.`
             : "Enter your arrival and departure dates."}
@@ -195,7 +195,7 @@ export default function PlanYourStay({ marina, plan, onPlanChange }: Props) {
             "Enter length, beam and draft to check."
           ) : fit.fits ? (
             <span className="font-medium text-ink">
-              Fits — Class {fit.marinaClass} berths available.
+              Fits: Class {fit.marinaClass} berths available.
               {fit.marinaClass === "IX"
                 ? " This is the mega-yacht allocation on the outer pontoon."
                 : ""}
@@ -203,10 +203,10 @@ export default function PlanYourStay({ marina, plan, onPlanChange }: Props) {
           ) : (
             <span className="font-medium text-ink">
               {fit.reason === "length"
-                ? "Too long for standard berths — contact the marina."
+                ? "Too long for standard berths, so contact the marina."
                 : fit.reason === "beam"
-                  ? "Beam exceeds the standard berth for your length — contact the marina."
-                  : "Too deep for standard berths — contact the marina."}
+                  ? "Beam exceeds the standard berth for your length, so contact the marina."
+                  : "Too deep for standard berths, so contact the marina."}
             </span>
           )}
         </p>

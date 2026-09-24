@@ -27,7 +27,7 @@ const LAND_CORNER_WIDTH = 150;
 const LAND_CORNER_HEIGHT = 200;
 
 // Fixed pseudo-random pattern so availability is stable across renders
-// and page loads, not a fresh random draw each time. Purely simulated —
+// and page loads, not a fresh random draw each time. Purely simulated,
 // not connected to any real booking system.
 function isSimulatedAvailable(berthId: string): boolean {
   let hash = 0;
@@ -68,7 +68,7 @@ type Props = {
 };
 
 // Sums each night's actual season rate, rather than assuming the whole
-// stay is one season — correct for a stay that spans the Apr/Sep or
+// stay is one season, which is correct for a stay that spans the Apr/Sep or
 // Sep/Oct season boundary.
 function computeStay(
   arrivalDate: Date,

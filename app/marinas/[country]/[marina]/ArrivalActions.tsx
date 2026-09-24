@@ -11,7 +11,7 @@ type Props = {
   selectedBerthId?: string | null;
 };
 
-const dash = (value: string) => (value.trim() ? value : "—");
+const dash = (value: string) => (value.trim() ? value : "-");
 
 export default function ArrivalActions({ marina, plan, selectedBerthId }: Props) {
   const [boatName, setBoatName] = useState("");
@@ -53,8 +53,8 @@ export default function ArrivalActions({ marina, plan, selectedBerthId }: Props)
       hour: "2-digit",
       minute: "2-digit",
     });
-    openMail(`Arriving now — ${boatName.trim() || "visiting vessel"}`, [
-      `ARRIVING NOW — ${marina.name.toUpperCase()}`,
+    openMail(`Arriving now - ${boatName.trim() || "visiting vessel"}`, [
+      `ARRIVING NOW - ${marina.name.toUpperCase()}`,
       "",
       `ETA: now (sent at ${now} local time)`,
       ...boatLines(),
@@ -65,8 +65,8 @@ export default function ArrivalActions({ marina, plan, selectedBerthId }: Props)
   }
 
   function digitalCheckIn() {
-    openMail(`Digital check-in — ${boatName.trim() || "visiting vessel"}`, [
-      `DIGITAL CHECK-IN — ${marina.name.toUpperCase()}`,
+    openMail(`Digital check-in - ${boatName.trim() || "visiting vessel"}`, [
+      `DIGITAL CHECK-IN - ${marina.name.toUpperCase()}`,
       "",
       `Arrival: ${plan.arrival || "(to confirm)"}`,
       `ETA: ${plan.eta || "(to confirm)"}`,
@@ -78,7 +78,7 @@ export default function ArrivalActions({ marina, plan, selectedBerthId }: Props)
       "People on board: (please add)",
       "",
       "CREW LIST (one per line)",
-      "1. Full name — date of birth — nationality — passport number — role",
+      "1. Full name, date of birth, nationality, passport number, role",
       "",
       "I will bring boat registration, third-party insurance certificate and the skipper's certificate of competence.",
     ]);

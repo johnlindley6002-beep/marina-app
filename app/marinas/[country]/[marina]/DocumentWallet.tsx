@@ -37,7 +37,7 @@ export default function DocumentWallet({
       <p className="mt-4 text-sm leading-relaxed text-ink/75">
         All optional. Save these details with your boat to reuse them next time,
         or leave any blank and give them to the marina staff in person. The
-        documents themselves must be shown on arrival — only the text is stored
+        documents themselves must be shown on arrival. Only the text is stored
         here, in this browser.
       </p>
       <p className="mt-2 text-xs text-ink/70">

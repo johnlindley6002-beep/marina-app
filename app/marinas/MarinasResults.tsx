@@ -63,7 +63,7 @@ export default function MarinasResults({ q, arrival, departure, length }: Props)
           }`}
         >
           {results.length > 0 ? (
-            <ul>
+            <ul className="max-w-3xl">
               {results.map((marina) => (
                 <MarinaRow
                   key={marina.id}
