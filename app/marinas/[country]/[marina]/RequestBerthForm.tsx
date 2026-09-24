@@ -16,6 +16,7 @@ import {
 } from "../../../../lib/boatProfile";
 import { COUNTRIES } from "../../../../lib/countries";
 import BoatSwitcher from "../../../components/BoatSwitcher";
+import Disclosure from "../../../components/Disclosure";
 import { useBoats } from "../../../components/BoatProvider";
 import DocumentWallet from "./DocumentWallet";
 import VesselUseFields, {
@@ -731,8 +732,8 @@ export default function RequestBerthForm({
         Request a berth
       </h2>
       <p className="mt-2 text-sm text-ink/70">
-        Send {marina.name} everything they need to confirm your visit. This
-        opens a pre-filled email. Nothing is submitted to a server.
+        Opens a pre-filled email to {marina.name}. Nothing is submitted to a
+        server.
       </p>
 
       <form ref={formElRef} onSubmit={handleSubmit} noValidate className="mt-8 space-y-12">
@@ -758,14 +759,14 @@ export default function RequestBerthForm({
               : ""}
           </p>
           <p className="mt-1 text-xs text-ink/70">
-            Dates and boat size come from{" "}
+            Edit them in{" "}
             <a
               href="#plan-your-stay"
               className="text-ink underline underline-offset-4"
             >
               Plan your stay
-            </a>{" "}
-            above to edit them.
+            </a>
+            .
           </p>
           <div className="mt-4 grid max-w-md gap-4 sm:grid-cols-2">
             <label className="block text-sm">
@@ -1209,11 +1210,18 @@ export default function RequestBerthForm({
                   </p>
                 ) : null}
                 <p className="mt-2 text-xs text-ink/70">
-                  Required: name, nationality and role. Date of birth,
-                  passport number and join date are optional. Passport
-                  numbers and other private details can be given to the
-                  marina staff in person instead.
+                  Required: name, nationality and role.
                 </p>
+                <Disclosure
+                  label="About the optional details"
+                  openLabel="Hide the optional details"
+                >
+                  <p className="pb-2 text-xs text-ink/70">
+                    Date of birth, passport number and join date are optional.
+                    Passport numbers and other private details can be given to
+                    the marina staff in person instead.
+                  </p>
+                </Disclosure>
                 <div className="mt-3 space-y-4">
                   {form.crew.map((member, index) => (
                     <div
@@ -1334,17 +1342,23 @@ export default function RequestBerthForm({
                 ) : null}
               </div>
 
-              <div className="mt-6 space-y-1 text-xs text-ink/70">
-                {[
-                  ...marina.vesselStatusNotes.internationalNotes.slice(0, 1),
-                  isCommercialUse(form.vesselUse)
-                    ? marina.vesselStatusNotes.temporaryAdmission.commercial
-                    : marina.vesselStatusNotes.temporaryAdmission.private,
-                  ...marina.vesselStatusNotes.internationalNotes.slice(1),
-                ].map((note) => (
-                  <p key={note}>{note}</p>
-                ))}
-              </div>
+              <Disclosure
+                className="mt-4"
+                label="Border and customs notes"
+                openLabel="Hide border and customs notes"
+              >
+                <div className="space-y-1 pb-2 text-xs text-ink/70">
+                  {[
+                    ...marina.vesselStatusNotes.internationalNotes.slice(0, 1),
+                    isCommercialUse(form.vesselUse)
+                      ? marina.vesselStatusNotes.temporaryAdmission.commercial
+                      : marina.vesselStatusNotes.temporaryAdmission.private,
+                    ...marina.vesselStatusNotes.internationalNotes.slice(1),
+                  ].map((note) => (
+                    <p key={note}>{note}</p>
+                  ))}
+                </div>
+              </Disclosure>
             </div>
           ) : null}
         </fieldset>

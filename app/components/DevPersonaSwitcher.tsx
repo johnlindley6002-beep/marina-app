@@ -61,7 +61,7 @@ export default function DevPersonaSwitcher() {
         onClick={() => setOpen((o) => !o)}
         className="inline-flex min-h-11 items-center gap-2 rounded-full border border-paper/30 bg-ink px-4 text-paper shadow-lg transition-colors hover:border-paper"
       >
-        <span className="text-xs font-medium tracking-wide">MOCK</span>
+        <span className="text-xs font-medium">Mock</span>
         <span className="text-stone">{active?.label ?? "Signed out"}</span>
       </button>
     </div>

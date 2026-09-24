@@ -5,6 +5,7 @@ import { marinas } from "../../data/marinas";
 import { siteConfig } from "../../data/site";
 import { formatLength } from "../../lib/units";
 import { useBoats } from "../components/BoatProvider";
+import Disclosure from "../components/Disclosure";
 import SavedMarinas from "../components/SavedMarinas";
 import UnitSegmented from "../components/UnitSegmented";
 import { useUnits } from "../components/UnitsProvider";
@@ -60,9 +61,14 @@ export default function MyBoatContent() {
           My boat
         </h1>
         <p className="measure mt-4 text-lg text-ink/75">{siteConfig.hub.intro}</p>
-        <p className="measure mt-2 text-sm text-ink/70">
-          {siteConfig.hub.deviceNote}
-        </p>
+        <Disclosure
+          label="Where is this stored?"
+          openLabel="Hide where this is stored"
+        >
+          <p className="measure pb-2 text-ink/75">
+            {siteConfig.hub.deviceNote}
+          </p>
+        </Disclosure>
         {!storageOk ? (
           <p
             role="alert"
@@ -320,9 +326,12 @@ export default function MyBoatContent() {
           <h2 id="clear-heading" className="type-heading type-h2 text-ink">
             Data on this device
           </h2>
-          <p className="measure mt-2 text-sm text-ink/70">
-            {siteConfig.privacyNote}
-          </p>
+          <Disclosure
+            label="How your data is handled"
+            openLabel="Hide how your data is handled"
+          >
+            <p className="measure pb-2 text-ink/75">{siteConfig.privacyNote}</p>
+          </Disclosure>
           {confirmClear ? (
             <div role="alertdialog" aria-label="Clear saved data" className="mt-4">
               <p className="measure text-ink">{siteConfig.hub.clearWarning}</p>

@@ -1,5 +1,6 @@
 "use client";
 
+import Disclosure from "../../../components/Disclosure";
 import type { BoatDocuments } from "../../../../lib/boatProfile";
 
 const inputClass =
@@ -36,11 +37,18 @@ export default function DocumentWallet({
   return (
     <div>
       <p className="mt-4 text-sm leading-relaxed text-ink/75">
-        All optional. Save these details with your boat to reuse them next time,
-        or leave any blank and give them to the marina staff in person. The
-        documents themselves must be shown on arrival. Only the text is stored
-        here, in this browser.
+        All optional. The documents themselves must be shown on arrival.
       </p>
+      <Disclosure
+        label="More about saving these details"
+        openLabel="Hide"
+      >
+        <p className="pb-2 text-sm leading-relaxed text-ink/75">
+          Save these details with your boat to reuse them next time, or leave
+          any blank and give them to the marina staff in person. Only the text
+          is stored here, in this browser.
+        </p>
+      </Disclosure>
       <p className="mt-2 text-xs text-ink/70">
         Bring: boat registration (Portugal requires originals, not laminated
         copies), proof of third-party insurance (min {insuranceMinimumLabel},

@@ -84,8 +84,7 @@ export default function PlanYourStay({ marina, plan, onPlanChange }: Props) {
         Plan your stay
       </h2>
       <p className="mt-2 text-sm text-ink/75">
-        Enter your dates and boat size once. They drive the berth map, the
-        price estimate and your enquiry below.
+        Dates and boat size drive the map, estimate and enquiry below.
       </p>
 
       <BoatSwitcher

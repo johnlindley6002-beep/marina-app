@@ -13,9 +13,14 @@ import {
   type Marina,
 } from "../../../../data/marinas";
 import { siteConfig } from "../../../../data/site";
-import { effectiveDeparture, type StayPlan } from "../../../../lib/stayPlan";
+import {
+  effectiveDeparture,
+  isPlanReady,
+  type StayPlan,
+} from "../../../../lib/stayPlan";
 import { toDisplay } from "../../../../lib/units";
 import { useLanguage } from "../../../components/LanguageProvider";
+import Disclosure, { Collapse } from "../../../components/Disclosure";
 import LastUpdated from "../../../components/LastUpdated";
 import { useUnits } from "../../../components/UnitsProvider";
 
@@ -64,6 +69,10 @@ export default function PriceEstimate({
       : `${toDisplay(minM, units)}–${toDisplay(maxM, units)} ${unit}`;
   }
 
+  const ready = isPlanReady(plan);
+  const cheapestNightly = Math.min(
+    ...MARINA_CLASS_ORDER.map((c) => marina.transientRates[c].low)
+  );
   const fees = marina.serviceFees;
   const demandNote = quote
     ? getDemandFlag(marina, plan.arrival, effectiveDeparture(plan))
@@ -100,6 +109,14 @@ export default function PriceEstimate({
         Your estimate
       </h2>
 
+      {!ready ? (
+        <p className="measure mt-3 text-ink/75">
+          From {eur(cheapestNightly)} per night, depending on boat length and
+          season. Add your dates and length overall for your own estimate.
+        </p>
+      ) : null}
+
+      <Collapse open={ready}>
       <fieldset className="mt-6">
         <legend className={labelClass}>Extras</legend>
         <p className="mt-1 text-xs text-ink/70">
@@ -250,7 +267,14 @@ export default function PriceEstimate({
         )}
       </div>
 
-      <h3 className="mt-12 text-lg font-medium tracking-tight text-ink">
+      </Collapse>
+
+      <Disclosure
+        label="All berth rates"
+        openLabel="Hide berth rates"
+        className="mt-8"
+      >
+      <h3 className="mt-2 text-lg font-medium tracking-tight text-ink">
         {t.rates.heading}
       </h3>
       <div className="mt-4 overflow-x-auto">
@@ -286,9 +310,10 @@ export default function PriceEstimate({
           </tbody>
         </table>
       </div>
-      <p className="mt-4 text-xs text-ink/70">
+      <p className="mt-4 pb-2 text-xs text-ink/70">
         {t.rates.caption(Math.round(marina.vatRate * 100))}
       </p>
+      </Disclosure>
     </div>
   );
 }

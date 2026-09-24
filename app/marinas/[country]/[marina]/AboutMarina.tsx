@@ -2,6 +2,7 @@
 
 import type { Marina } from "../../../../data/marinas";
 import { useLanguage } from "../../../components/LanguageProvider";
+import Disclosure from "../../../components/Disclosure";
 import NearbyPlaces from "./NearbyPlaces";
 import PhotoGallery from "./PhotoGallery";
 
@@ -18,7 +19,14 @@ export default function AboutMarina({ marina, description }: Props) {
     <section className="section px-5 md:px-8">
       <div className="mx-auto max-w-5xl">
         <h2 className="type-heading type-h2 text-ink">About {marina.name}</h2>
-        <p className="measure mt-6 text-lg text-ink/75">{description}</p>
+        <Disclosure
+          previewLines={2}
+          label="Read more"
+          openLabel="Show less"
+          className="measure mt-6"
+        >
+          <p className="text-lg text-ink/75">{description}</p>
+        </Disclosure>
 
         <dl className="mt-6">
           <div>

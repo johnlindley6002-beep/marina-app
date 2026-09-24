@@ -8,8 +8,13 @@ import {
 } from "../../../../data/marinas";
 import { siteConfig } from "../../../../data/site";
 import { getSimulatedAvailability } from "../../../../lib/simulatedAvailability";
-import { effectiveDeparture, type StayPlan } from "../../../../lib/stayPlan";
+import {
+  effectiveDeparture,
+  isPlanReady,
+  type StayPlan,
+} from "../../../../lib/stayPlan";
 import { formatLength } from "../../../../lib/units";
+import { Collapse } from "../../../components/Disclosure";
 import { useUnits } from "../../../components/UnitsProvider";
 
 type Tone = "yes" | "no" | "wait";
@@ -220,24 +225,39 @@ export default function StayDecisionSummary({
 
   const rows = [fitRow, spaceRow, costRow];
 
+  const ready = isPlanReady(plan);
+  const missing =
+    !plan.arrival || !(plan.openEnded || plan.departure)
+      ? haveLoa
+        ? "your dates"
+        : "your dates and length overall"
+      : "your length overall";
+
   return (
     <div className="mt-6 border-t border-hairline pt-6" aria-live="polite">
-      <p className="text-sm text-ink/75">
-        <span className="text-sm font-medium text-ink/80">Stay: </span>
-        {stayLine}
-      </p>
-      <ul className="mt-4 grid gap-x-8 gap-y-5 md:grid-cols-3">
-        {rows.map((row) => (
-          <li key={row.label} className="flex gap-3 md:min-h-[7.5rem]">
-            <StatusIcon tone={row.tone} />
-            <div className="min-w-0">
-              <p className="text-sm font-medium text-ink/80">{row.label}</p>
-              <p className="mt-1 font-medium text-ink">{row.headline}</p>
-              <p className="mt-1 text-sm text-ink/75">{row.detail}</p>
-            </div>
-          </li>
-        ))}
-      </ul>
+      {!ready ? (
+        <p className="text-sm text-ink/75">
+          Add {missing} to see fit, space and price.
+        </p>
+      ) : null}
+      <Collapse open={ready}>
+        <p className="text-sm text-ink/75">
+          <span className="text-sm font-medium text-ink/80">Stay: </span>
+          {stayLine}
+        </p>
+        <ul className="mt-4 grid gap-x-8 gap-y-5 md:grid-cols-3">
+          {rows.map((row) => (
+            <li key={row.label} className="flex gap-3 md:min-h-[7.5rem]">
+              <StatusIcon tone={row.tone} />
+              <div className="min-w-0">
+                <p className="text-sm font-medium text-ink/80">{row.label}</p>
+                <p className="mt-1 font-medium text-ink">{row.headline}</p>
+                <p className="mt-1 text-sm text-ink/75">{row.detail}</p>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </Collapse>
     </div>
   );
 }

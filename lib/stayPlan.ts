@@ -52,3 +52,12 @@ export function nextDayIso(iso: string): string {
 export function effectiveDeparture(plan: StayPlan): string {
   return plan.openEnded ? nextDayIso(plan.arrival) : plan.departure;
 }
+
+// True once there are arrival and departure dates (or an open-ended stay, which
+// needs only an arrival) and a length overall. The estimate and the enquiry
+// appear from this point on.
+export function isPlanReady(plan: StayPlan): boolean {
+  if (!plan.arrival || !(Number(plan.loa) > 0)) return false;
+  if (plan.openEnded) return true;
+  return !!plan.departure && plan.departure > plan.arrival;
+}

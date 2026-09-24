@@ -172,8 +172,7 @@ export default function StayRecap({
             )}
             <p className="mt-3 text-xs text-ink/70">
               Estimate only, excl. {Math.round(marina.vatRate * 100)}% VAT and
-              utilities. The final total is confirmed by the marina. Nothing is
-              billed through this site.
+              utilities. The marina confirms the final total.
             </p>
           </div>
 
@@ -183,8 +182,7 @@ export default function StayRecap({
                 Leaving? Let the marina know
               </h3>
               <p className="mt-2 text-sm text-ink/75">
-                Opens a pre-filled email with your boat, berth and departure
-                date and time.
+                Opens a pre-filled email with your boat and departure.
               </p>
               <button
                 type="button"
@@ -198,8 +196,7 @@ export default function StayRecap({
             <div className="hairline-top pt-6">
               <h3 className="text-sm font-medium text-ink">Coming back?</h3>
               <p className="mt-2 text-sm text-ink/75">
-                Start a new enquiry with the same boat and services. Dates are
-                left blank.
+                Same boat and services, dates left blank.
               </p>
               <button
                 type="button"

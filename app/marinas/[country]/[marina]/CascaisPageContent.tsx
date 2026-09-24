@@ -8,9 +8,11 @@ import { contentLocale, marinaContent } from "../../../../lib/i18n";
 import {
   EMPTY_PLAN,
   effectiveDeparture,
+  isPlanReady,
   type StayPlan,
 } from "../../../../lib/stayPlan";
 import { useBoats } from "../../../components/BoatProvider";
+import { Collapse } from "../../../components/Disclosure";
 import FuelPrices from "./FuelPrices";
 import MarinaHero from "./MarinaHero";
 import { GalleryProvider } from "./PhotoGallery";
@@ -126,6 +128,19 @@ export default function CascaisPageContent({
   const mapDeparture = useDeferredValue(effectiveDeparture(plan));
   const mapLength = useDeferredValue(plan.loa);
 
+  // The enquiry appears once there are dates and a length (or when rebooking a
+  // stay), and then stays, so nothing typed into it is lost by editing a date.
+  const readyNow = isPlanReady(plan) || rebookToken > 0;
+  const [formMounted, setFormMounted] = useState(readyNow);
+  const [formOpen, setFormOpen] = useState(readyNow);
+  useEffect(() => {
+    if (!readyNow || formOpen) return;
+    setFormMounted(true);
+    // Mount closed first, then open on the next tick, so it can animate in.
+    const timer = setTimeout(() => setFormOpen(true), 30);
+    return () => clearTimeout(timer);
+  }, [readyNow, formOpen]);
+
   const description = content?.description[cl] ?? marina.description;
   const arrivalInstructions =
     content?.arrivalInstructions[cl] ?? marina.arrivalInstructions;
@@ -186,13 +201,24 @@ export default function CascaisPageContent({
             />
           </div>
 
-          <RequestBerthForm
-            marina={marina}
-            plan={plan}
-            onPlanChange={onPlanChange}
-            selectedBerthId={selectedBerthId}
-            rebookToken={rebookToken}
-          />
+          {!formMounted ? (
+            <div id="request-berth" className="hairline-top scroll-mt-24 pt-6">
+              <h2 className="type-heading type-h3 text-ink">Request a berth</h2>
+              <p className="mt-2 text-ink/75">
+                Add your dates and length overall above to request a berth.
+              </p>
+            </div>
+          ) : (
+            <Collapse open={formOpen}>
+              <RequestBerthForm
+                marina={marina}
+                plan={plan}
+                onPlanChange={onPlanChange}
+                selectedBerthId={selectedBerthId}
+                rebookToken={rebookToken}
+              />
+            </Collapse>
+          )}
 
           <div>
             <ArrivalActions
@@ -241,8 +267,8 @@ export default function CascaisPageContent({
             Ready to plan your visit?
           </p>
           <a
-            href="#request-berth"
-            className="inline-flex min-h-12 items-center justify-center rounded-[3px] bg-brass px-8 text-base font-medium text-ink transition-[filter] hover:brightness-105"
+            href="#plan-your-stay"
+            className="inline-flex min-h-11 items-center text-ink underline decoration-brass decoration-2 underline-offset-[6px]"
           >
             Request a berth
           </a>

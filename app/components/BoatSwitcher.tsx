@@ -137,9 +137,6 @@ export default function BoatSwitcher({ current, heading, onSelect }: Props) {
           {message}
         </p>
       ) : null}
-      <p className="mt-2 text-xs text-ink/70">
-        Boats are stored only in this browser, so no account is needed.
-      </p>
     </div>
   );
 }

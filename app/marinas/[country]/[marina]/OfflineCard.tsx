@@ -60,8 +60,7 @@ export default function OfflineCard({
           </p>
         </div>
         <p className="mt-2 max-w-2xl text-sm text-ink/75">
-          These details are kept on this device and stay available without a
-          signal once you have opened this page online.
+          Kept on this device, so they work without a signal.
         </p>
 
         <div className="mt-6 grid gap-6 md:grid-cols-2">
