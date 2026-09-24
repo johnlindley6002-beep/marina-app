@@ -13,9 +13,9 @@ import LengthInput from "../../../components/LengthInput";
 import { useUnits } from "../../../components/UnitsProvider";
 
 const inputClass =
-  "mt-2 w-full border border-neutral-200 px-3 py-2 text-sm text-navy focus:border-navy/40 focus:outline-none disabled:bg-neutral-50 disabled:text-neutral-500";
-const labelClass = "text-xs font-normal tracking-wide text-navy/60 uppercase";
-const errorClass = "mt-1 text-xs font-light text-red-600";
+  "mt-2 w-full border border-hairline px-3 py-2 text-sm text-ink focus:border-ink focus:outline-none disabled:bg-paper-deep disabled:text-ink/70";
+const labelClass = "text-sm font-medium text-ink/80";
+const errorClass = "mt-1 text-xs text-red-600";
 
 function RequiredMark() {
   return <span className="text-red-600"> *</span>;
@@ -68,11 +68,11 @@ export default function PlanYourStay({ marina, plan, onPlanChange }: Props) {
     : null;
 
   return (
-    <div className="rounded-sm border border-neutral-200/80 bg-white p-8 md:p-10">
-      <h2 className="text-lg font-normal tracking-tight text-navy">
+    <div className="surface-lift p-6 sm:p-8 md:p-10">
+      <h2 className="type-heading type-h3 text-ink">
         Plan your stay
       </h2>
-      <p className="mt-2 text-sm font-light text-neutral-600">
+      <p className="mt-2 text-sm text-ink/75">
         Enter your dates and boat size once. They drive the berth map, the
         price estimate and your enquiry below.
       </p>
@@ -125,7 +125,7 @@ export default function PlanYourStay({ marina, plan, onPlanChange }: Props) {
             onChangeM={(v) => onPlanChange({ loa: v })}
             className={inputClass}
           />
-          <p className="mt-1 text-xs font-light text-neutral-500">
+          <p className="mt-1 text-xs text-ink/70">
             Including bowsprit, davits, dinghy
           </p>
           {dimError(plan.loa) ? (
@@ -164,7 +164,7 @@ export default function PlanYourStay({ marina, plan, onPlanChange }: Props) {
         </label>
       </div>
 
-      <label className="mt-4 flex items-center gap-2 text-sm font-light text-neutral-600">
+      <label className="mt-4 flex items-center gap-2 text-sm text-ink/75">
         <input
           type="checkbox"
           checked={plan.openEnded}
@@ -174,10 +174,10 @@ export default function PlanYourStay({ marina, plan, onPlanChange }: Props) {
       </label>
 
       <div
-        className="mt-6 space-y-2 border-t border-neutral-200 pt-6"
+        className="mt-6 space-y-2 border-t border-hairline pt-6"
         aria-live="polite"
       >
-        <p className="text-sm font-light text-neutral-600">
+        <p className="text-sm text-ink/75">
           <span className={labelClass}>Stay: </span>
           {datesValid
             ? plan.openEnded
@@ -189,19 +189,19 @@ export default function PlanYourStay({ marina, plan, onPlanChange }: Props) {
                   }.`
             : "Enter your arrival and departure dates."}
         </p>
-        <p className="text-sm font-light text-neutral-600">
+        <p className="text-sm text-ink/75">
           <span className={labelClass}>Will my boat fit? </span>
           {fit === null ? (
             "Enter length, beam and draft to check."
           ) : fit.fits ? (
-            <span className="font-normal text-navy">
+            <span className="font-medium text-ink">
               Fits — Class {fit.marinaClass} berths available.
               {fit.marinaClass === "IX"
                 ? " This is the mega-yacht allocation on the outer pontoon."
                 : ""}
             </span>
           ) : (
-            <span className="font-normal text-navy">
+            <span className="font-medium text-ink">
               {fit.reason === "length"
                 ? "Too long for standard berths — contact the marina."
                 : fit.reason === "beam"

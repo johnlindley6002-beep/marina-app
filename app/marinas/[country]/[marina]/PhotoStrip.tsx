@@ -10,7 +10,7 @@ export default function PhotoStrip({ photos }: { photos: Photo[] }) {
       {photos.map((photo) => (
         <figure key={photo.src}>
           {/* TODO: replace with a real photo */}
-          <div className="relative aspect-[4/3] overflow-hidden rounded-sm border border-neutral-200">
+          <div className="relative aspect-[4/3] overflow-hidden rounded-[3px]">
             <Image
               src={photo.src}
               alt={photo.alt}
@@ -20,10 +20,10 @@ export default function PhotoStrip({ photos }: { photos: Photo[] }) {
               className="object-cover"
             />
           </div>
-          <figcaption className="mt-2 text-sm font-light text-neutral-500">
+          <figcaption className="mt-2 text-sm text-ink/70">
             {photo.caption}
             {photo.credit ? (
-              <span className="block text-xs text-neutral-500">
+              <span className="block text-xs text-ink/70">
                 {photo.credit}
               </span>
             ) : null}

@@ -3,8 +3,8 @@
 import type { BoatDocuments } from "../../../../lib/boatProfile";
 
 const inputClass =
-  "mt-2 w-full border border-neutral-200 px-3 py-2 text-sm text-navy focus:border-navy/40 focus:outline-none";
-const labelClass = "text-xs font-normal tracking-wide text-navy/60 uppercase";
+  "mt-2 w-full border border-hairline px-3 py-2 text-sm text-ink focus:border-ink focus:outline-none";
+const labelClass = "text-sm font-medium text-ink/80";
 
 type Props = {
   documents: BoatDocuments;
@@ -34,13 +34,13 @@ export default function DocumentWallet({
 
   return (
     <div>
-      <p className="mt-4 text-sm leading-relaxed font-light text-neutral-600">
+      <p className="mt-4 text-sm leading-relaxed text-ink/75">
         All optional. Save these details with your boat to reuse them next time,
         or leave any blank and give them to the marina staff in person. The
         documents themselves must be shown on arrival — only the text is stored
         here, in this browser.
       </p>
-      <p className="mt-2 text-xs font-light text-neutral-500">
+      <p className="mt-2 text-xs text-ink/70">
         Bring: boat registration (Portugal requires originals, not laminated
         copies), proof of third-party insurance (min {insuranceMinimumLabel},
         certificate in Portuguese if possible), and the skipper&apos;s
@@ -84,7 +84,7 @@ export default function DocumentWallet({
             className={inputClass}
           />
           {expiresBeforeArrival ? (
-            <p className="mt-1 text-xs font-light text-amber-700">
+            <p className="mt-1 text-xs text-amber-700">
               This expires before your arrival date.
             </p>
           ) : null}
@@ -109,7 +109,7 @@ export default function DocumentWallet({
         </label>
       </div>
 
-      <label className="mt-4 flex items-center gap-2 text-sm font-light text-neutral-600">
+      <label className="mt-4 flex items-center gap-2 text-sm text-ink/75">
         <input
           type="checkbox"
           checked={includeInEnquiry}

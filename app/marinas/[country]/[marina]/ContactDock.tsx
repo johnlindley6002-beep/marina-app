@@ -33,26 +33,26 @@ export function ContactList({ marina }: { marina: Marina }) {
   }
 
   const rowClass =
-    "flex items-center justify-between gap-4 border-b border-neutral-100 px-4 py-3 text-sm text-navy";
+    "flex items-center justify-between gap-4 border-b border-hairline px-4 py-3 text-sm text-ink";
 
   return (
     <div>
-      <a href={telHref(marina.phone)} className={`${rowClass} hover:bg-neutral-50`}>
+      <a href={telHref(marina.phone)} className={`${rowClass} hover:bg-paper-deep`}>
         <span>{t.dock.call}</span>
-        <span className="font-normal">{marina.phone}</span>
+        <span className="font-medium">{marina.phone}</span>
       </a>
       <p className={rowClass}>
         <span>{t.dock.vhf}</span>
-        <span className="font-normal">{marina.vhfChannel}</span>
+        <span className="font-medium">{marina.vhfChannel}</span>
       </p>
-      <a href={`mailto:${marina.email}`} className={`${rowClass} hover:bg-neutral-50`}>
+      <a href={`mailto:${marina.email}`} className={`${rowClass} hover:bg-paper-deep`}>
         <span>{t.dock.email}</span>
-        <span className="font-normal">{marina.email}</span>
+        <span className="font-medium">{marina.email}</span>
       </a>
       <button
         type="button"
         onClick={messageMarina}
-        className="w-full px-4 py-3 text-left text-sm font-normal text-navy hover:bg-neutral-50"
+        className="w-full px-4 py-3 text-left text-sm font-medium text-ink hover:bg-paper-deep"
       >
         {t.dock.message}
       </button>
@@ -88,9 +88,9 @@ export default function ContactDock({ marina }: { marina: Marina }) {
           id="contact-dock-panel"
           role="dialog"
           aria-label={t.dock.heading}
-          className="w-72 border border-neutral-200 bg-white shadow-lg"
+          className="surface-lift w-72"
         >
-          <p className="px-4 pt-4 pb-2 text-xs font-normal tracking-wide text-navy/60 uppercase">
+          <p className="px-4 pt-4 pb-2 text-sm font-medium text-ink/80">
             {t.dock.heading}
           </p>
           <ContactList marina={marina} />
@@ -103,7 +103,7 @@ export default function ContactDock({ marina }: { marina: Marina }) {
         aria-controls="contact-dock-panel"
         aria-label={open ? t.dock.close : t.dock.open}
         onClick={() => setOpen((v) => !v)}
-        className="flex h-11 w-11 items-center justify-center rounded-full bg-navy text-white shadow-lg hover:bg-navy-accent"
+        className="flex h-11 w-11 items-center justify-center rounded-full bg-ink text-white shadow-lg hover:bg-ink-2"
       >
         <svg
           viewBox="0 0 24 24"

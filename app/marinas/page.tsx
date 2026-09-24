@@ -1,13 +1,29 @@
 import type { Metadata } from "next";
-import { getCountries } from "../../data/marinas";
-import MarinasListContent from "./MarinasListContent";
+import MarinasResults from "./MarinasResults";
 
 export const metadata: Metadata = {
   title: "Marinas — aldock",
-  description: "Browse marinas by country.",
+  description: "Find a marina by name, region or country.",
 };
 
-export default function MarinasPage() {
-  const countries = getCountries();
-  return <MarinasListContent countries={countries} />;
+type Props = {
+  searchParams: Promise<{
+    q?: string;
+    arrival?: string;
+    departure?: string;
+    length?: string;
+  }>;
+};
+
+export default async function MarinasPage({ searchParams }: Props) {
+  const { q = "", arrival = "", departure = "", length = "" } =
+    await searchParams;
+  return (
+    <MarinasResults
+      q={q}
+      arrival={arrival}
+      departure={departure}
+      length={length}
+    />
+  );
 }

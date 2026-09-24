@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import Link from "next/link";
 import {
   boatFitsMarina,
   getPriceBand,
@@ -12,16 +11,15 @@ import {
 } from "../../../data/marinas";
 import { loadBoatProfile, saveBoatProfile } from "../../../lib/boatProfile";
 import BoatSwitcher from "../../components/BoatSwitcher";
-import FavouriteButton from "../../components/FavouriteButton";
+import MarinaRow from "../../components/MarinaRow";
 import LengthInput from "../../components/LengthInput";
 import { useUnits } from "../../components/UnitsProvider";
 import { withUnit } from "../../../lib/units";
-import Image from "next/image";
 import { useLanguage } from "../../components/LanguageProvider";
 
 const inputClass =
-  "mt-2 w-full border border-neutral-200 px-3 py-2 text-sm text-navy focus:border-navy/40 focus:outline-none";
-const labelClass = "text-xs font-normal tracking-wide text-navy/60 uppercase";
+  "mt-2 w-full border border-hairline px-3 py-2 text-sm text-ink focus:border-ink focus:outline-none";
+const labelClass = "text-sm font-medium text-ink/80";
 
 export default function CountryPageContent({
   marinas,
@@ -97,18 +95,14 @@ export default function CountryPageContent({
   });
 
   return (
-    <section className="px-6 py-24 md:py-32">
-      <div className="mx-auto max-w-5xl">
-        <div className="text-center">
-          <p className="text-xs font-normal tracking-[0.25em] text-navy/60 uppercase">
-            {countryName}
-          </p>
-          <h1 className="mt-4 text-3xl font-normal tracking-tight text-navy md:text-4xl">
-            {t.countryPage.heading(countryName)}
-          </h1>
-        </div>
+    <section className="px-5 py-14 md:px-8 md:py-20">
+      <div className="mx-auto max-w-6xl">
+        <p className="text-ink/70">{countryName}</p>
+        <h1 className="type-display mt-2 text-ink [font-size:clamp(2rem,1.2rem+3vw,3.2rem)]">
+          {t.countryPage.heading(countryName)}
+        </h1>
 
-        <div className="mt-12 rounded-sm border border-neutral-200/80 bg-white p-6 md:p-8">
+        <div className="surface-lift mt-10 p-6 md:p-8">
           <BoatSwitcher
             onSelect={(boat) => {
               setLoa(boat.loa);
@@ -185,7 +179,7 @@ export default function CountryPageContent({
                 {availableFacilities.map((key) => (
                   <label
                     key={key}
-                    className="flex items-center gap-2 text-sm font-light text-neutral-600"
+                    className="flex items-center gap-2 text-sm text-ink/75"
                   >
                     <input
                       type="checkbox"
@@ -201,45 +195,15 @@ export default function CountryPageContent({
         </div>
 
         {filtered.length === 0 ? (
-          <p className="mt-12 text-center text-sm font-light text-neutral-500">
+          <p className="measure mt-10 text-ink/75">
             No marinas match these filters — try loosening them.
           </p>
         ) : (
-          <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <ul className="mt-10">
             {filtered.map((marina) => (
-              <div key={marina.id} className="relative">
-                <Link
-                  href={`/marinas/${marina.countrySlug}/${marina.id}`}
-                  className="group block rounded-sm border border-neutral-200/80 bg-white p-8 transition-colors hover:border-navy/20 md:p-10"
-                >
-                  <h2 className="flex items-center gap-2 text-lg font-normal tracking-tight text-navy">
-                    {marina.name}
-                    {marina.clubBurgee ? (
-                      <Image
-                        src={marina.clubBurgee.src}
-                        alt={marina.clubBurgee.name}
-                        width={1772}
-                        height={1063}
-                        className="h-4 w-auto"
-                      />
-                    ) : null}
-                  </h2>
-                  <p className="mt-3 text-sm leading-relaxed font-light text-neutral-600">
-                    {marina.location}
-                  </p>
-                  <p className="mt-4 text-sm font-light text-navy/70 group-hover:text-navy">
-                    {t.countryPage.viewMarina}
-                  </p>
-                </Link>
-                <FavouriteButton
-                  marinaId={marina.id}
-                  countrySlug={marina.countrySlug}
-                  marinaName={marina.name}
-                  className="absolute right-4 bottom-4"
-                />
-              </div>
+              <MarinaRow key={marina.id} marina={marina} />
             ))}
-          </div>
+          </ul>
         )}
       </div>
     </section>

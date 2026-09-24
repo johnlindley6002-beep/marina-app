@@ -4,6 +4,15 @@ export type Locale = "en" | "pt" | "fr" | "de" | "es" | "it";
 
 export const LOCALES: Locale[] = ["en", "pt", "fr", "de", "es", "it"];
 
+export const LOCALE_NAMES: Record<Locale, string> = {
+  en: "English",
+  pt: "Português",
+  fr: "Français",
+  de: "Deutsch",
+  es: "Español",
+  it: "Italiano",
+};
+
 // Locales that have full marina prose / facility text (see marinaContent
 // and data/marinas.ts). Others fall back to English for that content.
 export function contentLocale(locale: Locale): "en" | "pt" {
@@ -33,31 +42,30 @@ type Dictionary = {
     tagline: string;
     valueProp: string;
     browseMarinas: string;
-    aboutEyebrow: string;
     aboutHeading: string;
     aboutBody: string;
-    exploreEyebrow: string;
-    exploreHeading: string;
-    cardMarinasTitle: string;
-    cardMarinasDesc: string;
-    cardAboutTitle: string;
-    cardAboutDesc: string;
-    cardContactTitle: string;
-    cardContactDesc: string;
-    contactEyebrow: string;
     contactHeading: string;
     contactBody: string;
+    destinationLabel: string;
+    destinationPlaceholder: string;
+    addFilters: string;
+    hideFilters: string;
+    findMarinas: string;
+    featuredHeading: string;
+    moreMarinas: string;
+  };
+  results: {
+    heading: string;
+    forQuery: (query: string) => string;
+    count: (n: number) => string;
+    none: string;
+    from: string;
   };
   homeSearch: {
     arrival: string;
     departure: string;
     boatLength: string;
     searchButton: string;
-  };
-  marinasList: {
-    eyebrow: string;
-    heading: string;
-    viewMarinas: string;
   };
   countryPage: {
     heading: (country: string) => string;
@@ -181,33 +189,32 @@ const baseTranslations: Record<"en" | "pt", Dictionary> = {
       tagline: "Marina bookings, simplified.",
       valueProp: "Find and book a berth in Portugal's marinas.",
       browseMarinas: "Or browse marinas",
-      aboutEyebrow: "About us",
       aboutHeading: "A marina experience, reimagined",
       aboutBody:
         "aldock brings clarity to marina management — from berth reservations to guest communications. We believe booking a slip should feel as calm as a morning on the water.",
-      exploreEyebrow: "Explore",
-      exploreHeading: "Find your way around",
-      cardMarinasTitle: "Marinas",
-      cardMarinasDesc: "Browse marinas by country and find your next berth.",
-      cardAboutTitle: "About us",
-      cardAboutDesc: "What aldock is, and why we're building it.",
-      cardContactTitle: "Contact",
-      cardContactDesc: "Questions about bookings or partnerships? Reach out.",
-      contactEyebrow: "Contact",
       contactHeading: "Get in touch",
       contactBody:
         "Questions about berths, bookings, or partnerships? We'd love to hear from you.",
+      destinationLabel: "Where are you heading?",
+      destinationPlaceholder: "Marina, region or country",
+      addFilters: "Add dates and boat length",
+      hideFilters: "Hide dates and boat length",
+      findMarinas: "Find marinas",
+      featuredHeading: "Featured marina",
+      moreMarinas: "More marinas",
+    },
+    results: {
+      heading: "Marinas",
+      forQuery: (query) => `Marinas for “${query}”`,
+      count: (n) => `${n} ${n === 1 ? "marina" : "marinas"}`,
+      none: "No marinas match that search. Try a marina, region or country.",
+      from: "from",
     },
     homeSearch: {
       arrival: "Arrival",
       departure: "Departure",
       boatLength: "Boat length (m)",
       searchButton: "Search berths",
-    },
-    marinasList: {
-      eyebrow: "Marinas",
-      heading: "Choose a country",
-      viewMarinas: "View marinas →",
     },
     countryPage: {
       heading: (country) => `Marinas in ${country}`,
@@ -356,34 +363,32 @@ const baseTranslations: Record<"en" | "pt", Dictionary> = {
       valueProp:
         "Encontre e reserve um lugar de amarração nas marinas de Portugal.",
       browseMarinas: "Ou explore as marinas",
-      aboutEyebrow: "Sobre nós",
       aboutHeading: "Uma experiência de marina, reinventada",
       aboutBody:
         "A aldock traz clareza à gestão de marinas — desde reservas de lugares de amarração até à comunicação com os visitantes. Acreditamos que reservar um lugar deve ser tão tranquilo como uma manhã em água calma.",
-      exploreEyebrow: "Explorar",
-      exploreHeading: "Oriente-se",
-      cardMarinasTitle: "Marinas",
-      cardMarinasDesc:
-        "Explore marinas por país e encontre o seu próximo lugar de amarração.",
-      cardAboutTitle: "Sobre nós",
-      cardAboutDesc: "O que é a aldock e porque a estamos a construir.",
-      cardContactTitle: "Contacto",
-      cardContactDesc: "Dúvidas sobre reservas ou parcerias? Contacte-nos.",
-      contactEyebrow: "Contacto",
       contactHeading: "Fale connosco",
       contactBody:
         "Dúvidas sobre lugares de amarração, reservas ou parcerias? Adoraríamos ouvi-lo.",
+      destinationLabel: "Para onde vai?",
+      destinationPlaceholder: "Marina, região ou país",
+      addFilters: "Adicionar datas e comprimento",
+      hideFilters: "Ocultar datas e comprimento",
+      findMarinas: "Encontrar marinas",
+      featuredHeading: "Marina em destaque",
+      moreMarinas: "Mais marinas",
+    },
+    results: {
+      heading: "Marinas",
+      forQuery: (query) => `Marinas para “${query}”`,
+      count: (n) => `${n} ${n === 1 ? "marina" : "marinas"}`,
+      none: "Nenhuma marina corresponde à pesquisa. Experimente uma marina, região ou país.",
+      from: "desde",
     },
     homeSearch: {
       arrival: "Chegada",
       departure: "Partida",
       boatLength: "Comprimento do barco (m)",
       searchButton: "Procurar lugares",
-    },
-    marinasList: {
-      eyebrow: "Marinas",
-      heading: "Escolha um país",
-      viewMarinas: "Ver marinas →",
     },
     countryPage: {
       heading: (country) => `Marinas em ${country}`,
@@ -572,17 +577,26 @@ const fr: DeepPartial<Dictionary> = {
     valueProp:
       "Trouvez et réservez un emplacement dans les marinas du Portugal.",
     browseMarinas: "Ou parcourez les marinas",
+    destinationLabel: "Où allez-vous ?",
+    destinationPlaceholder: "Marina, région ou pays",
+    addFilters: "Ajouter dates et longueur",
+    hideFilters: "Masquer dates et longueur",
+    findMarinas: "Trouver des marinas",
+    featuredHeading: "Marina à la une",
+    moreMarinas: "Autres marinas",
+  },
+  results: {
+    heading: "Marinas",
+    forQuery: (query) => `Marinas pour « ${query} »`,
+    count: (n) => `${n} ${n === 1 ? "marina" : "marinas"}`,
+    none: "Aucune marina ne correspond. Essayez une marina, une région ou un pays.",
+    from: "dès",
   },
   homeSearch: {
     arrival: "Arrivée",
     departure: "Départ",
     boatLength: "Longueur du bateau (m)",
     searchButton: "Rechercher un emplacement",
-  },
-  marinasList: {
-    eyebrow: "Marinas",
-    heading: "Choisissez un pays",
-    viewMarinas: "Voir les marinas →",
   },
   countryPage: {
     heading: (country) => `Marinas : ${country}`,
@@ -651,17 +665,26 @@ const de: DeepPartial<Dictionary> = {
     valueProp:
       "Finden und buchen Sie einen Liegeplatz in Portugals Marinas.",
     browseMarinas: "Oder Marinas durchsuchen",
+    destinationLabel: "Wohin soll es gehen?",
+    destinationPlaceholder: "Marina, Region oder Land",
+    addFilters: "Daten und Bootslänge hinzufügen",
+    hideFilters: "Daten und Bootslänge ausblenden",
+    findMarinas: "Marinas finden",
+    featuredHeading: "Empfohlene Marina",
+    moreMarinas: "Weitere Marinas",
+  },
+  results: {
+    heading: "Marinas",
+    forQuery: (query) => `Marinas für „${query}“`,
+    count: (n) => `${n} ${n === 1 ? "Marina" : "Marinas"}`,
+    none: "Keine Marina passt zur Suche. Versuchen Sie eine Marina, Region oder ein Land.",
+    from: "ab",
   },
   homeSearch: {
     arrival: "Ankunft",
     departure: "Abreise",
     boatLength: "Bootslänge (m)",
     searchButton: "Liegeplätze suchen",
-  },
-  marinasList: {
-    eyebrow: "Marinas",
-    heading: "Land wählen",
-    viewMarinas: "Marinas ansehen →",
   },
   countryPage: {
     heading: (country) => `Marinas in ${country}`,
@@ -729,17 +752,26 @@ const es: DeepPartial<Dictionary> = {
     tagline: "Reservas de marina, simplificadas.",
     valueProp: "Encuentra y reserva un amarre en las marinas de Portugal.",
     browseMarinas: "O explora las marinas",
+    destinationLabel: "¿A dónde vas?",
+    destinationPlaceholder: "Marina, región o país",
+    addFilters: "Añadir fechas y eslora",
+    hideFilters: "Ocultar fechas y eslora",
+    findMarinas: "Buscar marinas",
+    featuredHeading: "Marina destacada",
+    moreMarinas: "Más marinas",
+  },
+  results: {
+    heading: "Marinas",
+    forQuery: (query) => `Marinas para «${query}»`,
+    count: (n) => `${n} ${n === 1 ? "marina" : "marinas"}`,
+    none: "Ninguna marina coincide con la búsqueda. Prueba con una marina, región o país.",
+    from: "desde",
   },
   homeSearch: {
     arrival: "Llegada",
     departure: "Salida",
     boatLength: "Eslora del barco (m)",
     searchButton: "Buscar amarres",
-  },
-  marinasList: {
-    eyebrow: "Marinas",
-    heading: "Elige un país",
-    viewMarinas: "Ver marinas →",
   },
   countryPage: {
     heading: (country) => `Marinas en ${country}`,
@@ -808,17 +840,26 @@ const it: DeepPartial<Dictionary> = {
     valueProp:
       "Trova e prenota un posto barca nelle marine del Portogallo.",
     browseMarinas: "Oppure sfoglia le marine",
+    destinationLabel: "Dove stai andando?",
+    destinationPlaceholder: "Marina, regione o paese",
+    addFilters: "Aggiungi date e lunghezza",
+    hideFilters: "Nascondi date e lunghezza",
+    findMarinas: "Trova marine",
+    featuredHeading: "Marina in evidenza",
+    moreMarinas: "Altre marine",
+  },
+  results: {
+    heading: "Marine",
+    forQuery: (query) => `Marine per «${query}»`,
+    count: (n) => `${n} ${n === 1 ? "marina" : "marine"}`,
+    none: "Nessuna marina corrisponde alla ricerca. Prova con una marina, una regione o un paese.",
+    from: "da",
   },
   homeSearch: {
     arrival: "Arrivo",
     departure: "Partenza",
     boatLength: "Lunghezza della barca (m)",
     searchButton: "Cerca posti barca",
-  },
-  marinasList: {
-    eyebrow: "Marine",
-    heading: "Scegli un paese",
-    viewMarinas: "Vedi le marine →",
   },
   countryPage: {
     heading: (country) => `Marine in ${country}`,

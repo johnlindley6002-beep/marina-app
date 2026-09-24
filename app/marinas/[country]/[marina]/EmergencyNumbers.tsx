@@ -12,20 +12,20 @@ export default function EmergencyNumbers({
   const { phones, vhf } = marina.emergency;
   const body = (
     <>
-      <p className="text-xs font-normal tracking-[0.25em] text-navy/60 uppercase">
+      <h3 className="type-heading type-h3 text-ink">
         Emergency &amp; key numbers
-      </p>
+      </h3>
       <div className="mt-6 grid gap-8 sm:grid-cols-2">
         <ul className="space-y-3">
           {phones.map((phone) => (
             <li
               key={phone.label}
-              className="flex items-baseline justify-between gap-4 border-b border-neutral-100 pb-3 text-sm"
+              className="flex items-baseline justify-between gap-4 border-b border-hairline pb-3 text-sm"
             >
-              <span className="font-light text-neutral-600">{phone.label}</span>
+              <span className="text-ink/75">{phone.label}</span>
               <a
                 href={telHref(phone.number)}
-                className="font-normal text-navy underline underline-offset-4"
+                className="font-medium text-ink underline underline-offset-4"
               >
                 {phone.number}
               </a>
@@ -36,12 +36,12 @@ export default function EmergencyNumbers({
           {vhf.map((channel) => (
             <li
               key={channel.channel}
-              className="flex items-baseline justify-between gap-4 border-b border-neutral-100 pb-3 text-sm"
+              className="flex items-baseline justify-between gap-4 border-b border-hairline pb-3 text-sm"
             >
-              <span className="font-light text-neutral-600">
+              <span className="text-ink/75">
                 {channel.label}
               </span>
-              <span className="font-normal text-navy">
+              <span className="font-medium text-ink">
                 VHF channel {channel.channel}
               </span>
             </li>

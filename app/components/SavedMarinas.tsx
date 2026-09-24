@@ -26,8 +26,8 @@ export default function SavedMarinas() {
   if (favourites.length === 0) return null;
 
   return (
-    <div className="mt-12 border border-neutral-200 bg-white p-6">
-      <h2 className="text-xs font-normal tracking-[0.25em] text-navy/60 uppercase">
+    <div className="mt-12 hairline-top pt-6">
+      <h2 className="type-heading text-xl text-ink">
         {t.favourites.savedHeading}
       </h2>
       <ul className="mt-4 space-y-3">
@@ -38,21 +38,21 @@ export default function SavedMarinas() {
           >
             <Link
               href={`/marinas/${favourite.countrySlug}/${favourite.marinaId}`}
-              className="font-normal text-navy underline underline-offset-4"
+              className="font-medium text-ink underline underline-offset-4"
             >
               {favourite.marinaName}
             </Link>
             <span className="flex items-center gap-4">
               <Link
                 href={`/marinas/${favourite.countrySlug}/${favourite.marinaId}#request-berth`}
-                className="font-light text-navy hover:underline"
+                className="text-ink hover:underline"
               >
                 New enquiry
               </Link>
               <button
                 type="button"
                 onClick={() => toggleFavourite(favourite)}
-                className="font-light text-neutral-500 hover:text-red-600"
+                className="text-ink/70 hover:text-red-600"
               >
                 Remove
               </button>

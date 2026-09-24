@@ -41,20 +41,20 @@ export default function ActionZone({
           selectedBerthId={selectedBerthId}
         />
 
-        <div className="mt-10 border-t border-neutral-200 pt-8">
+        <div className="mt-10 border-t border-hairline pt-8">
           <button
             type="button"
             aria-expanded={contactOpen}
             aria-controls="general-contact"
             onClick={() => setContactOpen((v) => !v)}
-            className="text-sm font-normal text-navy underline underline-offset-4 hover:text-navy-accent"
+            className="text-sm font-medium text-ink underline underline-offset-4 hover:text-ink-2"
           >
             General question? Contact the marina
           </button>
           {contactOpen ? (
             <div
               id="general-contact"
-              className="mt-4 max-w-sm border border-neutral-200 bg-white"
+              className="surface-lift mt-4 max-w-sm"
             >
               <ContactList marina={marina} />
             </div>

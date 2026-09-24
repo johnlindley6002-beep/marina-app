@@ -19,8 +19,8 @@ type Props = {
 };
 
 const inputClass =
-  "mt-2 w-full border border-neutral-200 px-3 py-2 text-sm text-navy focus:border-navy/40 focus:outline-none";
-const labelClass = "text-xs font-normal tracking-wide text-navy/60 uppercase";
+  "mt-2 w-full border border-hairline px-3 py-2 text-sm text-ink focus:border-ink focus:outline-none";
+const labelClass = "text-sm font-medium text-ink/80";
 
 export default function BoatSwitcher({ current, heading, onSelect }: Props) {
   const [boats, setBoats] = useState<SavedBoat[]>([]);
@@ -122,9 +122,9 @@ export default function BoatSwitcher({ current, heading, onSelect }: Props) {
     );
 
   return (
-    <div className="mt-4 border border-neutral-200/80 bg-neutral-50 p-4">
+    <div className="mt-4 rounded-[3px] bg-paper-deep p-4">
       {heading ? (
-        <p className="mb-3 text-sm font-normal text-navy">{heading}</p>
+        <p className="mb-3 text-sm font-medium text-ink">{heading}</p>
       ) : null}
       <div className="flex flex-wrap items-end gap-3">
         {boats.length > 0 ? (
@@ -150,7 +150,7 @@ export default function BoatSwitcher({ current, heading, onSelect }: Props) {
           <button
             type="button"
             onClick={handleSave}
-            className="border border-navy/30 px-4 py-2 text-sm font-normal tracking-wide text-navy hover:border-navy"
+            className="border border-ink/30 px-4 py-2 text-sm font-medium text-ink hover:border-ink"
           >
             {matchesSaved
               ? "Update saved boat"
@@ -164,7 +164,7 @@ export default function BoatSwitcher({ current, heading, onSelect }: Props) {
           <button
             type="button"
             onClick={handleDelete}
-            className="px-2 py-2 text-sm font-normal text-neutral-500 hover:text-red-600"
+            className="px-2 py-2 text-sm font-medium text-ink/70 hover:text-red-600"
           >
             Remove
           </button>
@@ -172,12 +172,12 @@ export default function BoatSwitcher({ current, heading, onSelect }: Props) {
       </div>
 
       {error ? (
-        <p className="mt-2 text-xs font-light text-red-600">{error}</p>
+        <p className="mt-2 text-xs text-red-600">{error}</p>
       ) : null}
       {message ? (
-        <p className="mt-2 text-xs font-light text-neutral-500">{message}</p>
+        <p className="mt-2 text-xs text-ink/70">{message}</p>
       ) : null}
-      <p className="mt-2 text-xs font-light text-neutral-500">
+      <p className="mt-2 text-xs text-ink/70">
         Boats are stored only in this browser — no account needed.
       </p>
     </div>

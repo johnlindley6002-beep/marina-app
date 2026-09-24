@@ -2,169 +2,122 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import HomeBerthSearch from "./HomeBerthSearch";
+import { siteConfig } from "../../data/site";
+import ChartLinework from "./ChartLinework";
+import DestinationSearch from "./DestinationSearch";
+import FeaturedMarina from "./FeaturedMarina";
 import { useLanguage } from "./LanguageProvider";
-
-function ChevronIcon() {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 20 20"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      className="h-4 w-4"
-      aria-hidden
-    >
-      <path d="M7.5 4l6 6-6 6" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
 
 export default function HomeContent() {
   const { t } = useLanguage();
-
-  const exploreCards = [
-    {
-      title: t.home.cardMarinasTitle,
-      description: t.home.cardMarinasDesc,
-      href: "/marinas",
-    },
-    {
-      title: t.home.cardAboutTitle,
-      description: t.home.cardAboutDesc,
-      href: "/#about",
-    },
-    {
-      title: t.home.cardContactTitle,
-      description: t.home.cardContactDesc,
-      href: "/#contact",
-    },
-  ];
+  const hero = siteConfig.heroImage;
 
   return (
     <main>
-      <section className="bg-navy px-6 py-20 md:py-32">
-        <div className="mx-auto max-w-3xl text-center">
-          <h1>
+      <section className="on-ink relative isolate overflow-hidden bg-gradient-to-br from-ink via-ink to-ink-2 text-paper">
+        {hero ? (
+          <Image
+            src={hero.src}
+            alt={hero.alt}
+            fill
+            priority
+            sizes="100vw"
+            className="hero-settle -z-20 object-cover"
+          />
+        ) : null}
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 -z-10"
+          style={{
+            background: hero
+              ? "linear-gradient(100deg, var(--ink) 10%, color-mix(in srgb, var(--ink) 80%, transparent) 50%, color-mix(in srgb, var(--ink-2) 45%, transparent) 100%)"
+              : "transparent",
+          }}
+        />
+        <ChartLinework className="absolute inset-0 -z-10 h-full w-full text-paper opacity-[0.07]" />
+
+        <div className="mx-auto max-w-6xl px-5 pt-20 pb-24 md:px-8 md:pt-32 md:pb-36">
+          <span
+            className="hero-rise block h-px w-16 bg-brass"
+            style={{ "--d": "0ms" } as React.CSSProperties}
+          />
+          <div
+            className="hero-rise mt-8"
+            style={{ "--d": "90ms" } as React.CSSProperties}
+          >
             <Image
-              src="/images/aldock-logo.png"
+              src="/images/aldock-wordmark.png"
               alt="aldock"
               width={407}
               height={108}
               priority
-              className="mx-auto h-auto w-[240px] sm:w-[320px] md:w-[420px]"
+              className="h-7 w-auto"
             />
-          </h1>
-          <p className="mx-auto mt-6 max-w-md text-base font-light tracking-wide text-white/60 md:mt-8 md:text-lg">
+          </div>
+          <h1
+            className="type-display hero-rise measure mt-6 max-w-3xl"
+            style={{ "--d": "180ms" } as React.CSSProperties}
+          >
             {t.home.tagline}
-          </p>
-          <p className="mx-auto mt-2 max-w-md text-sm font-light tracking-wide text-white/50">
+          </h1>
+          <p
+            className="hero-rise mt-5 max-w-xl text-lg text-stone"
+            style={{ "--d": "270ms" } as React.CSSProperties}
+          >
             {t.home.valueProp}
           </p>
 
-          <HomeBerthSearch />
-
-          <Link
-            href="/marinas"
-            className="mt-6 inline-block text-sm font-normal tracking-wide text-white/70 underline-offset-4 hover:text-white hover:underline"
+          <div
+            className="hero-rise mt-10 max-w-3xl"
+            style={{ "--d": "360ms" } as React.CSSProperties}
           >
-            {t.home.browseMarinas}
-          </Link>
+            <DestinationSearch />
+            <Link
+              href="/marinas"
+              className="mt-5 inline-block text-stone underline underline-offset-4 transition-colors hover:text-paper"
+            >
+              {t.home.browseMarinas}
+            </Link>
+          </div>
         </div>
       </section>
+
+      <FeaturedMarina />
 
       <section
         id="about"
-        className="defer-paint scroll-mt-28 bg-white px-6 py-24 md:py-32"
+        className="defer-paint scroll-mt-20 bg-paper-deep px-5 py-20 md:px-8 md:py-28"
       >
-        <div className="mx-auto max-w-2xl text-center">
-          <p className="text-xs font-normal tracking-[0.25em] text-navy/60 uppercase">
-            {t.home.aboutEyebrow}
-          </p>
-          <h2 className="mt-4 text-3xl font-normal tracking-tight text-navy md:text-4xl">
+        <div className="mx-auto grid max-w-6xl gap-8 md:grid-cols-[1fr_1.2fr] md:gap-20">
+          <h2 className="type-heading type-h2 text-ink">
             {t.home.aboutHeading}
           </h2>
-          <p className="mt-8 text-base leading-relaxed font-light text-neutral-500 md:text-lg">
-            {t.home.aboutBody}
-          </p>
-        </div>
-      </section>
-
-      <section
-        id="explore"
-        className="defer-paint scroll-mt-28 bg-neutral-50 px-6 py-24 md:py-32"
-      >
-        <div className="mx-auto max-w-5xl">
-          <div className="text-center">
-            <p className="text-xs font-normal tracking-[0.25em] text-navy/60 uppercase">
-              {t.home.exploreEyebrow}
-            </p>
-            <h2 className="mt-4 text-3xl font-normal tracking-tight text-navy md:text-4xl">
-              {t.home.exploreHeading}
-            </h2>
-          </div>
-
-          <div className="mt-16 grid gap-6 sm:grid-cols-3">
-            {exploreCards.map((card) => (
-              <Link
-                key={card.href}
-                href={card.href}
-                className="group relative block aspect-[4/5] overflow-hidden rounded-sm"
-              >
-                <Image
-                  src="/images/card-placeholder.svg"
-                  alt=""
-                  fill
-                  sizes="(max-width: 640px) 100vw, 33vw"
-                  className="object-cover transition-transform duration-300 group-hover:scale-105"
-                  aria-hidden
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-navy/90 via-navy/20 to-transparent" />
-                <div className="absolute inset-x-0 bottom-0 p-6">
-                  <p className="text-sm font-light text-white/70">
-                    {card.description}
-                  </p>
-                  <p className="mt-2 flex items-center gap-1 text-lg font-normal text-white">
-                    {card.title}
-                    <ChevronIcon />
-                  </p>
-                </div>
-              </Link>
-            ))}
-          </div>
+          <p className="measure text-lg text-ink/75">{t.home.aboutBody}</p>
         </div>
       </section>
 
       <section
         id="contact"
-        className="defer-paint scroll-mt-28 bg-navy px-6 py-24 md:py-32"
+        className="on-ink defer-paint scroll-mt-20 bg-ink px-5 py-20 text-paper md:px-8 md:py-28"
       >
-        <div className="mx-auto max-w-2xl text-center">
-          <p className="text-xs font-normal tracking-[0.25em] text-white/60 uppercase">
-            {t.home.contactEyebrow}
-          </p>
-          <h2 className="mt-4 text-3xl font-normal tracking-tight text-white md:text-4xl">
-            {t.home.contactHeading}
-          </h2>
-          <p className="mt-8 text-base font-light leading-relaxed text-white/60">
-            {t.home.contactBody}
-          </p>
-
-          <div className="mt-12 flex flex-col items-center gap-4 sm:flex-row sm:justify-center sm:gap-12">
-            <a
-              href="mailto:hello@aldock.com"
-              className="text-sm font-normal tracking-wide text-white/80 hover:text-white"
-            >
-              hello@aldock.com
-            </a>
-            <span className="hidden h-4 w-px bg-white/20 sm:block" />
-            <a
-              href="tel:+15551234567"
-              className="text-sm font-normal tracking-wide text-white/80 hover:text-white"
-            >
-              +1 (555) 123-4567
-            </a>
+        <div className="mx-auto grid max-w-6xl gap-8 md:grid-cols-[1fr_1.2fr] md:gap-20">
+          <h2 className="type-heading type-h2">{t.home.contactHeading}</h2>
+          <div>
+            <p className="measure text-lg text-stone">{t.home.contactBody}</p>
+            <div className="mt-8 flex flex-col gap-3 text-lg">
+              <a
+                href={`mailto:${siteConfig.contact.email}`}
+                className="w-fit underline decoration-brass decoration-2 underline-offset-[6px]"
+              >
+                {siteConfig.contact.email}
+              </a>
+              <a
+                href={`tel:${siteConfig.contact.phone.replace(/[^\d+]/g, "")}`}
+                className="tabular w-fit text-stone transition-colors hover:text-paper"
+              >
+                {siteConfig.contact.phone}
+              </a>
+            </div>
           </div>
         </div>
       </section>

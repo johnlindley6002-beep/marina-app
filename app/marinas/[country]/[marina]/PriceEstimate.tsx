@@ -15,8 +15,8 @@ import { useLanguage } from "../../../components/LanguageProvider";
 import { useUnits } from "../../../components/UnitsProvider";
 
 const inputClass =
-  "mt-2 w-full max-w-[160px] border border-neutral-200 px-3 py-2 text-sm text-navy focus:border-navy/40 focus:outline-none";
-const labelClass = "text-xs font-normal tracking-wide text-navy/60 uppercase";
+  "mt-2 w-full max-w-[160px] border border-hairline px-3 py-2 text-sm text-ink focus:border-ink focus:outline-none";
+const labelClass = "text-sm font-medium text-ink/80";
 const eur = (n: number) => `€${n.toFixed(2)}`;
 
 type Props = {
@@ -63,7 +63,7 @@ export default function PriceEstimate({
     label: string,
     key: "water" | "pumpOut" | "fuel" | "laundry"
   ) => (
-    <label className="flex items-center gap-2 text-sm font-light text-neutral-600">
+    <label className="flex items-center gap-2 text-sm text-ink/75">
       <input
         type="checkbox"
         checked={plan[key]}
@@ -75,10 +75,7 @@ export default function PriceEstimate({
 
   return (
     <div className="mx-auto max-w-5xl">
-      <p className="text-xs font-normal tracking-[0.25em] text-navy/60 uppercase">
-        {t.rates.eyebrow}
-      </p>
-      <h2 className="mt-4 text-2xl font-normal tracking-tight text-navy">
+      <h2 className="type-heading type-h2 text-ink">
         Price estimate &amp; extras
       </h2>
 
@@ -86,7 +83,7 @@ export default function PriceEstimate({
         <legend className={labelClass}>Extras</legend>
         <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           <div>
-            <label className="flex items-center gap-2 text-sm font-light text-neutral-600">
+            <label className="flex items-center gap-2 text-sm text-ink/75">
               <input
                 type="checkbox"
                 checked={plan.shorePower}
@@ -110,7 +107,7 @@ export default function PriceEstimate({
                   ))}
                 </select>
                 {amperageError && !plan.amperage ? (
-                  <p className="mt-1 text-xs font-light text-red-600">
+                  <p className="mt-1 text-xs text-red-600">
                     Choose an amperage
                   </p>
                 ) : null}
@@ -122,7 +119,7 @@ export default function PriceEstimate({
           {check("Fuel on arrival", "fuel")}
           {check("Laundry", "laundry")}
         </div>
-        <p className="mt-3 text-xs font-light text-neutral-500">
+        <p className="mt-3 text-xs text-ink/70">
           Power and water are metered and charged separately from the berth
           fee.
         </p>
@@ -131,7 +128,7 @@ export default function PriceEstimate({
       <div className="mt-8" aria-live="polite">
         {quote ? (
           <>
-            <p className="text-sm font-light text-neutral-600">
+            <p className="text-sm text-ink/75">
               Class {quote.marinaClass} berth ·{" "}
               {plan.openEnded
                 ? "nightly rate (open-ended stay)"
@@ -143,15 +140,15 @@ export default function PriceEstimate({
                 {quote.berthLines.map((line) => (
                   <tr
                     key={line.season}
-                    className="border-b border-neutral-100 text-neutral-600"
+                    className="border-b border-hairline text-ink/75"
                   >
-                    <td className="py-2 pr-4 font-light">
+                    <td className="py-2 pr-4 ">
                       {line.nights} × {eur(line.rateEur)}
-                      <span className="block text-xs text-neutral-500">
+                      <span className="block text-xs text-ink/70">
                         {SEASON_LABELS[line.season]}
                       </span>
                     </td>
-                    <td className="py-2 text-right font-normal text-navy">
+                    <td className="py-2 text-right font-medium text-ink">
                       {eur(line.subtotalEur)}
                     </td>
                   </tr>
@@ -159,38 +156,38 @@ export default function PriceEstimate({
                 {quote.addOnLines.map((line) => (
                   <tr
                     key={line.label}
-                    className="border-b border-neutral-100 text-neutral-600"
+                    className="border-b border-hairline text-ink/75"
                   >
-                    <td className="py-2 pr-4 font-light">
+                    <td className="py-2 pr-4 ">
                       {line.label}
                       {line.note ? (
-                        <span className="block text-xs text-neutral-500">
+                        <span className="block text-xs text-ink/70">
                           {line.note}
                         </span>
                       ) : null}
                     </td>
-                    <td className="py-2 text-right font-normal text-navy">
+                    <td className="py-2 text-right font-medium text-ink">
                       {line.amountEur !== null ? eur(line.amountEur) : "—"}
                     </td>
                   </tr>
                 ))}
                 <tr>
-                  <td className="pt-3 pr-4 font-normal text-navy">
+                  <td className="pt-3 pr-4 font-medium text-ink">
                     {plan.openEnded ? "Estimated first night" : "Estimated total"}
                   </td>
-                  <td className="pt-3 text-right text-base font-normal text-navy">
+                  <td className="pt-3 text-right text-base font-medium text-ink">
                     {eur(quote.estimatedTotalEur)}
                   </td>
                 </tr>
               </tbody>
             </table>
-            <p className="mt-3 text-xs font-light text-neutral-500">
+            <p className="mt-3 text-xs text-ink/70">
               Excl. {Math.round(marina.vatRate * 100)}% VAT and utilities —
               estimate, confirm with marina.
             </p>
           </>
         ) : (
-          <p className="text-sm font-light text-neutral-600">
+          <p className="text-sm text-ink/75">
             {loa > 0 && classifyBoatLength(loa) === null
               ? "Your length is outside the standard berth classes — contact the marina for a quote."
               : "Enter your dates and boat length above to see a price estimate."}
@@ -198,13 +195,13 @@ export default function PriceEstimate({
         )}
       </div>
 
-      <h3 className="mt-12 text-lg font-normal tracking-tight text-navy">
+      <h3 className="mt-12 text-lg font-medium tracking-tight text-ink">
         {t.rates.heading}
       </h3>
       <div className="mt-4 overflow-x-auto">
         <table className="w-full min-w-[480px] border-collapse text-left text-sm">
           <thead>
-            <tr className="border-b border-neutral-200 text-xs font-normal tracking-wide text-navy/60 uppercase">
+            <tr className="border-b border-hairline text-sm font-medium text-ink/80">
               <th className="py-3 pr-4">{t.rates.colClass}</th>
               <th className="py-3 pr-4">{t.rates.colLength}</th>
               <th className="py-3 pr-4">{t.rates.colLow}</th>
@@ -218,23 +215,23 @@ export default function PriceEstimate({
               return (
                 <tr
                   key={marinaClass}
-                  className="border-b border-neutral-100 text-neutral-600"
+                  className="border-b border-hairline text-ink/75"
                 >
-                  <td className="py-3 pr-4 font-normal text-navy">
+                  <td className="py-3 pr-4 font-medium text-ink">
                     {marinaClass}
                   </td>
-                  <td className="py-3 pr-4 font-light">
+                  <td className="py-3 pr-4 ">
                     {formatLengthRange(range.minM, range.maxM)}
                   </td>
-                  <td className="py-3 pr-4 font-light">€{rate.low.toFixed(2)}</td>
-                  <td className="py-3 font-light">€{rate.high.toFixed(2)}</td>
+                  <td className="py-3 pr-4 ">€{rate.low.toFixed(2)}</td>
+                  <td className="py-3 ">€{rate.high.toFixed(2)}</td>
                 </tr>
               );
             })}
           </tbody>
         </table>
       </div>
-      <p className="mt-4 text-xs font-light text-neutral-500">
+      <p className="mt-4 text-xs text-ink/70">
         {t.rates.caption(Math.round(marina.vatRate * 100))}
       </p>
     </div>

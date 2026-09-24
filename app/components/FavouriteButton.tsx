@@ -38,7 +38,7 @@ export default function FavouriteButton({
   const colour =
     tone === "light"
       ? "text-white hover:text-white"
-      : "text-navy hover:text-navy-accent";
+      : "text-ink hover:text-ink-2";
 
   return (
     <button

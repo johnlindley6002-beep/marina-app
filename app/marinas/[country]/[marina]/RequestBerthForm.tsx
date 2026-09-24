@@ -274,10 +274,10 @@ function buildSummary(
 }
 
 const inputClass =
-  "mt-2 w-full border border-neutral-200 px-3 py-2 text-sm text-navy focus:border-navy/40 focus:outline-none";
+  "mt-2 w-full border border-hairline px-3 py-2 text-sm text-ink focus:border-ink focus:outline-none";
 const labelClass =
-  "text-xs font-normal tracking-wide text-navy/60 uppercase";
-const errorClass = "mt-1 text-xs font-light text-red-600";
+  "text-sm font-medium text-ink/80";
+const errorClass = "mt-1 text-xs text-red-600";
 
 function RequiredMark() {
   return <span className="text-red-600"> *</span>;
@@ -567,12 +567,12 @@ export default function RequestBerthForm({
   return (
     <div
       id="request-berth"
-      className="scroll-mt-24 rounded-sm border border-neutral-200/80 bg-white p-8 md:p-10"
+      className="surface-lift scroll-mt-24 p-6 sm:p-8 md:p-10"
     >
-      <h2 className="text-lg font-normal tracking-tight text-navy">
+      <h2 className="type-heading type-h3 text-ink">
         Request a berth
       </h2>
-      <p className="mt-2 text-sm font-light text-neutral-500">
+      <p className="mt-2 text-sm text-ink/70">
         Send {marina.name} everything they need to confirm your visit. This
         opens a pre-filled email — nothing is submitted to a server.
       </p>
@@ -580,10 +580,10 @@ export default function RequestBerthForm({
       <form onSubmit={handleSubmit} className="mt-8 space-y-12">
         {/* 1. Your visit */}
         <fieldset>
-          <legend className="text-xs font-normal tracking-[0.25em] text-navy/60 uppercase">
+          <legend className="type-heading text-xl text-ink">
             Your visit
           </legend>
-          <p className="mt-4 text-sm font-light text-neutral-600">
+          <p className="mt-4 text-sm text-ink/75">
             <span className={labelClass}>Your stay: </span>
             {form.arrival
               ? `${form.arrival} → ${form.openEnded ? "open-ended" : form.departure || "—"}`
@@ -599,11 +599,11 @@ export default function RequestBerthForm({
               ? `, draft ${formatLength(Number(form.draft), units)}`
               : ""}
           </p>
-          <p className="mt-1 text-xs font-light text-neutral-500">
+          <p className="mt-1 text-xs text-ink/70">
             Dates and boat size come from{" "}
             <a
               href="#plan-your-stay"
-              className="text-navy underline underline-offset-4"
+              className="text-ink underline underline-offset-4"
             >
               Plan your stay
             </a>{" "}
@@ -634,7 +634,7 @@ export default function RequestBerthForm({
                 value={form.etd}
                 onChange={(e) => setField("etd", e.target.value)}
                 disabled={form.openEnded}
-                className={`${inputClass} disabled:bg-neutral-50 disabled:text-neutral-500`}
+                className={`${inputClass} disabled:bg-paper-deep disabled:text-ink/70`}
               />
               {errors.etd ? <p className={errorClass}>{errors.etd}</p> : null}
             </label>
@@ -643,7 +643,7 @@ export default function RequestBerthForm({
 
         {/* 2. Your boat */}
         <fieldset>
-          <legend className="text-xs font-normal tracking-[0.25em] text-navy/60 uppercase">
+          <legend className="type-heading text-xl text-ink">
             Your boat
           </legend>
           <BoatSwitcher
@@ -709,7 +709,7 @@ export default function RequestBerthForm({
               </select>
               {errors.vesselType ? <p className={errorClass}>{errors.vesselType}</p> : null}
               {form.vesselType === "catamaran" ? (
-                <p className="mt-1 text-xs font-light text-neutral-500">
+                <p className="mt-1 text-xs text-ink/70">
                   Catamarans may need a wider, pricier berth.
                 </p>
               ) : null}
@@ -744,7 +744,7 @@ export default function RequestBerthForm({
                 placeholder="e.g. I-4"
                 className={inputClass}
               />
-              <p className="mt-1 text-xs font-light text-neutral-500">
+              <p className="mt-1 text-xs text-ink/70">
                 Auto-filled if you selected one above
               </p>
             </label>
@@ -753,7 +753,7 @@ export default function RequestBerthForm({
 
         {/* 3. Skipper & contact */}
         <fieldset>
-          <legend className="text-xs font-normal tracking-[0.25em] text-navy/60 uppercase">
+          <legend className="type-heading text-xl text-ink">
             Skipper &amp; contact
           </legend>
           <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -829,11 +829,11 @@ export default function RequestBerthForm({
 
         {/* 4. Assistance */}
         <fieldset>
-          <legend className="text-xs font-normal tracking-[0.25em] text-navy/60 uppercase">
+          <legend className="type-heading text-xl text-ink">
             Services &amp; assistance
           </legend>
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
-            <label className="flex items-center gap-2 text-sm font-light text-neutral-600">
+            <label className="flex items-center gap-2 text-sm text-ink/75">
               <input
                 type="checkbox"
                 checked={form.helpMooring}
@@ -841,7 +841,7 @@ export default function RequestBerthForm({
               />
               Help mooring on arrival
             </label>
-            <label className="flex items-center gap-2 text-sm font-light text-neutral-600">
+            <label className="flex items-center gap-2 text-sm text-ink/75">
               <input
                 type="checkbox"
                 checked={form.helpSlipping}
@@ -850,7 +850,7 @@ export default function RequestBerthForm({
               Help slipping lines on departure
             </label>
           </div>
-          <p className="mt-4 text-xs font-light text-neutral-500">
+          <p className="mt-4 text-xs text-ink/70">
             Extras chosen in Price estimate &amp; extras:{" "}
             {[
               form.shorePower
@@ -869,10 +869,10 @@ export default function RequestBerthForm({
 
         {/* 5. Vessel status */}
         <fieldset>
-          <legend className="text-xs font-normal tracking-[0.25em] text-navy/60 uppercase">
+          <legend className="type-heading text-xl text-ink">
             Vessel status
           </legend>
-          <p className="mt-4 text-sm font-light text-neutral-600">
+          <p className="mt-4 text-sm text-ink/75">
             Is your vessel EU-flagged AND is all crew EU/Schengen, arriving
             from another EU port?
             <RequiredMark />
@@ -881,10 +881,10 @@ export default function RequestBerthForm({
             <button
               type="button"
               onClick={() => setField("euStatus", "yes")}
-              className={`px-6 py-2 text-sm font-normal tracking-wide ${
+              className={`px-6 py-2 text-sm font-medium ${
                 form.euStatus === "yes"
-                  ? "bg-navy text-white"
-                  : "border border-neutral-200 text-neutral-600 hover:border-navy/40"
+                  ? "bg-ink text-white"
+                  : "border border-hairline text-ink/75 hover:border-ink/40"
               }`}
             >
               Yes
@@ -892,10 +892,10 @@ export default function RequestBerthForm({
             <button
               type="button"
               onClick={() => setField("euStatus", "no")}
-              className={`px-6 py-2 text-sm font-normal tracking-wide ${
+              className={`px-6 py-2 text-sm font-medium ${
                 form.euStatus === "no"
-                  ? "bg-navy text-white"
-                  : "border border-neutral-200 text-neutral-600 hover:border-navy/40"
+                  ? "bg-ink text-white"
+                  : "border border-hairline text-ink/75 hover:border-ink/40"
               }`}
             >
               No
@@ -904,7 +904,7 @@ export default function RequestBerthForm({
           {errors.euStatus ? <p className={errorClass}>{errors.euStatus}</p> : null}
 
           {form.euStatus === "yes" ? (
-            <div className="mt-4 space-y-1 text-sm font-light text-neutral-500">
+            <div className="mt-4 space-y-1 text-sm text-ink/70">
               {marina.vesselStatusNotes.euReminders.map((note) => (
                 <p key={note}>{note}</p>
               ))}
@@ -912,7 +912,7 @@ export default function RequestBerthForm({
           ) : null}
 
           {form.euStatus === "no" ? (
-            <div className="mt-6 border-t border-neutral-200 pt-6">
+            <div className="mt-6 border-t border-hairline pt-6">
               <div className="grid gap-4 sm:grid-cols-2">
                 <label className="block text-sm">
                   <span className={labelClass}>
@@ -948,7 +948,7 @@ export default function RequestBerthForm({
                   Crew list
                   <RequiredMark />
                 </p>
-                <p className="mt-2 text-xs font-light text-neutral-500">
+                <p className="mt-2 text-xs text-ink/70">
                   Required: name, nationality and role. Date of birth,
                   passport number and join date are optional — passport
                   numbers and other private details can be given to the
@@ -958,7 +958,7 @@ export default function RequestBerthForm({
                   {form.crew.map((member, index) => (
                     <div
                       key={index}
-                      className="grid gap-3 border border-neutral-200 p-4 sm:grid-cols-2 lg:grid-cols-6"
+                      className="grid gap-3 border border-hairline p-4 sm:grid-cols-2 lg:grid-cols-6"
                     >
                       <input
                         type="text"
@@ -1025,7 +1025,7 @@ export default function RequestBerthForm({
                           type="button"
                           onClick={() => removeCrewRow(index)}
                           disabled={form.crew.length === 1}
-                          className="px-2 text-xs font-normal text-neutral-500 hover:text-red-600 disabled:cursor-not-allowed disabled:opacity-40"
+                          className="px-2 text-xs font-medium text-ink/70 hover:text-red-600 disabled:cursor-not-allowed disabled:opacity-40"
                           aria-label="Remove crew member"
                         >
                           Remove
@@ -1038,13 +1038,13 @@ export default function RequestBerthForm({
                 <button
                   type="button"
                   onClick={addCrewRow}
-                  className="mt-3 text-sm font-normal text-navy underline underline-offset-4 hover:text-navy-accent"
+                  className="mt-3 text-sm font-medium text-ink underline underline-offset-4 hover:text-ink-2"
                 >
                   + Add crew member
                 </button>
               </div>
 
-              <div className="mt-6 space-y-1 text-xs font-light text-neutral-500">
+              <div className="mt-6 space-y-1 text-xs text-ink/70">
                 {marina.vesselStatusNotes.internationalNotes.map((note) => (
                   <p key={note}>{note}</p>
                 ))}
@@ -1055,7 +1055,7 @@ export default function RequestBerthForm({
 
         {/* 6. Document wallet */}
         <fieldset>
-          <legend className="text-xs font-normal tracking-[0.25em] text-navy/60 uppercase">
+          <legend className="type-heading text-xl text-ink">
             Document wallet
           </legend>
           <DocumentWallet
@@ -1098,7 +1098,7 @@ export default function RequestBerthForm({
         </fieldset>
 
         {planErrorLabels.length > 0 ? (
-          <p role="alert" className="text-sm font-light text-red-600">
+          <p role="alert" className="text-sm text-red-600">
             Please complete {planErrorLabels.join(" and ")} in{" "}
             <a href="#plan-your-stay" className="underline underline-offset-4">
               Plan your stay
@@ -1107,7 +1107,7 @@ export default function RequestBerthForm({
           </p>
         ) : null}
         {errors.amperage ? (
-          <p role="alert" className="text-sm font-light text-red-600">
+          <p role="alert" className="text-sm text-red-600">
             Choose a shore power amperage in{" "}
             <a href="#price-estimate" className="underline underline-offset-4">
               Price estimate &amp; extras
@@ -1117,19 +1117,19 @@ export default function RequestBerthForm({
         ) : null}
 
         <div>
-          <p className="text-xs font-normal tracking-wide text-navy/60 uppercase">
+          <p className="text-sm font-medium text-ink/80">
             Cancellation policy
           </p>
-          <p className="mt-2 text-sm font-light text-neutral-600">
+          <p className="mt-2 text-sm text-ink/75">
             {marina.cancellationPolicy ??
               "Cancellation terms are confirmed by the marina — ask when they reply to your enquiry."}
           </p>
-          <p className="mt-4 text-sm font-light text-neutral-600">
+          <p className="mt-4 text-sm text-ink/75">
             This sends an enquiry; the marina confirms availability by email.
           </p>
           <button
             type="submit"
-            className="mt-6 bg-navy px-8 py-3 text-sm font-normal tracking-wide text-white hover:bg-navy-accent"
+            className="mt-6 bg-brass px-8 py-3 text-base font-medium text-ink transition-[filter] hover:brightness-105"
           >
             Send enquiry
           </button>
@@ -1137,21 +1137,21 @@ export default function RequestBerthForm({
       </form>
 
       {summary ? (
-        <div className="mt-10 border-t border-neutral-200 pt-8">
-          <h3 className="text-sm font-normal tracking-tight text-navy">
+        <div className="mt-10 border-t border-hairline pt-8">
+          <h3 className="text-sm font-medium tracking-tight text-ink">
             Enquiry summary
           </h3>
-          <p className="mt-2 text-xs font-light text-neutral-500">
+          <p className="mt-2 text-xs text-ink/70">
             Your email app should have opened with this pre-filled. If it
             didn&apos;t, copy the text below and send it manually.
           </p>
-          <pre className="mt-4 max-h-96 overflow-auto whitespace-pre-wrap border border-neutral-200 bg-neutral-50 p-4 text-xs font-light text-neutral-600">
+          <pre className="mt-4 max-h-96 overflow-auto whitespace-pre-wrap border border-hairline bg-paper-deep p-4 text-xs text-ink/75">
             {summary}
           </pre>
           <button
             type="button"
             onClick={handleCopy}
-            className="mt-4 bg-navy-accent px-6 py-3 text-sm font-normal tracking-wide text-white hover:bg-[#254a75]"
+            className="mt-4 bg-ink-2 px-6 py-3 text-sm font-medium text-white hover:bg-ink"
           >
             {copied ? "Copied!" : "Copy to clipboard"}
           </button>

@@ -30,22 +30,26 @@ export default function KeyFactsStrip({ marina, description }: Props) {
   ];
 
   return (
-    <section className="bg-neutral-50 px-6 py-10 md:px-8 md:py-14">
+    <section className="bg-paper-deep px-6 py-10 md:px-8 md:py-14">
       <div className="mx-auto max-w-5xl">
         <h2 className="sr-only">{t.keyFacts.heading}</h2>
         <dl className="grid grid-cols-2 gap-x-6 gap-y-5 sm:grid-cols-3 lg:grid-cols-6">
           {facts.map((fact) => (
             <div key={fact.label}>
-              <dt className="text-xs font-normal tracking-wide text-navy/60 uppercase">
+              <dt className="text-sm font-medium text-ink/80">
                 {fact.label}
               </dt>
-              <dd className="mt-1 text-sm font-normal text-navy">
+              <dd
+                className={`tabular mt-1 font-medium text-ink ${
+                  fact.label === "Location" ? "text-base" : "text-lg"
+                }`}
+              >
                 {fact.value}
               </dd>
             </div>
           ))}
         </dl>
-        <p className="mt-8 max-w-3xl text-sm leading-relaxed font-light text-neutral-600 md:text-base">
+        <p className="mt-8 max-w-3xl text-sm leading-relaxed text-ink/75 md:text-base">
           {description}
         </p>
       </div>

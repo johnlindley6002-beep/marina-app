@@ -41,16 +41,16 @@ export default function WriteReviewButton({
   return (
     <div>
       {intro ? (
-        <p className="mb-3 text-sm font-light text-neutral-600">{intro}</p>
+        <p className="mb-3 text-sm text-ink/75">{intro}</p>
       ) : null}
       <button
         type="button"
         onClick={openMail}
-        className="border border-navy/30 px-6 py-3 text-sm font-normal tracking-wide text-navy hover:border-navy"
+        className="border border-ink/30 px-6 py-3 text-sm font-medium text-ink hover:border-ink"
       >
         {label}
       </button>
-      <p className="mt-2 text-xs font-light text-neutral-500">
+      <p className="mt-2 text-xs text-ink/70">
         Opens an email to the marina. Reviews are not published on this page
         automatically.
       </p>

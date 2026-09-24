@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import dynamic from "next/dynamic";
-import { Titillium_Web } from "next/font/google";
+import { Archivo, Inter } from "next/font/google";
 import "./globals.css";
 import Footer from "./components/Footer";
 import { LanguageProvider } from "./components/LanguageProvider";
@@ -9,13 +9,17 @@ import { UnitsProvider } from "./components/UnitsProvider";
 
 const Navbar = dynamic(() => import("./components/Navbar"));
 
-const titillium = Titillium_Web({
-  weight: ["300", "400", "600"],
-  subsets: ["latin"],
-  variable: "--font-titillium",
+const archivo = Archivo({
+  subsets: ["latin", "latin-ext"],
+  axes: ["wdth"],
+  variable: "--font-archivo",
   display: "swap",
-  preload: true,
-  adjustFontFallback: true,
+});
+
+const inter = Inter({
+  subsets: ["latin", "latin-ext"],
+  variable: "--font-inter",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -35,11 +39,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${titillium.variable} h-full antialiased`}>
+    <html
+      lang="en"
+      className={`${archivo.variable} ${inter.variable} h-full antialiased`}
+    >
       <body className="flex min-h-full flex-col font-sans">
         <a
           href="#main"
-          className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[100] focus:bg-white focus:px-4 focus:py-2 focus:text-navy"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[100] focus:bg-paper focus:px-4 focus:py-2 focus:text-ink"
         >
           Skip to content
         </a>

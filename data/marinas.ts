@@ -405,6 +405,10 @@ export type Marina = {
   vesselStatusNotes: { euReminders: string[]; internationalNotes: string[] };
   preArrivalChecklist: string[];
   planImage: { src: string; alt: string };
+  // Optional photo for cards and the homepage feature; none supplied yet.
+  coverImage?: { src: string; alt: string };
+  // Shown as the flagship on the homepage.
+  featured?: boolean;
   reviews: Reviews;
   nearby: NearbyPlace[];
   // Only badges listed here are rendered — never claim one that isn't confirmed.
@@ -739,6 +743,7 @@ export const marinas: Marina[] = [
       `Hail the marina on VHF channel ${CASCAIS_VHF_CHANNEL}`,
       CASCAIS_OUTSIDE_HOURS,
     ],
+    featured: true,
     planImage: {
       src: "/images/cascais-marina-plan.webp",
       alt: "Official plan of Marina de Cascais showing the pontoons and quays",

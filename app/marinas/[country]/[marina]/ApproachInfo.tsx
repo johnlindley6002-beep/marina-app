@@ -37,7 +37,7 @@ function ProtectionTag({ protection }: { protection: Marina["protection"] }) {
           d="M3 15c1.5 1.2 3 1.2 4.5 0s3-1.2 4.5 0 3 1.2 4.5 0 3-1.2 4.5 0M3 19c1.5 1.2 3 1.2 4.5 0s3-1.2 4.5 0 3 1.2 4.5 0 3-1.2 4.5 0M12 3v9m0 0-3-3m3 3 3-3"
         />
       </svg>
-      <span className="font-normal">{PROTECTION_LABELS[protection.level]}</span>
+      <span className="font-medium">{PROTECTION_LABELS[protection.level]}</span>
     </div>
   );
 }
@@ -54,8 +54,8 @@ type Props = {
   gettingThere: { byCar: string; byTrain: string; byAir: string };
 };
 
-const labelClass = "text-xs font-normal tracking-wide text-navy/60 uppercase";
-const valueClass = "mt-2 text-sm font-light text-neutral-600";
+const labelClass = "text-sm font-medium text-ink/80";
+const valueClass = "mt-2 text-sm text-ink/75";
 
 export default function ApproachInfo({
   marina,
@@ -68,9 +68,9 @@ export default function ApproachInfo({
   return (
     <section className="px-6 py-16 md:px-8 md:py-24">
       <div className="mx-auto max-w-5xl">
-        <p className="text-xs font-normal tracking-[0.25em] text-navy/60 uppercase">
+        <h2 className="type-heading type-h2 text-ink">
           Approach &amp; practical info
-        </p>
+        </h2>
 
         <div className="mt-6 grid gap-8 sm:grid-cols-3">
           <div>
@@ -93,13 +93,13 @@ export default function ApproachInfo({
           </div>
         </div>
 
-        <p className="mt-6 max-w-3xl text-sm leading-relaxed font-light text-neutral-600">
+        <p className="mt-6 max-w-3xl text-sm leading-relaxed text-ink/75">
           {marina.entryNote}
         </p>
 
         <div className="mt-6">
           <ProtectionTag protection={marina.protection} />
-          <p className="mt-2 text-xs font-light text-neutral-500">
+          <p className="mt-2 text-xs text-ink/70">
             {marina.protection.description} General guide only — not a live
             forecast.
           </p>
@@ -111,14 +111,14 @@ export default function ApproachInfo({
             {[arrivalInstructions, ...marina.preArrivalChecklist].map((item) => (
               <li
                 key={item}
-                className="flex items-start gap-2 text-sm font-light text-neutral-600"
+                className="flex items-start gap-2 text-sm text-ink/75"
               >
                 <svg
                   viewBox="0 0 20 20"
                   fill="none"
                   stroke="currentColor"
                   strokeWidth={1.5}
-                  className="mt-0.5 h-4 w-4 shrink-0 text-navy"
+                  className="mt-0.5 h-4 w-4 shrink-0 text-ink"
                   aria-hidden="true"
                 >
                   <path

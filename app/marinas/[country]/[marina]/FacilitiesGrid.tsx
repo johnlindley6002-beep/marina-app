@@ -58,7 +58,7 @@ export default function FacilitiesGrid({
 
   return (
     <>
-      <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+      <div className="mt-6 grid gap-x-10 sm:grid-cols-2 lg:grid-cols-3">
         {facilities.map((facility) => (
           <button
             key={facility.id}
@@ -68,10 +68,10 @@ export default function FacilitiesGrid({
               triggerRef.current = e.currentTarget;
               setOpenId(facility.id);
             }}
-            className="flex flex-col items-center gap-3 rounded-sm border border-neutral-200 bg-white px-4 py-6 text-center transition-colors hover:border-navy/30"
+            className="hairline-top flex items-center gap-4 py-4 text-left transition-colors hover:bg-paper-deep/60"
           >
-            <FacilityIcon facility={facility.icon} className="h-6 w-6 text-navy" />
-            <span className="text-sm font-light text-neutral-600">
+            <FacilityIcon facility={facility.icon} className="h-6 w-6 text-ink" />
+            <span className="text-sm text-ink/75">
               {facility.name[cl]}
             </span>
           </button>
@@ -80,7 +80,7 @@ export default function FacilitiesGrid({
 
       {open ? (
         <div
-          className="fixed inset-0 z-[60] flex items-end justify-center bg-navy/60 p-0 sm:items-center sm:p-6"
+          className="fixed inset-0 z-[60] flex items-end justify-center bg-ink/60 p-0 sm:items-center sm:p-6"
           onClick={() => setOpenId(null)}
         >
           <div
@@ -93,10 +93,10 @@ export default function FacilitiesGrid({
           >
             <div className="flex items-start justify-between gap-4">
               <div className="flex items-center gap-3">
-                <FacilityIcon facility={open.icon} className="h-6 w-6 shrink-0 text-navy" />
+                <FacilityIcon facility={open.icon} className="h-6 w-6 shrink-0 text-ink" />
                 <h3
                   id="facility-dialog-title"
-                  className="text-lg font-normal tracking-tight text-navy"
+                  className="text-lg font-medium tracking-tight text-ink"
                 >
                   {open.name[cl]}
                 </h3>
@@ -106,17 +106,17 @@ export default function FacilitiesGrid({
                 type="button"
                 onClick={() => setOpenId(null)}
                 aria-label="Close"
-                className="-mt-1 -mr-2 px-2 py-1 text-2xl leading-none text-neutral-500 hover:text-navy"
+                className="-mt-1 -mr-2 px-2 py-1 text-2xl leading-none text-ink/70 hover:text-ink"
               >
                 ×
               </button>
             </div>
-            <p className="mt-4 text-sm leading-relaxed font-light text-neutral-600">
+            <p className="mt-4 text-sm leading-relaxed text-ink/75">
               {open.description[cl]}
             </p>
-            <ul className="mt-4 space-y-2 border-t border-neutral-200 pt-4">
+            <ul className="mt-4 space-y-2 border-t border-hairline pt-4">
               {open.details.map((detail, i) => (
-                <li key={i} className="text-sm font-light text-neutral-600">
+                <li key={i} className="text-sm text-ink/75">
                   {renderLengthTokens(detail[cl], units)}
                 </li>
               ))}

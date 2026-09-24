@@ -85,9 +85,9 @@ export default function ArrivalActions({ marina, plan, selectedBerthId }: Props)
   }
 
   return (
-    <div className="mt-10 border-t border-neutral-200 pt-8">
-      <h3 className="text-sm font-normal text-navy">Arriving today?</h3>
-      <p className="mt-2 text-sm font-light text-neutral-600">
+    <div className="mt-10 border-t border-hairline pt-8">
+      <h3 className="text-sm font-medium text-ink">Arriving today?</h3>
+      <p className="mt-2 text-sm text-ink/75">
         Both open a pre-filled email to {marina.name} with your boat, plan and
         selected berth. Digital check-in uses the ETA from the enquiry form
         above. Nothing is sent until you press send.
@@ -96,14 +96,14 @@ export default function ArrivalActions({ marina, plan, selectedBerthId }: Props)
         <button
           type="button"
           onClick={arrivingNow}
-          className="border border-navy/30 px-6 py-3 text-sm font-normal tracking-wide text-navy hover:border-navy"
+          className="border border-ink/30 px-6 py-3 text-sm font-medium text-ink hover:border-ink"
         >
           I&apos;m arriving now
         </button>
         <button
           type="button"
           onClick={digitalCheckIn}
-          className="border border-navy/30 px-6 py-3 text-sm font-normal tracking-wide text-navy hover:border-navy"
+          className="border border-ink/30 px-6 py-3 text-sm font-medium text-ink hover:border-ink"
         >
           Digital check-in
         </button>

@@ -23,6 +23,7 @@ import OfflineCard from "./OfflineCard";
 import StayRecap from "./StayRecap";
 import ContactDock from "./ContactDock";
 import Breadcrumbs from "../../../components/Breadcrumbs";
+import ChartLinework from "../../../components/ChartLinework";
 import FavouriteButton from "../../../components/FavouriteButton";
 import FlagIcon from "../../../components/FlagIcon";
 import { useLanguage } from "../../../components/LanguageProvider";
@@ -85,9 +86,10 @@ export default function CascaisPageContent({
 
   return (
     <>
-      <section className="on-navy bg-navy px-6 py-16 md:py-24">
+      <section className="on-ink relative isolate overflow-hidden bg-gradient-to-br from-ink to-ink-2 px-6 py-16 md:py-24">
+        <ChartLinework className="absolute inset-0 -z-10 h-full w-full text-paper opacity-[0.07]" />
         <div className="mx-auto max-w-5xl text-center">
-          <p className="flex items-center justify-center gap-2 text-xs font-normal tracking-[0.25em] text-white/60 uppercase">
+          <p className="flex items-center justify-center gap-2 text-sm text-stone">
             <FlagIcon countryCode={marina.countryCode} className="h-3 w-auto" />
             {marina.country}
             {marina.clubBurgee ? (
@@ -122,7 +124,7 @@ export default function CascaisPageContent({
         </div>
       </section>
 
-      <div className="mx-auto max-w-5xl px-6 py-4 text-navy/60 md:px-8">
+      <div className="mx-auto max-w-5xl px-6 py-4 text-ink/70 md:px-8">
         <Breadcrumbs
           items={[
             { label: t.breadcrumbs.marinas, href: "/marinas" },
@@ -175,9 +177,9 @@ export default function CascaisPageContent({
 
       <section className="px-6 pb-12 md:px-8 md:pb-16">
         <div className="mx-auto max-w-5xl">
-          <p className="mb-4 text-xs font-normal tracking-[0.25em] text-navy/60 uppercase">
+          <h2 className="type-heading type-h2 mb-6 text-ink">
             Photos
-          </p>
+          </h2>
           <PhotoStrip photos={marina.photos} />
         </div>
       </section>
@@ -188,11 +190,11 @@ export default function CascaisPageContent({
         gettingThere={gettingThere}
       />
 
-      <section className="bg-neutral-50 px-6 py-16 md:px-8 md:py-24">
+      <section className="bg-paper-deep px-6 py-16 md:px-8 md:py-24">
         <div className="mx-auto max-w-5xl">
-          <p className="text-xs font-normal tracking-wide text-navy/60 uppercase">
+          <h2 className="type-heading type-h2 text-ink">
             {t.facilities.heading}
-          </p>
+          </h2>
           <FacilitiesGrid facilities={marina.facilityDetails} />
         </div>
       </section>
