@@ -41,9 +41,9 @@ export default function MarinasResults({ q, arrival, departure, length }: Props)
   }));
 
   return (
-    <section className="px-5 py-14 md:px-8 md:py-20">
-      <div className="mx-auto max-w-6xl">
-        <h1 className="type-display [font-size:clamp(2rem,1.2rem+3vw,3.2rem)] text-ink">
+    <section className="section">
+      <div className="page-column">
+        <h1 className="type-title text-ink">
           {q ? t.results.forQuery(q) : t.results.heading}
         </h1>
         <p className="tabular mt-3 text-ink/70">
@@ -58,7 +58,7 @@ export default function MarinasResults({ q, arrival, departure, length }: Props)
         <SavedMarinas />
 
         <div
-          className={`mt-12 grid gap-12 ${
+          className={`stack-md grid gap-12 ${
             MARINAS_MAP_READY ? "lg:grid-cols-[1fr_1.1fr]" : ""
           }`}
         >

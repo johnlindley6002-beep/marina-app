@@ -18,9 +18,9 @@ const TYPES = [
 ];
 
 const inputClass =
-  "mt-2 w-full border border-hairline px-3 py-2 text-sm text-ink focus:border-ink focus:outline-none";
-const labelClass = "text-sm font-medium text-ink/80";
-const errorClass = "mt-1 text-xs text-error";
+  "field";
+const labelClass = "field-label";
+const errorClass = "field-error";
 
 type Errors = Partial<
   Record<"name" | "type" | "loa" | "beam" | "draft" | "flag", string>
@@ -228,7 +228,7 @@ export default function BoatEditor({ initial, onSave, onCancel }: Props) {
       <div className="mt-8 flex flex-wrap items-center gap-4">
         <button
           type="submit"
-          className="min-h-12 rounded-[3px] bg-brass px-8 text-base font-medium text-ink transition-[filter] hover:brightness-105"
+          className="btn-primary"
         >
           {initial ? "Save changes" : "Save boat"}
         </button>

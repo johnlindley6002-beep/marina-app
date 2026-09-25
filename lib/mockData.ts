@@ -23,6 +23,7 @@ const SESSION_KEY = "aldock-mock-session";
 const MODE_KEY = "aldock-mode";
 const PROFILE_KEY = "aldock-mock-profiles";
 const RELETTING_KEY = "aldock-mock-reletting";
+const DRAFT_KEY = "aldock-mock-relet-drafts";
 
 // ---------------------------------------------------------------------------
 // Stored records (what a real database would hold)
@@ -194,6 +195,7 @@ export const MOCK_STORAGE_KEYS = [
   MODE_KEY,
   PROFILE_KEY,
   RELETTING_KEY,
+  DRAFT_KEY,
 ];
 
 // ---------------------------------------------------------------------------
@@ -466,7 +468,8 @@ export function getActivePersonaId(): string {
 export type RelettingStatus =
   | "submitted"
   | "approved"
-  | "declined"
+  | "declined" // shown to the holder as "Not approved"
+  | "cancelled"
   | "listed"
   | "booked"
   | "completed";
@@ -483,13 +486,19 @@ export const RELETTING_PROGRESS: RelettingStatus[] = [
 export const RELETTING_STATUS_LABELS: Record<RelettingStatus, string> = {
   submitted: "Submitted",
   approved: "Approved",
-  declined: "Declined",
+  declined: "Not approved",
+  cancelled: "Cancelled",
   listed: "Listed",
   booked: "Booked",
   completed: "Completed",
 };
 
-export type RelettingEvent = { status: RelettingStatus; at: string };
+export type RelettingEvent = {
+  status: RelettingStatus;
+  at: string;
+  // A short plain-language note, for example "Dates changed by the holder".
+  note?: string;
+};
 
 export type RelettingRequest = {
   id: string;
@@ -505,7 +514,13 @@ export type RelettingRequest = {
   status: RelettingStatus;
   history: RelettingEvent[];
   decisionNote: string;
-  // Filled in once a stay is booked.
+  // The nights a visitor has booked. The marina may relet only some of the
+  // nights on offer, so this can be fewer than the nights away. It is empty
+  // until something is booked, and a request with any booked night is locked.
+  bookedNights: string[];
+  // Set when this request replaces one the marina did not approve.
+  resubmitOf: string | null;
+  // Filled in once a stay is booked (from the booked nights only).
   nightsRelet: number | null;
   grossEur: number | null;
   ownerShareEur: number | null;
@@ -554,31 +569,46 @@ export function countNights(startDate: string, endDate: string): number {
 
 const cents = (n: number) => Math.round(n * 100) / 100;
 
-// The money for relet nights, from the marina's real tariff for the berth's
-// class and the placeholder share and fee in its data. The holder's share is a
-// percent of the tariff income (excluding VAT), and the fee is a percent of
-// that share, so net is share minus fee. Pure and deterministic.
-export function computeReletSplit(
+// Every night of an absence as ISO dates: the day the holder leaves up to, but
+// not including, the day they return.
+export function nightDates(startDate: string, endDate: string): string[] {
+  const start = parseIso(startDate);
+  const nights = countNights(startDate, endDate);
+  if (!start || nights < 1) return [];
+  const pad = (n: number) => String(n).padStart(2, "0");
+  const out: string[] = [];
+  const cursor = new Date(start);
+  for (let i = 0; i < nights; i++) {
+    out.push(
+      `${cursor.getFullYear()}-${pad(cursor.getMonth() + 1)}-${pad(cursor.getDate())}`
+    );
+    cursor.setDate(cursor.getDate() + 1);
+  }
+  return out;
+}
+
+// The money for a list of relet nights, from the marina's real tariff for the
+// berth's class and the placeholder share and fee in its data. The holder's
+// share is a percent of the tariff income (excluding VAT), and the fee is a
+// percent of that share, so net is share minus fee. Pure and deterministic.
+export function computeSplitForNights(
   marinaId: string,
   berthId: string,
-  startDate: string,
-  nights: number
+  nights: string[]
 ): ReletSplit | null {
   const marina = marinas.find((m) => m.id === marinaId);
   const terms = marina?.reletting;
-  const start = parseIso(startDate);
   const berth = getAllBerths().find((b) => b.id === berthId);
-  if (!marina || !terms || !start || !berth || nights <= 0) return null;
+  if (!marina || !terms || !berth || nights.length === 0) return null;
   let gross = 0;
-  const cursor = new Date(start);
-  for (let i = 0; i < nights; i++) {
-    gross += marina.transientRates[berth.sizeClass][getSeason(cursor)];
-    cursor.setDate(cursor.getDate() + 1);
+  for (const night of nights) {
+    const date = parseIso(night);
+    if (date) gross += marina.transientRates[berth.sizeClass][getSeason(date)];
   }
   const share = (gross * terms.ownerSharePercent) / 100;
   const fee = (share * terms.processingFeePercent) / 100;
   return {
-    nights,
+    nights: nights.length,
     grossEur: cents(gross),
     ownerShareEur: cents(share),
     feeEur: cents(fee),
@@ -586,24 +616,20 @@ export function computeReletSplit(
   };
 }
 
-// What the whole absence would earn if every night were relet. An illustration,
-// never a promise.
+// What the whole absence would earn if every night were relet. An ESTIMATE,
+// never a promise: the marina may relet only some of the nights.
 export function estimateReletting(
   marinaId: string,
   berthId: string,
   startDate: string,
   endDate: string
 ): ReletSplit | null {
-  return computeReletSplit(
-    marinaId,
-    berthId,
-    startDate,
-    countNights(startDate, endDate)
-  );
+  return computeSplitForNights(marinaId, berthId, nightDates(startDate, endDate));
 }
 
 function buildSeedRelettingStore(): ReletStore {
-  const split = computeReletSplit("cascais", "G-14", "2026-07-06", 12);
+  const booked = nightDates("2026-07-06", "2026-07-20").slice(0, 12);
+  const split = computeSplitForNights("cascais", "G-14", booked);
   const request: RelettingRequest = {
     id: "relet-seed-1",
     userId: "u-owner",
@@ -624,6 +650,8 @@ function buildSeedRelettingStore(): ReletStore {
       { status: "completed", at: "2026-07-21T09:00:00.000Z" },
     ],
     decisionNote: "",
+    bookedNights: booked,
+    resubmitOf: null,
     nightsRelet: split?.nights ?? null,
     grossEur: split?.grossEur ?? null,
     ownerShareEur: split?.ownerShareEur ?? null,
@@ -670,7 +698,19 @@ function buildSeedRelettingStore(): ReletStore {
 }
 
 function loadReletStore(): ReletStore {
-  return readJson<ReletStore>(RELETTING_KEY) ?? buildSeedRelettingStore();
+  const stored = readJson<ReletStore>(RELETTING_KEY);
+  if (!stored) return buildSeedRelettingStore();
+  // Older stored requests lack the newer fields.
+  return {
+    ...stored,
+    requests: stored.requests.map((r) => ({
+      ...r,
+      bookedNights:
+        r.bookedNights ??
+        (r.nightsRelet ? nightDates(r.startDate, r.endDate).slice(0, r.nightsRelet) : []),
+      resubmitOf: r.resubmitOf ?? null,
+    })),
+  };
 }
 
 function saveReletStore(store: ReletStore) {
@@ -713,6 +753,8 @@ export type SubmitRelettingInput = {
   reletConsent: boolean;
   termsAccepted: boolean;
   readinessConfirmed: boolean;
+  // When set, this replaces a request the marina did not approve.
+  resubmitOf?: string;
 };
 
 export type SubmitRelettingResult =
@@ -745,6 +787,12 @@ export function submitRelettingRequest(
     return { ok: false, error: "Every confirmation is needed before the marina can consider your request." };
   }
   const store = loadReletStore();
+  if (input.resubmitOf) {
+    const original = store.requests.find((r) => r.id === input.resubmitOf);
+    if (!original || original.userId !== userId || original.status !== "declined") {
+      return { ok: false, error: "Only a request the marina did not approve can be resubmitted." };
+    }
+  }
   const overlaps = store.requests.some(
     (r) =>
       r.userId === userId &&
@@ -769,8 +817,16 @@ export function submitRelettingRequest(
     termsAcceptedAt: now,
     readinessConfirmedAt: now,
     status: "submitted",
-    history: [{ status: "submitted", at: now }],
+    history: [
+      {
+        status: "submitted",
+        at: now,
+        note: input.resubmitOf ? "Adjusted and sent again after it was not approved" : undefined,
+      },
+    ],
     decisionNote: "",
+    bookedNights: [],
+    resubmitOf: input.resubmitOf ?? null,
     nightsRelet: null,
     grossEur: null,
     ownerShareEur: null,
@@ -917,8 +973,8 @@ export function decideReletting(
       : notification(
           next,
           "declined",
-          "Reletting declined",
-          `Marina de Cascais declined your request for ${span}.${note.trim() ? ` Note: ${note.trim()}` : ""}`
+          "Reletting not approved",
+          `Marina de Cascais did not approve your request for ${span}.${note.trim() ? ` Reason: ${note.trim().replace(/[.]+$/, "")}.` : ""} You can adjust it and send it again.`
         );
   saveReletStore({
     requests: store.requests.map((r) => (r.id === requestId ? next : r)),
@@ -932,7 +988,8 @@ export function decideReletting(
 // marina's own system and from real visitor bookings, not from a button.
 export function advanceRelettingStatus(
   staffUserId: string | null,
-  requestId: string
+  requestId: string,
+  options: { nightsBooked?: number } = {}
 ): StaffActionResult {
   const store = loadReletStore();
   const request = store.requests.find((r) => r.id === requestId);
@@ -949,16 +1006,16 @@ export function advanceRelettingStatus(
   const added: MockNotification[] = [];
 
   if (nextStatus === "booked") {
-    // Mock: assume every night of the absence was booked.
-    const split = computeReletSplit(
-      request.marinaId,
-      request.berthId,
-      request.startDate,
-      countNights(request.startDate, request.endDate)
-    );
+    // Mock: the marina relets only some of the nights on offer, as a run from
+    // the first night. The staff member chooses how many.
+    const all = nightDates(request.startDate, request.endDate);
+    const wanted = Math.round(options.nightsBooked ?? defaultNightsBooked(all.length));
+    const booked = all.slice(0, Math.min(Math.max(wanted, 1), all.length));
+    const split = computeSplitForNights(request.marinaId, request.berthId, booked);
     if (split) {
       next = {
         ...next,
+        bookedNights: booked,
         nightsRelet: split.nights,
         grossEur: split.grossEur,
         ownerShareEur: split.ownerShareEur,
@@ -967,7 +1024,12 @@ export function advanceRelettingStatus(
       };
     }
     added.push(
-      notification(next, "booked", "Your berth was booked", "A visitor booked your berth during your absence.")
+      notification(
+        next,
+        "booked",
+        "Your berth was booked",
+        `A visitor booked ${next.bookedNights.length} of your ${all.length} nights.`
+      )
     );
   }
   if (nextStatus === "completed" && next.netEur !== null) {
@@ -990,5 +1052,266 @@ export function advanceRelettingStatus(
 // DEV ONLY: back to the seed data.
 export function resetMockReletting(): void {
   removeKey(RELETTING_KEY);
+  removeKey(DRAFT_KEY);
+  emitChange();
+}
+
+// The nights a mock booking covers by default: all but two, and at least one.
+export function defaultNightsBooked(totalNights: number): number {
+  return totalNights > 3 ? totalNights - 2 : totalNights;
+}
+
+// ---- Owner: change or cancel ----
+
+// A request can be changed or cancelled until any night is booked. Once a
+// visitor has booked, the marina has made a commitment, so it is locked.
+export function isRelettingEditable(request: RelettingRequest): boolean {
+  return (
+    ["submitted", "approved", "listed"].includes(request.status) &&
+    request.bookedNights.length === 0
+  );
+}
+
+export function isRelettingLocked(request: RelettingRequest): boolean {
+  return request.status === "booked" || (request.status === "listed" && request.bookedNights.length > 0);
+}
+
+function ownedRequest(
+  userId: string | null,
+  requestId: string
+): { store: ReletStore; request: RelettingRequest } | null {
+  if (!userId || !getRoles(userId).includes("owner")) return null;
+  const store = loadReletStore();
+  const request = store.requests.find((r) => r.id === requestId);
+  return request && request.userId === userId ? { store, request } : null;
+}
+
+export type ChangeRelettingResult =
+  | { ok: true; request: RelettingRequest }
+  | { ok: false; error: string };
+
+// Change the dates of a request that is still Submitted, Approved or Listed
+// with nothing booked. The marina consented to the OLD dates, so an approved or
+// listed request goes back to "submitted" and needs consent again. The real
+// backend must enforce all of this server-side.
+export function updateRelettingRequest(
+  userId: string | null,
+  requestId: string,
+  dates: { startDate: string; endDate: string }
+): ChangeRelettingResult {
+  const found = ownedRequest(userId, requestId);
+  if (!found) return { ok: false, error: "Only the holder can change this request." };
+  const { store, request } = found;
+  if (!isRelettingEditable(request)) {
+    return { ok: false, error: "A visitor has booked this, so it can no longer be changed here." };
+  }
+  if (countNights(dates.startDate, dates.endDate) < 1) {
+    return { ok: false, error: "Choose a return date after the day you leave." };
+  }
+  if (dates.startDate < todayIso()) {
+    return { ok: false, error: "The day you leave cannot be in the past." };
+  }
+  const overlaps = store.requests.some(
+    (r) =>
+      r.id !== request.id &&
+      r.userId === request.userId &&
+      r.berthId === request.berthId &&
+      ACTIVE_STATUSES.includes(r.status) &&
+      dates.startDate < r.endDate &&
+      r.startDate < dates.endDate
+  );
+  if (overlaps) {
+    return { ok: false, error: "You already have a request that overlaps these dates." };
+  }
+  const now = new Date().toISOString();
+  const needsConsent = request.status !== "submitted";
+  const next: RelettingRequest = {
+    ...request,
+    startDate: dates.startDate,
+    endDate: dates.endDate,
+    status: "submitted",
+    history: [
+      ...request.history,
+      {
+        status: "submitted",
+        at: now,
+        note: needsConsent
+          ? "Dates changed by the holder, so the marina's consent is needed again"
+          : "Dates changed by the holder",
+      },
+    ],
+  };
+  saveReletStore({
+    ...store,
+    requests: store.requests.map((r) => (r.id === requestId ? next : r)),
+  });
+  return { ok: true, request: next };
+}
+
+export function cancelRelettingRequest(
+  userId: string | null,
+  requestId: string
+): ChangeRelettingResult {
+  const found = ownedRequest(userId, requestId);
+  if (!found) return { ok: false, error: "Only the holder can cancel this request." };
+  const { store, request } = found;
+  if (!isRelettingEditable(request)) {
+    return { ok: false, error: "A visitor has booked this, so it cannot be cancelled here. Contact the marina." };
+  }
+  const next: RelettingRequest = {
+    ...request,
+    status: "cancelled",
+    history: [
+      ...request.history,
+      { status: "cancelled", at: new Date().toISOString(), note: "Cancelled by the holder" },
+    ],
+  };
+  saveReletStore({
+    ...store,
+    requests: store.requests.map((r) => (r.id === requestId ? next : r)),
+  });
+  return { ok: true, request: next };
+}
+
+// ---- Owner: a wizard that can be resumed ----
+
+export type RelettingDraft = {
+  mode: "new" | "edit" | "resubmit";
+  // The request being changed or replaced, for edit and resubmit.
+  requestId: string | null;
+  step: number;
+  startDate: string;
+  endDate: string;
+  boatRemoval: boolean;
+  consent: boolean;
+  termsAccepted: boolean;
+  boatReady: boolean;
+  berthReady: boolean;
+  updatedAt: string;
+};
+
+type DraftStore = Record<string, RelettingDraft>;
+
+export function getRelettingDraft(userId: string | null): RelettingDraft | null {
+  if (!userId) return null;
+  return readJson<DraftStore>(DRAFT_KEY)?.[userId] ?? null;
+}
+
+export function saveRelettingDraft(
+  userId: string | null,
+  draft: Omit<RelettingDraft, "updatedAt">
+): void {
+  if (!userId) return;
+  const all = readJson<DraftStore>(DRAFT_KEY) ?? {};
+  all[userId] = { ...draft, updatedAt: new Date().toISOString() };
+  writeJson(DRAFT_KEY, all);
+  emitChange();
+}
+
+export function clearRelettingDraft(userId: string | null): void {
+  if (!userId) return;
+  const all = readJson<DraftStore>(DRAFT_KEY) ?? {};
+  delete all[userId];
+  writeJson(DRAFT_KEY, all);
+  emitChange();
+}
+
+// Opens the wizard pre-filled from an existing request. Consents already given
+// stay ticked, so changing dates is quick.
+export function startRelettingDraftFrom(
+  userId: string | null,
+  requestId: string,
+  mode: "edit" | "resubmit"
+): boolean {
+  const found = ownedRequest(userId, requestId);
+  if (!found) return false;
+  const { request } = found;
+  if (mode === "edit" && !isRelettingEditable(request)) return false;
+  if (mode === "resubmit" && request.status !== "declined") return false;
+  saveRelettingDraft(userId, {
+    mode,
+    requestId,
+    step: 1,
+    startDate: request.startDate,
+    endDate: request.endDate,
+    boatRemoval: true,
+    consent: true,
+    termsAccepted: true,
+    boatReady: true,
+    berthReady: true,
+  });
+  return true;
+}
+
+// ---- Owner: a month calendar of the berth ----
+
+export type CalendarState = "none" | "awaiting" | "open" | "booked" | "away";
+
+export type CalendarDay = {
+  iso: string;
+  day: number;
+  inMonth: boolean;
+  state: CalendarState;
+};
+
+const CALENDAR_RANK: Record<CalendarState, number> = {
+  none: 0,
+  away: 1,
+  awaiting: 2,
+  open: 3,
+  booked: 4,
+};
+
+// A month as weeks starting on Monday. Each night of an absence is marked:
+// booked (a visitor has it), open (approved or listed and still free), awaiting
+// (submitted, not yet approved) or away (a finished absence's unbooked night).
+export function getBerthCalendar(
+  userId: string | null,
+  year: number,
+  monthIndex: number
+): { label: string; days: CalendarDay[] } {
+  const requests = getRelettingRequests(userId);
+  const stateByNight = new Map<string, CalendarState>();
+  const mark = (night: string, state: CalendarState) => {
+    const current = stateByNight.get(night) ?? "none";
+    if (CALENDAR_RANK[state] > CALENDAR_RANK[current]) stateByNight.set(night, state);
+  };
+  for (const r of requests) {
+    if (r.status === "declined" || r.status === "cancelled") continue;
+    for (const night of nightDates(r.startDate, r.endDate)) {
+      if (r.bookedNights.includes(night)) mark(night, "booked");
+      else if (r.status === "submitted") mark(night, "awaiting");
+      else if (r.status === "completed") mark(night, "away");
+      else mark(night, "open");
+    }
+  }
+  const first = new Date(year, monthIndex, 1);
+  const offset = (first.getDay() + 6) % 7; // Monday first
+  const start = new Date(year, monthIndex, 1 - offset);
+  const pad = (n: number) => String(n).padStart(2, "0");
+  const days: CalendarDay[] = [];
+  const cursor = new Date(start);
+  for (let i = 0; i < 42; i++) {
+    const iso = `${cursor.getFullYear()}-${pad(cursor.getMonth() + 1)}-${pad(cursor.getDate())}`;
+    days.push({
+      iso,
+      day: cursor.getDate(),
+      inMonth: cursor.getMonth() === monthIndex,
+      state: stateByNight.get(iso) ?? "none",
+    });
+    cursor.setDate(cursor.getDate() + 1);
+  }
+  // Drop a trailing week that holds no day of this month.
+  const trimmed = days.slice(35).some((d) => d.inMonth) ? days : days.slice(0, 35);
+  return {
+    label: new Intl.DateTimeFormat("en-GB", { month: "long", year: "numeric" }).format(first),
+    days: trimmed,
+  };
+}
+
+// DEV ONLY: an owner with nothing yet, to see the first-time view.
+export function emptyMockReletting(): void {
+  writeJson(RELETTING_KEY, { requests: [], notifications: [] });
+  removeKey(DRAFT_KEY);
   emitChange();
 }

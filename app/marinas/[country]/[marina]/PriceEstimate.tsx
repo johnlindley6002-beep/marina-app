@@ -25,8 +25,8 @@ import LastUpdated from "../../../components/LastUpdated";
 import { useUnits } from "../../../components/UnitsProvider";
 
 const inputClass =
-  "mt-2 w-full max-w-[160px] border border-hairline px-3 py-2 text-sm text-ink focus:border-ink focus:outline-none";
-const labelClass = "text-sm font-medium text-ink/80";
+  "field max-w-[160px]";
+const labelClass = "field-label";
 const eur = (n: number) => `€${n.toFixed(2)}`;
 
 type Props = {
@@ -104,7 +104,7 @@ export default function PriceEstimate({
   );
 
   return (
-    <div className="mx-auto max-w-5xl">
+    <div>
       <h2 className="type-heading type-h2 text-ink">
         Your estimate
       </h2>
@@ -143,7 +143,7 @@ export default function PriceEstimate({
                   ))}
                 </select>
                 {amperageError && !plan.amperage ? (
-                  <p className="mt-1 text-xs text-error">
+                  <p className="field-error">
                     Choose a shore power amperage, for example 16A or 32A.
                   </p>
                 ) : null}
@@ -249,7 +249,7 @@ export default function PriceEstimate({
             <div className="mt-6">
               <a
                 href="#request-berth"
-                className="inline-flex min-h-12 items-center rounded-[3px] bg-brass px-8 text-base font-medium text-ink transition-[filter] hover:brightness-105"
+                className="btn-primary"
               >
                 Request a berth
               </a>
@@ -274,13 +274,13 @@ export default function PriceEstimate({
         openLabel="Hide berth rates"
         className="mt-8"
       >
-      <h3 className="mt-2 text-lg font-medium tracking-tight text-ink">
+      <h3 className="type-heading type-h3 mt-2 text-ink">
         {t.rates.heading}
       </h3>
       <div className="mt-4 overflow-x-auto">
         <table className="w-full min-w-[480px] border-collapse text-left text-sm">
           <thead>
-            <tr className="border-b border-hairline text-sm font-medium text-ink/80">
+            <tr className="type-label border-b border-hairline">
               <th className="py-3 pr-4">{t.rates.colClass}</th>
               <th className="py-3 pr-4">{t.rates.colLength}</th>
               <th className="py-3 pr-4">{t.rates.colLow}</th>

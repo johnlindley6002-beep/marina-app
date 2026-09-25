@@ -41,7 +41,7 @@ export default function SavedMarinas({
   const Heading = headingLevel;
 
   return (
-    <div className="hairline-top mt-12 pt-6">
+    <div className="chapter">
       <Heading className="type-heading type-h3 text-ink">
         {t.favourites.savedHeading}
       </Heading>
@@ -67,7 +67,7 @@ export default function SavedMarinas({
               <span className="flex flex-wrap items-center gap-x-4">
                 <Link
                   href={`/marinas/${favourite.countrySlug}/${favourite.marinaId}#request-berth`}
-                  className="inline-flex min-h-11 items-center text-ink underline decoration-current/50 decoration-1 underline-offset-[6px]"
+                  className="btn-quiet"
                 >
                   Start an enquiry
                 </Link>

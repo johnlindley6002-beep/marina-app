@@ -54,15 +54,15 @@ export default function EmergencyNumbers({
 
   if (embedded) {
     return (
-      <div className="mt-24">
+      <div className="stack-lg">
         <ChartDivider className="mb-10" />
         {body}
       </div>
     );
   }
   return (
-    <section className="section px-5 md:px-8">
-      <div className="mx-auto max-w-5xl">{body}</div>
+    <section className="section">
+      <div className="page-column">{body}</div>
     </section>
   );
 }

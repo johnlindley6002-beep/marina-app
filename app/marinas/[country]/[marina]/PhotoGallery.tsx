@@ -148,7 +148,7 @@ export default function PhotoGallery({ photos }: { photos: Photo[] }) {
       <button
         type="button"
         onClick={() => open(0)}
-        className="mt-3 inline-flex min-h-11 items-center text-ink underline decoration-current/50 decoration-1 underline-offset-[6px]"
+        className="mt-3 btn-quiet"
       >
         {photos.length === 1 ? "View photo" : `View all ${photos.length} photos`}
       </button>

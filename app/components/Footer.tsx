@@ -18,7 +18,7 @@ export default function Footer() {
 
   return (
     <footer className="bg-ink text-paper">
-      <div className="mx-auto grid max-w-6xl gap-12 px-5 py-16 md:grid-cols-[1.4fr_1fr_1.2fr] md:px-8 md:py-20">
+      <div className="page-column grid gap-12 py-16 md:grid-cols-[1.4fr_1fr_1.2fr] md:py-20">
         <div>
           <Image
             src="/images/aldock-wordmark.png"
@@ -70,8 +70,8 @@ export default function Footer() {
         ) : null}
       </div>
 
-      <div className="border-t border-paper/10 px-5 py-6 md:px-8">
-        <p className="mx-auto max-w-6xl text-xs text-stone">
+      <div className="border-t border-paper/10 py-6">
+        <p className="page-column text-xs text-stone">
           {t.footer.copyright(new Date().getFullYear())}
         </p>
       </div>

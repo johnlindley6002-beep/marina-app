@@ -4,8 +4,8 @@ import Disclosure from "../../../components/Disclosure";
 import type { BoatDocuments } from "../../../../lib/boatProfile";
 
 const inputClass =
-  "mt-2 w-full border border-hairline px-3 py-2 text-sm text-ink focus:border-ink focus:outline-none";
-const labelClass = "text-sm font-medium text-ink/80";
+  "field";
+const labelClass = "field-label";
 
 type Props = {
   documents: BoatDocuments;
@@ -93,7 +93,7 @@ export default function DocumentWallet({
             className={inputClass}
           />
           {expiresBeforeArrival ? (
-            <p className="mt-1 text-xs text-error">
+            <p className="field-error">
               This expires before your arrival date.
             </p>
           ) : null}

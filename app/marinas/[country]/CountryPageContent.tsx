@@ -18,8 +18,8 @@ import { withUnit } from "../../../lib/units";
 import { useLanguage } from "../../components/LanguageProvider";
 
 const inputClass =
-  "mt-2 w-full border border-hairline px-3 py-2 text-sm text-ink focus:border-ink focus:outline-none";
-const labelClass = "text-sm font-medium text-ink/80";
+  "field";
+const labelClass = "field-label";
 
 export default function CountryPageContent({
   marinas,
@@ -95,10 +95,10 @@ export default function CountryPageContent({
   });
 
   return (
-    <section className="px-5 py-14 md:px-8 md:py-20">
-      <div className="mx-auto max-w-6xl">
+    <section className="section">
+      <div className="page-column">
         <p className="text-ink/70">{countryName}</p>
-        <h1 className="type-display mt-2 text-ink [font-size:clamp(2rem,1.2rem+3vw,3.2rem)]">
+        <h1 className="type-title mt-2 text-ink">
           {t.countryPage.heading(countryName)}
         </h1>
 

@@ -354,10 +354,10 @@ function buildSummary(
 }
 
 const inputClass =
-  "mt-2 w-full border border-hairline px-3 py-2 text-sm text-ink focus:border-ink focus:outline-none";
+  "field";
 const labelClass =
-  "text-sm font-medium text-ink/80";
-const errorClass = "mt-1 text-xs text-error";
+  "field-label";
+const errorClass = "field-error";
 
 function RequiredMark() {
   return <span className="text-error"> *</span>;
@@ -1427,7 +1427,7 @@ export default function RequestBerthForm({
         ) : null}
 
         <div>
-          <p className="text-sm font-medium text-ink/80">
+          <p className="field-label">
             Cancellation policy
           </p>
           <p className="mt-2 text-sm text-ink/75">
@@ -1446,7 +1446,7 @@ export default function RequestBerthForm({
           </p>
           <button
             type="submit"
-            className="mt-6 bg-brass px-8 py-3 text-base font-medium text-ink transition-[filter] hover:brightness-105"
+            className="mt-6 btn-primary"
           >
             Send enquiry
           </button>
@@ -1455,7 +1455,7 @@ export default function RequestBerthForm({
 
       {summary ? (
         <div className="mt-10 border-t border-hairline pt-8">
-          <h3 className="text-sm font-medium tracking-tight text-ink">
+          <h3 className="type-heading type-h3 text-ink">
             Enquiry summary
           </h3>
           <p className="mt-2 text-xs text-ink/70">
@@ -1468,7 +1468,7 @@ export default function RequestBerthForm({
           <button
             type="button"
             onClick={handleCopy}
-            className="mt-4 bg-ink-2 px-6 py-3 text-sm font-medium text-white hover:bg-ink"
+            className="mt-4 btn-dark"
           >
             {copied ? "Copied!" : "Copy to clipboard"}
           </button>

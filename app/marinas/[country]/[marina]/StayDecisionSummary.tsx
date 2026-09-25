@@ -242,7 +242,7 @@ export default function StayDecisionSummary({
       ) : null}
       <Collapse open={ready}>
         <p className="text-sm text-ink/75">
-          <span className="text-sm font-medium text-ink/80">Stay: </span>
+          <span className="field-label">Stay: </span>
           {stayLine}
         </p>
         <ul className="mt-4 grid gap-x-8 gap-y-5 md:grid-cols-3">
@@ -250,7 +250,7 @@ export default function StayDecisionSummary({
             <li key={row.label} className="flex gap-3 md:min-h-[7.5rem]">
               <StatusIcon tone={row.tone} />
               <div className="min-w-0">
-                <p className="text-sm font-medium text-ink/80">{row.label}</p>
+                <p className="field-label">{row.label}</p>
                 <p className="mt-1 font-medium text-ink">{row.headline}</p>
                 <p className="mt-1 text-sm text-ink/75">{row.detail}</p>
               </div>

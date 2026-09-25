@@ -5,12 +5,13 @@ import { useRef, useState, type FormEvent } from "react";
 import { siteConfig } from "../../data/site";
 import type { CurrentUser } from "../../lib/mockData";
 import { useAuth } from "../components/AuthProvider";
+import PageHeader from "../components/PageHeader";
 import RoleGate from "../components/RoleGate";
 
 const inputClass =
-  "mt-2 w-full border border-hairline px-3 py-2 text-sm text-ink focus:border-ink focus:outline-none";
-const labelClass = "text-sm font-medium text-ink/80";
-const errorClass = "mt-1 text-xs text-error";
+  "field";
+const labelClass = "field-label";
+const errorClass = "field-error";
 
 type Errors = Partial<Record<"name" | "email", string>>;
 
@@ -106,7 +107,7 @@ function ProfileForm({ user }: { user: CurrentUser }) {
       <div className="mt-6 flex flex-wrap items-center gap-4">
         <button
           type="submit"
-          className="min-h-12 rounded-[3px] bg-brass px-8 text-base font-medium text-ink transition-[filter] hover:brightness-105"
+          className="btn-primary"
         >
           Save changes
         </button>
@@ -124,19 +125,13 @@ function AccountBody() {
   const copy = siteConfig.accounts.roleCopy;
 
   return (
-    <div className="section px-5 md:px-8">
-      <div className="mx-auto max-w-4xl">
-        <h1 className="type-display [font-size:clamp(2rem,1.2rem+3vw,3.2rem)] text-ink">
-          Account
-        </h1>
-        <p className="measure mt-4 text-lg text-ink/75">
+    <div className="section">
+      <div className="page-column page-reading">
+        <PageHeader title="Account" mock>
           Signed in as {user.name}.
-        </p>
-        {siteConfig.mockMode ? (
-          <p className="mt-2 text-sm text-ink/70">{siteConfig.accounts.mockNote}</p>
-        ) : null}
+        </PageHeader>
 
-        <section className="mt-12" aria-labelledby="profile-heading">
+        <section className="stack-md" aria-labelledby="profile-heading">
           <h2 id="profile-heading" className="type-heading type-h2 text-ink">
             Profile
           </h2>
@@ -154,7 +149,7 @@ function AccountBody() {
         </section>
 
         <section
-          className="hairline-top mt-12 pt-8"
+          className="chapter"
           aria-labelledby="roles-heading"
         >
           <h2 id="roles-heading" className="type-heading type-h2 text-ink">
@@ -172,7 +167,7 @@ function AccountBody() {
             ))}
           </ul>
 
-          <p className="mt-6 text-sm font-medium text-ink/80">How roles work</p>
+          <p className="type-label mt-6">How roles work</p>
           <ul className="mt-2 space-y-1 text-sm text-ink/75">
             {siteConfig.accounts.rules.map((rule) => (
               <li key={rule}>{rule}</li>
@@ -181,7 +176,7 @@ function AccountBody() {
         </section>
 
         {canSwitchMode ? (
-          <section className="hairline-top mt-12 pt-8">
+          <section className="chapter">
             <h2 className="type-heading type-h2 text-ink">Owner mode</h2>
             <p className="measure mt-2 text-ink/75">
               Use the Guest and Owner switch in the top bar to move between
@@ -189,7 +184,7 @@ function AccountBody() {
             </p>
             <Link
               href="/owner"
-              className="mt-4 inline-flex min-h-11 items-center text-ink underline decoration-current/50 decoration-1 underline-offset-[6px]"
+              className="mt-4 btn-quiet"
             >
               Go to My berth
             </Link>

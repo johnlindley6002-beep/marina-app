@@ -6,10 +6,15 @@ import { marinas } from "../../../data/marinas";
 import { siteConfig } from "../../../data/site";
 import { eur, formatLongDate } from "../../../lib/formatDate";
 import {
+  clearRelettingDraft,
   countNights,
   estimateReletting,
   getOwnedBerths,
+  getRelettingDraft,
+  saveRelettingDraft,
   submitRelettingRequest,
+  updateRelettingRequest,
+  type RelettingDraft,
   type RelettingRequest,
 } from "../../../lib/mockData";
 import { useAuth } from "../../components/AuthProvider";
@@ -20,13 +25,13 @@ const copy = siteConfig.relet;
 const TOTAL = copy.steps.length;
 
 const inputClass =
-  "mt-2 w-full border border-hairline px-3 py-2 text-sm text-ink focus:border-ink focus:outline-none";
-const labelClass = "text-sm font-medium text-ink/80";
-const errorClass = "mt-2 text-sm text-error";
+  "field";
+const labelClass = "field-label";
+const errorClass = "field-error";
 const primaryClass =
-  "inline-flex min-h-12 items-center justify-center rounded-[3px] bg-brass px-8 text-base font-medium text-ink transition-[filter] hover:brightness-105";
+  "btn-primary";
 const quietClass =
-  "inline-flex min-h-11 items-center px-2 text-ink underline decoration-current/50 decoration-1 underline-offset-[6px]";
+  "btn-quiet";
 
 function todayIso(): string {
   const d = new Date();
@@ -80,6 +85,10 @@ function Wizard() {
   const [berthReady, setBerthReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState<RelettingRequest | null>(null);
+  const [mode, setMode] = useState<RelettingDraft["mode"]>("new");
+  const [requestId, setRequestId] = useState<string | null>(null);
+  const [hydrated, setHydrated] = useState(false);
+  const [resumed, setResumed] = useState(false);
   const headingRef = useRef<HTMLHeadingElement>(null);
   const firstRender = useRef(true);
 
@@ -90,6 +99,71 @@ function Wizard() {
     }
     headingRef.current?.focus();
   }, [step, submitted]);
+
+  // Resume a saved offer, or an edit or resubmit started from My berth.
+  const userId = user?.id ?? null;
+  useEffect(() => {
+    const draft = getRelettingDraft(userId);
+    if (draft) {
+      setMode(draft.mode);
+      setRequestId(draft.requestId);
+      setStep(Math.min(Math.max(draft.step, 1), TOTAL));
+      setStartDate(draft.startDate);
+      setEndDate(draft.endDate);
+      setBoatRemoval(draft.boatRemoval);
+      setConsent(draft.consent);
+      setTermsAccepted(draft.termsAccepted);
+      setBoatReady(draft.boatReady);
+      setBerthReady(draft.berthReady);
+      setResumed(draft.mode === "new" && draft.step > 1);
+    }
+    setHydrated(true);
+  }, [userId]);
+
+  // Save progress to the mock layer as the holder goes, so it can be resumed.
+  useEffect(() => {
+    if (!hydrated || submitted) return;
+    const untouched =
+      mode === "new" &&
+      step === 1 &&
+      !startDate &&
+      !endDate &&
+      !boatRemoval &&
+      !consent &&
+      !termsAccepted &&
+      !boatReady &&
+      !berthReady;
+    if (untouched) return;
+    const timer = setTimeout(() => {
+      saveRelettingDraft(userId, {
+        mode,
+        requestId,
+        step,
+        startDate,
+        endDate,
+        boatRemoval,
+        consent,
+        termsAccepted,
+        boatReady,
+        berthReady,
+      });
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [
+    hydrated,
+    submitted,
+    userId,
+    mode,
+    requestId,
+    step,
+    startDate,
+    endDate,
+    boatRemoval,
+    consent,
+    termsAccepted,
+    boatReady,
+    berthReady,
+  ]);
 
   if (!berth || !marina || !terms) {
     return (
@@ -138,18 +212,40 @@ function Wizard() {
     go(step + 1);
   }
 
+  function startOver() {
+    clearRelettingDraft(userId);
+    setMode("new");
+    setRequestId(null);
+    setStep(1);
+    setDirection("back");
+    setStartDate("");
+    setEndDate("");
+    setBoatRemoval(false);
+    setConsent(false);
+    setTermsAccepted(false);
+    setBoatReady(false);
+    setBerthReady(false);
+    setResumed(false);
+    setError(null);
+  }
+
   function onSubmit() {
-    const result = submitRelettingRequest(user?.id ?? null, {
-      berthId: berth.berthId,
-      startDate,
-      endDate,
-      boatRemovalConfirmed: boatRemoval,
-      reletConsent: consent,
-      termsAccepted,
-      readinessConfirmed: boatReady && berthReady,
-    });
+    const result =
+      mode === "edit" && requestId
+        ? updateRelettingRequest(userId, requestId, { startDate, endDate })
+        : submitRelettingRequest(userId, {
+            berthId: berth.berthId,
+            startDate,
+            endDate,
+            boatRemovalConfirmed: boatRemoval,
+            reletConsent: consent,
+            termsAccepted,
+            readinessConfirmed: boatReady && berthReady,
+            resubmitOf: mode === "resubmit" && requestId ? requestId : undefined,
+          });
     if (result.ok) {
       setError(null);
+      clearRelettingDraft(userId);
       setSubmitted(result.request);
     } else {
       setError(result.error);
@@ -185,6 +281,22 @@ function Wizard() {
 
   return (
     <div>
+      {mode !== "new" ? (
+        <p className="measure mb-6 text-ink/75">
+          {mode === "edit" ? copy.editTitle : copy.resubmitTitle}. The marina
+          {mode === "edit"
+            ? " will need to consent to the new dates."
+            : " will look at it again."}
+        </p>
+      ) : null}
+      {resumed ? (
+        <p role="status" className="mb-6 text-sm text-ink/75">
+          {copy.resumeBanner}{" "}
+          <button type="button" onClick={startOver} className="link text-ink">
+            Start over
+          </button>
+        </p>
+      ) : null}
       {/* Progress: one idea per step */}
       <div className="flex items-center gap-2" aria-hidden="true">
         {copy.steps.map((_, i) => (
@@ -309,11 +421,12 @@ function Wizard() {
                 : "This is paid to you after the marina has processed it."}
             </p>
             {estimate ? (
-              <p className="measure tabular mt-3 text-sm text-ink/70">
+              <p className="measure tabular mt-4 text-ink/75">
+                <span className="chip mr-2">Estimate</span>{" "}
                 If every one of your {estimate.nights} nights were relet, about{" "}
                 {eur(estimate.netEur)} would be{" "}
                 {terms.settlement === "credit" ? "credited" : "paid"} after the
-                fee. An illustration, not a promise.
+                fee. {copy.estimateNote}
               </p>
             ) : null}
             {siteConfig.mockMode ? (
@@ -388,6 +501,15 @@ function Wizard() {
                 {terms.ownerSharePercent}% share, {terms.processingFeePercent}%
                 fee, {terms.settlement}
               </dd>
+              {estimate ? (
+                <>
+                  <dt className="text-ink/70">Estimate</dt>
+                  <dd className="tabular">
+                    About {eur(estimate.netEur)} if every night were relet. The
+                    marina may relet only some of them.
+                  </dd>
+                </>
+              ) : null}
             </dl>
             <p className="measure mt-6 text-sm text-ink/70">
               Sending this asks for the marina&apos;s consent. Nothing is relet
@@ -430,18 +552,18 @@ function Wizard() {
 export default function RelettingWizard() {
   return (
     <RoleGate role="owner">
-      <div className="section px-5 md:px-8">
-        <div className="mx-auto max-w-3xl">
+      <div className="section">
+        <div className="page-column page-reading">
           <Link
             href="/owner"
             className="inline-flex min-h-11 items-center text-sm text-ink/70 underline underline-offset-4"
           >
             My berth
           </Link>
-          <h1 className="type-display mt-6 [font-size:clamp(2rem,1.2rem+3vw,3.2rem)] text-ink">
+          <h1 className="type-title mt-6 text-ink">
             {copy.primaryAction}
           </h1>
-          <div className="mt-12">
+          <div className="stack-md">
             <Wizard />
           </div>
         </div>

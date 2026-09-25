@@ -15,9 +15,9 @@ import { useUnits } from "../../../components/UnitsProvider";
 import StayDecisionSummary from "./StayDecisionSummary";
 
 const inputClass =
-  "mt-2 w-full border border-hairline px-3 py-2 text-sm text-ink focus:border-ink focus:outline-none disabled:bg-paper-deep disabled:text-ink/70";
-const labelClass = "text-sm font-medium text-ink/80";
-const errorClass = "mt-1 text-xs text-error";
+  "field";
+const labelClass = "field-label";
+const errorClass = "field-error";
 
 function RequiredMark() {
   return <span className="text-error"> *</span>;

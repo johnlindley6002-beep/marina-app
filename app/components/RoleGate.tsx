@@ -8,13 +8,13 @@ import { useAuth } from "./AuthProvider";
 
 function Message({ title, body }: { title: string; body: string }) {
   return (
-    <div className="section px-5 md:px-8">
-      <div className="mx-auto max-w-3xl">
-        <h1 className="type-heading type-h2 text-ink">{title}</h1>
+    <div className="section">
+      <div className="page-column page-reading">
+        <h1 className="type-title text-ink">{title}</h1>
         <p className="measure mt-4 text-lg text-ink/75">{body}</p>
         <Link
           href="/marinas"
-          className="mt-6 inline-flex min-h-11 items-center text-ink underline decoration-current/50 decoration-1 underline-offset-[6px]"
+          className="mt-6 btn-quiet"
         >
           Back to marinas
         </Link>

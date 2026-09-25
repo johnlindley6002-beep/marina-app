@@ -89,14 +89,14 @@ export default function FacilitiesGrid({
             aria-modal="true"
             aria-labelledby="facility-dialog-title"
             onClick={(e) => e.stopPropagation()}
-            className="max-h-[85vh] w-full max-w-md overflow-y-auto rounded-t-sm bg-white p-6 sm:rounded-[3px] md:p-8"
+            className="surface-lift max-h-[85vh] w-full max-w-md overflow-y-auto p-6 md:p-8"
           >
             <div className="flex items-start justify-between gap-4">
               <div className="flex items-center gap-3">
                 <FacilityIcon facility={open.icon} className="h-6 w-6 shrink-0 text-ink" />
                 <h3
                   id="facility-dialog-title"
-                  className="text-lg font-medium tracking-tight text-ink"
+                  className="type-heading type-h3 text-ink"
                 >
                   {open.name[cl]}
                 </h3>

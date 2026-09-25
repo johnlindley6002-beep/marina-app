@@ -143,7 +143,7 @@ export default function Disclosure({
         aria-expanded={open}
         aria-controls={panelId}
         onClick={toggle}
-        className="inline-flex min-h-11 items-center gap-2 text-ink underline decoration-current/50 decoration-1 underline-offset-[6px]"
+        className="btn-quiet gap-2"
       >
         <span>{text}</span>
         <Chevron open={open} />

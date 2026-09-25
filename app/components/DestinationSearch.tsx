@@ -151,7 +151,7 @@ export default function DestinationSearch({
 
         <button
           type="submit"
-          className="rounded-[3px] bg-brass px-8 py-3 text-base font-medium text-ink transition-[filter] hover:brightness-105"
+          className="btn-primary"
         >
           {t.home.findMarinas}
         </button>

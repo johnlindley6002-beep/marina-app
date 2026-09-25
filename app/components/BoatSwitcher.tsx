@@ -15,8 +15,8 @@ type Props = {
 };
 
 const inputClass =
-  "mt-2 w-full border border-hairline px-3 py-2 text-sm text-ink focus:border-ink focus:outline-none";
-const labelClass = "text-sm font-medium text-ink/80";
+  "field";
+const labelClass = "field-label";
 
 // Pick the active boat, and optionally save what is in the form as a boat.
 // The boats themselves live in BoatProvider; the full editor is /my-boat.
@@ -109,7 +109,7 @@ export default function BoatSwitcher({ current, heading, onSelect }: Props) {
           <button
             type="button"
             onClick={handleSave}
-            className="min-h-11 border border-ink/30 px-4 text-sm font-medium text-ink hover:border-ink"
+            className="btn-secondary"
           >
             {matchesSaved
               ? "Update saved boat"

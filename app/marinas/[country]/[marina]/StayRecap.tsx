@@ -13,8 +13,8 @@ import {
 } from "../../../../lib/tripStore";
 
 const inputClass =
-  "mt-2 w-full border border-hairline px-3 py-2 text-sm text-ink focus:border-ink focus:outline-none";
-const labelClass = "text-sm font-medium text-ink/80";
+  "field";
+const labelClass = "field-label";
 const eur = (n: number) => `€${n.toFixed(2)}`;
 
 export default function StayRecap({
@@ -81,8 +81,8 @@ export default function StayRecap({
   const Heading = embedded ? "h3" : "h2";
 
   return (
-    <div className={embedded ? "hairline-top mt-12 pt-8" : "bg-paper-deep section px-5 md:px-8"}>
-      <div className="mx-auto max-w-5xl">
+    <div className={embedded ? "hairline-top stack-md pt-8" : "bg-paper-deep section"}>
+      <div className={embedded ? "" : "page-column"}>
         <Heading className={`type-heading text-ink ${embedded ? "type-h3" : "type-h2"}`}>
           Your stay &amp; departure
         </Heading>
@@ -94,7 +94,7 @@ export default function StayRecap({
 
         <div className="mt-6 grid gap-6 md:grid-cols-2">
           <div className="hairline-top pt-6">
-            <h3 className="text-sm font-medium text-ink">
+            <h3 className="type-heading type-h3 text-ink">
               Settle-up estimate
             </h3>
             <div className="mt-3 grid grid-cols-2 gap-3">
@@ -178,7 +178,7 @@ export default function StayRecap({
 
           <div className="space-y-6">
             <div className="hairline-top pt-6">
-              <h3 className="text-sm font-medium text-ink">
+              <h3 className="type-heading type-h3 text-ink">
                 Leaving? Let the marina know
               </h3>
               <p className="mt-2 text-sm text-ink/75">
@@ -187,21 +187,21 @@ export default function StayRecap({
               <button
                 type="button"
                 onClick={notifyDeparture}
-                className="mt-4 bg-ink px-6 py-3 text-sm font-medium text-white hover:bg-ink-2"
+                className="mt-4 btn-dark"
               >
                 Notify departure
               </button>
             </div>
 
             <div className="hairline-top pt-6">
-              <h3 className="text-sm font-medium text-ink">Coming back?</h3>
+              <h3 className="type-heading type-h3 text-ink">Coming back?</h3>
               <p className="mt-2 text-sm text-ink/75">
                 Same boat and services, dates left blank.
               </p>
               <button
                 type="button"
                 onClick={onRebook}
-                className="mt-4 border border-ink/30 px-6 py-3 text-sm font-medium text-ink hover:border-ink"
+                className="mt-4 btn-secondary"
               >
                 Rebook this stay
               </button>

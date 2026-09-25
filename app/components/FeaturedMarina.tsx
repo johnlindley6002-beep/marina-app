@@ -69,16 +69,16 @@ export default function FeaturedMarina() {
   ];
 
   return (
-    <section className="section-editorial px-5 md:px-8">
-      <div className="mx-auto max-w-6xl">
+    <section className="section-editorial">
+      <div className="page-column">
         <Reveal>
           <h2 className="type-statement text-ink">{t.home.featuredHeading}</h2>
         </Reveal>
-        <ChartDivider className="mt-12 md:mt-16" />
+        <ChartDivider className="stack-md" />
 
-        <div className="mt-12 grid gap-12 md:mt-16 lg:grid-cols-[1.05fr_1fr] lg:items-center lg:gap-24">
+        <div className="stack-md grid gap-12 lg:grid-cols-[1.05fr_1fr] lg:items-center lg:gap-24">
           <Reveal>
-            <h3 className="type-heading flex flex-wrap items-center gap-x-4 text-3xl text-ink">
+            <h3 className="type-card flex flex-wrap items-center gap-x-4 text-ink">
               {flagship.name}
               {flagship.clubBurgee ? (
                 <Image
@@ -105,7 +105,7 @@ export default function FeaturedMarina() {
 
             <Link
               href={`/marinas/${flagship.countrySlug}/${flagship.id}`}
-              className="mt-8 inline-flex min-h-11 items-center text-lg text-ink underline decoration-current/50 decoration-1 underline-offset-[8px] hover:decoration-ink"
+              className="mt-8 btn-quiet text-lg"
             >
               {t.countryPage.viewMarina}
             </Link>
@@ -115,7 +115,7 @@ export default function FeaturedMarina() {
         </div>
 
         {others.length > 0 ? (
-          <div className="mt-24">
+          <div className="stack-lg">
             <h3 className="type-heading type-h3 text-ink">
               {t.home.moreMarinas}
             </h3>

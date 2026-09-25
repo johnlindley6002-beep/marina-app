@@ -33,8 +33,8 @@ export default function KeyFactsStrip({ marina }: { marina: Marina }) {
   ];
 
   return (
-    <section className="bg-paper-deep section-tight px-5 md:px-8">
-      <div className="mx-auto max-w-5xl">
+    <section className="bg-paper-deep section-tight">
+      <div className="page-column">
         <h2 className="sr-only">{t.keyFacts.heading}</h2>
         <dl className="grid grid-cols-2 gap-x-6 gap-y-5 sm:grid-cols-3 lg:grid-cols-[repeat(5,auto)_minmax(0,1.6fr)]">
           {facts.map((fact) => (
@@ -42,7 +42,7 @@ export default function KeyFactsStrip({ marina }: { marina: Marina }) {
               key={fact.label}
               className={fact.label === "Location" ? "col-span-2 sm:col-span-3 lg:col-span-1" : ""}
             >
-              <dt className="text-sm font-medium text-ink/80">{fact.label}</dt>
+              <dt className="field-label">{fact.label}</dt>
               <dd
                 className={`tabular mt-1 font-medium text-ink ${
                   fact.label === "Location" ? "text-base" : "text-lg"

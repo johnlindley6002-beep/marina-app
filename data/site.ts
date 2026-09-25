@@ -26,6 +26,15 @@ export type ReletCopy = {
   pendingBody: string;
   legalFooter: string;
   queueIntro: string;
+  firstTimeTitle: string;
+  firstTimeBody: string;
+  lockedNote: string;
+  estimateNote: string;
+  resumeBanner: string;
+  editTitle: string;
+  resubmitTitle: string;
+  cancelConfirm: string;
+  notApprovedLead: string;
 };
 
 // Site-level configuration. Set heroImage when a photo is supplied; until
@@ -109,6 +118,18 @@ export const siteConfig: {
       "Your berth is a right of use of public maritime domain, held under a State concession. It can be relet only with the marina's prior consent, and the marina handles the visitor's formalities. Your details are processed only with your consent (GDPR). Any credit may be taxable. Consumer disputes can go to consumer arbitration.",
     queueIntro:
       "Berth holders ask for your consent before their berth is relet. Approve or decline each request.",
+    firstTimeTitle: "Let your berth work while you are away",
+    firstTimeBody:
+      "When you are away, the marina can relet your berth to a visiting boat and you earn a credit. Nothing happens without the marina's approval, and you choose the dates.",
+    lockedNote:
+      "A visitor has booked some of these nights, so this can no longer be changed or cancelled here. Please contact the marina.",
+    estimateNote:
+      "The marina may relet only some of your nights, and you are credited for the nights actually booked.",
+    resumeBanner: "You are continuing where you left off.",
+    editTitle: "Change your dates",
+    resubmitTitle: "Adjust and send again",
+    cancelConfirm: "Cancel this request? The marina will no longer consider it.",
+    notApprovedLead: "The marina did not approve this request.",
   },
   accounts: {
     mockNote: "Mockup: this is sample data and nothing is saved to a server.",

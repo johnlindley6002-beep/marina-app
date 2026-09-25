@@ -19,7 +19,7 @@ function FuelCard({
 }) {
   return (
     <div className="hairline-top pt-4">
-      <dt className="text-sm font-medium text-ink/80">{label}</dt>
+      <dt className="field-label">{label}</dt>
       <dd className="mt-1">
         {entry.value !== null ? (
           <>
@@ -39,7 +39,7 @@ function FuelCard({
 
 export default function FuelPrices({ marina }: { marina: Marina }) {
   return (
-    <div className="mt-12">
+    <div className="stack-md">
       <h3 className="type-heading type-h3 text-ink">Fuel prices</h3>
       <dl className="mt-4 grid gap-x-10 gap-y-6 sm:grid-cols-2">
         <FuelCard label="Diesel" entry={marina.fuelPrices.diesel} />

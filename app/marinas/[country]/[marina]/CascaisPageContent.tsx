@@ -159,7 +159,7 @@ export default function CascaisPageContent({
     <GalleryProvider photos={galleryPhotos}>
       <MarinaHero marina={marina} />
 
-      <div className="mx-auto max-w-5xl px-5 py-4 text-ink/70 md:px-8">
+      <div className="page-column py-4 text-ink/70">
         <Breadcrumbs
           items={[
             { label: t.breadcrumbs.marinas, href: "/marinas" },
@@ -173,9 +173,9 @@ export default function CascaisPageContent({
 
       <section
         id="plan-your-stay"
-        className="section-tight scroll-mt-24 px-5 md:px-8"
+        className="section-tight scroll-mt-24"
       >
-        <div className="mx-auto max-w-5xl">
+        <div className="page-column">
           <PlanYourStay
             marina={marina}
             plan={plan}
@@ -186,9 +186,9 @@ export default function CascaisPageContent({
 
       {/* The map is the focal moment: a quiet ink stage with the chart lines
           and generous space around it. The map itself is unchanged. */}
-      <section className="relative isolate overflow-hidden bg-ink px-5 py-20 md:px-8 md:py-36">
+      <section className="relative isolate overflow-hidden bg-ink py-20 md:py-36">
         <ChartLinework className="absolute inset-0 -z-10 h-full w-full text-paper opacity-[0.07]" />
-        <div className="mx-auto max-w-5xl">
+        <div className="page-column">
           <BerthAvailabilityMap
             marinaName={marina.name}
             marinaEmail={marina.email}
@@ -204,8 +204,8 @@ export default function CascaisPageContent({
         </div>
       </section>
 
-      <section className="section-tight px-5 md:px-8">
-        <div className="mx-auto max-w-5xl space-y-10 md:space-y-14">
+      <section className="section-tight">
+        <div className="page-column space-y-10 md:space-y-14">
           <div id="price-estimate" className="scroll-mt-24">
             <PriceEstimate
               marina={marina}
@@ -265,12 +265,12 @@ export default function CascaisPageContent({
         gettingThere={gettingThere}
       />
 
-      <section className="section-editorial bg-paper-deep px-5 md:px-8">
-        <div className="mx-auto max-w-5xl">
+      <section className="section-editorial bg-paper-deep">
+        <div className="page-column">
           <Reveal>
             <h2 className="type-statement text-ink">{t.facilities.heading}</h2>
           </Reveal>
-          <div className="mt-12 md:mt-16">
+          <div className="stack-md">
             <FacilitiesGrid facilities={marina.facilityDetails} />
           </div>
           <FuelPrices marina={marina} />
@@ -281,17 +281,19 @@ export default function CascaisPageContent({
 
       <AboutMarina marina={marina} description={description} />
 
-      <section className="px-5 pb-10 md:px-8 md:pb-14">
-        <div className="hairline-top mx-auto flex max-w-5xl flex-col gap-4 pt-8 sm:flex-row sm:items-center sm:justify-between">
+      <section className="pb-10 md:pb-14">
+        <div className="page-column">
+        <div className="hairline-top flex flex-col gap-4 pt-8 sm:flex-row sm:items-center sm:justify-between">
           <p className="type-heading type-h3 text-ink">
             Ready to plan your visit?
           </p>
           <a
             href="#plan-your-stay"
-            className="inline-flex min-h-11 items-center text-ink underline decoration-current/50 decoration-1 underline-offset-[6px]"
+            className="btn-quiet"
           >
             Request a berth
           </a>
+        </div>
         </div>
       </section>
 

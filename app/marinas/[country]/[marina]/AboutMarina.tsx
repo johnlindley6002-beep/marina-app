@@ -18,8 +18,8 @@ export default function AboutMarina({ marina, description }: Props) {
   const photos = marina.photos.filter((photo) => !photo.placeholder);
 
   return (
-    <section className="section-editorial px-5 md:px-8">
-      <div className="mx-auto max-w-5xl">
+    <section className="section-editorial">
+      <div className="page-column">
         <Reveal>
           <h2 className="type-statement text-ink">About {marina.name}</h2>
         </Reveal>
@@ -28,7 +28,7 @@ export default function AboutMarina({ marina, description }: Props) {
             previewLines={2}
             label="Read more"
             openLabel="Show less"
-            className="measure mt-12 md:mt-16"
+            className="measure stack-md"
           >
             <p className="text-ink/75">{description}</p>
           </Disclosure>
@@ -36,7 +36,7 @@ export default function AboutMarina({ marina, description }: Props) {
 
         <dl className="mt-10">
           <div>
-            <dt className="text-sm font-medium text-ink/80">
+            <dt className="field-label">
               {t.keyFacts.berths}
             </dt>
             <dd className="tabular mt-1 text-lg font-medium text-ink">
@@ -46,7 +46,7 @@ export default function AboutMarina({ marina, description }: Props) {
         </dl>
 
         {photos.length > 0 ? (
-          <div className="mt-24">
+          <div className="stack-lg">
             <ChartDivider className="mb-10" />
             <h3 className="type-heading type-h3 mb-6 text-ink">Photos</h3>
             <PhotoGallery photos={photos} />

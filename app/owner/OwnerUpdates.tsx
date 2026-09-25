@@ -53,7 +53,7 @@ export default function OwnerUpdates() {
         <button
           type="button"
           onClick={() => markNotificationsRead(user?.id ?? null)}
-          className="mt-2 inline-flex min-h-11 items-center text-ink underline decoration-current/50 decoration-1 underline-offset-[6px]"
+          className="mt-2 btn-quiet"
         >
           Mark all as read
         </button>

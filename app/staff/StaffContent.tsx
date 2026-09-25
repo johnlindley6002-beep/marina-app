@@ -4,6 +4,7 @@ import { useMemo } from "react";
 import { siteConfig } from "../../data/site";
 import { getStaffMemberships } from "../../lib/mockData";
 import { useAuth } from "../components/AuthProvider";
+import PageHeader from "../components/PageHeader";
 import RoleGate from "../components/RoleGate";
 import RelettingQueue from "./RelettingQueue";
 
@@ -15,19 +16,13 @@ function StaffBody() {
   );
 
   return (
-    <div className="section px-5 md:px-8">
-      <div className="mx-auto max-w-4xl">
-        <h1 className="type-display [font-size:clamp(2rem,1.2rem+3vw,3.2rem)] text-ink">
-          Staff area
-        </h1>
-        {memberships.map((m) => (
-          <p key={m.marinaId} className="measure mt-4 text-lg text-ink/75">
-            Signed in as staff of {m.marinaName}.
-          </p>
-        ))}
-        {siteConfig.mockMode ? (
-          <p className="mt-2 text-sm text-ink/70">{siteConfig.accounts.mockNote}</p>
-        ) : null}
+    <div className="section">
+      <div className="page-column page-reading">
+        <PageHeader title="Staff area" mock>
+          {memberships.map((m) => (
+            <p key={m.marinaId}>Signed in as staff of {m.marinaName}.</p>
+          ))}
+        </PageHeader>
         <RelettingQueue />
       </div>
     </div>

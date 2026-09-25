@@ -53,7 +53,7 @@ export default function MarinaRow({
         ) : null}
 
         <div className="min-w-0 sm:col-start-2">
-          <h2 className="type-heading flex items-center gap-3 text-2xl text-ink">
+          <h2 className="type-card flex items-center gap-3 text-ink">
             <Link
               href={`/marinas/${marina.countrySlug}/${marina.id}${search}`}
               className="after:absolute after:inset-0 after:content-['']"
@@ -103,7 +103,7 @@ export default function MarinaRow({
         <div className="flex items-center justify-end gap-6 sm:col-start-3 sm:row-start-1 sm:flex-col sm:items-end sm:justify-between">
           <span
             aria-hidden="true"
-            className="text-ink underline decoration-current/50 decoration-1 underline-offset-[6px]"
+            className="link text-ink"
           >
             {t.countryPage.viewMarina}
           </span>

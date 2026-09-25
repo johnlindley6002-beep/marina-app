@@ -7,6 +7,7 @@ import {
   advanceRelettingStatus,
   countNights,
   decideReletting,
+  defaultNightsBooked,
   getRelettingQueue,
   RELETTING_PROGRESS,
   RELETTING_STATUS_LABELS,
@@ -15,17 +16,17 @@ import {
 import { useMock } from "../../lib/useMock";
 import { useAuth } from "../components/AuthProvider";
 import Disclosure from "../components/Disclosure";
+import StatusChip from "../components/StatusChip";
 
 const NONE: RelettingQueueItem[] = [];
-
-const actionClass =
-  "inline-flex min-h-11 items-center justify-center rounded-[3px] px-6 text-sm font-medium transition-colors";
 
 function Item({ item, staffId }: { item: RelettingQueueItem; staffId: string }) {
   const { request, ownerName, boatName, berthClass, estimate } = item;
   const [note, setNote] = useState("");
   const [error, setError] = useState<string | null>(null);
   const nights = countNights(request.startDate, request.endDate);
+  const [nightsBooked, setNightsBooked] = useState(String(defaultNightsBooked(nights)));
+  const lastNote = request.history[request.history.length - 1]?.note;
   const index = RELETTING_PROGRESS.indexOf(request.status);
   const canAdvance =
     request.status !== "declined" && index >= 1 && index < RELETTING_PROGRESS.length - 1;
@@ -51,10 +52,23 @@ function Item({ item, staffId }: { item: RelettingQueueItem; staffId: string }) 
             {nights} nights{boatName ? `, ${boatName}` : ""}
           </p>
         </div>
-        <p className="rounded-full border border-ink/30 px-3 py-1 text-sm font-medium text-ink">
-          {RELETTING_STATUS_LABELS[request.status]}
-        </p>
+        <StatusChip>{RELETTING_STATUS_LABELS[request.status]}</StatusChip>
       </div>
+
+      {lastNote && request.status === "submitted" ? (
+        <p className="mt-3 text-sm font-medium text-ink">{lastNote}.</p>
+      ) : null}
+      {request.bookedNights.length > 0 ? (
+        <p className="tabular mt-3 text-sm text-ink">
+          {request.bookedNights.length} of {nights} nights booked
+          {request.bookedNights.length < nights
+            ? `, ${nights - request.bookedNights.length} still open`
+            : ""}
+        </p>
+      ) : null}
+      {request.status === "cancelled" ? (
+        <p className="mt-3 text-sm text-ink/75">Cancelled by the holder.</p>
+      ) : null}
 
       <ul className="mt-4 space-y-1 text-sm text-ink/75">
         <li>Boat removal confirmed by the holder: {request.boatRemovalConfirmed ? "yes" : "no"}</li>
@@ -73,28 +87,28 @@ function Item({ item, staffId }: { item: RelettingQueueItem; staffId: string }) 
       {request.status === "submitted" ? (
         <div className="mt-6">
           <label className="block max-w-md text-sm">
-            <span className="text-sm font-medium text-ink/80">
+            <span className="field-label">
               Note to the holder (optional)
             </span>
             <input
               type="text"
               value={note}
               onChange={(e) => setNote(e.target.value)}
-              className="mt-2 w-full border border-hairline px-3 py-2 text-sm text-ink focus:border-ink focus:outline-none"
+              className="field"
             />
           </label>
           <div className="mt-4 flex flex-wrap items-center gap-3">
             <button
               type="button"
               onClick={() => decide("approve")}
-              className={`${actionClass} bg-ink text-paper hover:bg-ink-2`}
+              className="btn-dark"
             >
               Approve
             </button>
             <button
               type="button"
               onClick={() => decide("decline")}
-              className={`${actionClass} border border-ink/30 text-ink hover:border-ink`}
+              className="btn-secondary"
             >
               Decline
             </button>
@@ -104,13 +118,28 @@ function Item({ item, staffId }: { item: RelettingQueueItem; staffId: string }) 
 
       {canAdvance ? (
         <div className="mt-6">
+          {nextLabel === "Booked" ? (
+            <label className="mb-3 block max-w-[10rem] text-sm">
+              <span className="field-label">Nights booked (mock)</span>
+              <input
+                type="number"
+                min={1}
+                max={nights}
+                value={nightsBooked}
+                onChange={(e) => setNightsBooked(e.target.value)}
+                className="field"
+              />
+            </label>
+          ) : null}
           <button
             type="button"
             onClick={() => {
-              const result = advanceRelettingStatus(staffId, request.id);
+              const result = advanceRelettingStatus(staffId, request.id, {
+                nightsBooked: Number(nightsBooked) || undefined,
+              });
               setError(result.ok ? null : result.error);
             }}
-            className={`${actionClass} border border-ink/30 text-ink hover:border-ink`}
+            className="btn-secondary"
           >
             Mock: mark as {nextLabel}
           </button>
@@ -149,11 +178,11 @@ export default function RelettingQueue() {
     ["approved", "listed", "booked"].includes(i.request.status)
   );
   const closed = items.filter((i) =>
-    ["completed", "declined"].includes(i.request.status)
+    ["completed", "declined", "cancelled"].includes(i.request.status)
   );
 
   return (
-    <section className="mt-16" aria-labelledby="relet-heading">
+    <section className="chapter" aria-labelledby="relet-heading">
       <h2 id="relet-heading" className="type-heading type-h2 text-ink">
         Reletting approvals
       </h2>
@@ -174,7 +203,7 @@ export default function RelettingQueue() {
 
       {active.length > 0 ? (
         <>
-          <h3 className="type-heading type-h3 mt-12 text-ink">In progress</h3>
+          <h3 className="type-heading type-h3 stack-md text-ink">In progress</h3>
           <ul className="mt-2">
             {active.map((item) => (
               <Item key={item.request.id} item={item} staffId={staffId} />

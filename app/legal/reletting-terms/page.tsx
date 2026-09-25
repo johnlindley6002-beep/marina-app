@@ -10,9 +10,9 @@ export const metadata: Metadata = {
 // the marina and reviewed by counsel. No clauses are invented here.
 export default function ReletingTermsPage() {
   return (
-    <div className="section px-5 md:px-8">
-      <div className="mx-auto max-w-3xl">
-        <h1 className="type-display [font-size:clamp(2rem,1.2rem+3vw,3.2rem)] text-ink">
+    <div className="section">
+      <div className="page-column page-reading">
+        <h1 className="type-title text-ink">
           Reletting terms
         </h1>
         <p className="measure mt-6 text-lg text-ink/75">
@@ -21,7 +21,7 @@ export default function ReletingTermsPage() {
         </p>
         <Link
           href="/owner"
-          className="mt-8 inline-flex min-h-11 items-center text-ink underline decoration-current/50 decoration-1 underline-offset-[6px]"
+          className="mt-8 btn-quiet"
         >
           Back to My berth
         </Link>

@@ -23,7 +23,7 @@ type Props = {
   gettingThere: { byCar: string; byTrain: string; byAir: string };
 };
 
-const labelClass = "text-sm font-medium text-ink/80";
+const labelClass = "field-label";
 const valueClass = "mt-2 text-ink/75";
 
 export default function ApproachInfo({
@@ -37,9 +37,9 @@ export default function ApproachInfo({
   return (
     <section
       id="practical-info"
-      className="section-editorial scroll-mt-20 px-5 md:px-8"
+      className="section-editorial scroll-mt-20"
     >
-      <div className="mx-auto max-w-5xl">
+      <div className="page-column">
         <Reveal>
           <h2 className="type-statement text-ink">
             Approach &amp; practical info
@@ -47,7 +47,7 @@ export default function ApproachInfo({
         </Reveal>
 
         {/* The four essentials */}
-        <div className="mt-12 grid gap-10 sm:grid-cols-2 md:mt-16 lg:grid-cols-4">
+        <div className="stack-md grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
           <div>
             <p className={labelClass}>{t.visiting.hailing}</p>
             <p className={valueClass}>{t.visiting.vhfChannel(marina.vhfChannel)}</p>
@@ -138,7 +138,7 @@ export default function ApproachInfo({
         <ContactBlock marina={marina} />
         <EmergencyNumbers marina={marina} embedded />
 
-        <div id="cancellation" className="mt-24 scroll-mt-24">
+        <div id="cancellation" className="stack-lg scroll-mt-24">
           <ChartDivider className="mb-10" />
           <h3 className="type-heading type-h3 text-ink">Cancellation policy</h3>
           <p className="measure mt-3 text-ink/75">{marina.cancellationPolicy}</p>

@@ -47,9 +47,9 @@ export default function OfflineCard({
   const Heading = embedded ? "h3" : "h2";
 
   return (
-    <div className={embedded ? "mt-24" : "section px-5 md:px-8"}>
+    <div className={embedded ? "stack-lg" : "section"}>
       {embedded ? <ChartDivider className="mb-10" /> : null}
-      <div className="mx-auto max-w-5xl">
+      <div className={embedded ? "" : "page-column"}>
         <div className="flex flex-wrap items-baseline justify-between gap-3">
           <Heading className={`type-heading text-ink ${embedded ? "type-h3" : "type-h2"}`}>
             Offline essentials
@@ -67,7 +67,7 @@ export default function OfflineCard({
 
         <div className="mt-6 grid gap-6 md:grid-cols-2">
           <div className="hairline-top pt-6">
-            <h3 className="text-sm font-medium text-ink">Contact &amp; VHF</h3>
+            <h3 className="type-heading type-h3 text-ink">Contact &amp; VHF</h3>
             <ul className="mt-3 space-y-2 text-sm text-ink/75">
               <li>
                 <a
@@ -100,7 +100,7 @@ export default function OfflineCard({
           </div>
 
           <div className="hairline-top pt-6">
-            <h3 className="text-sm font-medium text-ink">
+            <h3 className="type-heading type-h3 text-ink">
               Your saved enquiry
             </h3>
             {enquiry ? (

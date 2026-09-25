@@ -11,8 +11,7 @@ import FlagIcon from "../../../components/FlagIcon";
 import ShareButton from "../../../components/ShareButton";
 import { useGallery } from "./PhotoGallery";
 
-const chipClass =
-  "inline-flex min-h-11 items-center gap-2 rounded-full border border-white/30 bg-ink/40 px-4 text-sm text-white transition-colors hover:border-white";
+const chipClass = "chip-dark";
 
 const rise = (delay: number, duration = "0.7s"): CSSProperties =>
   ({ "--d": `${delay}ms`, animationDuration: duration }) as CSSProperties;
@@ -60,7 +59,7 @@ export default function MarinaHero({ marina }: { marina: Marina }) {
         <ChartLinework className="absolute inset-0 -z-10 h-full w-full text-paper opacity-[0.09]" />
       )}
 
-      <div className="mx-auto flex h-full max-w-5xl flex-col justify-between px-5 py-6 md:px-8 md:py-8">
+      <div className="page-column flex h-full flex-col justify-between py-6 md:py-8">
         <div className="flex items-center justify-between gap-4">
           <p className="flex items-center gap-2 text-sm text-white">
             <FlagIcon countryCode={marina.countryCode} className="h-3 w-auto" />
@@ -120,7 +119,7 @@ export default function MarinaHero({ marina }: { marina: Marina }) {
           >
             <a
               href="#plan-your-stay"
-              className="inline-flex min-h-12 items-center rounded-[3px] bg-brass px-8 text-base font-medium text-ink transition-[filter] hover:brightness-105"
+              className="btn-primary"
             >
               Request a berth
             </a>

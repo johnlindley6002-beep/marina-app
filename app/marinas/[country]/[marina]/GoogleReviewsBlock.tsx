@@ -10,7 +10,7 @@ export default function GoogleReviewsBlock({ marina }: { marina: Marina }) {
   if (!summary) return null;
 
   return (
-    <div className="mt-24">
+    <div className="stack-lg">
       <ChartDivider className="mb-10" />
       <h3 className="type-heading type-h3 text-ink">Google reviews</h3>
       <p className="mt-4 text-ink">
@@ -25,7 +25,7 @@ export default function GoogleReviewsBlock({ marina }: { marina: Marina }) {
         href={summary.googleUrl}
         target="_blank"
         rel="noopener noreferrer"
-        className="mt-4 inline-flex min-h-11 items-center text-ink underline decoration-current/50 decoration-1 underline-offset-[6px]"
+        className="mt-4 btn-quiet"
       >
         Read reviews on Google
         <span className="sr-only"> (opens in a new tab)</span>

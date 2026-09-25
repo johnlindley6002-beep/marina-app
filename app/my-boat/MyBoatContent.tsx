@@ -13,8 +13,8 @@ import DocumentWallet from "../marinas/[country]/[marina]/DocumentWallet";
 import BoatEditor from "./BoatEditor";
 
 const inputClass =
-  "mt-2 w-full border border-hairline px-3 py-2 text-sm text-ink focus:border-ink focus:outline-none";
-const labelClass = "text-sm font-medium text-ink/80";
+  "field";
+const labelClass = "field-label";
 
 function formatInsurance(amount: number): string {
   if (amount >= 1_000_000) return `€${(amount / 1_000_000).toFixed(1)}M`;
@@ -55,9 +55,9 @@ export default function MyBoatContent() {
   const insuranceLabel = formatInsurance(marinas[0]?.insuranceMinimumEur ?? 0);
 
   return (
-    <div className="section px-5 md:px-8">
-      <div className="mx-auto max-w-4xl">
-        <h1 className="type-display [font-size:clamp(2rem,1.2rem+3vw,3.2rem)] text-ink">
+    <div className="section">
+      <div className="page-column page-reading">
+        <h1 className="type-title text-ink">
           My boat
         </h1>
         <p className="measure mt-4 text-lg text-ink/75">{siteConfig.hub.intro}</p>
@@ -82,7 +82,7 @@ export default function MyBoatContent() {
           {notice}
         </p>
 
-        <section className="mt-12" aria-labelledby="boats-heading">
+        <section className="stack-md" aria-labelledby="boats-heading">
           <div className="flex flex-wrap items-baseline justify-between gap-4">
             <h2 id="boats-heading" className="type-heading type-h2 text-ink">
               Your boats
@@ -91,7 +91,7 @@ export default function MyBoatContent() {
               <button
                 type="button"
                 onClick={() => setEditing("new")}
-                className="inline-flex min-h-11 items-center text-ink underline decoration-current/50 decoration-1 underline-offset-[6px]"
+                className="btn-quiet"
               >
                 Add a boat
               </button>
@@ -119,7 +119,7 @@ export default function MyBoatContent() {
                         <h3 className="type-heading type-h3 flex flex-wrap items-center gap-3 text-ink">
                           {boat.name}
                           {active ? (
-                            <span className="rounded-full border border-ink/30 px-3 py-0.5 font-sans text-xs font-medium">
+                            <span className="chip">
                               Active boat
                             </span>
                           ) : null}
@@ -150,7 +150,7 @@ export default function MyBoatContent() {
                               setActiveId(boat.id);
                               flash(`${boat.name} is now your active boat.`);
                             }}
-                            className="inline-flex min-h-11 items-center text-ink underline decoration-current/50 decoration-1 underline-offset-[6px]"
+                            className="btn-quiet"
                           >
                             Use this boat
                           </button>
@@ -222,7 +222,7 @@ export default function MyBoatContent() {
           ) : null}
         </section>
 
-        <section className="hairline-top mt-12 pt-8" aria-labelledby="docs-heading">
+        <section className="chapter" aria-labelledby="docs-heading">
           <h2 id="docs-heading" className="type-heading type-h2 text-ink">
             Documents
           </h2>
@@ -260,7 +260,7 @@ export default function MyBoatContent() {
           )}
         </section>
 
-        <section className="hairline-top mt-12 pt-8" aria-labelledby="you-heading">
+        <section className="chapter" aria-labelledby="you-heading">
           <h2 id="you-heading" className="type-heading type-h2 text-ink">
             About you
           </h2>
@@ -308,7 +308,7 @@ export default function MyBoatContent() {
           </div>
         </section>
 
-        <section className="hairline-top mt-12 pt-8" aria-labelledby="units-heading">
+        <section className="chapter" aria-labelledby="units-heading">
           <h2 id="units-heading" className="type-heading type-h2 text-ink">
             Units
           </h2>
@@ -322,7 +322,7 @@ export default function MyBoatContent() {
 
         <SavedMarinas showEmpty headingLevel="h2" />
 
-        <section className="hairline-top mt-12 pt-8" aria-labelledby="clear-heading">
+        <section className="chapter" aria-labelledby="clear-heading">
           <h2 id="clear-heading" className="type-heading type-h2 text-ink">
             Data on this device
           </h2>
@@ -361,7 +361,7 @@ export default function MyBoatContent() {
             <button
               type="button"
               onClick={() => setConfirmClear(true)}
-              className="mt-4 inline-flex min-h-11 items-center border border-ink/30 px-5 text-sm font-medium text-ink hover:border-error hover:text-error"
+              className="btn-secondary mt-4 hover:border-error hover:text-error"
             >
               Clear all saved data on this device
             </button>

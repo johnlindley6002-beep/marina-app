@@ -26,9 +26,9 @@ export const isCommercialUse = (use: VesselUse) =>
   use !== "" && use !== "private";
 
 const inputClass =
-  "mt-2 w-full border border-hairline px-3 py-2 text-sm text-ink focus:border-ink focus:outline-none";
-const labelClass = "text-sm font-medium text-ink/80";
-const errorClass = "mt-1 text-xs text-error";
+  "field";
+const labelClass = "field-label";
+const errorClass = "field-error";
 
 function Required() {
   return <span className="text-error"> *</span>;
