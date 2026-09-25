@@ -13,7 +13,7 @@
 // ============================================================================
 
 import { getAllBerths } from "../data/berths";
-import { marinas } from "../data/marinas";
+import { getSeason, marinas } from "../data/marinas";
 
 export type Role = "voyager" | "owner" | "staff";
 export type Mode = "guest" | "owner";
@@ -22,6 +22,7 @@ export const MOCK_CHANGED_EVENT = "aldock-mock-changed";
 const SESSION_KEY = "aldock-mock-session";
 const MODE_KEY = "aldock-mode";
 const PROFILE_KEY = "aldock-mock-profiles";
+const RELETTING_KEY = "aldock-mock-reletting";
 
 // ---------------------------------------------------------------------------
 // Stored records (what a real database would hold)
@@ -99,15 +100,15 @@ const BERTH_LINKS: BerthLinkRecord[] = [
     id: "link-1",
     userId: "u-owner",
     marinaId: "cascais",
-    berthId: "P-24",
+    berthId: "G-14",
     linkedAt: "2026-03-12",
     active: true,
     boatOnFile: {
       name: "Mar Azul",
       type: "sail",
-      loa: "9.6",
-      beam: "3.3",
-      draft: "1.6",
+      loa: "7.6",
+      beam: "2.9",
+      draft: "1.4",
       flag: "Portugal",
     },
   },
@@ -188,7 +189,12 @@ function emitChange() {
 }
 
 // The storage keys, so a provider can react to changes made in another tab.
-export const MOCK_STORAGE_KEYS = [SESSION_KEY, MODE_KEY, PROFILE_KEY];
+export const MOCK_STORAGE_KEYS = [
+  SESSION_KEY,
+  MODE_KEY,
+  PROFILE_KEY,
+  RELETTING_KEY,
+];
 
 // ---------------------------------------------------------------------------
 // Role rules (mocked here, enforced by the real backend later)
@@ -431,7 +437,7 @@ export function listDevPersonas(): DevPersona[] {
       id: "owner",
       userId: "u-owner",
       label: "Voyager and owner",
-      description: "Holds berth P-24, sees the mode switch",
+      description: "Holds berth G-14, sees the mode switch",
     },
     {
       id: "staff",
@@ -445,4 +451,544 @@ export function listDevPersonas(): DevPersona[] {
 export function getActivePersonaId(): string {
   const id = getSessionUserId();
   return listDevPersonas().find((p) => p.userId === id)?.id ?? "signed-out";
+}
+
+// ---------------------------------------------------------------------------
+// Reletting a held berth while its holder is away
+//
+// LEGAL SHAPE (mocked here, enforced by the real backend later): a berth is a
+// right of use on public maritime domain, so it can be relet only with the
+// marina's PRIOR CONSENT. That is why a request starts as "submitted" and
+// nothing is relet until marina staff approve it. The holder never sublets to a
+// visitor directly: the marina manages and approves every stay.
+// ---------------------------------------------------------------------------
+
+export type RelettingStatus =
+  | "submitted"
+  | "approved"
+  | "declined"
+  | "listed"
+  | "booked"
+  | "completed";
+
+// The order a request moves through once approved.
+export const RELETTING_PROGRESS: RelettingStatus[] = [
+  "submitted",
+  "approved",
+  "listed",
+  "booked",
+  "completed",
+];
+
+export const RELETTING_STATUS_LABELS: Record<RelettingStatus, string> = {
+  submitted: "Submitted",
+  approved: "Approved",
+  declined: "Declined",
+  listed: "Listed",
+  booked: "Booked",
+  completed: "Completed",
+};
+
+export type RelettingEvent = { status: RelettingStatus; at: string };
+
+export type RelettingRequest = {
+  id: string;
+  userId: string;
+  marinaId: string;
+  berthId: string;
+  startDate: string; // the day the holder leaves (ISO)
+  endDate: string; // the day the holder returns (ISO)
+  boatRemovalConfirmed: boolean;
+  reletConsent: boolean;
+  termsAcceptedAt: string;
+  readinessConfirmedAt: string;
+  status: RelettingStatus;
+  history: RelettingEvent[];
+  decisionNote: string;
+  // Filled in once a stay is booked.
+  nightsRelet: number | null;
+  grossEur: number | null;
+  ownerShareEur: number | null;
+  feeEur: number | null;
+  netEur: number | null;
+  createdAt: string;
+};
+
+export type MockNotification = {
+  id: string;
+  userId: string;
+  kind: "approved" | "declined" | "booked" | "credit-applied";
+  requestId: string;
+  title: string;
+  body: string;
+  at: string;
+  read: boolean;
+};
+
+type ReletStore = {
+  requests: RelettingRequest[];
+  notifications: MockNotification[];
+};
+
+export type ReletSplit = {
+  nights: number;
+  grossEur: number;
+  ownerShareEur: number;
+  feeEur: number;
+  netEur: number;
+};
+
+function parseIso(value: string): Date | null {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
+  if (!m) return null;
+  const d = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
+  return Number.isNaN(d.getTime()) ? null : d;
+}
+
+export function countNights(startDate: string, endDate: string): number {
+  const a = parseIso(startDate);
+  const b = parseIso(endDate);
+  if (!a || !b || b <= a) return 0;
+  return Math.round((b.getTime() - a.getTime()) / 86_400_000);
+}
+
+const cents = (n: number) => Math.round(n * 100) / 100;
+
+// The money for relet nights, from the marina's real tariff for the berth's
+// class and the placeholder share and fee in its data. The holder's share is a
+// percent of the tariff income (excluding VAT), and the fee is a percent of
+// that share, so net is share minus fee. Pure and deterministic.
+export function computeReletSplit(
+  marinaId: string,
+  berthId: string,
+  startDate: string,
+  nights: number
+): ReletSplit | null {
+  const marina = marinas.find((m) => m.id === marinaId);
+  const terms = marina?.reletting;
+  const start = parseIso(startDate);
+  const berth = getAllBerths().find((b) => b.id === berthId);
+  if (!marina || !terms || !start || !berth || nights <= 0) return null;
+  let gross = 0;
+  const cursor = new Date(start);
+  for (let i = 0; i < nights; i++) {
+    gross += marina.transientRates[berth.sizeClass][getSeason(cursor)];
+    cursor.setDate(cursor.getDate() + 1);
+  }
+  const share = (gross * terms.ownerSharePercent) / 100;
+  const fee = (share * terms.processingFeePercent) / 100;
+  return {
+    nights,
+    grossEur: cents(gross),
+    ownerShareEur: cents(share),
+    feeEur: cents(fee),
+    netEur: cents(share - fee),
+  };
+}
+
+// What the whole absence would earn if every night were relet. An illustration,
+// never a promise.
+export function estimateReletting(
+  marinaId: string,
+  berthId: string,
+  startDate: string,
+  endDate: string
+): ReletSplit | null {
+  return computeReletSplit(
+    marinaId,
+    berthId,
+    startDate,
+    countNights(startDate, endDate)
+  );
+}
+
+function buildSeedRelettingStore(): ReletStore {
+  const split = computeReletSplit("cascais", "G-14", "2026-07-06", 12);
+  const request: RelettingRequest = {
+    id: "relet-seed-1",
+    userId: "u-owner",
+    marinaId: "cascais",
+    berthId: "G-14",
+    startDate: "2026-07-06",
+    endDate: "2026-07-20",
+    boatRemovalConfirmed: true,
+    reletConsent: true,
+    termsAcceptedAt: "2026-06-10T09:00:00.000Z",
+    readinessConfirmedAt: "2026-06-10T09:00:00.000Z",
+    status: "completed",
+    history: [
+      { status: "submitted", at: "2026-06-10T09:00:00.000Z" },
+      { status: "approved", at: "2026-06-12T10:30:00.000Z" },
+      { status: "listed", at: "2026-06-13T08:00:00.000Z" },
+      { status: "booked", at: "2026-06-20T14:15:00.000Z" },
+      { status: "completed", at: "2026-07-21T09:00:00.000Z" },
+    ],
+    decisionNote: "",
+    nightsRelet: split?.nights ?? null,
+    grossEur: split?.grossEur ?? null,
+    ownerShareEur: split?.ownerShareEur ?? null,
+    feeEur: split?.feeEur ?? null,
+    netEur: split?.netEur ?? null,
+    createdAt: "2026-06-10T09:00:00.000Z",
+  };
+  const credit = split ? split.netEur.toFixed(2) : "0.00";
+  return {
+    requests: [request],
+    notifications: [
+      {
+        id: "note-seed-1",
+        userId: "u-owner",
+        kind: "approved",
+        requestId: request.id,
+        title: "Reletting approved",
+        body: "Marina de Cascais approved your request for 6 to 20 July.",
+        at: "2026-06-12T10:30:00.000Z",
+        read: true,
+      },
+      {
+        id: "note-seed-2",
+        userId: "u-owner",
+        kind: "booked",
+        requestId: request.id,
+        title: "Your berth was booked",
+        body: "A visitor booked your berth for part of your absence.",
+        at: "2026-06-20T14:15:00.000Z",
+        read: true,
+      },
+      {
+        id: "note-seed-3",
+        userId: "u-owner",
+        kind: "credit-applied",
+        requestId: request.id,
+        title: "Credit applied",
+        body: `A credit of \u20ac${credit} was applied to your berth account.`,
+        at: "2026-07-21T09:00:00.000Z",
+        read: false,
+      },
+    ],
+  };
+}
+
+function loadReletStore(): ReletStore {
+  return readJson<ReletStore>(RELETTING_KEY) ?? buildSeedRelettingStore();
+}
+
+function saveReletStore(store: ReletStore) {
+  writeJson(RELETTING_KEY, store);
+  emitChange();
+}
+
+function newId(prefix: string): string {
+  return `${prefix}-${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
+}
+
+function todayIso(): string {
+  const d = new Date();
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+}
+
+const ACTIVE_STATUSES: RelettingStatus[] = [
+  "submitted",
+  "approved",
+  "listed",
+  "booked",
+];
+
+// ---- Owner side ----
+
+// The holder's own requests, newest first.
+export function getRelettingRequests(userId: string | null): RelettingRequest[] {
+  if (!userId) return [];
+  return loadReletStore()
+    .requests.filter((r) => r.userId === userId)
+    .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+}
+
+export type SubmitRelettingInput = {
+  berthId: string;
+  startDate: string;
+  endDate: string;
+  boatRemovalConfirmed: boolean;
+  reletConsent: boolean;
+  termsAccepted: boolean;
+  readinessConfirmed: boolean;
+};
+
+export type SubmitRelettingResult =
+  | { ok: true; request: RelettingRequest }
+  | { ok: false; error: string };
+
+// This is the marina PRIOR-CONSENT step: it only ever creates a "submitted"
+// request. The real backend must check server-side that the caller holds the
+// berth (owner role via an active berth link), that every consent is true, and
+// that the dates are valid and do not overlap, exactly as done here.
+export function submitRelettingRequest(
+  userId: string | null,
+  input: SubmitRelettingInput
+): SubmitRelettingResult {
+  const berth = getOwnedBerths(userId).find((b) => b.berthId === input.berthId);
+  if (!userId || !berth) {
+    return { ok: false, error: "Only the holder of this berth can make it available." };
+  }
+  if (!marinas.find((m) => m.id === berth.marinaId)?.reletting) {
+    return { ok: false, error: "This marina does not offer reletting." };
+  }
+  const nights = countNights(input.startDate, input.endDate);
+  if (nights < 1) {
+    return { ok: false, error: "Choose a return date after the day you leave." };
+  }
+  if (input.startDate < todayIso()) {
+    return { ok: false, error: "The day you leave cannot be in the past." };
+  }
+  if (!input.boatRemovalConfirmed || !input.reletConsent || !input.termsAccepted || !input.readinessConfirmed) {
+    return { ok: false, error: "Every confirmation is needed before the marina can consider your request." };
+  }
+  const store = loadReletStore();
+  const overlaps = store.requests.some(
+    (r) =>
+      r.userId === userId &&
+      r.berthId === input.berthId &&
+      ACTIVE_STATUSES.includes(r.status) &&
+      input.startDate < r.endDate &&
+      r.startDate < input.endDate
+  );
+  if (overlaps) {
+    return { ok: false, error: "You already have a request that overlaps these dates." };
+  }
+  const now = new Date().toISOString();
+  const request: RelettingRequest = {
+    id: newId("relet"),
+    userId,
+    marinaId: berth.marinaId,
+    berthId: berth.berthId,
+    startDate: input.startDate,
+    endDate: input.endDate,
+    boatRemovalConfirmed: true,
+    reletConsent: true,
+    termsAcceptedAt: now,
+    readinessConfirmedAt: now,
+    status: "submitted",
+    history: [{ status: "submitted", at: now }],
+    decisionNote: "",
+    nightsRelet: null,
+    grossEur: null,
+    ownerShareEur: null,
+    feeEur: null,
+    netEur: null,
+    createdAt: now,
+  };
+  saveReletStore({ ...store, requests: [request, ...store.requests] });
+  return { ok: true, request };
+}
+
+export function getNotifications(userId: string | null): MockNotification[] {
+  if (!userId) return [];
+  return loadReletStore()
+    .notifications.filter((n) => n.userId === userId)
+    .sort((a, b) => b.at.localeCompare(a.at));
+}
+
+export function markNotificationsRead(userId: string | null): void {
+  if (!userId) return;
+  const store = loadReletStore();
+  saveReletStore({
+    ...store,
+    notifications: store.notifications.map((n) =>
+      n.userId === userId ? { ...n, read: true } : n
+    ),
+  });
+}
+
+// ---- Staff side ----
+
+export type RelettingQueueItem = {
+  request: RelettingRequest;
+  ownerName: string;
+  boatName: string;
+  berthClass: string | null;
+  estimate: ReletSplit | null;
+};
+
+function isStaffOfMarina(staffUserId: string | null, marinaId: string): boolean {
+  return getStaffMemberships(staffUserId).some((m) => m.marinaId === marinaId);
+}
+
+function dateLabel(iso: string): string {
+  const d = parseIso(iso);
+  return d
+    ? new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "long" }).format(d)
+    : iso;
+}
+
+// Only requests for marinas the staff member belongs to. The real backend must
+// filter by the staff membership server-side, never trust the client.
+export function getRelettingQueue(
+  staffUserId: string | null
+): RelettingQueueItem[] {
+  if (!staffUserId) return [];
+  const allBerths = getAllBerths();
+  return loadReletStore()
+    .requests.filter((r) => isStaffOfMarina(staffUserId, r.marinaId))
+    .map((request) => {
+      const owner = ACCOUNTS.find((a) => a.id === request.userId);
+      const link = BERTH_LINKS.find(
+        (l) => l.userId === request.userId && l.berthId === request.berthId
+      );
+      return {
+        request,
+        ownerName: owner?.name ?? "Berth holder",
+        boatName: link?.boatOnFile.name ?? "",
+        berthClass:
+          allBerths.find((b) => b.id === request.berthId)?.sizeClass ?? null,
+        estimate: estimateReletting(
+          request.marinaId,
+          request.berthId,
+          request.startDate,
+          request.endDate
+        ),
+      };
+    })
+    .sort((a, b) => {
+      const rank = (s: RelettingStatus) => (s === "submitted" ? 0 : ACTIVE_STATUSES.includes(s) ? 1 : 2);
+      return (
+        rank(a.request.status) - rank(b.request.status) ||
+        a.request.startDate.localeCompare(b.request.startDate)
+      );
+    });
+}
+
+function withEvent(
+  request: RelettingRequest,
+  status: RelettingStatus
+): RelettingRequest {
+  return {
+    ...request,
+    status,
+    history: [...request.history, { status, at: new Date().toISOString() }],
+  };
+}
+
+function notification(
+  request: RelettingRequest,
+  kind: MockNotification["kind"],
+  title: string,
+  body: string
+): MockNotification {
+  return {
+    id: newId("note"),
+    userId: request.userId,
+    kind,
+    requestId: request.id,
+    title,
+    body,
+    at: new Date().toISOString(),
+    read: false,
+  };
+}
+
+export type StaffActionResult = { ok: true } | { ok: false; error: string };
+
+// The marina's consent decision. Only staff of that marina, only on a
+// submitted request.
+export function decideReletting(
+  staffUserId: string | null,
+  requestId: string,
+  decision: "approve" | "decline",
+  note = ""
+): StaffActionResult {
+  const store = loadReletStore();
+  const request = store.requests.find((r) => r.id === requestId);
+  if (!request) return { ok: false, error: "Request not found." };
+  if (!isStaffOfMarina(staffUserId, request.marinaId)) {
+    return { ok: false, error: "Only staff of this marina can decide." };
+  }
+  if (request.status !== "submitted") {
+    return { ok: false, error: "This request has already been decided." };
+  }
+  const span = `${dateLabel(request.startDate)} to ${dateLabel(request.endDate)}`;
+  const next = {
+    ...withEvent(request, decision === "approve" ? "approved" : "declined"),
+    decisionNote: note.trim(),
+  };
+  const message =
+    decision === "approve"
+      ? notification(next, "approved", "Reletting approved", `Marina de Cascais approved your request for ${span}.`)
+      : notification(
+          next,
+          "declined",
+          "Reletting declined",
+          `Marina de Cascais declined your request for ${span}.${note.trim() ? ` Note: ${note.trim()}` : ""}`
+        );
+  saveReletStore({
+    requests: store.requests.map((r) => (r.id === requestId ? next : r)),
+    notifications: [message, ...store.notifications],
+  });
+  return { ok: true };
+}
+
+// MOCK ONLY. Moves an approved request through listed, booked and completed so
+// the ledger and notifications can be previewed. In reality these come from the
+// marina's own system and from real visitor bookings, not from a button.
+export function advanceRelettingStatus(
+  staffUserId: string | null,
+  requestId: string
+): StaffActionResult {
+  const store = loadReletStore();
+  const request = store.requests.find((r) => r.id === requestId);
+  if (!request) return { ok: false, error: "Request not found." };
+  if (!isStaffOfMarina(staffUserId, request.marinaId)) {
+    return { ok: false, error: "Only staff of this marina can do this." };
+  }
+  const index = RELETTING_PROGRESS.indexOf(request.status);
+  if (request.status === "declined" || index < 1 || index >= RELETTING_PROGRESS.length - 1) {
+    return { ok: false, error: "There is no next step for this request." };
+  }
+  const nextStatus = RELETTING_PROGRESS[index + 1];
+  let next = withEvent(request, nextStatus);
+  const added: MockNotification[] = [];
+
+  if (nextStatus === "booked") {
+    // Mock: assume every night of the absence was booked.
+    const split = computeReletSplit(
+      request.marinaId,
+      request.berthId,
+      request.startDate,
+      countNights(request.startDate, request.endDate)
+    );
+    if (split) {
+      next = {
+        ...next,
+        nightsRelet: split.nights,
+        grossEur: split.grossEur,
+        ownerShareEur: split.ownerShareEur,
+        feeEur: split.feeEur,
+        netEur: split.netEur,
+      };
+    }
+    added.push(
+      notification(next, "booked", "Your berth was booked", "A visitor booked your berth during your absence.")
+    );
+  }
+  if (nextStatus === "completed" && next.netEur !== null) {
+    added.push(
+      notification(
+        next,
+        "credit-applied",
+        "Credit applied",
+        `A credit of \u20ac${next.netEur.toFixed(2)} was applied to your berth account.`
+      )
+    );
+  }
+  saveReletStore({
+    requests: store.requests.map((r) => (r.id === requestId ? next : r)),
+    notifications: [...added, ...store.notifications],
+  });
+  return { ok: true };
+}
+
+// DEV ONLY: back to the seed data.
+export function resetMockReletting(): void {
+  removeKey(RELETTING_KEY);
+  emitChange();
 }

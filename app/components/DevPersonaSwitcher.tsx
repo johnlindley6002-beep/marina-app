@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { siteConfig } from "../../data/site";
+import { resetMockReletting } from "../../lib/mockData";
 import { useAuth } from "./AuthProvider";
 
 // MOCK / DEV ONLY. Stands in for signing in so each experience can be
@@ -53,6 +54,13 @@ export default function DevPersonaSwitcher() {
               );
             })}
           </ul>
+          <button
+            type="button"
+            onClick={resetMockReletting}
+            className="mt-2 flex min-h-11 w-full items-center rounded-[3px] px-3 text-left text-xs text-stone hover:bg-paper/10"
+          >
+            Reset mock reletting data
+          </button>
         </div>
       ) : null}
       <button

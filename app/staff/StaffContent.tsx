@@ -5,6 +5,7 @@ import { siteConfig } from "../../data/site";
 import { getStaffMemberships } from "../../lib/mockData";
 import { useAuth } from "../components/AuthProvider";
 import RoleGate from "../components/RoleGate";
+import RelettingQueue from "./RelettingQueue";
 
 function StaffBody() {
   const { user } = useAuth();
@@ -24,12 +25,10 @@ function StaffBody() {
             Signed in as staff of {m.marinaName}.
           </p>
         ))}
-        <p className="measure mt-4 text-ink/75">
-          {siteConfig.accounts.staffPlaceholder}
-        </p>
         {siteConfig.mockMode ? (
           <p className="mt-2 text-sm text-ink/70">{siteConfig.accounts.mockNote}</p>
         ) : null}
+        <RelettingQueue />
       </div>
     </div>
   );

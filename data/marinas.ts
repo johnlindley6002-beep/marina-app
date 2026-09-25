@@ -394,6 +394,20 @@ export type FuelPrices = {
 // busyMonths uses 1 (January) to 12 (December).
 export type DemandInfo = { busyMonths: number[]; note: string };
 
+// Terms for reletting a held berth while its holder is away. A berth is a right
+// of use, so the marina must consent to every reletting. ALL NUMBERS HERE ARE
+// PLACEHOLDERS to be set with the marina and reviewed by legal counsel.
+export type RelettingTerms = {
+  // The holder's share of the tariff income for the nights relet (percent).
+  ownerSharePercent: number;
+  // The marina's processing fee, taken from the holder's share (percent).
+  processingFeePercent: number;
+  // "credit" is a credit against berth fees, "payment" would be cash out.
+  settlement: "credit" | "payment";
+  termsHref: string;
+  taxNote: string;
+};
+
 export type NearbyPlace = { name: string; description: string };
 export type EmergencyPhone = { label: string; number: string };
 export type VhfChannelInfo = { channel: number; label: string };
@@ -479,6 +493,8 @@ export type Marina = {
   googleReviews: GoogleReviews;
   fuelPrices: FuelPrices;
   demand: DemandInfo | null;
+  // Null when the marina does not offer reletting.
+  reletting: RelettingTerms | null;
   nearby: NearbyPlace[];
   emergency: { phones: EmergencyPhone[]; vhf: VhfChannelInfo[] };
 };
@@ -853,6 +869,17 @@ export const marinas: Marina[] = [
     demand: {
       busyMonths: [7, 8],
       note: "Busy period: peak summer, so availability may be tighter.",
+    },
+    // TODO (legal and marina): every value below is a placeholder. Set the real
+    // share, fee and settlement with the marina, and have the tax note and the
+    // terms page reviewed by counsel before launch.
+    reletting: {
+      ownerSharePercent: 50,
+      processingFeePercent: 10,
+      settlement: "credit",
+      termsHref: "/legal/reletting-terms",
+      taxNote:
+        "A credit may count as income for tax purposes where you live. This is general information, not tax advice, so check with your own adviser.",
     },
     nearby: [
       {

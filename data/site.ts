@@ -1,3 +1,33 @@
+// Copy for the owner's reletting flow. All of it is plain-language and English
+// only for now. TODO (legal): have the "why" and footer wording reviewed.
+export type ReletCopy = {
+  useRight: string;
+  primaryAction: string;
+  placeholderNote: string;
+  steps: string[];
+  absenceTitle: string;
+  absenceBody: string;
+  absenceConfirm: string;
+  authorizeTitle: string;
+  authorizeToggle: string;
+  authorizeLine: string;
+  authorizeWhyLabel: string;
+  authorizeWhy: string;
+  termsTitle: string;
+  termsAccept: string;
+  taxLabel: string;
+  readinessTitle: string;
+  readinessBoat: string;
+  readinessBerth: string;
+  readinessInsurance: string;
+  submitTitle: string;
+  submitAction: string;
+  pendingTitle: string;
+  pendingBody: string;
+  legalFooter: string;
+  queueIntro: string;
+};
+
 // Site-level configuration. Set heroImage when a photo is supplied; until
 // then the homepage hero renders as an ink gradient with chart linework.
 export const siteConfig: {
@@ -12,6 +42,7 @@ export const siteConfig: {
   // Short, plain description of how the site handles data. Have it checked
   // before launch.
   privacyNote: string;
+  relet: ReletCopy;
   // MOCK: shows the dev sign-in switcher and "sample data" notes. Set to false
   // to hide the switcher. Delete the mock layer when a real backend arrives.
   mockMode: boolean;
@@ -43,6 +74,42 @@ export const siteConfig: {
   privacyNote:
     "aldock has no accounts. Boat details, saved marinas and your last enquiry are stored only in this browser. When you send an enquiry, your own email app sends it straight to the marina and aldock does not receive a copy. Passport numbers and other private details are optional and can be given to staff in person.",
   mockMode: true,
+  relet: {
+    useRight:
+      "You hold a right of use of this berth. It is not ownership, and it can be relet only with the marina's consent.",
+    primaryAction: "Make my berth available while I am away",
+    placeholderNote:
+      "Placeholder terms for the mockup. The marina sets the final amounts.",
+    steps: ["Absence", "Authorize", "Terms", "Readiness", "Send"],
+    absenceTitle: "When will you be away?",
+    absenceBody: "Choose the day you leave and the day you return.",
+    absenceConfirm: "My boat will be removed from the berth for these dates.",
+    authorizeTitle: "Let the marina relet your berth",
+    authorizeToggle:
+      "Allow Marina de Cascais to relet my berth during my absence",
+    authorizeLine:
+      "Your berth is a right of use, so it can be relet only with the marina's consent. The marina manages and approves every stay.",
+    authorizeWhyLabel: "Why this",
+    authorizeWhy:
+      "This is not a sublet between you and a visitor. The berth stays under your right of use. The marina, not you, decides whether to relet it, finds and checks the visitor, and handles their formalities. Nothing is relet until the marina approves your request.",
+    termsTitle: "The terms",
+    termsAccept: "I accept the reletting terms",
+    taxLabel: "About tax",
+    readinessTitle: "Before you go",
+    readinessBoat: "My boat will be removed from the berth by the start date.",
+    readinessBerth: "The berth will be cleared of lines, fenders and belongings.",
+    readinessInsurance:
+      "Your own insurance stays valid for your berth. The visitor's insurance is the marina's responsibility at check-in.",
+    submitTitle: "Send your request",
+    submitAction: "Send request to the marina",
+    pendingTitle: "Pending marina approval",
+    pendingBody:
+      "The marina reviews every request before anything is relet. You will see the update in Updates on My berth.",
+    legalFooter:
+      "Your berth is a right of use of public maritime domain, held under a State concession. It can be relet only with the marina's prior consent, and the marina handles the visitor's formalities. Your details are processed only with your consent (GDPR). Any credit may be taxable. Consumer disputes can go to consumer arbitration.",
+    queueIntro:
+      "Berth holders ask for your consent before their berth is relet. Approve or decline each request.",
+  },
   accounts: {
     mockNote: "Mockup: this is sample data and nothing is saved to a server.",
     signedOut:

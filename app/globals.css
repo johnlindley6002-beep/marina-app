@@ -216,6 +216,38 @@ footer :focus-visible,
   animation: hero-settle 1.8s cubic-bezier(0.2, 0.7, 0.2, 1) both;
 }
 
+/* One step of the reletting wizard slides and fades in, in the direction of
+   travel, so going back feels like going back. Instant under reduced motion. */
+@keyframes step-forward {
+  from {
+    opacity: 0;
+    transform: translateX(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes step-back {
+  from {
+    opacity: 0;
+    transform: translateX(-14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.step-forward {
+  animation: step-forward 0.45s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+.step-back {
+  animation: step-back 0.45s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
 /* Reveal: elements settle in once as they enter the viewport. An element hides
    itself (is-armed) only after the page has loaded, only when motion is
    allowed, and only if it starts below the fold, so with no JavaScript, with
