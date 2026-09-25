@@ -1,20 +1,69 @@
 @import "tailwindcss";
 
+/* Design tokens: "nautical chart meets Atlantic hospitality".
+   Ink and paper carry the page; stone draws the hairlines; brass is the
+   single accent, used in only two roles: the primary action fill and the one
+   hairline rule in the hero. Everything else is ink, paper or stone. */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-  --navy: #0a1a2f;
-  --navy-accent: #1e3a5f;
+  --ink: #0a1a2f;
+  --ink-2: #16304f;
+  --paper: #eef1f0;
+  --stone: #b9c2c0;
+  --brass: #c7a15b;
+
+  --paper-deep: color-mix(in srgb, var(--paper) 74%, var(--stone));
+  --hairline: color-mix(in srgb, var(--ink) 16%, var(--paper));
+  --lift:
+    0 1px 0 color-mix(in srgb, var(--ink) 8%, transparent),
+    0 24px 48px -28px rgb(10 26 47 / 0.45);
+
+  /* Error and warning text. Deep enough to pass contrast on paper and white. */
+  --error: #b3261e;
+
+  --background: var(--paper);
+  --foreground: var(--ink);
+
+  /* Legacy names, kept so untouched components inherit the new palette. */
+  --navy: var(--ink);
+  --navy-accent: var(--ink-2);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --color-navy: var(--navy);
-  --color-navy-accent: var(--navy-accent);
-  --font-sans: var(--font-titillium), system-ui, sans-serif;
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-paper: var(--paper);
+  --color-paper-deep: var(--paper-deep);
+  --color-stone: var(--stone);
+  --color-brass: var(--brass);
+  --color-hairline: var(--hairline);
+  --color-error: var(--error);
+  --color-navy: var(--ink);
+  --color-navy-accent: var(--ink-2);
+  --font-sans: var(--font-inter), system-ui, sans-serif;
 }
 
+/* THE SYSTEM, in one place.
+
+   Column: every page, the navbar and the footer sit on .page-column (72rem,
+   1.25rem padding, 2rem from md up, padding inside the width), so all left and
+   right edges line up. Task pages add .page-reading, which limits the blocks
+   inside to one readable measure while staying left aligned to the same edge.
+
+   Vertical rhythm: .section-editorial for discovery and storytelling,
+   .section for task and back-office pages, .section-tight for the booking
+   cluster (kept quick on purpose). Between blocks inside a section use only
+   .stack-sm, .stack-md and .stack-lg.
+
+   Type: .type-display (home hero), .type-statement (discovery headline),
+   .type-title (task page title), .type-h2, .type-card, .type-h3, .type-label.
+
+   Controls: .btn-primary (brass, the one primary per screen), .btn-secondary,
+   .btn-dark, .btn-quiet, .chip, .field, .field-label, .field-error, .link.
+
+   Motion: 200ms for interface state, 500ms for disclosures and steps, 900ms
+   for reveals. All of it is instant under prefers-reduced-motion. */
 html {
   scroll-behavior: smooth;
 }
@@ -22,11 +71,421 @@ html {
 body {
   background: var(--background);
   color: var(--foreground);
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+/* Type: Archivo at expanded width for display; Inter for body and UI. */
+.type-display,
+.type-heading {
+  font-family: var(--font-archivo), system-ui, sans-serif;
+}
+
+.type-display {
+  font-variation-settings: "wdth" 125;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  line-height: 1.03;
+  font-size: clamp(2.4rem, 1.1rem + 5.4vw, 4.6rem);
+}
+
+.type-heading {
+  font-variation-settings: "wdth" 110;
+  font-weight: 600;
+  letter-spacing: -0.012em;
+  line-height: 1.12;
+}
+
+.type-h2 {
+  font-size: clamp(1.6rem, 1.05rem + 1.7vw, 2.4rem);
+}
+
+.type-h3 {
+  font-size: 1.2rem;
+  line-height: 1.25;
+}
+
+/* Page title on task and back-office pages. */
+.type-title {
+  font-family: var(--font-archivo), system-ui, sans-serif;
+  font-variation-settings: "wdth" 125;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  line-height: 1.03;
+  font-size: clamp(2rem, 1.2rem + 3vw, 3.2rem);
+}
+
+/* Title of a card or a list row. */
+.type-card {
+  font-family: var(--font-archivo), system-ui, sans-serif;
+  font-variation-settings: "wdth" 110;
+  font-weight: 600;
+  letter-spacing: -0.012em;
+  line-height: 1.15;
+  font-size: 1.5rem;
+}
+
+/* Small label above a value or a field. */
+.type-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: color-mix(in srgb, var(--ink) 80%, transparent);
+}
+
+/* The one very large, quiet headline per major section. Booking headings keep
+   type-h2 and type-h3. */
+.type-statement {
+  font-family: var(--font-archivo), system-ui, sans-serif;
+  font-variation-settings: "wdth" 118;
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  line-height: 1.04;
+  font-size: clamp(2.4rem, 1.2rem + 4.6vw, 4.2rem);
+}
+
+.measure {
+  max-width: 68ch;
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Elevated surfaces are reserved for interactive tools: search, plan, map, form. */
+.surface-lift {
+  background: #fff;
+  color: var(--ink);
+  border-radius: 4px;
+  box-shadow: var(--lift);
+}
+
+/* One vertical rhythm for page sections. */
+.section {
+  padding-block: clamp(3.5rem, 2.2rem + 5vw, 6.5rem);
+}
+
+/* Discovery and storytelling sections breathe. The booking cluster keeps
+   .section-tight so the flow stays quick. */
+.section-editorial {
+  padding-block: clamp(6rem, 3.5rem + 9vw, 12rem);
+}
+
+.page-column {
+  width: 100%;
+  max-width: 72rem;
+  margin-inline: auto;
+  padding-inline: 1.25rem;
+}
+
+@media (min-width: 768px) {
+  .page-column {
+    padding-inline: 2rem;
+  }
+}
+
+/* One readable measure for task pages, left aligned to the column edge. */
+.page-reading > * {
+  max-width: 56rem;
+}
+
+/* A chapter of a task or back-office page: a hairline and the large gap. */
+.chapter {
+  margin-top: clamp(4rem, 3rem + 4vw, 6rem);
+  padding-top: 2rem;
+  border-top: 1px solid var(--hairline);
+}
+
+/* Space between blocks inside a section. */
+.stack-sm {
+  margin-top: 1.5rem;
+}
+
+.stack-md {
+  margin-top: clamp(2.5rem, 2rem + 2vw, 3.5rem);
+}
+
+.stack-lg {
+  margin-top: clamp(4rem, 3rem + 4vw, 6rem);
+}
+
+.section-tight {
+  padding-block: clamp(2.5rem, 1.6rem + 3vw, 4rem);
+}
+
+/* Comfortable touch targets and iOS-safe input text on phones. */
+#main input:not([type="checkbox"]):not([type="radio"]),
+#main select {
+  min-height: 2.75rem;
+}
+
+input[type="checkbox"] {
+  width: 1.125rem;
+  height: 1.125rem;
+  accent-color: var(--ink);
+}
+
+label:has(> input[type="checkbox"]) {
+  min-height: 2.75rem;
+}
+
+@media (max-width: 639px) {
+  #main input,
+  #main select,
+  #main textarea {
+    font-size: 1rem;
+  }
+}
+
+.hairline-top {
+  border-top: 1px solid var(--hairline);
+}
+
+@layer components {
+  .btn-primary,
+  .btn-secondary,
+  .btn-dark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 2.75rem;
+    padding-inline: 1.5rem;
+    border-radius: 3px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    line-height: 1.2;
+    text-align: center;
+    transition:
+      color 200ms,
+      background-color 200ms,
+      border-color 200ms,
+      filter 200ms;
+  }
+
+  .btn-primary {
+    min-height: 3rem;
+    padding-inline: 2rem;
+    font-size: 1rem;
+    background: var(--brass);
+    color: var(--ink);
+  }
+
+  .btn-primary:hover {
+    filter: brightness(1.05);
+  }
+
+  .btn-secondary {
+    border: 1px solid color-mix(in srgb, var(--ink) 30%, transparent);
+    color: var(--ink);
+  }
+
+  .btn-secondary:hover {
+    border-color: var(--ink);
+  }
+
+  .btn-dark {
+    background: var(--ink);
+    color: var(--paper);
+  }
+
+  .btn-dark:hover {
+    background: var(--ink-2);
+  }
+
+  /* A text action: the quiet choice next to a primary. */
+  .btn-quiet {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    color: var(--ink);
+    text-decoration: underline;
+    text-decoration-color: color-mix(in srgb, currentColor 50%, transparent);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 6px;
+    transition: text-decoration-color 200ms;
+  }
+
+  .btn-quiet:hover {
+    text-decoration-color: currentColor;
+  }
+
+  /* An inline text link inside a sentence. */
+  .link {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid color-mix(in srgb, var(--ink) 30%, transparent);
+    border-radius: 9999px;
+    padding: 0.125rem 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--ink);
+  }
+
+  /* A chip over a photo or a dark plate. */
+  .chip-dark {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 2.75rem;
+    border: 1px solid rgb(255 255 255 / 0.3);
+    border-radius: 9999px;
+    background: color-mix(in srgb, var(--ink) 40%, transparent);
+    padding-inline: 1rem;
+    font-size: 0.875rem;
+    color: #fff;
+    transition: border-color 200ms;
+  }
+
+  .chip-dark:hover {
+    border-color: #fff;
+  }
+
+  .field {
+    margin-top: 0.5rem;
+    width: 100%;
+    border: 1px solid var(--hairline);
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+    color: var(--ink);
+    transition: border-color 200ms;
+  }
+
+  .field:focus {
+    border-color: var(--ink);
+    outline: none;
+  }
+
+  .field:disabled {
+    background: var(--paper-deep);
+    color: color-mix(in srgb, var(--ink) 70%, transparent);
+  }
+
+  .field-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: color-mix(in srgb, var(--ink) 80%, transparent);
+  }
+
+  .field-error {
+    margin-top: 0.25rem;
+    font-size: 0.8125rem;
+    color: var(--error);
+  }
+}
+
+.hairline-bottom {
+  border-bottom: 1px solid var(--hairline);
+}
+
+:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 3px;
+}
+
+header :focus-visible,
+footer :focus-visible,
+.on-ink :focus-visible {
+  outline-color: var(--paper);
 }
 
 .defer-paint {
   content-visibility: auto;
   contain-intrinsic-size: auto 480px;
+}
+
+/* The one orchestrated motion moment: the homepage hero load. */
+@keyframes hero-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes hero-settle {
+  from {
+    transform: scale(1.06);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+.hero-rise {
+  animation: hero-rise 0.8s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  animation-delay: var(--d, 0ms);
+}
+
+.hero-settle {
+  animation: hero-settle 1.8s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+/* One step of the reletting wizard slides and fades in, in the direction of
+   travel, so going back feels like going back. Instant under reduced motion. */
+@keyframes step-forward {
+  from {
+    opacity: 0;
+    transform: translateX(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes step-back {
+  from {
+    opacity: 0;
+    transform: translateX(-14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.step-forward {
+  animation: step-forward 0.45s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+.step-back {
+  animation: step-back 0.45s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+/* Reveal: elements settle in once as they enter the viewport. An element hides
+   itself (is-armed) only after the page has loaded, only when motion is
+   allowed, and only if it starts below the fold, so with no JavaScript, with
+   reduced motion, or on screen at load, everything is simply there. */
+@media (prefers-reduced-motion: no-preference) {
+  .reveal {
+    transition:
+      opacity 0.9s cubic-bezier(0.2, 0.7, 0.2, 1),
+      transform 0.9s cubic-bezier(0.2, 0.7, 0.2, 1);
+    transition-delay: var(--d, 0ms);
+  }
+
+  .reveal.is-armed:not(.is-in) {
+    opacity: 0;
+    transform: translateY(16px);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
