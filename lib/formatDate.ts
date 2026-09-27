@@ -19,3 +19,27 @@ export function formatLongDate(iso: string): string {
 }
 
 export const eur = (amount: number) => `€${amount.toFixed(2)}`;
+
+export function todayIso(): string {
+  const d = new Date();
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+}
+
+export function addDaysIso(iso: string, days: number): string {
+  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(iso);
+  if (!m) return iso;
+  const d = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
+  d.setDate(d.getDate() + days);
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+}
+
+// The day a boat leaves the berth: the departure date, or one night after
+// arrival for an open-ended enquiry with no departure set yet.
+export function effectiveEnquiryDeparture(e: {
+  arrival: string;
+  departure: string;
+}): string {
+  return e.departure || addDaysIso(e.arrival, 1);
+}

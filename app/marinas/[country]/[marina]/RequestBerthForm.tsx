@@ -26,6 +26,7 @@ import VesselUseFields, {
 } from "./VesselUseFields";
 import { useUnits } from "../../../components/UnitsProvider";
 import { loadLastEnquiry, saveLastEnquiry } from "../../../../lib/tripStore";
+import { EMPTY_ENQUIRY_DOCUMENTS, submitEnquiry } from "../../../../lib/mockData";
 import { effectiveDeparture, PLAN_KEYS, type StayPlan } from "../../../../lib/stayPlan";
 import { formatLength } from "../../../../lib/units";
 
@@ -703,6 +704,50 @@ export default function RequestBerthForm({
         laundry: form.laundry,
       },
     });
+    // In addition to the mailto below (which is still the record of the
+    // enquiry), submit it to the mock layer so staff can act on it in real
+    // time instead of only replying by email later.
+    submitEnquiry({
+      marinaId: marina.id,
+      arrival: form.arrival,
+      eta: form.eta,
+      departure: form.openEnded ? "" : form.departure,
+      etd: form.openEnded ? "" : form.etd,
+      openEnded: form.openEnded,
+      boatName: form.boatName,
+      vesselType: form.vesselType,
+      loa: form.loa,
+      beam: form.beam,
+      draft: form.draft,
+      flagCountry: form.flagCountry,
+      requestedBerthId: form.berthId,
+      skipperName: form.skipperName,
+      phone: form.phone,
+      email: form.email,
+      homePort: form.homePort,
+      peopleOnBoard: form.peopleOnBoard,
+      services: {
+        shorePower: form.shorePower,
+        amperage: form.amperage,
+        water: form.water,
+        helpMooring: form.helpMooring,
+        helpSlipping: form.helpSlipping,
+        pumpOut: form.pumpOut,
+        fuel: form.fuel,
+        laundry: form.laundry,
+      },
+      vesselUse: form.vesselUse,
+      operatingEntity: form.operatingEntity,
+      companyRegistration: form.companyRegistration,
+      contractName: form.contractName,
+      contractRole: form.contractRole,
+      euStatus: form.euStatus,
+      lastPort: form.lastPort,
+      nextPort: form.nextPort,
+      crew: form.crew,
+      documents: includeDocs ? docs : { ...EMPTY_ENQUIRY_DOCUMENTS },
+    });
+
     setSummary(text);
     setCopied(false);
 

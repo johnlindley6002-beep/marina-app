@@ -46,6 +46,42 @@ const STATUS_FILL: Record<BerthStatus, string> = {
   unfit: "#e5e5e5",
 };
 
+// Staff mode: five clear operational states, shown by fill and (for the two
+// states most easily missed as color alone) a hatch pattern too. Not the
+// consumer palette's soft tones, since this is a working tool, not a photo of
+// availability.
+export type StaffBerthState =
+  | "occupied"
+  | "free"
+  | "reserved"
+  | "owner-away"
+  | "out-of-service";
+
+const STAFF_STATUS_FILL: Record<StaffBerthState, string> = {
+  occupied: "#0a1a2f",
+  free: "#eef1f0",
+  reserved: "#5b6b82",
+  "owner-away": "url(#staff-hatch-away)",
+  "out-of-service": "url(#staff-hatch-oos)",
+};
+
+export const STAFF_STATUS_LABEL: Record<StaffBerthState, string> = {
+  occupied: "Occupied",
+  free: "Free",
+  reserved: "Reserved",
+  "owner-away": "Owner away",
+  "out-of-service": "Out of service",
+};
+
+export type StaffBerthInfo = { status: StaffBerthState; detail?: string };
+
+export type StaffMode = {
+  // A status for every berth id. A berth missing from the map reads as free.
+  statuses: Record<string, StaffBerthInfo>;
+  selectedBerthId?: string | null;
+  onBerthClick: (berthId: string) => void;
+};
+
 type SearchResult = {
   boatClass: MarinaClass | null;
   lowNights: number;
@@ -65,6 +101,12 @@ type Props = {
   // Controlled mode: the parent owns the inputs, validation, price summary
   // and contact CTA; the map only renders availability for these values.
   controlled?: { arrival: string; departure: string; lengthM: string };
+  // Staff mode: an operational status per berth, driven by the mock layer.
+  // Every berth is clickable (not just an available one), the search form,
+  // price panel and enquiry CTA are hidden, and the legend shows the five
+  // operational states instead. Additive only: nothing changes for the boater
+  // view when this prop is absent.
+  staffMode?: StaffMode;
 };
 
 // Sums each night's actual season rate, rather than assuming the whole
@@ -100,6 +142,7 @@ export default function BerthAvailabilityMap({
   initialLength = "",
   onBerthSelect,
   controlled,
+  staffMode,
 }: Props) {
   const { t } = useLanguage();
   const [arrival, setArrival] = useState(initialArrival);
@@ -158,6 +201,7 @@ export default function BerthAvailabilityMap({
   // Auto-run the search once if we arrived here pre-filled from the
   // homepage search (e.g. /marinas/portugal/cascais?arrival=...).
   useEffect(() => {
+    if (staffMode) return;
     if (controlled) {
       runSearch(controlled.arrival, controlled.departure, controlled.lengthM);
       return;
@@ -166,7 +210,7 @@ export default function BerthAvailabilityMap({
       runSearch(initialArrival, initialDeparture, initialLength);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [controlled?.arrival, controlled?.departure, controlled?.lengthM]);
+  }, [staffMode, controlled?.arrival, controlled?.departure, controlled?.lengthM]);
 
   const statusFor = (berth: Berth): BerthStatus => {
     if (!result) return "neutral";
@@ -215,18 +259,22 @@ export default function BerthAvailabilityMap({
   })();
 
   return (
-    <div className="rounded-sm border border-neutral-200/80 bg-white p-8 md:p-10">
-      <h2 className="text-lg font-normal tracking-tight text-navy">
-        {t.berthSearch.heading}
-      </h2>
-      <p className="mt-2 text-sm font-light text-neutral-500">
-        {t.berthSearch.subheading(marinaName)}
-      </p>
-      <p className="mt-1 text-xs font-light text-neutral-400">
-        {t.berthSearch.illustrative}
-      </p>
+    <div className={staffMode ? "" : "rounded-sm border border-neutral-200/80 bg-white p-8 md:p-10"}>
+      {!staffMode ? (
+        <>
+          <h2 className="text-lg font-normal tracking-tight text-navy">
+            {t.berthSearch.heading}
+          </h2>
+          <p className="mt-2 text-sm font-light text-neutral-500">
+            {t.berthSearch.subheading(marinaName)}
+          </p>
+          <p className="mt-1 text-xs font-light text-neutral-400">
+            {t.berthSearch.illustrative}
+          </p>
+        </>
+      ) : null}
 
-      {!controlled ? (
+      {!controlled && !staffMode ? (
       <form onSubmit={handleSubmit} className="mt-6 grid gap-4 sm:grid-cols-4">
         <label className="block text-sm">
           <span className="text-xs font-normal tracking-wide text-navy/60 uppercase">
@@ -278,29 +326,29 @@ export default function BerthAvailabilityMap({
       </form>
       ) : null}
 
-      {error && !controlled ? (
+      {error && !controlled && !staffMode ? (
         <p className="mt-4 text-sm font-light text-red-600">{error}</p>
       ) : null}
 
-      {result && result.boatClass && matchingBerths.length === 0 ? (
+      {!staffMode && result && result.boatClass && matchingBerths.length === 0 ? (
         <p className="mt-4 text-sm font-light text-neutral-500">
           {t.berthSearch.noClass(result.boatClass)}
         </p>
       ) : null}
 
-      {result && result.boatClass && matchingBerths.length > 0 && availableBerths.length === 0 ? (
+      {!staffMode && result && result.boatClass && matchingBerths.length > 0 && availableBerths.length === 0 ? (
         <p className="mt-4 text-sm font-light text-neutral-500">
           {t.berthSearch.noAvailable}
         </p>
       ) : null}
 
-      {result && !result.boatClass ? (
+      {!staffMode && result && !result.boatClass ? (
         <p className="mt-4 text-sm font-light text-neutral-500">
           {t.berthSearch.noFit}
         </p>
       ) : null}
 
-      {result && result.boatClass && totalNights > 0 && !controlled ? (
+      {result && result.boatClass && totalNights > 0 && !controlled && !staffMode ? (
         <p className="mt-4 text-sm font-light text-neutral-500">
           {result.lowNights > 0 && result.highNights > 0
             ? t.berthSearch.seasonBoth(result.lowNights, result.highNights)
@@ -310,13 +358,37 @@ export default function BerthAvailabilityMap({
         </p>
       ) : null}
 
-      <div className="mt-8">
+      <div className={staffMode ? "" : "mt-8"}>
         <svg
           viewBox={VIEW_BOX}
           className="w-full rounded-sm"
           role="img"
           aria-label="Schematic map of Marina de Cascais berths"
         >
+          {staffMode ? (
+            <defs>
+              <pattern
+                id="staff-hatch-away"
+                width="6"
+                height="6"
+                patternTransform="rotate(45)"
+                patternUnits="userSpaceOnUse"
+              >
+                <rect width="6" height="6" fill="#eef1f0" />
+                <line x1="0" y1="0" x2="0" y2="6" stroke="#0a1a2f" strokeWidth="2" />
+              </pattern>
+              <pattern
+                id="staff-hatch-oos"
+                width="6"
+                height="6"
+                patternTransform="rotate(45)"
+                patternUnits="userSpaceOnUse"
+              >
+                <rect width="6" height="6" fill="#b3261e" />
+                <line x1="0" y1="0" x2="0" y2="6" stroke="#ffffff" strokeWidth="1.5" />
+              </pattern>
+            </defs>
+          ) : null}
           {/* Water fills the whole canvas; land and breakwater are drawn on top. */}
           <rect
             x={0}
@@ -410,6 +482,39 @@ export default function BerthAvailabilityMap({
           })}
 
           {allBerths.map((berth) => {
+            if (staffMode) {
+              const info = staffMode.statuses[berth.id] ?? { status: "free" as const };
+              const isSelected = berth.id === staffMode.selectedBerthId;
+              const label = `Berth ${berth.id}, Class ${berth.sizeClass}, ${STAFF_STATUS_LABEL[info.status]}${
+                info.detail ? `, ${info.detail}` : ""
+              }`;
+              return (
+                <rect
+                  key={berth.id}
+                  x={berth.x - berth.width / 2}
+                  y={berth.y - berth.height / 2}
+                  width={berth.width}
+                  height={berth.height}
+                  transform={`rotate(${berth.rotationDeg} ${berth.x} ${berth.y})`}
+                  fill={STAFF_STATUS_FILL[info.status]}
+                  stroke={isSelected ? "#c7a15b" : "#0a1a2f"}
+                  strokeWidth={isSelected ? 3 : 0.75}
+                  strokeOpacity={isSelected ? 1 : 0.35}
+                  className="cursor-pointer"
+                  onClick={() => staffMode.onBerthClick(berth.id)}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      staffMode.onBerthClick(berth.id);
+                    }
+                  }}
+                  aria-label={label}
+                  aria-pressed={isSelected}
+                />
+              );
+            }
             const status = statusFor(berth);
             const clickable = status === "available";
             const isSelected = berth.id === selectedBerthId;
@@ -442,45 +547,60 @@ export default function BerthAvailabilityMap({
           })}
         </svg>
 
-        <div className="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-xs font-light text-neutral-500">
-          <span className="flex items-center gap-2">
-            <span
-              className="h-3 w-3 rounded-sm"
-              style={{ background: STATUS_FILL.available }}
-            />
-            {t.berthSearch.legendAvailable}
-          </span>
-          <span className="flex items-center gap-2">
-            <span
-              className="h-3 w-3 rounded-sm"
-              style={{ background: STATUS_FILL.occupied }}
-            />
-            {t.berthSearch.legendOccupied}
-          </span>
-          <span className="flex items-center gap-2">
-            <span
-              className="h-3 w-3 rounded-sm"
-              style={{ background: STATUS_FILL.unfit }}
-            />
-            {t.berthSearch.legendUnfit}
-          </span>
-          <span className="flex items-center gap-2">
-            <span
-              className="h-3 w-3 rounded-sm"
-              style={{ background: STATUS_FILL.neutral }}
-            />
-            {t.berthSearch.legendNeutral}
-          </span>
-        </div>
+        {staffMode ? (
+          <ul className="mt-3 flex flex-wrap gap-x-5 gap-y-1.5 text-xs text-ink/75">
+            {(Object.keys(STAFF_STATUS_LABEL) as StaffBerthState[]).map((state) => (
+              <li key={state} className="flex items-center gap-1.5">
+                <span
+                  aria-hidden="true"
+                  className="h-3 w-3 rounded-[2px] border border-ink/40"
+                  style={{ background: STAFF_STATUS_FILL[state] }}
+                />
+                {STAFF_STATUS_LABEL[state]}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <div className="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-xs font-light text-neutral-500">
+            <span className="flex items-center gap-2">
+              <span
+                className="h-3 w-3 rounded-sm"
+                style={{ background: STATUS_FILL.available }}
+              />
+              {t.berthSearch.legendAvailable}
+            </span>
+            <span className="flex items-center gap-2">
+              <span
+                className="h-3 w-3 rounded-sm"
+                style={{ background: STATUS_FILL.occupied }}
+              />
+              {t.berthSearch.legendOccupied}
+            </span>
+            <span className="flex items-center gap-2">
+              <span
+                className="h-3 w-3 rounded-sm"
+                style={{ background: STATUS_FILL.unfit }}
+              />
+              {t.berthSearch.legendUnfit}
+            </span>
+            <span className="flex items-center gap-2">
+              <span
+                className="h-3 w-3 rounded-sm"
+                style={{ background: STATUS_FILL.neutral }}
+              />
+              {t.berthSearch.legendNeutral}
+            </span>
+          </div>
+        )}
       </div>
 
-      {!result && !controlled ? (
+      {!result && !controlled && !staffMode ? (
         <p className="mt-6 text-sm font-light text-neutral-400">
           {t.berthSearch.hintBeforeSearch}
         </p>
       ) : null}
 
-      {selectedBerth && result?.boatClass && selectedPrice !== null && !controlled ? (
+      {selectedBerth && result?.boatClass && selectedPrice !== null && !controlled && !staffMode ? (
         <div className="mt-6 border-t border-neutral-200 pt-6">
           <p className="text-sm font-light text-neutral-500">
             {t.berthSearch.priceBerthLine(
@@ -498,7 +618,7 @@ export default function BerthAvailabilityMap({
         </div>
       ) : null}
 
-      {!controlled ? (
+      {!controlled && !staffMode ? (
       <div className="mt-6 border-t border-neutral-200 pt-6">
         <p className="text-sm font-light text-neutral-500">
           {t.berthSearch.ctaHeading(marinaName)}

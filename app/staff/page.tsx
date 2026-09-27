@@ -1,11 +1,6 @@
-import type { Metadata } from "next";
-import StaffContent from "./StaffContent";
+import { redirect } from "next/navigation";
 
-export const metadata: Metadata = {
-  title: "Staff area - aldock",
-  description: "Marina staff area.",
-};
-
-export default function StaffPage() {
-  return <StaffContent />;
+// Arrivals is the home screen of the staff back office.
+export default function StaffIndexPage() {
+  redirect("/staff/arrivals");
 }

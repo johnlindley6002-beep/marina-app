@@ -2,7 +2,12 @@
 
 import { useState } from "react";
 import { siteConfig } from "../../data/site";
-import { emptyMockReletting, resetMockReletting } from "../../lib/mockData";
+import {
+  emptyMockReletting,
+  resetMockEnquiries,
+  resetMockOutOfService,
+  resetMockReletting,
+} from "../../lib/mockData";
 import { useAuth } from "./AuthProvider";
 
 // MOCK / DEV ONLY. Stands in for signing in so each experience can be
@@ -67,6 +72,16 @@ export default function DevPersonaSwitcher() {
             className="flex min-h-11 w-full items-center rounded-[3px] px-3 text-left text-xs text-stone hover:bg-paper/10"
           >
             Show first-time owner view
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              resetMockEnquiries();
+              resetMockOutOfService();
+            }}
+            className="flex min-h-11 w-full items-center rounded-[3px] px-3 text-left text-xs text-stone hover:bg-paper/10"
+          >
+            Reset mock staff data
           </button>
         </div>
       ) : null}
