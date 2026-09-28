@@ -1,0 +1,319 @@
+"use client";
+
+import { useMemo, type ReactNode } from "react";
+import {
+  calculateQuote,
+  classifyBoatLength,
+  CLASS_LENGTH_RANGES,
+  getDemandFlag,
+  getFuelNote,
+  getFuelUpdated,
+  MARINA_CLASS_ORDER,
+  SEASON_LABELS,
+  type Marina,
+} from "../../../../data/marinas";
+import { siteConfig } from "../../../../data/site";
+import {
+  effectiveDeparture,
+  isPlanReady,
+  type StayPlan,
+} from "../../../../lib/stayPlan";
+import { toDisplay } from "../../../../lib/units";
+import { useLanguage } from "../../../components/LanguageProvider";
+import Disclosure, { Collapse } from "../../../components/Disclosure";
+import LastUpdated from "../../../components/LastUpdated";
+import { useUnits } from "../../../components/UnitsProvider";
+
+const inputClass =
+  "field max-w-[160px]";
+const labelClass = "field-label";
+const eur = (n: number) => `€${n.toFixed(2)}`;
+
+type Props = {
+  marina: Marina;
+  plan: StayPlan;
+  onPlanChange: (patch: Partial<StayPlan>) => void;
+  selectedBerthId: string | null;
+  amperageError?: boolean;
+};
+
+export default function PriceEstimate({
+  marina,
+  plan,
+  onPlanChange,
+  selectedBerthId,
+  amperageError,
+}: Props) {
+  const { t } = useLanguage();
+  const { units, label: unit } = useUnits();
+
+  const loa = Number(plan.loa);
+  const quote = useMemo(() => {
+    if (!plan.arrival || !(loa > 0)) return null;
+    return calculateQuote(
+      marina,
+      { loa, arrival: plan.arrival, departure: effectiveDeparture(plan) },
+      {
+        shorePower: plan.shorePower,
+        water: plan.water,
+        pumpOut: plan.pumpOut,
+        fuel: plan.fuel,
+        laundry: plan.laundry,
+      }
+    );
+  }, [marina, loa, plan]);
+
+  function formatLengthRange(minM: number, maxM: number) {
+    return minM === 0
+      ? t.rates.upTo(toDisplay(maxM, units)).replace(/ m$/, ` ${unit}`)
+      : `${toDisplay(minM, units)}–${toDisplay(maxM, units)} ${unit}`;
+  }
+
+  const ready = isPlanReady(plan);
+  const cheapestNightly = Math.min(
+    ...MARINA_CLASS_ORDER.map((c) => marina.transientRates[c].low)
+  );
+  const fees = marina.serviceFees;
+  const demandNote = quote
+    ? getDemandFlag(marina, plan.arrival, effectiveDeparture(plan))
+    : null;
+
+  // One modular row per extra: a real checkbox, its price hint, and the fee
+  // folds into the breakdown below as soon as it is ticked.
+  const extraRow = (
+    key: "shorePower" | "water" | "pumpOut" | "fuel" | "laundry",
+    label: string,
+    hint: ReactNode,
+    more?: ReactNode
+  ) => (
+    <div className="hairline-top pt-3">
+      <label className="flex items-start gap-3 text-sm">
+        <input
+          type="checkbox"
+          checked={plan[key]}
+          onChange={(e) => onPlanChange({ [key]: e.target.checked })}
+          className="mt-1"
+        />
+        <span>
+          <span className="font-medium text-ink">{label}</span>
+          <span className="block text-xs text-ink/70">{hint}</span>
+        </span>
+      </label>
+      {more}
+    </div>
+  );
+
+  return (
+    <div>
+      <h2 className="type-heading type-h2 text-ink">
+        Your estimate
+      </h2>
+
+      {!ready ? (
+        <p className="measure mt-3 text-ink/75">
+          From {eur(cheapestNightly)} per night, depending on boat length and
+          season. Add your dates and length overall for your own estimate.
+        </p>
+      ) : null}
+
+      <Collapse open={ready}>
+      <fieldset className="mt-6">
+        <legend className={labelClass}>Extras</legend>
+        <p className="mt-1 text-xs text-ink/70">
+          Pick what you need. Each one is added to the breakdown below.
+        </p>
+        <div className="mt-3 grid gap-x-8 gap-y-3 sm:grid-cols-2">
+          {extraRow(
+            "shorePower",
+            "Shore power",
+            `Metered, billed on consumption (up to ${fees.maxAmperage} A)`,
+            plan.shorePower ? (
+              <div className="mt-2 ml-7">
+                <select
+                  value={plan.amperage}
+                  aria-label="Shore power amperage"
+                  onChange={(e) => onPlanChange({ amperage: e.target.value })}
+                  className={`${inputClass} mt-0`}
+                >
+                  <option value="">Amperage…</option>
+                  {fees.amperageOptions.map((amps) => (
+                    <option key={amps} value={String(amps)}>
+                      {amps}A
+                    </option>
+                  ))}
+                </select>
+                {amperageError && !plan.amperage ? (
+                  <p className="field-error">
+                    Choose a shore power amperage, for example 16A or 32A.
+                  </p>
+                ) : null}
+              </div>
+            ) : null
+          )}
+          {extraRow("water", "Water", "Metered, billed on consumption")}
+          {extraRow("pumpOut", "Pump-out", `${eur(fees.pumpOutEur)} per operation`)}
+          {extraRow(
+            "fuel",
+            "Fuel on arrival",
+            <>
+              {getFuelNote(marina)}
+              <LastUpdated date={getFuelUpdated(marina)} className="mt-0.5 block" />
+            </>
+          )}
+          {extraRow(
+            "laundry",
+            "Laundry",
+            `Wash ${eur(fees.laundryWashEur)}, dry ${eur(fees.laundryDryEur)} per load, tokens from reception`
+          )}
+        </div>
+      </fieldset>
+
+      <div className="mt-8" aria-live="polite">
+        {quote ? (
+          <>
+            <p className="text-sm text-ink/75">
+              Class {quote.marinaClass} berth ·{" "}
+              {plan.openEnded
+                ? "nightly rate (open-ended stay)"
+                : `${quote.nights} night${quote.nights === 1 ? "" : "s"}`}{" "}
+              ·{" "}
+              {quote.berthLines.length > 1
+                ? "both seasons"
+                : SEASON_LABELS[quote.berthLines[0].season]}
+              {selectedBerthId ? ` · Berth ${selectedBerthId}` : ""}
+            </p>
+            {demandNote ? (
+              <p className="mt-2 max-w-xl border-l-2 border-ink/40 pl-3 text-sm text-ink/75">
+                {demandNote}
+              </p>
+            ) : null}
+            <table className="mt-3 w-full max-w-xl border-collapse text-left text-sm">
+              <tbody>
+                {quote.berthLines.map((line) => (
+                  <tr
+                    key={line.season}
+                    className="border-b border-hairline text-ink/75"
+                  >
+                    <td className="py-2 pr-4 ">
+                      {line.nights} night{line.nights === 1 ? "" : "s"} at{" "}
+                      {eur(line.rateEur)} per night
+                      <span className="block text-xs text-ink/70">
+                        {SEASON_LABELS[line.season]}
+                      </span>
+                    </td>
+                    <td className="py-2 text-right font-medium text-ink">
+                      {eur(line.subtotalEur)}
+                    </td>
+                  </tr>
+                ))}
+                {quote.berthLines.length > 1 || quote.addOnLines.length > 0 ? (
+                  <tr className="border-b border-hairline text-ink/75">
+                    <td className="py-2 pr-4">Berth subtotal</td>
+                    <td className="py-2 text-right font-medium text-ink">
+                      {eur(quote.berthSubtotalEur)}
+                    </td>
+                  </tr>
+                ) : null}
+                {quote.addOnLines.map((line) => (
+                  <tr
+                    key={line.label}
+                    className="border-b border-hairline text-ink/75"
+                  >
+                    <td className="py-2 pr-4 ">
+                      {line.label}
+                      {line.note ? (
+                        <span className="block text-xs text-ink/70">
+                          {line.note}
+                        </span>
+                      ) : null}
+                    </td>
+                    <td className="py-2 text-right font-medium text-ink">
+                      {line.amountEur !== null ? eur(line.amountEur) : "-"}
+                    </td>
+                  </tr>
+                ))}
+                <tr>
+                  <td className="pt-3 pr-4 font-medium text-ink">
+                    {plan.openEnded ? "Estimated first night" : "Estimated total"}
+                  </td>
+                  <td className="pt-3 text-right text-base font-medium text-ink">
+                    {eur(quote.estimatedTotalEur)}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <p className="mt-3 text-xs text-ink/70">
+              Excl. {Math.round(marina.vatRate * 100)}% VAT and utilities, estimate,
+              confirm with the marina.
+            </p>
+            <div className="mt-6">
+              <a
+                href="#request-berth"
+                className="btn-primary"
+              >
+                Request a berth
+              </a>
+              <p className="mt-2 text-sm text-ink/75">
+                {siteConfig.decision.requestNote}
+              </p>
+            </div>
+          </>
+        ) : (
+          <p className="text-sm text-ink/75">
+            {loa > 0 && classifyBoatLength(loa) === null
+              ? "Your length is outside the standard berth classes, so contact the marina for a quote."
+              : "Enter your dates and boat length above to see a price estimate."}
+          </p>
+        )}
+      </div>
+
+      </Collapse>
+
+      <Disclosure
+        label="All berth rates"
+        openLabel="Hide berth rates"
+        className="mt-8"
+      >
+      <h3 className="type-heading type-h3 mt-2 text-ink">
+        {t.rates.heading}
+      </h3>
+      <div className="mt-4 overflow-x-auto">
+        <table className="w-full min-w-[480px] border-collapse text-left text-sm">
+          <thead>
+            <tr className="type-label border-b border-hairline">
+              <th className="py-3 pr-4">{t.rates.colClass}</th>
+              <th className="py-3 pr-4">{t.rates.colLength}</th>
+              <th className="py-3 pr-4">{t.rates.colLow}</th>
+              <th className="py-3">{t.rates.colHigh}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {MARINA_CLASS_ORDER.map((marinaClass) => {
+              const range = CLASS_LENGTH_RANGES[marinaClass];
+              const rate = marina.transientRates[marinaClass];
+              return (
+                <tr
+                  key={marinaClass}
+                  className="border-b border-hairline text-ink/75"
+                >
+                  <td className="py-3 pr-4 font-medium text-ink">
+                    {marinaClass}
+                  </td>
+                  <td className="py-3 pr-4 ">
+                    {formatLengthRange(range.minM, range.maxM)}
+                  </td>
+                  <td className="py-3 pr-4 ">€{rate.low.toFixed(2)}</td>
+                  <td className="py-3 ">€{rate.high.toFixed(2)}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+      <p className="mt-4 pb-2 text-xs text-ink/70">
+        {t.rates.caption(Math.round(marina.vatRate * 100))}
+      </p>
+      </Disclosure>
+    </div>
+  );
+}
