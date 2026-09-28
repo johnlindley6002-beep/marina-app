@@ -14,6 +14,7 @@
 
 import { getAllBerths } from "../data/berths";
 import { getSeason, marinas } from "../data/marinas";
+import type { PreArrivalDraft } from "./prearrival/schema";
 
 export type Role = "voyager" | "owner" | "staff";
 export type Mode = "guest" | "owner";
@@ -26,6 +27,8 @@ const RELETTING_KEY = "aldock-mock-reletting";
 const DRAFT_KEY = "aldock-mock-relet-drafts";
 const ENQUIRY_KEY = "aldock-mock-enquiries";
 const OOS_KEY = "aldock-mock-berth-oos";
+const PREARRIVAL_DRAFT_KEY = "aldock-prearrival-drafts";
+const PREARRIVAL_KEY = "aldock-prearrival-checkins";
 
 // ---------------------------------------------------------------------------
 // Stored records (what a real database would hold)
@@ -200,6 +203,8 @@ export const MOCK_STORAGE_KEYS = [
   DRAFT_KEY,
   ENQUIRY_KEY,
   OOS_KEY,
+  PREARRIVAL_DRAFT_KEY,
+  PREARRIVAL_KEY,
 ];
 
 // ---------------------------------------------------------------------------
@@ -2125,4 +2130,99 @@ export function getMarinaBerthLinks(marinaId: string): MarinaBerthLink[] {
     ownerName: ACCOUNTS.find((a) => a.id === l.userId)?.name ?? "Berth holder",
     linkedAt: l.linkedAt,
   }));
+}
+
+// ============================================================================
+// PRE-ARRIVAL CHECK-IN
+//
+// The voyager's multi-step pre-arrival wizard (app/marinas/[country]/[marina]/
+// pre-arrival/). No sign-in is required to fill it in or submit it, the same
+// as the enquiry form: the draft autosaves under a local, device-only key, and
+// a submitted check-in is stored with a short reference code the boater can
+// quote at the marina office. Nothing here is sent anywhere; it is a
+// front-end mockup of what the marina's own system would record.
+// ============================================================================
+
+
+export type PreArrivalCheckIn = {
+  id: string;
+  referenceCode: string;
+  marinaId: string;
+  draft: PreArrivalDraft;
+  submittedAt: string;
+};
+
+type PreArrivalDraftStore = Record<string, PreArrivalDraft>;
+type PreArrivalCheckInStore = { checkIns: PreArrivalCheckIn[] };
+
+// One in-progress draft per marina on this device (a boater is not signed in,
+// so there is no per-user key to use, unlike the reletting drafts above).
+export function getPreArrivalDraft(marinaId: string): PreArrivalDraft | null {
+  return readJson<PreArrivalDraftStore>(PREARRIVAL_DRAFT_KEY)?.[marinaId] ?? null;
+}
+
+export function savePreArrivalDraft(
+  marinaId: string,
+  draft: PreArrivalDraft
+): void {
+  const all = readJson<PreArrivalDraftStore>(PREARRIVAL_DRAFT_KEY) ?? {};
+  all[marinaId] = draft;
+  writeJson(PREARRIVAL_DRAFT_KEY, all);
+  emitChange();
+}
+
+export function clearPreArrivalDraft(marinaId: string): void {
+  const all = readJson<PreArrivalDraftStore>(PREARRIVAL_DRAFT_KEY) ?? {};
+  delete all[marinaId];
+  writeJson(PREARRIVAL_DRAFT_KEY, all);
+  emitChange();
+}
+
+function loadPreArrivalStore(): PreArrivalCheckInStore {
+  return readJson<PreArrivalCheckInStore>(PREARRIVAL_KEY) ?? { checkIns: [] };
+}
+
+// "CAS-7F3K2Q" style: a marina prefix (first three letters of its id, upper
+// case) plus six characters from a fresh id, short enough to read aloud at
+// the reception desk.
+function newReferenceCode(marinaId: string): string {
+  const prefix = marinaId.slice(0, 3).toUpperCase();
+  const raw = newId("ref").split("-").pop() ?? "000000";
+  return `${prefix}-${raw.slice(0, 6).toUpperCase()}`;
+}
+
+export function submitPreArrivalCheckIn(
+  marinaId: string,
+  draft: PreArrivalDraft
+): PreArrivalCheckIn {
+  const store = loadPreArrivalStore();
+  const checkIn: PreArrivalCheckIn = {
+    id: newId("prearrival"),
+    referenceCode: newReferenceCode(marinaId),
+    marinaId,
+    draft,
+    submittedAt: new Date().toISOString(),
+  };
+  writeJson(PREARRIVAL_KEY, { checkIns: [checkIn, ...store.checkIns] });
+  emitChange();
+  clearPreArrivalDraft(marinaId);
+  return checkIn;
+}
+
+export function getPreArrivalCheckIn(id: string): PreArrivalCheckIn | null {
+  return loadPreArrivalStore().checkIns.find((c) => c.id === id) ?? null;
+}
+
+// The people list from the most recently submitted check-in on this device,
+// for the "Reuse crew from my last trip" toggle. Not scoped to one marina, a
+// boater's crew is usually the same wherever they are headed next.
+export function getLastSubmittedCrew(): PreArrivalDraft["people"] {
+  return loadPreArrivalStore().checkIns[0]?.draft.people ?? [];
+}
+
+// DEV ONLY: back to no drafts or submitted check-ins.
+export function resetMockPreArrival(): void {
+  removeKey(PREARRIVAL_DRAFT_KEY);
+  removeKey(PREARRIVAL_KEY);
+  emitChange();
 }

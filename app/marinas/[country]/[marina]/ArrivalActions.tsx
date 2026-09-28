@@ -1,7 +1,9 @@
 "use client";
 
+import Link from "next/link";
 import type { Marina } from "../../../../data/marinas";
 import { useBoats } from "../../../components/BoatProvider";
+import { useLanguage } from "../../../components/LanguageProvider";
 import type { StayPlan } from "../../../../lib/stayPlan";
 
 type Props = {
@@ -13,6 +15,7 @@ type Props = {
 const dash = (value: string) => (value.trim() ? value : "-");
 
 export default function ArrivalActions({ marina, plan, selectedBerthId }: Props) {
+  const { t } = useLanguage();
   const { activeBoat } = useBoats();
   const boatName = activeBoat?.name ?? "";
   const boatType = activeBoat?.type ?? "";
@@ -95,6 +98,12 @@ export default function ArrivalActions({ marina, plan, selectedBerthId }: Props)
         >
           Digital check-in
         </button>
+        <Link
+          href={`/marinas/${marina.countrySlug}/${marina.id}/pre-arrival`}
+          className="btn-primary"
+        >
+          {t.preArrival.cta.arrivalActions}
+        </Link>
       </div>
     </div>
   );

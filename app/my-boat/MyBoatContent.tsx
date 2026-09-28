@@ -1,11 +1,13 @@
 "use client";
 
+import Link from "next/link";
 import { useRef, useState } from "react";
 import { marinas } from "../../data/marinas";
 import { siteConfig } from "../../data/site";
 import { formatLength } from "../../lib/units";
 import { useBoats } from "../components/BoatProvider";
 import Disclosure from "../components/Disclosure";
+import { useLanguage } from "../components/LanguageProvider";
 import SavedMarinas from "../components/SavedMarinas";
 import UnitSegmented from "../components/UnitSegmented";
 import { useUnits } from "../components/UnitsProvider";
@@ -23,6 +25,7 @@ function formatInsurance(amount: number): string {
 }
 
 export default function MyBoatContent() {
+  const { t } = useLanguage();
   const {
     ready,
     storageOk,
@@ -81,6 +84,15 @@ export default function MyBoatContent() {
         <p role="status" className="mt-4 min-h-6 text-sm font-medium text-ink">
           {notice}
         </p>
+
+        {marinas[0] ? (
+          <Link
+            href={`/marinas/${marinas[0].countrySlug}/${marinas[0].id}/pre-arrival`}
+            className="surface-lift mt-2 block p-6"
+          >
+            <p className="font-medium text-ink">{t.preArrival.cta.myBoat}</p>
+          </Link>
+        ) : null}
 
         <section className="stack-md" aria-labelledby="boats-heading">
           <div className="flex flex-wrap items-baseline justify-between gap-4">

@@ -162,6 +162,181 @@ type Dictionary = {
     message: string;
   };
   favourites: { save: string; saved: string; savedHeading: string };
+  preArrival: {
+    cta: {
+      arrivalActions: string;
+      myBoat: string;
+    };
+    page: {
+      title: string;
+      subtitle: string;
+      autosaveNote: string;
+      resumeBanner: string;
+      startOver: string;
+      back: string;
+      continueBtn: string;
+      stepOf: (step: number, total: number) => string;
+      nightsCount: (n: number) => string;
+      peopleOnBoard: (n: number) => string;
+    };
+    steps: {
+      boat: string;
+      voyage: string;
+      crew: string;
+      documents: string;
+      stay: string;
+      review: string;
+    };
+    boat: {
+      heading: string;
+      chooseSaved: string;
+      chooseSavedPlaceholder: string;
+      orNewBoat: string;
+      nameLabel: string;
+      registrationLabel: string;
+      flagLabel: string;
+      portOfRegistryLabel: string;
+      zoneLabel: string;
+      specificationsHeading: string;
+      lengthLabel: string;
+      beamLabel: string;
+      draughtLabel: string;
+      propulsionLabel: string;
+      propulsionSail: string;
+      propulsionPower: string;
+      propulsionBoth: string;
+      multihullLabel: string;
+      classLabel: (cls: string) => string;
+      indicativeNightly: (amount: string) => string;
+      vesselUseLabel: string;
+      ownerHeading: string;
+      ownerNameLabel: string;
+      ownerIdLabel: string;
+      ownerTaxNumberLabel: string;
+      ownerResidenceLabel: string;
+      ownerAddressLabel: string;
+      ownerIsCompanyLabel: string;
+      ownerCompanyTaxIdLabel: string;
+      ownerEmailLabel: string;
+      ownerPhoneLabel: string;
+    };
+    voyage: {
+      heading: string;
+      lastPortLabel: string;
+      lastPortCountryLabel: string;
+      nextPortLabel: string;
+      nextPortCountryLabel: string;
+      arrivalLabel: string;
+      departureLabel: string;
+      infoOutsideSchengenTitle: string;
+      infoOutsideSchengenBody: string;
+      infoNonEUFlagTitle: string;
+      infoNonEUFlagBody: string;
+      infoNonEUFlagResidentWarning: string;
+      infoNonEUMovementTitle: string;
+      infoNonEUMovementBody: string;
+    };
+    crew: {
+      heading: string;
+      howManyLabel: string;
+      allFreeMovementToggle: string;
+      reuseLastCrewToggle: string;
+      sameSurnameToggle: string;
+      sameNationalityToggle: string;
+      personTitle: (n: number) => string;
+      skipperDefaultNote: string;
+      statusComplete: string;
+      statusMissing: string;
+      statusCheckDates: string;
+      scanPassport: string;
+      scanComingSoon: string;
+      fullCrewListChip: string;
+      roleLabel: string;
+      roleSkipper: string;
+      roleCrew: string;
+      roleGuest: string;
+      familyNameLabel: string;
+      givenNamesLabel: string;
+      nationalityLabel: string;
+      dateOfBirthLabel: string;
+      placeOfBirthLabel: string;
+      genderLabel: string;
+      idTypeLabel: string;
+      idTypePassport: string;
+      idTypeNationalId: string;
+      idNumberLabel: string;
+      idIssuingStateLabel: string;
+      idExpiryLabel: string;
+      idIssueDateLabel: string;
+      embarkationDateLabel: string;
+      guardianLabel: string;
+      guardianPlaceholder: string;
+      removePerson: string;
+    };
+    documents: {
+      heading: string;
+      intro: string;
+      requiredChip: string;
+      optionalChip: string;
+      useSaved: string;
+      uploadTile: string;
+      numberLabel: string;
+      expiryLabel: string;
+      issuingAuthorityLabel: string;
+      insurerLabel: string;
+      items: {
+        registration: string;
+        thirdPartyInsurance: string;
+        skipperLicence: string;
+        iucProof: string;
+        radioStationLicence: string;
+        surveyCertificate: string;
+        temporaryAdmissionEvidence: string;
+      };
+    };
+    stay: {
+      heading: string;
+      arrivalLabel: string;
+      departureLabel: string;
+      servicesHeading: string;
+      electricityLabel: string;
+      waterLabel: string;
+      pumpOutLabel: string;
+      fuelDockSlotLabel: string;
+      craneLabel: string;
+      specialRequestsLabel: string;
+      depositNote: string;
+      billingNote: string;
+      priceHeading: string;
+      indicativeNote: string;
+      askMarina: string;
+      seasonLow: string;
+      seasonHigh: string;
+      lineLabel: (nights: number, season: string, rate: string) => string;
+      multihullNote: string;
+      subtotalLine: (subtotal: string, vat: string) => string;
+    };
+    review: {
+      heading: string;
+      edit: string;
+      peopleCount: (n: number) => string;
+      documentMissing: string;
+      documentNotProvided: string;
+      consentsHeading: string;
+      gdprLabel: string;
+      termsLabel: string;
+      declarationLabel: string;
+      submit: string;
+    };
+    confirmation: {
+      heading: string;
+      referenceLabel: string;
+      whatNextHeading: string;
+      whatNextBody: string;
+      bringHeading: string;
+      backToMarina: string;
+    };
+  };
 };
 
 const baseTranslations: Record<"en" | "pt", Dictionary> = {
@@ -337,6 +512,190 @@ const baseTranslations: Record<"en" | "pt", Dictionary> = {
       save: "Save marina",
       saved: "Saved",
       savedHeading: "Your saved marinas",
+    },
+    preArrival: {
+      cta: {
+        arrivalActions: "Complete pre-arrival check-in",
+        myBoat: "Start your pre-arrival check-in",
+      },
+      page: {
+        title: "Pre-arrival check-in",
+        subtitle:
+          "Answer these once and arrival becomes confirm and go. Nothing is sent anywhere until you press Send at the end.",
+        autosaveNote: "Saved on this device as you go.",
+        resumeBanner: "Continuing where you left off.",
+        startOver: "Start over",
+        back: "Back",
+        continueBtn: "Continue",
+        stepOf: (step, total) => `Step ${step} of ${total}`,
+        nightsCount: (n) => `${n} ${n === 1 ? "night" : "nights"}`,
+        peopleOnBoard: (n) => `${n} ${n === 1 ? "person" : "people"} on board`,
+      },
+      steps: {
+        boat: "Your boat",
+        voyage: "Your voyage",
+        crew: "Who is on board",
+        documents: "Documents",
+        stay: "Your stay",
+        review: "Review and send",
+      },
+      boat: {
+        heading: "Your boat",
+        chooseSaved: "Choose a saved boat",
+        chooseSavedPlaceholder: "Choose a saved boat…",
+        orNewBoat: "Or enter a new boat",
+        nameLabel: "Boat name",
+        registrationLabel: "Registration number",
+        flagLabel: "Flag country",
+        portOfRegistryLabel: "Port of registry",
+        zoneLabel: "Navigation zone",
+        specificationsHeading: "Specifications",
+        lengthLabel: "Length overall (m)",
+        beamLabel: "Beam (m)",
+        draughtLabel: "Draught (m)",
+        propulsionLabel: "Propulsion",
+        propulsionSail: "Sail",
+        propulsionPower: "Power",
+        propulsionBoth: "Sail and power",
+        multihullLabel: "Multihull",
+        classLabel: (cls) => `Berth class ${cls}`,
+        indicativeNightly: (amount) => `About ${amount} a night, indicative`,
+        vesselUseLabel: "Vessel use",
+        ownerHeading: "About you",
+        ownerNameLabel: "Full name",
+        ownerIdLabel: "ID or passport number",
+        ownerTaxNumberLabel: "Tax number (NIF), if resident in Portugal",
+        ownerResidenceLabel: "Country of residence",
+        ownerAddressLabel: "Address",
+        ownerIsCompanyLabel: "The boat is owned by a company",
+        ownerCompanyTaxIdLabel: "Company tax number (NIPC)",
+        ownerEmailLabel: "Email",
+        ownerPhoneLabel: "Phone",
+      },
+      voyage: {
+        heading: "Your voyage",
+        lastPortLabel: "Last port",
+        lastPortCountryLabel: "Last port's country",
+        nextPortLabel: "Next port",
+        nextPortCountryLabel: "Next port's country",
+        arrivalLabel: "Arrival date and time",
+        departureLabel: "Departure date and time",
+        infoOutsideSchengenTitle: "Arriving from outside Schengen",
+        infoOutsideSchengenBody:
+          "You must clear border control with the GNR on arrival. The marina will help. Everyone on board needs a valid passport.",
+        infoNonEUFlagTitle: "Non-EU-flagged boat",
+        infoNonEUFlagBody:
+          "A non-EU-flagged boat can normally stay under EU Temporary Admission for up to 18 months without import VAT, for private use only, when the owner is resident outside the EU. It does not cover charter use.",
+        infoNonEUFlagResidentWarning:
+          "The owner given in Step 1 is resident in the EU, so Temporary Admission is not normally available. Check with customs.",
+        infoNonEUMovementTitle: "Crossing to or from outside the EU",
+        infoNonEUMovementBody:
+          "The marina must report this movement to the maritime, border and customs authorities (Latitude 32). This form collects what is needed for that report.",
+      },
+      crew: {
+        heading: "Who is on board",
+        howManyLabel: "How many people on board?",
+        allFreeMovementToggle: "All on board are EU, EEA or Swiss citizens",
+        reuseLastCrewToggle: "Reuse crew from my last trip",
+        sameSurnameToggle: "Same surname as person 1",
+        sameNationalityToggle: "Same nationality as person 1",
+        personTitle: (n) => `Person ${n}`,
+        skipperDefaultNote: "Person 1 is the skipper by default.",
+        statusComplete: "Complete",
+        statusMissing: "Missing info",
+        statusCheckDates: "Check dates",
+        scanPassport: "Scan passport",
+        scanComingSoon: "Coming soon, type the details for now",
+        fullCrewListChip: "Full crew list required for this route",
+        roleLabel: "Role",
+        roleSkipper: "Skipper",
+        roleCrew: "Crew",
+        roleGuest: "Guest",
+        familyNameLabel: "Family name",
+        givenNamesLabel: "Given names",
+        nationalityLabel: "Nationality",
+        dateOfBirthLabel: "Date of birth",
+        placeOfBirthLabel: "Place of birth",
+        genderLabel: "Gender, as on ID",
+        idTypeLabel: "ID type",
+        idTypePassport: "Passport",
+        idTypeNationalId: "National ID",
+        idNumberLabel: "ID number",
+        idIssuingStateLabel: "ID issuing state",
+        idExpiryLabel: "ID expiry date",
+        idIssueDateLabel: "ID issue date",
+        embarkationDateLabel: "Embarkation date",
+        guardianLabel: "Travelling with",
+        guardianPlaceholder: "Choose the adult guardian…",
+        removePerson: "Remove",
+      },
+      documents: {
+        heading: "Documents",
+        intro:
+          "This list is built for your boat and voyage. Mark what you have, the physical document is still checked on arrival.",
+        requiredChip: "Required",
+        optionalChip: "Optional",
+        useSaved: "Use saved document",
+        uploadTile: "Add file (mock, stores the file name only)",
+        numberLabel: "Number",
+        expiryLabel: "Expiry date",
+        issuingAuthorityLabel: "Issuing authority",
+        insurerLabel: "Insurer",
+        items: {
+          registration: "Boat registration (livrete)",
+          thirdPartyInsurance: "Third-party liability insurance",
+          skipperLicence: "Skipper's certificate of competence",
+          iucProof: "Proof of IUC (boat tax) payment",
+          radioStationLicence: "Radio station licence",
+          surveyCertificate: "Survey certificate",
+          temporaryAdmissionEvidence: "Evidence of Temporary Admission",
+        },
+      },
+      stay: {
+        heading: "Your stay",
+        arrivalLabel: "Arrival date",
+        departureLabel: "Departure date",
+        servicesHeading: "Services wanted",
+        electricityLabel: "Electricity",
+        waterLabel: "Water",
+        pumpOutLabel: "Pump-out",
+        fuelDockSlotLabel: "Fuel dock slot",
+        craneLabel: "Crane",
+        specialRequestsLabel: "Special requests",
+        depositNote: "A deposit is paid at check-in and adjusted at departure.",
+        billingNote: "Days run from 12:00 to 12:00.",
+        priceHeading: "Indicative price",
+        indicativeNote: "Indicative, confirmed by the marina.",
+        askMarina: "Outside the standard classes, ask the marina for a quote.",
+        seasonLow: "low season",
+        seasonHigh: "high season",
+        lineLabel: (nights, season, rate) =>
+          `${nights} ${nights === 1 ? "night" : "nights"} · ${season} · ${rate}/night`,
+        multihullNote: "Multihull surcharge applied.",
+        subtotalLine: (subtotal, vat) => `Subtotal ${subtotal} + VAT ${vat}`,
+      },
+      review: {
+        heading: "Review and send",
+        edit: "Edit",
+        peopleCount: (n) => `${n} ${n === 1 ? "person" : "people"}`,
+        documentMissing: "Missing",
+        documentNotProvided: "Not provided",
+        consentsHeading: "Before you send this",
+        gdprLabel:
+          "I understand my data is used only to register this stay and to meet the marina's legal reporting duties.",
+        termsLabel: "I accept the marina's regulation.",
+        declarationLabel: "I declare the information given is true.",
+        submit: "Send pre-arrival check-in",
+      },
+      confirmation: {
+        heading: "Check-in received",
+        referenceLabel: "Your reference",
+        whatNextHeading: "What happens next",
+        whatNextBody:
+          "The marina reviews this before you arrive. At the office, quote your reference and confirm your berth.",
+        bringHeading: "Bring these documents in person",
+        backToMarina: "Back to the marina page",
+      },
     },
   },
   pt: {
@@ -516,6 +875,190 @@ const baseTranslations: Record<"en" | "pt", Dictionary> = {
       saved: "Guardada",
       savedHeading: "As suas marinas guardadas",
     },
+    preArrival: {
+      cta: {
+        arrivalActions: "Preencher o pre-check-in de chegada",
+        myBoat: "Iniciar o pre-check-in de chegada",
+      },
+      page: {
+        title: "Pre-check-in de chegada",
+        subtitle:
+          "Responda uma vez e a chegada torna-se confirmar e seguir. Nada é enviado até premir Enviar no final.",
+        autosaveNote: "Guardado neste dispositivo à medida que avança.",
+        resumeBanner: "A continuar de onde ficou.",
+        startOver: "Recomeçar",
+        back: "Voltar",
+        continueBtn: "Continuar",
+        stepOf: (step, total) => `Passo ${step} de ${total}`,
+        nightsCount: (n) => `${n} ${n === 1 ? "noite" : "noites"}`,
+        peopleOnBoard: (n) => `${n} ${n === 1 ? "pessoa" : "pessoas"} a bordo`,
+      },
+      steps: {
+        boat: "A sua embarcação",
+        voyage: "A sua viagem",
+        crew: "Quem está a bordo",
+        documents: "Documentos",
+        stay: "A sua estadia",
+        review: "Rever e enviar",
+      },
+      boat: {
+        heading: "A sua embarcação",
+        chooseSaved: "Escolha uma embarcação guardada",
+        chooseSavedPlaceholder: "Escolha uma embarcação guardada…",
+        orNewBoat: "Ou introduza uma nova embarcação",
+        nameLabel: "Nome da embarcação",
+        registrationLabel: "Número de registo",
+        flagLabel: "País de bandeira",
+        portOfRegistryLabel: "Porto de registo",
+        zoneLabel: "Zona de navegação",
+        specificationsHeading: "Especificações",
+        lengthLabel: "Comprimento fora a fora (m)",
+        beamLabel: "Boca (m)",
+        draughtLabel: "Calado (m)",
+        propulsionLabel: "Propulsão",
+        propulsionSail: "Vela",
+        propulsionPower: "Motor",
+        propulsionBoth: "Vela e motor",
+        multihullLabel: "Multicasco",
+        classLabel: (cls) => `Classe de posto de amarração ${cls}`,
+        indicativeNightly: (amount) => `Cerca de ${amount} por noite, indicativo`,
+        vesselUseLabel: "Utilização da embarcação",
+        ownerHeading: "Sobre si",
+        ownerNameLabel: "Nome completo",
+        ownerIdLabel: "Número de identificação ou passaporte",
+        ownerTaxNumberLabel: "NIF, se residente em Portugal",
+        ownerResidenceLabel: "País de residência",
+        ownerAddressLabel: "Morada",
+        ownerIsCompanyLabel: "A embarcação pertence a uma empresa",
+        ownerCompanyTaxIdLabel: "NIPC da empresa",
+        ownerEmailLabel: "Email",
+        ownerPhoneLabel: "Telefone",
+      },
+      voyage: {
+        heading: "A sua viagem",
+        lastPortLabel: "Último porto",
+        lastPortCountryLabel: "País do último porto",
+        nextPortLabel: "Próximo porto",
+        nextPortCountryLabel: "País do próximo porto",
+        arrivalLabel: "Data e hora de chegada",
+        departureLabel: "Data e hora de partida",
+        infoOutsideSchengenTitle: "A chegar de fora do espaço Schengen",
+        infoOutsideSchengenBody:
+          "Tem de efetuar o controlo fronteiriço com a GNR à chegada. A marina irá ajudar. Todos a bordo precisam de passaporte válido.",
+        infoNonEUFlagTitle: "Embarcação com bandeira extra-UE",
+        infoNonEUFlagBody:
+          "Uma embarcação com bandeira extra-UE pode normalmente permanecer em Admissão Temporária da UE até 18 meses sem IVA de importação, apenas para uso privado, quando o proprietário reside fora da UE. Não cobre uso de charter.",
+        infoNonEUFlagResidentWarning:
+          "O proprietário indicado no Passo 1 reside na UE, pelo que a Admissão Temporária não está normalmente disponível. Confirme junto da alfândega.",
+        infoNonEUMovementTitle: "A cruzar de ou para fora da UE",
+        infoNonEUMovementBody:
+          "A marina tem de comunicar este movimento às autoridades marítima, fronteiriça e aduaneira (Latitude 32). Este formulário recolhe o necessário para essa comunicação.",
+      },
+      crew: {
+        heading: "Quem está a bordo",
+        howManyLabel: "Quantas pessoas estão a bordo?",
+        allFreeMovementToggle: "Todos a bordo são cidadãos UE, EEE ou suíços",
+        reuseLastCrewToggle: "Reutilizar tripulação da última viagem",
+        sameSurnameToggle: "Mesmo apelido da pessoa 1",
+        sameNationalityToggle: "Mesma nacionalidade da pessoa 1",
+        personTitle: (n) => `Pessoa ${n}`,
+        skipperDefaultNote: "A pessoa 1 é o comandante por predefinição.",
+        statusComplete: "Completo",
+        statusMissing: "Falta informação",
+        statusCheckDates: "Verificar datas",
+        scanPassport: "Digitalizar passaporte",
+        scanComingSoon: "Brevemente, por agora introduza os dados",
+        fullCrewListChip: "Lista de tripulação completa exigida nesta rota",
+        roleLabel: "Função",
+        roleSkipper: "Comandante",
+        roleCrew: "Tripulante",
+        roleGuest: "Convidado",
+        familyNameLabel: "Apelido",
+        givenNamesLabel: "Nomes próprios",
+        nationalityLabel: "Nacionalidade",
+        dateOfBirthLabel: "Data de nascimento",
+        placeOfBirthLabel: "Naturalidade",
+        genderLabel: "Género, conforme no documento",
+        idTypeLabel: "Tipo de documento",
+        idTypePassport: "Passaporte",
+        idTypeNationalId: "Cartão de cidadão",
+        idNumberLabel: "Número do documento",
+        idIssuingStateLabel: "País emissor do documento",
+        idExpiryLabel: "Data de validade",
+        idIssueDateLabel: "Data de emissão",
+        embarkationDateLabel: "Data de embarque",
+        guardianLabel: "Viaja com",
+        guardianPlaceholder: "Escolha o adulto responsável…",
+        removePerson: "Remover",
+      },
+      documents: {
+        heading: "Documentos",
+        intro:
+          "Esta lista é construída para a sua embarcação e viagem. Assinale o que tem, o documento físico é sempre verificado à chegada.",
+        requiredChip: "Obrigatório",
+        optionalChip: "Opcional",
+        useSaved: "Usar documento guardado",
+        uploadTile: "Adicionar ficheiro (simulado, guarda apenas o nome)",
+        numberLabel: "Número",
+        expiryLabel: "Data de validade",
+        issuingAuthorityLabel: "Entidade emissora",
+        insurerLabel: "Seguradora",
+        items: {
+          registration: "Livrete da embarcação",
+          thirdPartyInsurance: "Seguro de responsabilidade civil",
+          skipperLicence: "Carta de navegador / comandante",
+          iucProof: "Comprovativo de pagamento do IUC",
+          radioStationLicence: "Licença de estação de rádio",
+          surveyCertificate: "Certificado de vistoria",
+          temporaryAdmissionEvidence: "Comprovativo de Admissão Temporária",
+        },
+      },
+      stay: {
+        heading: "A sua estadia",
+        arrivalLabel: "Data de chegada",
+        departureLabel: "Data de partida",
+        servicesHeading: "Serviços pretendidos",
+        electricityLabel: "Eletricidade",
+        waterLabel: "Água",
+        pumpOutLabel: "Despejo de águas residuais",
+        fuelDockSlotLabel: "Reserva no posto de combustível",
+        craneLabel: "Grua",
+        specialRequestsLabel: "Pedidos especiais",
+        depositNote: "O depósito é pago no check-in e ajustado na partida.",
+        billingNote: "Os dias contam-se das 12:00 às 12:00.",
+        priceHeading: "Preço indicativo",
+        indicativeNote: "Indicativo, confirmado pela marina.",
+        askMarina: "Fora das classes padrão, peça um orçamento à marina.",
+        seasonLow: "época baixa",
+        seasonHigh: "época alta",
+        lineLabel: (nights, season, rate) =>
+          `${nights} ${nights === 1 ? "noite" : "noites"} · ${season} · ${rate}/noite`,
+        multihullNote: "Sobretaxa de multicasco aplicada.",
+        subtotalLine: (subtotal, vat) => `Subtotal ${subtotal} + IVA ${vat}`,
+      },
+      review: {
+        heading: "Rever e enviar",
+        edit: "Editar",
+        peopleCount: (n) => `${n} ${n === 1 ? "pessoa" : "pessoas"}`,
+        documentMissing: "Em falta",
+        documentNotProvided: "Não fornecido",
+        consentsHeading: "Antes de enviar",
+        gdprLabel:
+          "Compreendo que os meus dados são usados apenas para registar esta estadia e cumprir as obrigações legais de comunicação da marina.",
+        termsLabel: "Aceito o regulamento da marina.",
+        declarationLabel: "Declaro que a informação prestada é verdadeira.",
+        submit: "Enviar pre-check-in de chegada",
+      },
+      confirmation: {
+        heading: "Pre-check-in recebido",
+        referenceLabel: "A sua referência",
+        whatNextHeading: "Próximos passos",
+        whatNextBody:
+          "A marina revê este pre-check-in antes da sua chegada. No cais, indique a referência e confirme o posto de amarração.",
+        bringHeading: "Traga estes documentos pessoalmente",
+        backToMarina: "Voltar à página da marina",
+      },
+    },
   },
 };
 
@@ -553,8 +1096,10 @@ function mergeDictionary(
 }
 
 // TODO(i18n): ES and FR cover navigation, footer, home, search, rates
-// headings, results and the shared contact/units/favourites labels.
-// Everything else falls back to English until fully translated.
+// headings, results, the shared contact/units/favourites labels, and (for
+// preArrival) the page chrome, step names and the three calm voyage info
+// panels. The rest of preArrival (every field label) falls back to English
+// until fully translated, the same as everything else not listed here.
 const es: DeepPartial<Dictionary> = {
   nav: {
     home: "Inicio",
@@ -646,6 +1191,44 @@ const es: DeepPartial<Dictionary> = {
     save: "Guardar marina",
     saved: "Guardada",
     savedHeading: "Tus marinas guardadas",
+  },
+  preArrival: {
+    cta: {
+      arrivalActions: "Completar el registro previo a la llegada",
+      myBoat: "Iniciar el registro previo a la llegada",
+    },
+    page: {
+      title: "Registro previo a la llegada",
+      subtitle:
+        "Responda una vez y la llegada será confirmar y listo. No se envía nada hasta que pulse Enviar al final.",
+      autosaveNote: "Guardado en este dispositivo a medida que avanza.",
+      resumeBanner: "Continuando donde lo dejó.",
+      startOver: "Empezar de nuevo",
+      back: "Atrás",
+      continueBtn: "Continuar",
+      stepOf: (step, total) => `Paso ${step} de ${total}`,
+    },
+    steps: {
+      boat: "Su embarcación",
+      voyage: "Su travesía",
+      crew: "Quién va a bordo",
+      documents: "Documentos",
+      stay: "Su estancia",
+      review: "Revisar y enviar",
+    },
+    voyage: {
+      infoOutsideSchengenTitle: "Llegada desde fuera de Schengen",
+      infoOutsideSchengenBody:
+        "Debe pasar el control fronterizo con la GNR a la llegada. La marina le ayudará. Todos a bordo necesitan pasaporte válido.",
+      infoNonEUFlagTitle: "Embarcación con pabellón no comunitario",
+      infoNonEUFlagBody:
+        "Una embarcación con pabellón no comunitario puede permanecer en Admisión Temporal de la UE hasta 18 meses sin IVA de importación, solo para uso privado, si el propietario reside fuera de la UE. No cubre el chárter.",
+      infoNonEUFlagResidentWarning:
+        "El propietario indicado en el paso 1 reside en la UE, por lo que la Admisión Temporal no suele estar disponible. Consulte con aduanas.",
+      infoNonEUMovementTitle: "Cruce hacia o desde fuera de la UE",
+      infoNonEUMovementBody:
+        "La marina debe comunicar este movimiento a las autoridades marítima, fronteriza y aduanera (Latitude 32). Este formulario recoge lo necesario para ese aviso.",
+    },
   },
 };
 
@@ -741,6 +1324,44 @@ const fr: DeepPartial<Dictionary> = {
     save: "Enregistrer la marina",
     saved: "Enregistrée",
     savedHeading: "Vos marinas enregistrées",
+  },
+  preArrival: {
+    cta: {
+      arrivalActions: "Compléter le pré-enregistrement d'arrivée",
+      myBoat: "Démarrer le pré-enregistrement d'arrivée",
+    },
+    page: {
+      title: "Pré-enregistrement d'arrivée",
+      subtitle:
+        "Répondez une fois, et l'arrivée devient un simple contrôle. Rien n'est envoyé avant d'appuyer sur Envoyer à la fin.",
+      autosaveNote: "Enregistré sur cet appareil au fur et à mesure.",
+      resumeBanner: "Reprise là où vous en étiez.",
+      startOver: "Recommencer",
+      back: "Retour",
+      continueBtn: "Continuer",
+      stepOf: (step, total) => `Étape ${step} sur ${total}`,
+    },
+    steps: {
+      boat: "Votre bateau",
+      voyage: "Votre traversée",
+      crew: "Qui est à bord",
+      documents: "Documents",
+      stay: "Votre séjour",
+      review: "Vérifier et envoyer",
+    },
+    voyage: {
+      infoOutsideSchengenTitle: "Arrivée depuis hors de l'espace Schengen",
+      infoOutsideSchengenBody:
+        "Vous devez passer le contrôle frontalier avec la GNR à l'arrivée. La capitainerie vous aidera. Chaque personne à bord doit avoir un passeport valide.",
+      infoNonEUFlagTitle: "Bateau battant pavillon hors UE",
+      infoNonEUFlagBody:
+        "Un bateau battant pavillon hors UE peut rester en Admission Temporaire de l'UE jusqu'à 18 mois sans TVA à l'importation, pour un usage privé uniquement, si le propriétaire réside hors de l'UE. Cela ne couvre pas la location.",
+      infoNonEUFlagResidentWarning:
+        "Le propriétaire indiqué à l'étape 1 réside dans l'UE, l'Admission Temporaire n'est donc normalement pas disponible. Vérifiez auprès des douanes.",
+      infoNonEUMovementTitle: "Traversée vers ou depuis hors de l'UE",
+      infoNonEUMovementBody:
+        "La capitainerie doit déclarer ce mouvement aux autorités maritime, frontalière et douanière (Latitude 32). Ce formulaire recueille ce qui est nécessaire pour cette déclaration.",
+    },
   },
 };
 
