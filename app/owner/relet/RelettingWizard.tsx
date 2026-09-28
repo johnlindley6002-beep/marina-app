@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { marinas } from "../../../data/marinas";
+import { creditModelCaption, creditModelHeadline, marinas } from "../../../data/marinas";
 import { siteConfig } from "../../../data/site";
 import { eur, formatLongDate } from "../../../lib/formatDate";
 import {
@@ -73,6 +73,7 @@ function Wizard() {
   const berth = useMemo(() => getOwnedBerths(user?.id ?? null)[0], [user?.id]);
   const marina = marinas.find((m) => m.id === berth?.marinaId);
   const terms = marina?.reletting ?? null;
+  const mediated = terms?.reletAllowed === "marina_mediated";
 
   const [step, setStep] = useState(1);
   const [direction, setDirection] = useState<"forward" | "back">("forward");
@@ -80,6 +81,7 @@ function Wizard() {
   const [endDate, setEndDate] = useState("");
   const [boatRemoval, setBoatRemoval] = useState(false);
   const [consent, setConsent] = useState(false);
+  const [outsideArrangementConfirmed, setOutsideArrangementConfirmed] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [boatReady, setBoatReady] = useState(false);
   const [berthReady, setBerthReady] = useState(false);
@@ -112,6 +114,7 @@ function Wizard() {
       setEndDate(draft.endDate);
       setBoatRemoval(draft.boatRemoval);
       setConsent(draft.consent);
+      setOutsideArrangementConfirmed(draft.outsideArrangementConfirmed);
       setTermsAccepted(draft.termsAccepted);
       setBoatReady(draft.boatReady);
       setBerthReady(draft.berthReady);
@@ -130,6 +133,7 @@ function Wizard() {
       !endDate &&
       !boatRemoval &&
       !consent &&
+      !outsideArrangementConfirmed &&
       !termsAccepted &&
       !boatReady &&
       !berthReady;
@@ -143,6 +147,7 @@ function Wizard() {
         endDate,
         boatRemoval,
         consent,
+        outsideArrangementConfirmed,
         termsAccepted,
         boatReady,
         berthReady,
@@ -160,16 +165,28 @@ function Wizard() {
     endDate,
     boatRemoval,
     consent,
+    outsideArrangementConfirmed,
     termsAccepted,
     boatReady,
     berthReady,
   ]);
 
-  if (!berth || !marina || !terms) {
+  if (!berth || !marina || !terms || terms.reletAllowed === "none") {
     return (
       <p className="measure text-ink/75">
         Reletting is not available for this berth.
       </p>
+    );
+  }
+
+  if (!mediated) {
+    return (
+      <div>
+        <p className="measure text-ink/75">
+          This marina does not mediate a paid relet of your berth. You may lend
+          it for free with written notice to the marina.
+        </p>
+      </div>
     );
   }
 
@@ -187,6 +204,9 @@ function Wizard() {
     }
     if (step === 2 && !consent) {
       return "Switch this on to let the marina relet your berth.";
+    }
+    if (step === 2 && !outsideArrangementConfirmed) {
+      return "Confirm you will not arrange any paid use of your berth outside the marina.";
     }
     if (step === 3 && !termsAccepted) {
       return "Accept the reletting terms to continue.";
@@ -222,6 +242,7 @@ function Wizard() {
     setEndDate("");
     setBoatRemoval(false);
     setConsent(false);
+    setOutsideArrangementConfirmed(false);
     setTermsAccepted(false);
     setBoatReady(false);
     setBerthReady(false);
@@ -239,6 +260,7 @@ function Wizard() {
             endDate,
             boatRemovalConfirmed: boatRemoval,
             reletConsent: consent,
+            outsideArrangementConfirmed,
             termsAccepted,
             readinessConfirmed: boatReady && berthReady,
             resubmitOf: mode === "resubmit" && requestId ? requestId : undefined,
@@ -389,6 +411,12 @@ function Wizard() {
             >
               <p className="measure pb-2 text-ink/75">{copy.authorizeWhy}</p>
             </Disclosure>
+            <div className="mt-6">
+              <Check checked={outsideArrangementConfirmed} onChange={setOutsideArrangementConfirmed}>
+                I will not arrange any paid use of my berth outside the marina.
+              </Check>
+            </div>
+            <p className="measure mt-4 text-sm text-ink/70">{terms.noticeRuleNote}</p>
           </>
         ) : null}
 
@@ -399,12 +427,12 @@ function Wizard() {
             </h2>
             <dl className="mt-8 grid max-w-md gap-6 sm:grid-cols-2">
               <div>
-                <dt className="text-sm text-ink/70">Your share</dt>
+                <dt className="text-sm text-ink/70">Your credit</dt>
                 <dd className="tabular mt-1 text-2xl font-medium text-ink">
-                  {terms.ownerSharePercent}%
+                  {creditModelHeadline(terms.creditModel)}
                 </dd>
                 <dd className="mt-1 text-sm text-ink/70">
-                  of the berth income for the nights relet
+                  {creditModelCaption(terms.creditModel)}
                 </dd>
               </div>
               <div>
@@ -439,6 +467,24 @@ function Wizard() {
             >
               <p className="measure pb-2 text-ink/75">{terms.taxNote}</p>
             </Disclosure>
+            {terms.mooringLetFeeSchedule.length > 0 ? (
+              <Disclosure
+                className="mt-2"
+                label="If you arrange a paid let yourself"
+                openLabel="If you arrange a paid let yourself"
+              >
+                <p className="measure pb-2 text-ink/75">
+                  Letting your berth for payment outside the marina still needs
+                  its prior written authorisation, and is a different path from
+                  the one on this page. If authorised, the marina&apos;s own
+                  processing fee is{" "}
+                  {terms.mooringLetFeeSchedule
+                    .map((tier) => `€${tier.feeEur} up to ${tier.maxDays} days`)
+                    .join(", ")}{" "}
+                  (excl. VAT).
+                </p>
+              </Disclosure>
+            ) : null}
             <div className="mt-6">
               <Check
                 checked={termsAccepted}
@@ -498,7 +544,7 @@ function Wizard() {
               <dd>The marina may relet it, with its approval</dd>
               <dt className="text-ink/70">Terms</dt>
               <dd>
-                {terms.ownerSharePercent}% share, {terms.processingFeePercent}%
+                {creditModelHeadline(terms.creditModel)} credit, {terms.processingFeePercent}%
                 fee, {terms.settlement}
               </dd>
               {estimate ? (

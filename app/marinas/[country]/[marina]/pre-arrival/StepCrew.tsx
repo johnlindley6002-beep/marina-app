@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+import { loadFrequentCrew, type FrequentPerson } from "../../../../../lib/boatProfile";
 import { getLastSubmittedCrew } from "../../../../../lib/mockData";
 import { EMPTY_PERSON, getVoyageFlags } from "../../../../../lib/prearrival/schema";
 import { getExtraErrors, getWarnings } from "../../../../../lib/prearrival/warnings";
@@ -26,11 +28,12 @@ function statusFor(index: number, draft: StepProps["draft"]): PersonStatus {
   return "complete";
 }
 
-export default function StepCrew({ draft, setDraft }: StepProps) {
+export default function StepCrew({ draft, setDraft, focusPersonIndex }: StepProps & { focusPersonIndex?: number | null }) {
   const { t } = useLanguage();
   const copy = t.preArrival.crew;
   const flags = getVoyageFlags(draft.voyage);
   const fullCrewListMode = flags.crossesExternalBorder;
+  const [frequentCrew] = useState<FrequentPerson[]>(() => loadFrequentCrew());
 
   function setCount(count: number) {
     setDraft((d) => {
@@ -71,6 +74,32 @@ export default function StepCrew({ draft, setDraft }: StepProps) {
     setDraft((d) => ({ ...d, people: lastCrew.map((p) => ({ ...p })) }));
   }
 
+  // Fills the first blank person card with a remembered crew member, or adds
+  // one if every card already has a name, up to the 12-person limit.
+  function applyFrequentPerson(fp: FrequentPerson) {
+    setDraft((d) => {
+      const fill = {
+        familyName: fp.familyName,
+        givenNames: fp.givenNames,
+        nationality: fp.nationality,
+        dateOfBirth: fp.dateOfBirth,
+        idType: fp.idType,
+      };
+      const blankIndex = d.people.findIndex((p) => !p.familyName.trim() && !p.givenNames.trim());
+      if (blankIndex >= 0) {
+        return {
+          ...d,
+          people: d.people.map((p, i) => (i === blankIndex ? { ...p, ...fill } : p)),
+        };
+      }
+      if (d.people.length >= 12) return d;
+      return {
+        ...d,
+        people: [...d.people, { ...EMPTY_PERSON, ...fill, role: "crew" }],
+      };
+    });
+  }
+
   return (
     <div>
       <div className="mt-6 max-w-xs">
@@ -106,6 +135,23 @@ export default function StepCrew({ draft, setDraft }: StepProps) {
         </p>
       ) : null}
 
+      {frequentCrew.length > 0 ? (
+        <div className="mt-4">
+          <p className="field-label">{copy.frequentCrewLabel}</p>
+          <ul className="flex flex-wrap gap-2">
+            {frequentCrew.map((fp) => (
+              <li key={fp.key}>
+                <button type="button" onClick={() => applyFrequentPerson(fp)} className="chip">
+                  {[fp.givenNames, fp.familyName].filter(Boolean).join(" ")}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
+
+      <p className="mt-6 max-w-xl text-xs text-ink/65">{t.preArrival.privacyNote}</p>
+
       <ul className="mt-6">
         {draft.people.map((person, index) => (
           <PersonCard
@@ -118,6 +164,7 @@ export default function StepCrew({ draft, setDraft }: StepProps) {
             setDraft={setDraft}
             onRemove={() => removePerson(index)}
             canRemove={draft.people.length > 1}
+            initialOpen={index === 0 || index === focusPersonIndex}
           />
         ))}
       </ul>

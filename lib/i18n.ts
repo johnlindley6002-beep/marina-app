@@ -167,6 +167,19 @@ type Dictionary = {
       arrivalActions: string;
       myBoat: string;
     };
+    privacyNote: string;
+    upcoming: {
+      heading: string;
+      newBoat: string;
+      datesNotSet: string;
+      draftLabel: string;
+      referenceLabel: (code: string) => string;
+      reviewBtn: string;
+      continueBtn: string;
+      nothingOutstanding: string;
+      idExpiring: (name: string, days: number) => string;
+      insuranceExpiring: (days: number) => string;
+    };
     page: {
       title: string;
       subtitle: string;
@@ -195,6 +208,7 @@ type Dictionary = {
       nameLabel: string;
       registrationLabel: string;
       flagLabel: string;
+      callSignLabel: string;
       portOfRegistryLabel: string;
       zoneLabel: string;
       specificationsHeading: string;
@@ -241,6 +255,7 @@ type Dictionary = {
       howManyLabel: string;
       allFreeMovementToggle: string;
       reuseLastCrewToggle: string;
+      frequentCrewLabel: string;
       sameSurnameToggle: string;
       sameNationalityToggle: string;
       personTitle: (n: number) => string;
@@ -335,6 +350,18 @@ type Dictionary = {
       whatNextBody: string;
       bringHeading: string;
       backToMarina: string;
+      saveOfferHeading: string;
+      saveOfferBody: string;
+      saveOfferBtn: string;
+      savedNote: string;
+    };
+    generatedDocs: {
+      declarationBtn: string;
+      crewListBtn: string;
+      preparing: string;
+      authorityNote: string;
+      authorityJsonBtn: string;
+      authorityCsvBtn: string;
     };
   };
 };
@@ -518,6 +545,20 @@ const baseTranslations: Record<"en" | "pt", Dictionary> = {
         arrivalActions: "Complete pre-arrival check-in",
         myBoat: "Start your pre-arrival check-in",
       },
+      privacyNote:
+        "Identity data is used only to register this stay and meet legal reporting duties. Nothing is uploaded in this demo.",
+      upcoming: {
+        heading: "Upcoming stays",
+        newBoat: "New boat",
+        datesNotSet: "Dates not set yet",
+        draftLabel: "draft",
+        referenceLabel: (code) => `ref. ${code}`,
+        reviewBtn: "Review",
+        continueBtn: "Continue",
+        nothingOutstanding: "Nothing outstanding.",
+        idExpiring: (name, days) => `${name}'s ID expires in ${days} ${days === 1 ? "day" : "days"}.`,
+        insuranceExpiring: (days) => `Third-party insurance expires in ${days} ${days === 1 ? "day" : "days"}.`,
+      },
       page: {
         title: "Pre-arrival check-in",
         subtitle:
@@ -547,6 +588,7 @@ const baseTranslations: Record<"en" | "pt", Dictionary> = {
         nameLabel: "Boat name",
         registrationLabel: "Registration number",
         flagLabel: "Flag country",
+        callSignLabel: "Call sign, if any",
         portOfRegistryLabel: "Port of registry",
         zoneLabel: "Navigation zone",
         specificationsHeading: "Specifications",
@@ -597,6 +639,7 @@ const baseTranslations: Record<"en" | "pt", Dictionary> = {
         howManyLabel: "How many people on board?",
         allFreeMovementToggle: "All on board are EU, EEA or Swiss citizens",
         reuseLastCrewToggle: "Reuse crew from my last trip",
+        frequentCrewLabel: "Frequent crew",
         sameSurnameToggle: "Same surname as person 1",
         sameNationalityToggle: "Same nationality as person 1",
         personTitle: (n) => `Person ${n}`,
@@ -695,6 +738,20 @@ const baseTranslations: Record<"en" | "pt", Dictionary> = {
           "The marina reviews this before you arrive. At the office, quote your reference and confirm your berth.",
         bringHeading: "Bring these documents in person",
         backToMarina: "Back to the marina page",
+        saveOfferHeading: "Save this for next time",
+        saveOfferBody:
+          "Save this boat, its documents and everyone on board to My boat, so your next pre-arrival check-in is one tap.",
+        saveOfferBtn: "Save to My boat",
+        savedNote: "Saved to My boat.",
+      },
+      generatedDocs: {
+        declarationBtn: "Arrival declaration (PDF)",
+        crewListBtn: "Crew list (PDF)",
+        preparing: "Preparing…",
+        authorityNote:
+          "Draft format. The official Latitude 32 field list will be confirmed with the marina.",
+        authorityJsonBtn: "Authority report (JSON)",
+        authorityCsvBtn: "Authority report (CSV)",
       },
     },
   },
@@ -880,6 +937,21 @@ const baseTranslations: Record<"en" | "pt", Dictionary> = {
         arrivalActions: "Preencher o pre-check-in de chegada",
         myBoat: "Iniciar o pre-check-in de chegada",
       },
+      privacyNote:
+        "Os dados de identificação são usados apenas para registar esta estadia e cumprir as obrigações legais de comunicação. Nada é carregado nesta demonstração.",
+      upcoming: {
+        heading: "Próximas estadias",
+        newBoat: "Nova embarcação",
+        datesNotSet: "Datas ainda não definidas",
+        draftLabel: "rascunho",
+        referenceLabel: (code) => `ref. ${code}`,
+        reviewBtn: "Rever",
+        continueBtn: "Continuar",
+        nothingOutstanding: "Nada pendente.",
+        idExpiring: (name, days) => `O documento de ${name} expira em ${days} ${days === 1 ? "dia" : "dias"}.`,
+        insuranceExpiring: (days) =>
+          `O seguro de responsabilidade civil expira em ${days} ${days === 1 ? "dia" : "dias"}.`,
+      },
       page: {
         title: "Pre-check-in de chegada",
         subtitle:
@@ -909,6 +981,7 @@ const baseTranslations: Record<"en" | "pt", Dictionary> = {
         nameLabel: "Nome da embarcação",
         registrationLabel: "Número de registo",
         flagLabel: "País de bandeira",
+        callSignLabel: "Indicativo de chamada, se aplicável",
         portOfRegistryLabel: "Porto de registo",
         zoneLabel: "Zona de navegação",
         specificationsHeading: "Especificações",
@@ -959,6 +1032,7 @@ const baseTranslations: Record<"en" | "pt", Dictionary> = {
         howManyLabel: "Quantas pessoas estão a bordo?",
         allFreeMovementToggle: "Todos a bordo são cidadãos UE, EEE ou suíços",
         reuseLastCrewToggle: "Reutilizar tripulação da última viagem",
+        frequentCrewLabel: "Tripulação frequente",
         sameSurnameToggle: "Mesmo apelido da pessoa 1",
         sameNationalityToggle: "Mesma nacionalidade da pessoa 1",
         personTitle: (n) => `Pessoa ${n}`,
@@ -1057,6 +1131,20 @@ const baseTranslations: Record<"en" | "pt", Dictionary> = {
           "A marina revê este pre-check-in antes da sua chegada. No cais, indique a referência e confirme o posto de amarração.",
         bringHeading: "Traga estes documentos pessoalmente",
         backToMarina: "Voltar à página da marina",
+        saveOfferHeading: "Guarde para a próxima vez",
+        saveOfferBody:
+          "Guarde esta embarcação, os seus documentos e todos a bordo em O meu barco, para que o próximo pre-check-in seja num toque.",
+        saveOfferBtn: "Guardar em O meu barco",
+        savedNote: "Guardado em O meu barco.",
+      },
+      generatedDocs: {
+        declarationBtn: "Declaração de chegada (PDF)",
+        crewListBtn: "Lista de tripulação (PDF)",
+        preparing: "A preparar…",
+        authorityNote:
+          "Formato de rascunho. A lista de campos oficial do Latitude 32 será confirmada com a marina.",
+        authorityJsonBtn: "Relatório para a autoridade (JSON)",
+        authorityCsvBtn: "Relatório para a autoridade (CSV)",
       },
     },
   },

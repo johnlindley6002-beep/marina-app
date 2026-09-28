@@ -394,18 +394,77 @@ export type FuelPrices = {
 // busyMonths uses 1 (January) to 12 (December).
 export type DemandInfo = { busyMonths: number[]; note: string };
 
+// How a marina lets a holder's berth work while they are away, per its own
+// regulation. "none": reletting is not offered at all (e.g. Marina do Freixo).
+// "free_notice_only": a holder may lend the berth for free with written notice,
+// but the marina does not mediate a paid let. "marina_mediated": the marina may
+// re-let the berth under its own contract with the visitor (the only mechanism
+// Aldock supports; a holder is never paid by a visitor directly).
+export type ReletAllowed = "none" | "free_notice_only" | "marina_mediated";
+
+// How the holder's credit for a relet night is computed. "percentage" and
+// "fixed_per_night" are both real settlement money (subject to the marina's
+// processing fee below); "incentive_next_year" is a discount off the
+// following year's berth fee rather than a credit against the current one,
+// computed the same way as "percentage" for display purposes.
+export type CreditModel =
+  | { kind: "percentage"; sharePercent: number }
+  | { kind: "fixed_per_night"; amountEur: number }
+  | { kind: "incentive_next_year"; sharePercent: number; description: string };
+
+// Plain-language labels for a credit model, for the holder-facing terms step
+// and ledger breakdown, so neither screen needs its own switch statement.
+export function creditModelHeadline(model: CreditModel): string {
+  switch (model.kind) {
+    case "percentage":
+      return `${model.sharePercent}%`;
+    case "fixed_per_night":
+      return `€${model.amountEur.toFixed(2)}`;
+    case "incentive_next_year":
+      return `${model.sharePercent}%`;
+  }
+}
+
+export function creditModelCaption(model: CreditModel): string {
+  switch (model.kind) {
+    case "percentage":
+      return "of the berth income for the nights relet";
+    case "fixed_per_night":
+      return "credited per night relet";
+    case "incentive_next_year":
+      return model.description;
+  }
+}
+
+// A tier of the marina's flat processing fee for a holder-arranged paid let
+// (art. 23(1)-(2): needs the marina's prior written authorisation, but is not
+// the marina-mediated mechanism itself). Shown for information only, since
+// Aldock does not arrange this kind of let.
+export type MooringLetFeeTier = { maxDays: number; feeEur: number };
+
 // Terms for reletting a held berth while its holder is away. A berth is a right
 // of use, so the marina must consent to every reletting. ALL NUMBERS HERE ARE
 // PLACEHOLDERS to be set with the marina and reviewed by legal counsel.
 export type RelettingTerms = {
-  // The holder's share of the tariff income for the nights relet (percent).
-  ownerSharePercent: number;
-  // The marina's processing fee, taken from the holder's share (percent).
+  reletAllowed: ReletAllowed;
+  creditModel: CreditModel;
+  // The marina's processing fee, taken from the holder's credit (percent).
   processingFeePercent: number;
   // "credit" is a credit against berth fees, "payment" would be cash out.
   settlement: "credit" | "payment";
   termsHref: string;
   taxNote: string;
+  // Whether the 45/30-day notice period (art. 10(2)/24(3)) applies when the
+  // marina itself re-lets under art. 23(4). Unclear in the regulation, so this
+  // defaults to false with noticeRuleNote explaining it is unconfirmed.
+  noticeRuleEnabled: boolean;
+  noticeRuleNote: string;
+  // The holder-arranged paid let processing fee (art. 23(1)-(2)), shown for
+  // information only; empty when the marina does not publish one.
+  mooringLetFeeSchedule: MooringLetFeeTier[];
+  // Days of buffer the marina keeps clear before the holder's return date,
+  // when suggesting a released berth for an incoming visitor.
+  returnBufferDays: number;
 };
 
 export type NearbyPlace = { name: string; description: string };
@@ -874,12 +933,26 @@ export const marinas: Marina[] = [
     // share, fee and settlement with the marina, and have the tax note and the
     // terms page reviewed by counsel before launch.
     reletting: {
-      ownerSharePercent: 50,
+      reletAllowed: "marina_mediated",
+      creditModel: { kind: "percentage", sharePercent: 50 },
       processingFeePercent: 10,
       settlement: "credit",
       termsHref: "/legal/reletting-terms",
       taxNote:
         "A credit may count as income for tax purposes where you live. This is general information, not tax advice, so check with your own adviser.",
+      // TODO (legal): art. 10(2)/24(3) notice is unclear for a marina-mediated
+      // relet under art. 23(4). Left off by default until confirmed.
+      noticeRuleEnabled: false,
+      noticeRuleNote:
+        "Notice periods of 45 days (a borrowed boat) or 30 days (a different owner) may apply under the marina's regulation. To confirm with the marina.",
+      // Cascais 2026 tariff, processing fee for a holder-arranged mooring let
+      // (excl. VAT). Shown for information only; not the mechanism Aldock uses.
+      mooringLetFeeSchedule: [
+        { maxDays: 90, feeEur: 150 },
+        { maxDays: 180, feeEur: 300 },
+        { maxDays: 359, feeEur: 500 },
+      ],
+      returnBufferDays: 2,
     },
     nearby: [
       {

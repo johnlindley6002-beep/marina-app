@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { getMarina, marinas } from "../../../../../data/marinas";
 import PreArrivalWizard from "./PreArrivalWizard";
 
@@ -25,7 +26,11 @@ export default async function PreArrivalPage({ params }: Props) {
     notFound();
   }
 
-  return <PreArrivalWizard marina={marina} />;
+  return (
+    <Suspense>
+      <PreArrivalWizard marina={marina} />
+    </Suspense>
+  );
 }
 
 export async function generateStaticParams() {

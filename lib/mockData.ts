@@ -13,7 +13,14 @@
 // ============================================================================
 
 import { getAllBerths } from "../data/berths";
-import { getSeason, marinas } from "../data/marinas";
+import {
+  CLASS_BEAM_RANGES,
+  CLASS_LENGTH_RANGES,
+  getSeason,
+  marinas,
+  type MarinaClass,
+  type RelettingTerms,
+} from "../data/marinas";
 import type { PreArrivalDraft } from "./prearrival/schema";
 
 export type Role = "voyager" | "owner" | "staff";
@@ -509,6 +516,16 @@ export type RelettingEvent = {
   note?: string;
 };
 
+// Set by staff when approving a request: what an incoming visitor's boat
+// and dates must respect for this released berth. All optional; null/0 means
+// no extra restriction beyond the marina's own defaults.
+export type RelettingConditions = {
+  maxLengthM: number | null;
+  maxBeamM: number | null;
+  earliestReletDate: string | null;
+  bufferDays: number;
+};
+
 export type RelettingRequest = {
   id: string;
   userId: string;
@@ -518,11 +535,18 @@ export type RelettingRequest = {
   endDate: string; // the day the holder returns (ISO)
   boatRemovalConfirmed: boolean;
   reletConsent: boolean;
+  // Second, separate consent: the holder will not arrange any paid use of the
+  // berth themselves outside the marina (art. 29(1)(i), art. 13(1)(m)).
+  outsideArrangementConfirmed: boolean;
   termsAcceptedAt: string;
   readinessConfirmedAt: string;
   status: RelettingStatus;
   history: RelettingEvent[];
   decisionNote: string;
+  // Set by staff on approval; null before a decision.
+  conditions: RelettingConditions | null;
+  // Set when the holder asks to return before the end date.
+  earlyReturnRequestedAt: string | null;
   // The nights a visitor has booked. The marina may relet only some of the
   // nights on offer, so this can be fewer than the nights away. It is empty
   // until something is booked, and a request with any booked night is locked.
@@ -600,10 +624,23 @@ export function nightDates(startDate: string, endDate: string): string[] {
   return out;
 }
 
+// The holder's credit before the marina's fee, from the marina's credit
+// model: a percent of the tariff income, a fixed amount per night, or (for
+// display) the nominal percent an incentive-next-year model would be worth.
+function creditBeforeFee(terms: RelettingTerms, grossEur: number, nightCount: number): number {
+  switch (terms.creditModel.kind) {
+    case "percentage":
+      return (grossEur * terms.creditModel.sharePercent) / 100;
+    case "fixed_per_night":
+      return terms.creditModel.amountEur * nightCount;
+    case "incentive_next_year":
+      return (grossEur * terms.creditModel.sharePercent) / 100;
+  }
+}
+
 // The money for a list of relet nights, from the marina's real tariff for the
-// berth's class and the placeholder share and fee in its data. The holder's
-// share is a percent of the tariff income (excluding VAT), and the fee is a
-// percent of that share, so net is share minus fee. Pure and deterministic.
+// berth's class and its credit model and fee. The fee is a percent of the
+// credit before fee, so net is credit minus fee. Pure and deterministic.
 export function computeSplitForNights(
   marinaId: string,
   berthId: string,
@@ -618,7 +655,7 @@ export function computeSplitForNights(
     const date = parseIso(night);
     if (date) gross += marina.transientRates[berth.sizeClass][getSeason(date)];
   }
-  const share = (gross * terms.ownerSharePercent) / 100;
+  const share = creditBeforeFee(terms, gross, nights.length);
   const fee = (share * terms.processingFeePercent) / 100;
   return {
     nights: nights.length,
@@ -653,6 +690,7 @@ function buildSeedRelettingStore(): ReletStore {
     endDate: "2026-07-20",
     boatRemovalConfirmed: true,
     reletConsent: true,
+    outsideArrangementConfirmed: true,
     termsAcceptedAt: "2026-06-10T09:00:00.000Z",
     readinessConfirmedAt: "2026-06-10T09:00:00.000Z",
     status: "completed",
@@ -664,6 +702,8 @@ function buildSeedRelettingStore(): ReletStore {
       { status: "completed", at: "2026-07-21T09:00:00.000Z" },
     ],
     decisionNote: "",
+    conditions: { maxLengthM: null, maxBeamM: null, earliestReletDate: null, bufferDays: 2 },
+    earlyReturnRequestedAt: null,
     bookedNights: booked,
     approvedNights: all,
     resubmitOf: null,
@@ -767,6 +807,7 @@ export type SubmitRelettingInput = {
   endDate: string;
   boatRemovalConfirmed: boolean;
   reletConsent: boolean;
+  outsideArrangementConfirmed: boolean;
   termsAccepted: boolean;
   readinessConfirmed: boolean;
   // When set, this replaces a request the marina did not approve.
@@ -789,8 +830,12 @@ export function submitRelettingRequest(
   if (!userId || !berth) {
     return { ok: false, error: "Only the holder of this berth can make it available." };
   }
-  if (!marinas.find((m) => m.id === berth.marinaId)?.reletting) {
+  const terms = marinas.find((m) => m.id === berth.marinaId)?.reletting;
+  if (!terms) {
     return { ok: false, error: "This marina does not offer reletting." };
+  }
+  if (terms.reletAllowed !== "marina_mediated") {
+    return { ok: false, error: "This marina does not offer a marina-mediated relet." };
   }
   const nights = countNights(input.startDate, input.endDate);
   if (nights < 1) {
@@ -799,7 +844,13 @@ export function submitRelettingRequest(
   if (input.startDate < todayIso()) {
     return { ok: false, error: "The day you leave cannot be in the past." };
   }
-  if (!input.boatRemovalConfirmed || !input.reletConsent || !input.termsAccepted || !input.readinessConfirmed) {
+  if (
+    !input.boatRemovalConfirmed ||
+    !input.reletConsent ||
+    !input.outsideArrangementConfirmed ||
+    !input.termsAccepted ||
+    !input.readinessConfirmed
+  ) {
     return { ok: false, error: "Every confirmation is needed before the marina can consider your request." };
   }
   const store = loadReletStore();
@@ -830,6 +881,7 @@ export function submitRelettingRequest(
     endDate: input.endDate,
     boatRemovalConfirmed: true,
     reletConsent: true,
+    outsideArrangementConfirmed: true,
     termsAcceptedAt: now,
     readinessConfirmedAt: now,
     status: "submitted",
@@ -841,6 +893,8 @@ export function submitRelettingRequest(
       },
     ],
     decisionNote: "",
+    conditions: null,
+    earlyReturnRequestedAt: null,
     bookedNights: [],
     approvedNights: null,
     resubmitOf: input.resubmitOf ?? null,
@@ -892,6 +946,10 @@ function dateLabel(iso: string): string {
   return d
     ? new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "long" }).format(d)
     : iso;
+}
+
+function formatWindow(startIso: string, endIso: string): string {
+  return `available ${dateLabel(startIso)} to ${dateLabel(endIso)}`;
 }
 
 // Only requests for marinas the staff member belongs to. The real backend must
@@ -971,7 +1029,9 @@ export function decideReletting(
   note = "",
   // The nights to clear for transient use. Defaults to every night offered.
   // Fewer than that is a partial approval, reflected in the owner's ledger.
-  approvedNights?: string[]
+  approvedNights?: string[],
+  // Conditions for the incoming visitor's boat and dates, set on approval.
+  conditions?: RelettingConditions
 ): StaffActionResult {
   const store = loadReletStore();
   const request = store.requests.find((r) => r.id === requestId);
@@ -992,6 +1052,7 @@ export function decideReletting(
     ...withEvent(request, decision === "approve" ? "approved" : "declined"),
     decisionNote: note.trim(),
     approvedNights: cleared,
+    conditions: decision === "approve" ? (conditions ?? request.conditions) : request.conditions,
   };
   const message =
     decision === "approve"
@@ -1206,6 +1267,37 @@ export function cancelRelettingRequest(
   return { ok: true, request: next };
 }
 
+// The holder asks to come back before the end date. Recorded for the marina
+// to see; the marina either finds the holder a temporary berth or asks them
+// to coordinate with whoever is aboard, per its own rule (mocked as a note).
+export function requestEarlyReturn(
+  userId: string | null,
+  requestId: string
+): ChangeRelettingResult {
+  const found = ownedRequest(userId, requestId);
+  if (!found) return { ok: false, error: "Only the holder can do this." };
+  const { store, request } = found;
+  if (!["approved", "listed", "booked"].includes(request.status)) {
+    return { ok: false, error: "This request is not currently active." };
+  }
+  if (request.earlyReturnRequestedAt) {
+    return { ok: true, request };
+  }
+  const next: RelettingRequest = {
+    ...request,
+    earlyReturnRequestedAt: new Date().toISOString(),
+    history: [
+      ...request.history,
+      { status: request.status, at: new Date().toISOString(), note: "Holder asked to return early" },
+    ],
+  };
+  saveReletStore({
+    ...store,
+    requests: store.requests.map((r) => (r.id === requestId ? next : r)),
+  });
+  return { ok: true, request: next };
+}
+
 // ---- Owner: a wizard that can be resumed ----
 
 export type RelettingDraft = {
@@ -1217,6 +1309,7 @@ export type RelettingDraft = {
   endDate: string;
   boatRemoval: boolean;
   consent: boolean;
+  outsideArrangementConfirmed: boolean;
   termsAccepted: boolean;
   boatReady: boolean;
   berthReady: boolean;
@@ -1269,6 +1362,7 @@ export function startRelettingDraftFrom(
     endDate: request.endDate,
     boatRemoval: true,
     consent: true,
+    outsideArrangementConfirmed: true,
     termsAccepted: true,
     boatReady: true,
     berthReady: true,
@@ -2014,6 +2108,7 @@ export type BerthOperationalStatus =
   | "free"
   | "reserved"
   | "owner-away"
+  | "released"
   | "out-of-service";
 
 export type BerthOperationalInfo = {
@@ -2063,8 +2158,8 @@ export function getBerthStatuses(
           };
         } else if ((request.approvedNights ?? []).includes(dateIso)) {
           out[berth.id] = {
-            status: "owner-away",
-            detail: "The holder is away; open for reletting.",
+            status: "released",
+            detail: `Released by the holder, ${formatWindow(request.startDate, request.endDate)}.`,
             relettingId: request.id,
           };
         } else {
@@ -2112,6 +2207,63 @@ export function getBerthStatuses(
   return out;
 }
 
+function boatFitsMarinaClass(dims: { loa: number; beam: number }, sizeClass: MarinaClass): boolean {
+  return dims.loa <= CLASS_LENGTH_RANGES[sizeClass].maxM && dims.beam <= CLASS_BEAM_RANGES[sizeClass];
+}
+
+export type ReleasedBerthSuggestion = {
+  berthId: string;
+  sizeClass: MarinaClass;
+  requestId: string;
+  ownerName: string;
+  availableFrom: string;
+  availableTo: string;
+};
+
+// Released holder berths that fit a boat and clear every night of a stay,
+// respecting the marina's own buffer and any staff-set conditions from the
+// approval. Used to suggest a berth when staff assign an incoming visitor.
+export function suggestReleasedBerths(
+  marinaId: string,
+  dims: { loa: number; beam: number },
+  stay: { arrival: string; departure: string }
+): ReleasedBerthSuggestion[] {
+  const nights = nightDates(stay.arrival, stay.departure);
+  if (nights.length === 0) return [];
+  const allBerths = getAllBerths();
+  const requests = loadReletStore().requests.filter(
+    (r) => r.marinaId === marinaId && ["approved", "listed", "booked"].includes(r.status)
+  );
+  const out: ReleasedBerthSuggestion[] = [];
+  for (const request of requests) {
+    const berth = allBerths.find((b) => b.id === request.berthId);
+    if (!berth) continue;
+    const approved = new Set(request.approvedNights ?? []);
+    const booked = new Set(request.bookedNights);
+    const everyNightClear = nights.every((n) => approved.has(n) && !booked.has(n));
+    if (!everyNightClear) continue;
+
+    const cond = request.conditions;
+    if (cond?.maxLengthM && dims.loa > cond.maxLengthM) continue;
+    if (cond?.maxBeamM && dims.beam > cond.maxBeamM) continue;
+    if (cond?.earliestReletDate && stay.arrival < cond.earliestReletDate) continue;
+    const bufferDays = cond?.bufferDays ?? 0;
+    if (bufferDays > 0 && stay.departure > addDaysIso(request.endDate, -bufferDays)) continue;
+    if (!boatFitsMarinaClass(dims, berth.sizeClass)) continue;
+
+    const owner = ACCOUNTS.find((a) => a.id === request.userId);
+    out.push({
+      berthId: berth.id,
+      sizeClass: berth.sizeClass,
+      requestId: request.id,
+      ownerName: owner?.name ?? "Berth holder",
+      availableFrom: request.startDate,
+      availableTo: request.endDate,
+    });
+  }
+  return out;
+}
+
 // ---- Records: who holds what, tied together without re-keying ----
 
 export type MarinaBerthLink = {
@@ -2150,6 +2302,9 @@ export type PreArrivalCheckIn = {
   marinaId: string;
   draft: PreArrivalDraft;
   submittedAt: string;
+  // Set by staff when the boat actually checks in at the desk; moves the
+  // arrivals-board card from Ready to Berthed.
+  checkedInAt: string | null;
 };
 
 type PreArrivalDraftStore = Record<string, PreArrivalDraft>;
@@ -2202,6 +2357,7 @@ export function submitPreArrivalCheckIn(
     marinaId,
     draft,
     submittedAt: new Date().toISOString(),
+    checkedInAt: null,
   };
   writeJson(PREARRIVAL_KEY, { checkIns: [checkIn, ...store.checkIns] });
   emitChange();
@@ -2211,6 +2367,39 @@ export function submitPreArrivalCheckIn(
 
 export function getPreArrivalCheckIn(id: string): PreArrivalCheckIn | null {
   return loadPreArrivalStore().checkIns.find((c) => c.id === id) ?? null;
+}
+
+// Every submitted check-in on this device, newest first. A boater is not
+// signed in, so this is device-only, exactly like the drafts above.
+export function getAllPreArrivalCheckIns(): PreArrivalCheckIn[] {
+  return loadPreArrivalStore().checkIns;
+}
+
+// The check-ins staff of a marina can see, for the arrivals board's
+// pre-arrival panel. In the real product this would be scoped server-side by
+// marina the same way enquiries and reletting requests are.
+export function getPreArrivalCheckInsForStaff(staffUserId: string | null): PreArrivalCheckIn[] {
+  if (!staffUserId) return [];
+  return loadPreArrivalStore().checkIns.filter((c) => isStaffOfMarina(staffUserId, c.marinaId));
+}
+
+// Every in-progress draft on this device, one per marina, for the "upcoming
+// stays" list in My boat.
+export function getAllPreArrivalDrafts(): { marinaId: string; draft: PreArrivalDraft }[] {
+  const all = readJson<PreArrivalDraftStore>(PREARRIVAL_DRAFT_KEY) ?? {};
+  return Object.entries(all).map(([marinaId, draft]) => ({ marinaId, draft }));
+}
+
+export function markPreArrivalCheckedIn(id: string): StaffActionResult {
+  const store = loadPreArrivalStore();
+  const checkIn = store.checkIns.find((c) => c.id === id);
+  if (!checkIn) return { ok: false, error: "Check-in not found." };
+  if (checkIn.checkedInAt) return { ok: true };
+  writeJson(PREARRIVAL_KEY, {
+    checkIns: store.checkIns.map((c) => (c.id === id ? { ...c, checkedInAt: new Date().toISOString() } : c)),
+  });
+  emitChange();
+  return { ok: true };
 }
 
 // The people list from the most recently submitted check-in on this device,

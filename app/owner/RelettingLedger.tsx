@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { marinas } from "../../data/marinas";
+import { creditModelHeadline, marinas } from "../../data/marinas";
 import { siteConfig } from "../../data/site";
 import { eur, formatLongDate } from "../../lib/formatDate";
 import {
@@ -11,6 +11,7 @@ import {
   getRelettingRequests,
   isRelettingEditable,
   nightDates,
+  requestEarlyReturn,
   RELETTING_PROGRESS,
   RELETTING_STATUS_LABELS,
   startRelettingDraftFrom,
@@ -98,6 +99,41 @@ function NightStrip({ request }: { request: RelettingRequest }) {
           );
         })}
       </ul>
+    </div>
+  );
+}
+
+function EarlyReturn({ request }: { request: RelettingRequest }) {
+  const { user } = useAuth();
+  const [error, setError] = useState<string | null>(null);
+  if (!["approved", "listed", "booked"].includes(request.status)) return null;
+  if (request.earlyReturnRequestedAt) {
+    return (
+      <p className="mt-3 text-sm text-ink/70">
+        You told the marina you are returning early.
+        {request.status === "booked"
+          ? " Since a visitor is aboard, the marina will offer you a temporary berth or ask you to coordinate a handover."
+          : ""}
+      </p>
+    );
+  }
+  return (
+    <div className="mt-3">
+      <button
+        type="button"
+        onClick={() => {
+          const result = requestEarlyReturn(user?.id ?? null, request.id);
+          setError(result.ok ? null : result.error);
+        }}
+        className="btn-quiet text-sm"
+      >
+        I am returning early
+      </button>
+      {error ? (
+        <p role="alert" className="field-error mt-1">
+          {error}
+        </p>
+      ) : null}
     </div>
   );
 }
@@ -276,7 +312,7 @@ export default function RelettingLedger() {
                   <dd className="text-right text-ink">{request.nightsRelet}</dd>
                   <dt>Berth income</dt>
                   <dd className="text-right text-ink">{eur(request.grossEur ?? 0)}</dd>
-                  <dt>Your share ({terms?.ownerSharePercent}%)</dt>
+                  <dt>Your credit ({terms ? creditModelHeadline(terms.creditModel) : ""})</dt>
                   <dd className="text-right text-ink">
                     {eur(request.ownerShareEur ?? 0)}
                   </dd>
@@ -292,6 +328,7 @@ export default function RelettingLedger() {
               </Disclosure>
             ) : null}
 
+            <EarlyReturn request={request} />
             <Actions request={request} />
           </li>
         );

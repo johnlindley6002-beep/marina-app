@@ -1,10 +1,74 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
 import type { Marina } from "../../../../../data/marinas";
+import { saveFrequentPerson } from "../../../../../lib/boatProfile";
 import { getDocumentRequirements } from "../../../../../lib/prearrival/documentRules";
 import type { PreArrivalCheckIn } from "../../../../../lib/mockData";
+import { useBoats, type BoatInput } from "../../../../components/BoatProvider";
+import DocumentButtons from "../../../../components/DocumentButtons";
 import { useLanguage } from "../../../../components/LanguageProvider";
+
+function boatTypeFor(propulsion: string, isMultihull: boolean): string {
+  if (isMultihull) return "catamaran";
+  return propulsion === "power" ? "motor" : "sail";
+}
+
+function SaveToMyBoat({ checkIn }: { checkIn: PreArrivalCheckIn }) {
+  const { t } = useLanguage();
+  const copy = t.preArrival.confirmation;
+  const { saveBoat, saveSkipper } = useBoats();
+  const [saved, setSaved] = useState(false);
+
+  function save() {
+    const { boatIdentity, boatSpecs, owner, documents, people } = checkIn.draft;
+    const input: BoatInput = {
+      name: boatIdentity.name,
+      type: boatTypeFor(boatSpecs.propulsion, boatSpecs.isMultihull),
+      loa: boatSpecs.lengthOverall,
+      beam: boatSpecs.beam,
+      draft: boatSpecs.draught,
+      flag: boatIdentity.flagCountry,
+      homePort: boatIdentity.portOfRegistry,
+      documents: {
+        registrationNumber: documents.registration.number,
+        insuranceProvider: documents.thirdPartyInsurance.insurer,
+        insurancePolicy: documents.thirdPartyInsurance.number,
+        insuranceExpiry: documents.thirdPartyInsurance.expiryDate,
+        competenceCertificate: documents.skipperLicence.number,
+        vhfLicence: documents.radioStationLicence.number,
+      },
+    };
+    saveBoat(input);
+    for (const person of people) {
+      saveFrequentPerson({
+        familyName: person.familyName,
+        givenNames: person.givenNames,
+        nationality: person.nationality,
+        dateOfBirth: person.dateOfBirth,
+        idType: person.idType,
+      });
+    }
+    if (owner.fullName || owner.email || owner.phone) {
+      saveSkipper({ name: owner.fullName, phone: owner.phone, email: owner.email });
+    }
+    setSaved(true);
+  }
+
+  if (saved) {
+    return <p className="mt-4 text-sm text-ink/75">{copy.savedNote}</p>;
+  }
+  return (
+    <div className="surface-lift mt-8 p-6">
+      <p className="font-medium text-ink">{copy.saveOfferHeading}</p>
+      <p className="mt-1 text-sm text-ink/75">{copy.saveOfferBody}</p>
+      <button type="button" onClick={save} className="btn-secondary mt-4">
+        {copy.saveOfferBtn}
+      </button>
+    </div>
+  );
+}
 
 export default function Confirmation({
   marina,
@@ -41,6 +105,10 @@ export default function Confirmation({
             ))}
           </ul>
         </div>
+
+        <DocumentButtons checkIn={checkIn} marina={marina} className="mt-8" />
+
+        <SaveToMyBoat checkIn={checkIn} />
 
         <Link
           href={`/marinas/${marina.countrySlug}/${marina.id}`}

@@ -12,6 +12,7 @@ import {
   getOutOfServiceBerths,
   reassignEnquiryBerth,
   setBerthOutOfService,
+  suggestReleasedBerths,
   type Enquiry,
 } from "../../../lib/mockData";
 import { useMock } from "../../../lib/useMock";
@@ -141,6 +142,36 @@ export default function BerthOperations() {
                     {panel.enquiry.arrival} to{" "}
                     {panel.enquiry.openEnded ? "open-ended" : panel.enquiry.departure}
                   </p>
+                  {(() => {
+                    const suggestions = suggestReleasedBerths(
+                      MARINA.id,
+                      { loa: Number(panel.enquiry.loa) || 0, beam: 0 },
+                      { arrival: panel.enquiry.arrival, departure: panel.enquiry.openEnded ? panel.enquiry.arrival : panel.enquiry.departure }
+                    );
+                    return suggestions.length > 0 ? (
+                      <div className="mt-2">
+                        <p className="staff-label">Suggested released berths</p>
+                        <ul className="flex flex-wrap gap-1.5">
+                          {suggestions.map((s) => (
+                            <li key={s.berthId}>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setReassignTo(s.berthId);
+                                  const result = reassignEnquiryBerth(staffId, panel.enquiry!.id, s.berthId);
+                                  if (result.ok) selectBerth(s.berthId);
+                                  setError(result.ok ? null : result.error);
+                                }}
+                                className="staff-btn text-xs"
+                              >
+                                {s.berthId} (Class {s.sizeClass}, {s.ownerName})
+                              </button>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ) : null;
+                  })()}
                   <div className="mt-2">
                     <p className="staff-label">Reassign to</p>
                     <BerthPicker
@@ -171,7 +202,9 @@ export default function BerthOperations() {
                   >
                     Return to service
                   </button>
-                ) : panel.info.status === "free" || panel.info.status === "owner-away" ? (
+                ) : panel.info.status === "free" ||
+                  panel.info.status === "owner-away" ||
+                  panel.info.status === "released" ? (
                   <div>
                     <label className="block text-sm">
                       <span className="staff-label">Reason</span>

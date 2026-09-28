@@ -122,6 +122,15 @@ export default function StepBoat({ marina, draft, setDraft, errors }: StepProps)
             ))}
           </select>
         </Field>
+        <Field label={copy.callSignLabel} htmlFor="boat-callsign">
+          <input
+            id="boat-callsign"
+            type="text"
+            value={draft.boatIdentity.callSign}
+            onChange={(e) => setDraft((d) => ({ ...d, boatIdentity: { ...d.boatIdentity, callSign: e.target.value } }))}
+            className="field"
+          />
+        </Field>
         <Field label={copy.portOfRegistryLabel} htmlFor="boat-port" required error={errors["boatIdentity.portOfRegistry"]}>
           <input
             id="boat-port"

@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { addDaysIso, effectiveEnquiryDeparture, todayIso } from "../../../lib/formatDate";
 import {
+  getBerthStatuses,
   getEnquiries,
   markEnquiryArrived,
   markEnquiryDeparted,
@@ -16,6 +17,7 @@ import { useAuth } from "../../components/AuthProvider";
 import { Collapse } from "../../components/Disclosure";
 import { useUnits } from "../../components/UnitsProvider";
 import BerthPicker from "../BerthPicker";
+import PreArrivalArrivals from "./PreArrivalArrivals";
 
 const NONE: Enquiry[] = [];
 const WINDOW_DAYS = 6;
@@ -44,6 +46,9 @@ function EventRow({ event, staffId }: { event: BoardEvent; staffId: string | nul
   const [flagDraft, setFlagDraft] = useState(enquiry.flagNote);
   const [editingFlag, setEditingFlag] = useState(false);
   const rowId = `arrival-${enquiry.id}-${kind}`;
+  const releasedBerth =
+    enquiry.assignedBerthId &&
+    getBerthStatuses(enquiry.marinaId, event.date)[enquiry.assignedBerthId]?.status === "released";
 
   return (
     <li className="staff-panel">
@@ -68,6 +73,9 @@ function EventRow({ event, staffId }: { event: BoardEvent; staffId: string | nul
             ) : null}
             {enquiry.arrivalStatus === "arrived" ? (
               <span className="staff-badge staff-badge-ink">On site</span>
+            ) : null}
+            {releasedBerth ? (
+              <span className="staff-badge staff-badge-accent">Released holder berth</span>
             ) : null}
           </p>
           <p className="tabular mt-1 text-xs text-ink/70">
@@ -295,6 +303,8 @@ export default function ArrivalsBoard() {
           {type !== "all" ? ` (${type}s)` : ""}.
         </p>
       ) : null}
+
+      <PreArrivalArrivals />
     </div>
   );
 }

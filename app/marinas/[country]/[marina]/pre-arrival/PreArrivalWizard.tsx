@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import type { Marina } from "../../../../../data/marinas";
 import {
@@ -41,6 +42,7 @@ export type StepProps = {
 export default function PreArrivalWizard({ marina }: { marina: Marina }) {
   const { t } = useLanguage();
   const copy = t.preArrival;
+  const searchParams = useSearchParams();
 
   const [draft, setDraftState] = useState<PreArrivalDraft>(() => emptyDraft());
   const [step, setStep] = useState(1);
@@ -51,11 +53,18 @@ export default function PreArrivalWizard({ marina }: { marina: Marina }) {
   const headingRef = useRef<HTMLHeadingElement>(null);
   const firstRender = useRef(true);
 
+  // Jumped to directly, e.g. from a readiness checklist in My boat.
+  const focusStep = Number(searchParams.get("step"));
+  const focusPersonIndex = searchParams.get("person") !== null ? Number(searchParams.get("person")) : null;
+
   useEffect(() => {
     const saved = getPreArrivalDraft(marina.id);
     if (saved) {
       setDraftState(saved);
       setResumed(true);
+    }
+    if (focusStep >= 1 && focusStep <= TOTAL_STEPS) {
+      setStep(focusStep);
     }
     setHydrated(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -195,7 +204,7 @@ export default function PreArrivalWizard({ marina }: { marina: Marina }) {
 
             {step === 1 ? <StepBoat {...stepProps} /> : null}
             {step === 2 ? <StepVoyage {...stepProps} /> : null}
-            {step === 3 ? <StepCrew {...stepProps} /> : null}
+            {step === 3 ? <StepCrew {...stepProps} focusPersonIndex={focusPersonIndex} /> : null}
             {step === 4 ? <StepDocuments {...stepProps} /> : null}
             {step === 5 ? <StepStay {...stepProps} quote={quote} /> : null}
             {step === 6 ? (

@@ -95,6 +95,10 @@ export const boatIdentitySchema = z.object({
   ]).nullable(),
   // Auto-built for a Portuguese boat; see buildPtIdentificationSet.
   ptIdentificationSet: z.string(),
+  // Optional: used as IMO FAL Form 5's call sign field (1.3) when the boat
+  // carries VHF with an assigned call sign. Defaulted so a draft saved before
+  // this field existed still parses.
+  callSign: z.string().default(""),
 });
 export type BoatIdentity = z.infer<typeof boatIdentitySchema>;
 
@@ -105,6 +109,7 @@ export const EMPTY_BOAT_IDENTITY: BoatIdentity = {
   portOfRegistry: "",
   navigationZoneType: null,
   ptIdentificationSet: "",
+  callSign: "",
 };
 
 export const boatSpecsSchema = z.object({

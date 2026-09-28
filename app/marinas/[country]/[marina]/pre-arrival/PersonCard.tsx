@@ -16,6 +16,7 @@ type Props = {
   setDraft: StepProps["setDraft"];
   onRemove: () => void;
   canRemove: boolean;
+  initialOpen?: boolean;
 };
 
 export default function PersonCard({
@@ -27,10 +28,11 @@ export default function PersonCard({
   setDraft,
   onRemove,
   canRemove,
+  initialOpen,
 }: Props) {
   const { t } = useLanguage();
   const copy = t.preArrival.crew;
-  const [open, setOpen] = useState(index === 0);
+  const [open, setOpen] = useState(!!initialOpen);
   const panelId = `person-${index}-panel`;
 
   function update(patch: Partial<Person>) {

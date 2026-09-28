@@ -175,6 +175,7 @@ export function clearAllSavedData(): void {
     SKIPPER_KEY,
     "aldock-favourites",
     "aldock-last-enquiry",
+    FREQUENT_CREW_KEY,
   ];
   for (const key of keys) {
     try {
@@ -187,4 +188,63 @@ export function clearAllSavedData(): void {
 
 export function newBoatId(): string {
   return `boat-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
+}
+
+// A short, non-sensitive summary of a person the boater has entered before,
+// offered as a one-tap "Frequent crew" chip on the pre-arrival wizard's crew
+// step. Never includes an ID number: enough to remember who someone is, not
+// enough to be a stored identity document.
+export type FrequentPerson = {
+  key: string; // familyName+givenNames+dateOfBirth, so re-saving the same person updates rather than duplicates
+  familyName: string;
+  givenNames: string;
+  nationality: string;
+  dateOfBirth: string;
+  idType: "passport" | "national_id";
+};
+
+const FREQUENT_CREW_KEY = "aldock-frequent-crew";
+const MAX_FREQUENT_CREW = 12;
+
+export function loadFrequentCrew(): FrequentPerson[] {
+  try {
+    const raw = window.localStorage.getItem(FREQUENT_CREW_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed)
+      ? parsed
+          .filter((p: unknown) => p && typeof (p as FrequentPerson).key === "string")
+          .map((p: FrequentPerson) => ({
+            key: str(p.key),
+            familyName: str(p.familyName),
+            givenNames: str(p.givenNames),
+            nationality: str(p.nationality),
+            dateOfBirth: str(p.dateOfBirth),
+            idType: p.idType === "national_id" ? "national_id" : "passport",
+          }))
+      : [];
+  } catch {
+    return [];
+  }
+}
+
+// Adds or updates a person, keeping the most recently used up to a limit.
+export function saveFrequentPerson(person: Omit<FrequentPerson, "key">): void {
+  const key = `${person.familyName}|${person.givenNames}|${person.dateOfBirth}`.toLowerCase();
+  if (!person.familyName.trim() && !person.givenNames.trim()) return;
+  const existing = loadFrequentCrew().filter((p) => p.key !== key);
+  const next = [{ ...person, key }, ...existing].slice(0, MAX_FREQUENT_CREW);
+  try {
+    window.localStorage.setItem(FREQUENT_CREW_KEY, JSON.stringify(next));
+  } catch {
+    // Storage unavailable: the chip simply will not appear next time.
+  }
+}
+
+export function clearFrequentCrew(): void {
+  try {
+    window.localStorage.removeItem(FREQUENT_CREW_KEY);
+  } catch {
+    // Nothing to remove if storage is unavailable.
+  }
 }

@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useRef, useState } from "react";
 import { marinas } from "../../data/marinas";
 import { siteConfig } from "../../data/site";
+import { clearFrequentCrew } from "../../lib/boatProfile";
+import { resetMockPreArrival } from "../../lib/mockData";
 import { formatLength } from "../../lib/units";
 import { useBoats } from "../components/BoatProvider";
 import Disclosure from "../components/Disclosure";
@@ -13,6 +15,7 @@ import UnitSegmented from "../components/UnitSegmented";
 import { useUnits } from "../components/UnitsProvider";
 import DocumentWallet from "../marinas/[country]/[marina]/DocumentWallet";
 import BoatEditor from "./BoatEditor";
+import UpcomingStays from "./UpcomingStays";
 
 const inputClass =
   "field";
@@ -93,6 +96,8 @@ export default function MyBoatContent() {
             <p className="font-medium text-ink">{t.preArrival.cta.myBoat}</p>
           </Link>
         ) : null}
+
+        <UpcomingStays />
 
         <section className="stack-md" aria-labelledby="boats-heading">
           <div className="flex flex-wrap items-baseline justify-between gap-4">
@@ -352,6 +357,8 @@ export default function MyBoatContent() {
                   type="button"
                   onClick={() => {
                     clearAll();
+                    resetMockPreArrival();
+                    clearFrequentCrew();
                     setConfirmClear(false);
                     setEditing(null);
                     flash("All saved data was removed from this device.");

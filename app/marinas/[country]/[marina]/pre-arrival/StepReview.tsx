@@ -110,6 +110,7 @@ export default function StepReview({ draft, setDraft, errors, quote, warnings, o
 
       <div className="hairline-top mt-6 pt-6">
         <p className="type-heading type-h3 text-ink">{copy.consentsHeading}</p>
+        <p className="mt-2 max-w-xl text-xs text-ink/65">{t.preArrival.privacyNote}</p>
         <div className="mt-4 space-y-3">
           <label className="flex items-start gap-3 text-sm text-ink/80">
             <input

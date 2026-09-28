@@ -55,6 +55,7 @@ export type StaffBerthState =
   | "free"
   | "reserved"
   | "owner-away"
+  | "released"
   | "out-of-service";
 
 const STAFF_STATUS_FILL: Record<StaffBerthState, string> = {
@@ -62,6 +63,7 @@ const STAFF_STATUS_FILL: Record<StaffBerthState, string> = {
   free: "#eef1f0",
   reserved: "#5b6b82",
   "owner-away": "url(#staff-hatch-away)",
+  released: "url(#staff-hatch-released)",
   "out-of-service": "url(#staff-hatch-oos)",
 };
 
@@ -70,6 +72,7 @@ export const STAFF_STATUS_LABEL: Record<StaffBerthState, string> = {
   free: "Free",
   reserved: "Reserved",
   "owner-away": "Owner away",
+  released: "Released, available",
   "out-of-service": "Out of service",
 };
 
@@ -385,6 +388,16 @@ export default function BerthAvailabilityMap({
                 patternUnits="userSpaceOnUse"
               >
                 <rect width="6" height="6" fill="#b3261e" />
+                <line x1="0" y1="0" x2="0" y2="6" stroke="#ffffff" strokeWidth="1.5" />
+              </pattern>
+              <pattern
+                id="staff-hatch-released"
+                width="6"
+                height="6"
+                patternTransform="rotate(45)"
+                patternUnits="userSpaceOnUse"
+              >
+                <rect width="6" height="6" fill="#1a6b4c" />
                 <line x1="0" y1="0" x2="0" y2="6" stroke="#ffffff" strokeWidth="1.5" />
               </pattern>
             </defs>

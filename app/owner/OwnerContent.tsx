@@ -101,6 +101,7 @@ function OwnerBody() {
                 </span>
               </p>
               <p className="measure mt-4 text-ink/75">{copy.useRight}</p>
+              <p className="measure mt-2 text-sm text-ink/70">{copy.contractNote}</p>
 
               {firstTime ? (
                 <div className="stack-sm">

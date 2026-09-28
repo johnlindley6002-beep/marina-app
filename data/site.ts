@@ -2,6 +2,7 @@
 // only for now. TODO (legal): have the "why" and footer wording reviewed.
 export type ReletCopy = {
   useRight: string;
+  contractNote: string;
   primaryAction: string;
   placeholderNote: string;
   steps: string[];
@@ -86,6 +87,8 @@ export const siteConfig: {
   relet: {
     useRight:
       "You hold a right of use of this berth. It is not ownership, and it can be relet only with the marina's consent.",
+    contractNote:
+      "Your berth is a right of use under the marina's concession. Letting it through the marina keeps you compliant. Check your own contract, which may contain extra clauses. This is not legal advice.",
     primaryAction: "Make my berth available while I am away",
     placeholderNote:
       "Placeholder terms for the mockup. The marina sets the final amounts.",

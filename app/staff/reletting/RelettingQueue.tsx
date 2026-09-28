@@ -61,6 +61,10 @@ function Item({ item, staffId }: { item: RelettingQueueItem; staffId: string }) 
   const nights = countNights(request.startDate, request.endDate);
   const [approvedSet, setApprovedSet] = useState<Set<string>>(new Set(offered));
   const [nightsBooked, setNightsBooked] = useState(String(defaultNightsBooked(nights)));
+  const [maxLengthM, setMaxLengthM] = useState("");
+  const [maxBeamM, setMaxBeamM] = useState("");
+  const [earliestReletDate, setEarliestReletDate] = useState("");
+  const [bufferDays, setBufferDays] = useState("2");
   const lastNote = request.history[request.history.length - 1]?.note;
   const index = RELETTING_PROGRESS.indexOf(request.status);
   const canAdvance =
@@ -74,7 +78,15 @@ function Item({ item, staffId }: { item: RelettingQueueItem; staffId: string }) 
       request.id,
       decision,
       note,
-      decision === "approve" ? [...approvedSet] : undefined
+      decision === "approve" ? [...approvedSet] : undefined,
+      decision === "approve"
+        ? {
+            maxLengthM: maxLengthM ? Number(maxLengthM) : null,
+            maxBeamM: maxBeamM ? Number(maxBeamM) : null,
+            earliestReletDate: earliestReletDate || null,
+            bufferDays: Number(bufferDays) || 0,
+          }
+        : undefined
     );
     setError(result.ok ? null : result.error);
   }
@@ -150,6 +162,49 @@ function Item({ item, staffId }: { item: RelettingQueueItem; staffId: string }) 
                 partial approval.
               </p>
 
+              <p className="staff-label mt-3">Conditions for a released berth (optional)</p>
+              <div className="mt-1 grid max-w-lg grid-cols-2 gap-2 sm:grid-cols-4">
+                <label className="text-sm">
+                  <span className="staff-label">Max length (m)</span>
+                  <input
+                    type="number"
+                    min={0}
+                    value={maxLengthM}
+                    onChange={(e) => setMaxLengthM(e.target.value)}
+                    className="staff-field"
+                  />
+                </label>
+                <label className="text-sm">
+                  <span className="staff-label">Max beam (m)</span>
+                  <input
+                    type="number"
+                    min={0}
+                    value={maxBeamM}
+                    onChange={(e) => setMaxBeamM(e.target.value)}
+                    className="staff-field"
+                  />
+                </label>
+                <label className="text-sm">
+                  <span className="staff-label">Earliest relet date</span>
+                  <input
+                    type="date"
+                    value={earliestReletDate}
+                    onChange={(e) => setEarliestReletDate(e.target.value)}
+                    className="staff-field"
+                  />
+                </label>
+                <label className="text-sm">
+                  <span className="staff-label">Buffer before return (days)</span>
+                  <input
+                    type="number"
+                    min={0}
+                    value={bufferDays}
+                    onChange={(e) => setBufferDays(e.target.value)}
+                    className="staff-field"
+                  />
+                </label>
+              </div>
+
               <label className="mt-3 block max-w-md text-sm">
                 <span className="staff-label">Note to the holder (optional)</span>
                 <input
@@ -173,6 +228,30 @@ function Item({ item, staffId }: { item: RelettingQueueItem; staffId: string }) 
                 </button>
               </div>
             </div>
+          ) : null}
+
+          {request.conditions &&
+          (request.conditions.maxLengthM ||
+            request.conditions.maxBeamM ||
+            request.conditions.earliestReletDate ||
+            request.conditions.bufferDays) ? (
+            <p className="tabular mt-2 text-ink/70">
+              Conditions:{" "}
+              {[
+                request.conditions.maxLengthM ? `max ${request.conditions.maxLengthM} m length` : null,
+                request.conditions.maxBeamM ? `max ${request.conditions.maxBeamM} m beam` : null,
+                request.conditions.earliestReletDate
+                  ? `not before ${formatLongDate(request.conditions.earliestReletDate)}`
+                  : null,
+                request.conditions.bufferDays ? `${request.conditions.bufferDays} day buffer before return` : null,
+              ]
+                .filter(Boolean)
+                .join(", ")}
+            </p>
+          ) : null}
+
+          {request.earlyReturnRequestedAt ? (
+            <p className="mt-2 font-medium text-ink">The holder asked to return early.</p>
           ) : null}
 
           {canAdvance ? (
@@ -219,6 +298,59 @@ function Item({ item, staffId }: { item: RelettingQueueItem; staffId: string }) 
         </div>
       </Collapse>
     </li>
+  );
+}
+
+// A simple per-holder ledger: nights let, what the visitor paid, what the
+// holder was credited and what the marina kept, from every settled request.
+function Ledger({ items }: { items: RelettingQueueItem[] }) {
+  const rows = new Map<
+    string,
+    { ownerName: string; nights: number; grossEur: number; ownerShareEur: number; feeEur: number }
+  >();
+  for (const { request, ownerName } of items) {
+    if (request.netEur === null) continue;
+    const row = rows.get(request.userId) ?? {
+      ownerName,
+      nights: 0,
+      grossEur: 0,
+      ownerShareEur: 0,
+      feeEur: 0,
+    };
+    row.nights += request.nightsRelet ?? 0;
+    row.grossEur += request.grossEur ?? 0;
+    row.ownerShareEur += request.ownerShareEur ?? 0;
+    row.feeEur += request.feeEur ?? 0;
+    rows.set(request.userId, row);
+  }
+  const list = Array.from(rows.values());
+  if (list.length === 0) return null;
+
+  return (
+    <div className="mt-8 overflow-x-auto">
+      <table className="staff-table w-full text-left text-sm">
+        <thead>
+          <tr>
+            <th scope="col">Holder</th>
+            <th scope="col">Nights let</th>
+            <th scope="col">Visitor revenue</th>
+            <th scope="col">Holder credit</th>
+            <th scope="col">Marina share</th>
+          </tr>
+        </thead>
+        <tbody>
+          {list.map((row) => (
+            <tr key={row.ownerName}>
+              <td>{row.ownerName}</td>
+              <td className="tabular">{row.nights}</td>
+              <td className="tabular">{eur(row.grossEur)}</td>
+              <td className="tabular">{eur(row.ownerShareEur)}</td>
+              <td className="tabular">{eur(row.feeEur)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 }
 
@@ -278,6 +410,9 @@ export default function RelettingQueue() {
           </ul>
         </>
       ) : null}
+
+      <h2 className="type-heading type-h3 mt-8 text-ink">Ledger</h2>
+      <Ledger items={items} />
     </div>
   );
 }
