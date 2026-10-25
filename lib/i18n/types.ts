@@ -110,7 +110,6 @@ export type Dictionary = {
     mailSignoff: string;
   };
   rates: {
-    eyebrow: string;
     heading: string;
     colClass: string;
     colLength: string;
@@ -118,9 +117,6 @@ export type Dictionary = {
     colHigh: string;
     caption: (vat: number) => string;
     upTo: (max: number) => string;
-  };
-  about: {
-    eyebrow: string;
   };
   contact: {
     heading: string;
@@ -365,32 +361,3 @@ export type Dictionary = {
     };
   };
 };
-
-export type DeepPartial<T> = T extends (...args: never[]) => unknown
-  ? T
-  : T extends object
-    ? { [K in keyof T]?: DeepPartial<T[K]> }
-    : T;
-
-export function mergeDictionary(base: Dictionary, override: DeepPartial<Dictionary>): Dictionary {
-  const merge = (b: unknown, o: unknown): unknown => {
-    if (o === undefined) return b;
-    if (o && b && typeof o === "object" && typeof b === "object" && !Array.isArray(o)) {
-      const result: Record<string, unknown> = { ...(b as object) };
-      for (const key of Object.keys(o)) {
-        result[key] = merge(
-          (b as Record<string, unknown>)[key],
-          (o as Record<string, unknown>)[key]
-        );
-      }
-      return result;
-    }
-    return o;
-  };
-  return merge(base, override) as Dictionary;
-}
-
-// TODO(i18n): ES and FR cover navigation, footer, home, search, rates
-// headings, results, the shared contact/units/favourites labels, and (for
-// preArrival) the page chrome, step names and the three calm voyage info
-// panels. The rest of preArrival (every field label) falls back to English

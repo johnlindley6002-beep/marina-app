@@ -1,14 +1,14 @@
 import type { Dictionary } from "../../types";
 
 export const home: Dictionary["home"] = {
-  tagline: "Reserve a sua amarração, sem complicações",
-  valueProp: "Encontre e reserve a sua amarração nas marinas de Portugal.",
+  tagline: "Reservas de postos de amarração, sem complicações",
+  valueProp: "Encontre e reserve um posto de amarração nas marinas de Portugal.",
   browseMarinas: "Ou explore as marinas",
-  aboutHeading: "A reserva de amarração, reinventada",
+  aboutHeading: "Reservar um posto de amarração, com clareza",
   aboutBody:
-    "A aldock traz clareza à reserva de amarrações e à comunicação com quem visita a marina. Acreditamos que reservar um lugar deve ser tão sereno como uma manhã em águas calmas.",
+    "A aldock ajuda-o a encontrar um posto de amarração, a dar a conhecer à marina o seu barco e a sua tripulação antes da chegada e a guardar os seus dados num só lugar.",
   contactHeading: "Fale connosco",
-  contactBody: "Dúvidas sobre amarrações, reservas ou parcerias? Teremos todo o gosto em ajudar.",
+  contactBody: "Dúvidas sobre postos de amarração, reservas ou parcerias? Escreva-nos.",
   destinationLabel: "Para onde navega?",
   destinationPlaceholder: "Marina, região ou país",
   addFilters: "Adicionar datas e comprimento",

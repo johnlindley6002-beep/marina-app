@@ -1,9 +1,10 @@
 import type { Dictionary } from "../../types";
+import { plural } from "../../format";
 
 export const preArrival: Dictionary["preArrival"] = {
   cta: {
-    arrivalActions: "Preencher o pre-check-in de chegada",
-    myBoat: "Iniciar o pre-check-in de chegada",
+    arrivalActions: "Preencher o registo prévio de chegada",
+    myBoat: "Iniciar o registo prévio de chegada",
   },
   privacyNote:
     "Os dados de identificação são usados apenas para registar esta estadia e cumprir as obrigações legais de comunicação. Nada é carregado nesta demonstração.",
@@ -17,12 +18,12 @@ export const preArrival: Dictionary["preArrival"] = {
     continueBtn: "Continuar",
     nothingOutstanding: "Nada pendente.",
     idExpiring: (name, days) =>
-      `O documento de ${name} expira em ${days} ${days === 1 ? "dia" : "dias"}.`,
+      `O documento de ${name} expira em ${days} ${plural("pt", days, { one: "dia", other: "dias" })}.`,
     insuranceExpiring: (days) =>
-      `O seguro de responsabilidade civil expira em ${days} ${days === 1 ? "dia" : "dias"}.`,
+      `O seguro de responsabilidade civil expira em ${days} ${plural("pt", days, { one: "dia", other: "dias" })}.`,
   },
   page: {
-    title: "Pre-check-in de chegada",
+    title: "Registo prévio de chegada",
     subtitle:
       "Responda uma vez e a chegada torna-se confirmar e seguir. Nada é enviado até premir Enviar no final.",
     autosaveNote: "Guardado neste dispositivo à medida que avança.",
@@ -31,8 +32,8 @@ export const preArrival: Dictionary["preArrival"] = {
     back: "Voltar",
     continueBtn: "Continuar",
     stepOf: (step, total) => `Passo ${step} de ${total}`,
-    nightsCount: (n) => `${n} ${n === 1 ? "noite" : "noites"}`,
-    peopleOnBoard: (n) => `${n} ${n === 1 ? "pessoa" : "pessoas"} a bordo`,
+    nightsCount: (n) => `${n} ${plural("pt", n, { one: "noite", other: "noites" })}`,
+    peopleOnBoard: (n) => `${n} ${plural("pt", n, { one: "pessoa", other: "pessoas" })} a bordo`,
   },
   steps: {
     boat: "A sua embarcação",
@@ -141,7 +142,7 @@ export const preArrival: Dictionary["preArrival"] = {
     requiredChip: "Obrigatório",
     optionalChip: "Opcional",
     useSaved: "Usar documento guardado",
-    uploadTile: "Adicionar ficheiro (simulado, guarda apenas o nome)",
+    uploadTile: "Adicionar ficheiro (demonstração: só guarda o nome)",
     numberLabel: "Número",
     expiryLabel: "Data de validade",
     issuingAuthorityLabel: "Entidade emissora",
@@ -149,7 +150,7 @@ export const preArrival: Dictionary["preArrival"] = {
     items: {
       registration: "Livrete da embarcação",
       thirdPartyInsurance: "Seguro de responsabilidade civil",
-      skipperLicence: "Carta de navegador / comandante",
+      skipperLicence: "Carta de navegador de recreio",
       iucProof: "Comprovativo de pagamento do IUC",
       radioStationLicence: "Licença de estação de rádio",
       surveyCertificate: "Certificado de vistoria",
@@ -163,7 +164,7 @@ export const preArrival: Dictionary["preArrival"] = {
     servicesHeading: "Serviços pretendidos",
     electricityLabel: "Eletricidade",
     waterLabel: "Água",
-    pumpOutLabel: "Despejo de águas residuais",
+    pumpOutLabel: "Recolha de águas residuais",
     fuelDockSlotLabel: "Reserva no posto de combustível",
     craneLabel: "Grua",
     specialRequestsLabel: "Pedidos especiais",
@@ -175,14 +176,14 @@ export const preArrival: Dictionary["preArrival"] = {
     seasonLow: "época baixa",
     seasonHigh: "época alta",
     lineLabel: (nights, season, rate) =>
-      `${nights} ${nights === 1 ? "noite" : "noites"} · ${season} · ${rate}/noite`,
+      `${nights} ${plural("pt", nights, { one: "noite", other: "noites" })} · ${season} · ${rate}/noite`,
     multihullNote: "Sobretaxa de multicasco aplicada.",
     subtotalLine: (subtotal, vat) => `Subtotal ${subtotal} + IVA ${vat}`,
   },
   review: {
     heading: "Rever e enviar",
     edit: "Editar",
-    peopleCount: (n) => `${n} ${n === 1 ? "pessoa" : "pessoas"}`,
+    peopleCount: (n) => `${n} ${plural("pt", n, { one: "pessoa", other: "pessoas" })}`,
     documentMissing: "Em falta",
     documentNotProvided: "Não fornecido",
     consentsHeading: "Antes de enviar",
@@ -190,19 +191,19 @@ export const preArrival: Dictionary["preArrival"] = {
       "Compreendo que os meus dados são usados apenas para registar esta estadia e cumprir as obrigações legais de comunicação da marina.",
     termsLabel: "Aceito o regulamento da marina.",
     declarationLabel: "Declaro que a informação prestada é verdadeira.",
-    submit: "Enviar pre-check-in de chegada",
+    submit: "Enviar registo prévio",
   },
   confirmation: {
-    heading: "Pre-check-in recebido",
+    heading: "Registo prévio recebido",
     referenceLabel: "A sua referência",
     whatNextHeading: "Próximos passos",
     whatNextBody:
-      "A marina revê este pre-check-in antes da sua chegada. No cais, indique a referência e confirme o posto de amarração.",
+      "A marina analisa este registo antes da sua chegada. No escritório, indique a referência e confirme o posto de amarração.",
     bringHeading: "Traga estes documentos pessoalmente",
     backToMarina: "Voltar à página da marina",
     saveOfferHeading: "Guarde para a próxima vez",
     saveOfferBody:
-      "Guarde esta embarcação, os seus documentos e todos a bordo em O meu barco, para que o próximo pre-check-in seja num toque.",
+      "Guarde esta embarcação, os seus documentos e todos a bordo em O meu barco, para que o próximo registo prévio seja num toque.",
     saveOfferBtn: "Guardar em O meu barco",
     savedNote: "Guardado em O meu barco.",
   },

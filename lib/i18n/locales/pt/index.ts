@@ -8,7 +8,6 @@ import { countryPage } from "./countryPage";
 import { breadcrumbs } from "./breadcrumbs";
 import { berthSearch } from "./berthSearch";
 import { rates } from "./rates";
-import { about } from "./about";
 import { contact } from "./contact";
 import { visiting } from "./visiting";
 import { keyFacts } from "./keyFacts";
@@ -29,7 +28,6 @@ export const pt: Dictionary = {
   breadcrumbs,
   berthSearch,
   rates,
-  about,
   contact,
   visiting,
   keyFacts,

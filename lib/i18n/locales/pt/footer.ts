@@ -1,7 +1,7 @@
 import type { Dictionary } from "../../types";
 
 export const footer: Dictionary["footer"] = {
-  tagline: "Reserve a sua amarração, sem complicações",
+  tagline: "Reservas de postos de amarração, sem complicações",
   company: "Empresa",
   product: "Produto",
   contact: "Contactos",

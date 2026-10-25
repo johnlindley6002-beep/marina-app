@@ -10,7 +10,7 @@ export const facilities: Dictionary["facilities"] = {
   pumpOut: "Pump-out",
   laundry: "Laundry",
   security24h: "24-hour security",
-  wifi: "Wifi",
+  wifi: "Wi-Fi",
   dryStorage: "Dry storage",
   repairs: "Repairs",
 };

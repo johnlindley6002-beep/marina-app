@@ -1,9 +1,10 @@
 import type { Dictionary } from "../../types";
+import { plural } from "../../format";
 
 export const berthSearch: Dictionary["berthSearch"] = {
   heading: "Available berths",
-  subheading: (marinaName) => `Check simulated availability at ${marinaName}.`,
-  illustrative: "Berth availability shown is illustrative for now.",
+  subheading: (marinaName) => `Search the berth plan for ${marinaName}.`,
+  illustrative: "Demo data. The marina confirms availability.",
   arrival: "Arrival",
   departure: "Departure",
   boatLength: "Boat length (m)",
@@ -13,24 +14,24 @@ export const berthSearch: Dictionary["berthSearch"] = {
   errorDates: "Choose an arrival and departure date.",
   errorDeparture: "Departure must be after arrival.",
   noClass: (cls) =>
-    `No Class ${cls} berths modeled yet in this schematic. Larger vessel classes are coming in a future pass.`,
-  noAvailable: "No available berths match your dates. Try different dates.",
+    `This plan does not show Class ${cls} berths yet. Contact the marina for larger boats.`,
+  noAvailable: "No berths are free for those dates. Try other dates.",
   noFit:
-    "No berth class fits a vessel this length in our current tariff (max 45 m). Please contact the marina directly.",
+    "No berth class fits a boat this long in the current tariff (maximum 45 m). Contact the marina.",
   seasonBoth: (low, high) =>
-    `Your stay spans both seasons: ${low} night${low === 1 ? "" : "s"} low season, ${high} night${high === 1 ? "" : "s"} high season.`,
-  seasonHigh: "Your dates fall in high season (Apr–Sep).",
-  seasonLow: "Your dates fall in low season (Jan–Mar & Oct–Dec).",
-  legendAvailable: "Available & fits",
+    `Your stay spans both seasons: ${low} ${plural("en", low, { one: "night", other: "nights" })} in low season, ${high} ${plural("en", high, { one: "night", other: "nights" })} in high season.`,
+  seasonHigh: "Your dates are in high season (April to September).",
+  seasonLow: "Your dates are in low season (January to March, October to December).",
+  legendAvailable: "Available and fits",
   legendOccupied: "Occupied",
-  legendUnfit: "Doesn't fit your boat",
+  legendUnfit: "Does not fit your boat",
   legendNeutral: "Not searched yet",
-  hintBeforeSearch: "Enter your dates and boat length, then search to see berth availability.",
+  hintBeforeSearch: "Enter your dates and boat length, then search.",
   priceBerthLine: (id, cls, nights) =>
-    `Berth ${id} · Class ${cls} · ${nights} night${nights === 1 ? "" : "s"}`,
-  vatNote: (rate) => `+ ${rate}% VAT and utilities. Estimate, confirm with marina.`,
+    `Berth ${id} · Class ${cls} · ${nights} ${plural("en", nights, { one: "night", other: "nights" })}`,
+  vatNote: (rate) => `Plus ${rate}% VAT and utilities. Indicative price, confirmed by the marina.`,
   ctaHeading: (marinaName) => `Questions about a berth at ${marinaName}?`,
-  ctaButton: "Contact marina",
+  ctaButton: "Contact the marina",
   mailSubject: "Berth request - Marina de Cascais",
   mailGreeting: "Hello,",
   mailIntro: "I'd like to enquire about berth availability at Marina de Cascais.",

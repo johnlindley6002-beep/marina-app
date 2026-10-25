@@ -1,4 +1,5 @@
 import type { Dictionary } from "../../types";
+import { plural } from "../../format";
 
 export const preArrival: Dictionary["preArrival"] = {
   cta: {
@@ -16,9 +17,10 @@ export const preArrival: Dictionary["preArrival"] = {
     reviewBtn: "Review",
     continueBtn: "Continue",
     nothingOutstanding: "Nothing outstanding.",
-    idExpiring: (name, days) => `${name}'s ID expires in ${days} ${days === 1 ? "day" : "days"}.`,
+    idExpiring: (name, days) =>
+      `${name}'s ID expires in ${days} ${plural("en", days, { one: "day", other: "days" })}.`,
     insuranceExpiring: (days) =>
-      `Third-party insurance expires in ${days} ${days === 1 ? "day" : "days"}.`,
+      `Third-party insurance expires in ${days} ${plural("en", days, { one: "day", other: "days" })}.`,
   },
   page: {
     title: "Pre-arrival check-in",
@@ -30,8 +32,8 @@ export const preArrival: Dictionary["preArrival"] = {
     back: "Back",
     continueBtn: "Continue",
     stepOf: (step, total) => `Step ${step} of ${total}`,
-    nightsCount: (n) => `${n} ${n === 1 ? "night" : "nights"}`,
-    peopleOnBoard: (n) => `${n} ${n === 1 ? "person" : "people"} on board`,
+    nightsCount: (n) => `${n} ${plural("en", n, { one: "night", other: "nights" })}`,
+    peopleOnBoard: (n) => `${n} ${plural("en", n, { one: "person", other: "people" })} on board`,
   },
   steps: {
     boat: "Your boat",
@@ -140,7 +142,7 @@ export const preArrival: Dictionary["preArrival"] = {
     requiredChip: "Required",
     optionalChip: "Optional",
     useSaved: "Use saved document",
-    uploadTile: "Add file (mock, stores the file name only)",
+    uploadTile: "Add file (demo: only the file name is kept)",
     numberLabel: "Number",
     expiryLabel: "Expiry date",
     issuingAuthorityLabel: "Issuing authority",
@@ -174,14 +176,14 @@ export const preArrival: Dictionary["preArrival"] = {
     seasonLow: "low season",
     seasonHigh: "high season",
     lineLabel: (nights, season, rate) =>
-      `${nights} ${nights === 1 ? "night" : "nights"} · ${season} · ${rate}/night`,
+      `${nights} ${plural("en", nights, { one: "night", other: "nights" })} · ${season} · ${rate}/night`,
     multihullNote: "Multihull surcharge applied.",
     subtotalLine: (subtotal, vat) => `Subtotal ${subtotal} + VAT ${vat}`,
   },
   review: {
     heading: "Review and send",
     edit: "Edit",
-    peopleCount: (n) => `${n} ${n === 1 ? "person" : "people"}`,
+    peopleCount: (n) => `${n} ${plural("en", n, { one: "person", other: "people" })}`,
     documentMissing: "Missing",
     documentNotProvided: "Not provided",
     consentsHeading: "Before you send this",
@@ -189,7 +191,7 @@ export const preArrival: Dictionary["preArrival"] = {
       "I understand my data is used only to register this stay and to meet the marina's legal reporting duties.",
     termsLabel: "I accept the marina's regulation.",
     declarationLabel: "I declare the information given is true.",
-    submit: "Send pre-arrival check-in",
+    submit: "Send pre-arrival",
   },
   confirmation: {
     heading: "Check-in received",

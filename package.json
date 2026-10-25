@@ -14,7 +14,8 @@
     "test": "vitest run",
     "test:e2e": "playwright test",
     "knip": "knip",
-    "check": "npm run typecheck && npm run lint && npm run check:copy && npm run format:check && npm run test && npm run build"
+    "check": "npm run typecheck && npm run lint && npm run check:copy && npm run check:i18n && npm run format:check && npm run test && npm run build",
+    "check:i18n": "node scripts/check-i18n.mjs"
   },
   "dependencies": {
     "next": "16.2.9",

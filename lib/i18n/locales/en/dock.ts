@@ -1,7 +1,7 @@
 import type { Dictionary } from "../../types";
 
 export const dock: Dictionary["dock"] = {
-  open: "Contact marina",
+  open: "Contact the marina",
   close: "Close",
   heading: "Contact the marina",
   call: "Call",
