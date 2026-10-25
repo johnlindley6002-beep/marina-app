@@ -8,22 +8,68 @@
 // anything beyond this mockup.
 
 export const EU_COUNTRIES = new Set<string>([
-  "Austria", "Belgium", "Bulgaria", "Croatia", "Cyprus", "Czechia",
-  "Denmark", "Estonia", "Finland", "France", "Germany", "Greece",
-  "Hungary", "Ireland", "Italy", "Latvia", "Lithuania", "Luxembourg",
-  "Malta", "Netherlands", "Poland", "Portugal", "Romania", "Slovakia",
-  "Slovenia", "Spain", "Sweden",
+  "Austria",
+  "Belgium",
+  "Bulgaria",
+  "Croatia",
+  "Cyprus",
+  "Czechia",
+  "Denmark",
+  "Estonia",
+  "Finland",
+  "France",
+  "Germany",
+  "Greece",
+  "Hungary",
+  "Ireland",
+  "Italy",
+  "Latvia",
+  "Lithuania",
+  "Luxembourg",
+  "Malta",
+  "Netherlands",
+  "Poland",
+  "Portugal",
+  "Romania",
+  "Slovakia",
+  "Slovenia",
+  "Spain",
+  "Sweden",
 ]);
 
 // The Schengen area is not the same as the EU: Ireland and Cyprus are EU but
 // outside Schengen; Iceland, Norway, Liechtenstein and Switzerland are
 // Schengen but outside the EU.
 export const SCHENGEN_COUNTRIES = new Set<string>([
-  "Austria", "Belgium", "Bulgaria", "Croatia", "Czechia", "Denmark",
-  "Estonia", "Finland", "France", "Germany", "Greece", "Hungary",
-  "Iceland", "Italy", "Latvia", "Liechtenstein", "Lithuania", "Luxembourg",
-  "Malta", "Netherlands", "Norway", "Poland", "Portugal", "Romania",
-  "Slovakia", "Slovenia", "Spain", "Sweden", "Switzerland",
+  "Austria",
+  "Belgium",
+  "Bulgaria",
+  "Croatia",
+  "Czechia",
+  "Denmark",
+  "Estonia",
+  "Finland",
+  "France",
+  "Germany",
+  "Greece",
+  "Hungary",
+  "Iceland",
+  "Italy",
+  "Latvia",
+  "Liechtenstein",
+  "Lithuania",
+  "Luxembourg",
+  "Malta",
+  "Netherlands",
+  "Norway",
+  "Poland",
+  "Portugal",
+  "Romania",
+  "Slovakia",
+  "Slovenia",
+  "Spain",
+  "Sweden",
+  "Switzerland",
 ]);
 
 // EU, EEA (EU plus Iceland, Norway, Liechtenstein) and Switzerland: nationals
@@ -32,7 +78,10 @@ export const SCHENGEN_COUNTRIES = new Set<string>([
 // specifically, not this wider group.
 export const FREE_MOVEMENT_COUNTRIES = new Set<string>([
   ...EU_COUNTRIES,
-  "Iceland", "Norway", "Liechtenstein", "Switzerland",
+  "Iceland",
+  "Norway",
+  "Liechtenstein",
+  "Switzerland",
 ]);
 
 export function isEU(country: string): boolean {
@@ -60,14 +109,12 @@ export const NAVIGATION_ZONES: { value: 1 | 2 | 3 | 4 | 5; label: string }[] = [
 // A plausible-looking Portuguese boat identification (Documento Único de
 // Identificação style: NAME-NNNNNN-xPT). This is a mock format for display
 // only, not issued by any registry.
-export function buildPtIdentificationSet(
-  boatName: string,
-  seed: string
-): string {
-  const clean = (boatName || "BOAT")
-    .toUpperCase()
-    .replace(/[^A-Z0-9]+/g, "")
-    .slice(0, 12) || "BOAT";
+export function buildPtIdentificationSet(boatName: string, seed: string): string {
+  const clean =
+    (boatName || "BOAT")
+      .toUpperCase()
+      .replace(/[^A-Z0-9]+/g, "")
+      .slice(0, 12) || "BOAT";
   let hash = 0;
   for (let i = 0; i < seed.length; i++) {
     hash = (hash * 31 + seed.charCodeAt(i)) >>> 0;

@@ -1,19 +1,10 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import {
-  calculateQuote,
-  SEASON_LABELS,
-  type Marina,
-} from "../../../../data/marinas";
-import {
-  loadLastEnquiry,
-  TRIP_CHANGED_EVENT,
-  type LastEnquiry,
-} from "../../../../lib/tripStore";
+import { calculateQuote, SEASON_LABELS, type Marina } from "../../../../data/marinas";
+import { loadLastEnquiry, TRIP_CHANGED_EVENT, type LastEnquiry } from "../../../../lib/tripStore";
 
-const inputClass =
-  "field";
+const inputClass = "field";
 const labelClass = "field-label";
 const eur = (n: number) => `€${n.toFixed(2)}`;
 
@@ -81,22 +72,19 @@ export default function StayRecap({
   const Heading = embedded ? "h3" : "h2";
 
   return (
-    <div className={embedded ? "hairline-top stack-md pt-8" : "bg-paper-deep section"}>
+    <div className={embedded ? "hairline-top stack-md pt-8" : "section bg-paper-deep"}>
       <div className={embedded ? "" : "page-column"}>
         <Heading className={`type-heading text-ink ${embedded ? "type-h3" : "type-h2"}`}>
           Your stay &amp; departure
         </Heading>
         <p className="mt-2 max-w-2xl text-sm text-ink/75">
           Based on your last enquiry ({enquiry.arrival}
-          {enquiry.boatName ? `, ${enquiry.boatName}` : ""}), saved on this
-          device.
+          {enquiry.boatName ? `, ${enquiry.boatName}` : ""}), saved on this device.
         </p>
 
         <div className="mt-6 grid gap-6 md:grid-cols-2">
           <div className="hairline-top pt-6">
-            <h3 className="type-heading type-h3 text-ink">
-              Settle-up estimate
-            </h3>
+            <h3 className="type-heading type-h3 text-ink">Settle-up estimate</h3>
             <div className="mt-3 grid grid-cols-2 gap-3">
               <label className="block text-sm">
                 <span className={labelClass}>Departure date</span>
@@ -122,11 +110,8 @@ export default function StayRecap({
               <table className="mt-4 w-full border-collapse text-left text-sm">
                 <tbody>
                   {quote.berthLines.map((line) => (
-                    <tr
-                      key={line.season}
-                      className="border-b border-hairline text-ink/75"
-                    >
-                      <td className="py-2 pr-4 ">
+                    <tr key={line.season} className="border-b border-hairline text-ink/75">
+                      <td className="py-2 pr-4">
                         {line.nights} × {eur(line.rateEur)}
                         <span className="block text-xs text-ink/70">
                           Class {quote.marinaClass} · {SEASON_LABELS[line.season]}
@@ -138,16 +123,11 @@ export default function StayRecap({
                     </tr>
                   ))}
                   {quote.addOnLines.map((line) => (
-                    <tr
-                      key={line.label}
-                      className="border-b border-hairline text-ink/75"
-                    >
-                      <td className="py-2 pr-4 ">
+                    <tr key={line.label} className="border-b border-hairline text-ink/75">
+                      <td className="py-2 pr-4">
                         {line.label}
                         {line.note ? (
-                          <span className="block text-xs text-ink/70">
-                            {line.note}
-                          </span>
+                          <span className="block text-xs text-ink/70">{line.note}</span>
                         ) : null}
                       </td>
                       <td className="py-2 text-right font-medium text-ink">
@@ -156,9 +136,7 @@ export default function StayRecap({
                     </tr>
                   ))}
                   <tr>
-                    <td className="pt-3 font-medium text-ink">
-                      Estimated total
-                    </td>
+                    <td className="pt-3 font-medium text-ink">Estimated total</td>
                     <td className="pt-3 text-right text-base font-medium text-ink">
                       {eur(quote.estimatedTotalEur)}
                     </td>
@@ -171,38 +149,26 @@ export default function StayRecap({
               </p>
             )}
             <p className="mt-3 text-xs text-ink/70">
-              Estimate only, excl. {Math.round(marina.vatRate * 100)}% VAT and
-              utilities. The marina confirms the final total.
+              Estimate only, excl. {Math.round(marina.vatRate * 100)}% VAT and utilities. The marina
+              confirms the final total.
             </p>
           </div>
 
           <div className="space-y-6">
             <div className="hairline-top pt-6">
-              <h3 className="type-heading type-h3 text-ink">
-                Leaving? Let the marina know
-              </h3>
+              <h3 className="type-heading type-h3 text-ink">Leaving? Let the marina know</h3>
               <p className="mt-2 text-sm text-ink/75">
                 Opens a pre-filled email with your boat and departure.
               </p>
-              <button
-                type="button"
-                onClick={notifyDeparture}
-                className="mt-4 btn-dark"
-              >
+              <button type="button" onClick={notifyDeparture} className="btn-dark mt-4">
                 Notify departure
               </button>
             </div>
 
             <div className="hairline-top pt-6">
               <h3 className="type-heading type-h3 text-ink">Coming back?</h3>
-              <p className="mt-2 text-sm text-ink/75">
-                Same boat and services, dates left blank.
-              </p>
-              <button
-                type="button"
-                onClick={onRebook}
-                className="mt-4 btn-secondary"
-              >
+              <p className="mt-2 text-sm text-ink/75">Same boat and services, dates left blank.</p>
+              <button type="button" onClick={onRebook} className="btn-secondary mt-4">
                 Rebook this stay
               </button>
             </div>

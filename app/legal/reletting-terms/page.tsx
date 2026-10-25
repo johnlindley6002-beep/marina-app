@@ -12,17 +12,12 @@ export default function ReletingTermsPage() {
   return (
     <div className="section">
       <div className="page-column page-reading">
-        <h1 className="type-title text-ink">
-          Reletting terms
-        </h1>
+        <h1 className="type-title text-ink">Reletting terms</h1>
         <p className="measure mt-6 text-lg text-ink/75">
-          The full terms for reletting a berth are provided by the marina. This
-          is a placeholder page for the mockup, and it contains no legal text.
+          The full terms for reletting a berth are provided by the marina. This is a placeholder
+          page for the mockup, and it contains no legal text.
         </p>
-        <Link
-          href="/owner"
-          className="mt-8 btn-quiet"
-        >
+        <Link href="/owner" className="btn-quiet mt-8">
           Back to My berth
         </Link>
       </div>

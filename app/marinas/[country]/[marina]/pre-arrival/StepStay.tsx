@@ -23,21 +23,35 @@ export default function StepStay({ draft, setDraft, errors, quote }: Props) {
   return (
     <div>
       <div className="mt-6 grid gap-4 sm:grid-cols-2">
-        <Field label={copy.arrivalLabel} htmlFor="stay-arrival" required error={errors["stay.requestedArrival"]}>
+        <Field
+          label={copy.arrivalLabel}
+          htmlFor="stay-arrival"
+          required
+          error={errors["stay.requestedArrival"]}
+        >
           <input
             id="stay-arrival"
             type="date"
             value={draft.stay.requestedArrival}
-            onChange={(e) => setDraft((d) => ({ ...d, stay: { ...d.stay, requestedArrival: e.target.value } }))}
+            onChange={(e) =>
+              setDraft((d) => ({ ...d, stay: { ...d.stay, requestedArrival: e.target.value } }))
+            }
             className="field"
           />
         </Field>
-        <Field label={copy.departureLabel} htmlFor="stay-departure" required error={errors["stay.requestedDeparture"]}>
+        <Field
+          label={copy.departureLabel}
+          htmlFor="stay-departure"
+          required
+          error={errors["stay.requestedDeparture"]}
+        >
           <input
             id="stay-departure"
             type="date"
             value={draft.stay.requestedDeparture}
-            onChange={(e) => setDraft((d) => ({ ...d, stay: { ...d.stay, requestedDeparture: e.target.value } }))}
+            onChange={(e) =>
+              setDraft((d) => ({ ...d, stay: { ...d.stay, requestedDeparture: e.target.value } }))
+            }
             className="field"
           />
         </Field>
@@ -51,7 +65,9 @@ export default function StepStay({ draft, setDraft, errors, quote }: Props) {
             id="stay-amps"
             value={draft.stay.servicesWanted.electricityAmps}
             onChange={(e) =>
-              setServices({ electricityAmps: Number(e.target.value) as (typeof AMP_OPTIONS)[number] })
+              setServices({
+                electricityAmps: Number(e.target.value) as (typeof AMP_OPTIONS)[number],
+              })
             }
             className="field"
           >
@@ -102,7 +118,9 @@ export default function StepStay({ draft, setDraft, errors, quote }: Props) {
             id="stay-requests"
             rows={3}
             value={draft.stay.specialRequests}
-            onChange={(e) => setDraft((d) => ({ ...d, stay: { ...d.stay, specialRequests: e.target.value } }))}
+            onChange={(e) =>
+              setDraft((d) => ({ ...d, stay: { ...d.stay, specialRequests: e.target.value } }))
+            }
             className="field"
           />
         </Field>
@@ -121,9 +139,14 @@ export default function StepStay({ draft, setDraft, errors, quote }: Props) {
                 )}
               </p>
             ))}
-            {quote.multihull ? <p className="mt-1 text-xs text-ink/65">{copy.multihullNote}</p> : null}
+            {quote.multihull ? (
+              <p className="mt-1 text-xs text-ink/65">{copy.multihullNote}</p>
+            ) : null}
             <p className="tabular mt-3 text-sm text-ink/75">
-              {copy.subtotalLine(`€${quote.subtotalExVatEur.toFixed(2)}`, `€${quote.vatEur.toFixed(2)}`)}
+              {copy.subtotalLine(
+                `€${quote.subtotalExVatEur.toFixed(2)}`,
+                `€${quote.vatEur.toFixed(2)}`
+              )}
             </p>
             <p className="tabular mt-1 text-2xl font-medium text-ink">
               €{quote.totalIncVatEur.toFixed(2)}
@@ -139,7 +162,9 @@ export default function StepStay({ draft, setDraft, errors, quote }: Props) {
         <input
           type="checkbox"
           checked={draft.stay.depositAcknowledged}
-          onChange={(e) => setDraft((d) => ({ ...d, stay: { ...d.stay, depositAcknowledged: e.target.checked } }))}
+          onChange={(e) =>
+            setDraft((d) => ({ ...d, stay: { ...d.stay, depositAcknowledged: e.target.checked } }))
+          }
           className="mt-1"
         />
         {copy.depositNote}

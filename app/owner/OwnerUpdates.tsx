@@ -1,11 +1,7 @@
 "use client";
 
 import { formatLongDate } from "../../lib/formatDate";
-import {
-  getNotifications,
-  markNotificationsRead,
-  type MockNotification,
-} from "../../lib/mockData";
+import { getNotifications, markNotificationsRead, type MockNotification } from "../../lib/mockData";
 import { useMock } from "../../lib/useMock";
 import { useAuth } from "../components/AuthProvider";
 
@@ -43,9 +39,7 @@ export default function OwnerUpdates() {
               {note.title}
             </p>
             <p className="mt-1 text-ink/75">{note.body}</p>
-            <p className="mt-1 text-sm text-ink/70">
-              {formatLongDate(note.at)}
-            </p>
+            <p className="mt-1 text-sm text-ink/70">{formatLongDate(note.at)}</p>
           </li>
         ))}
       </ul>
@@ -53,7 +47,7 @@ export default function OwnerUpdates() {
         <button
           type="button"
           onClick={() => markNotificationsRead(user?.id ?? null)}
-          className="mt-2 btn-quiet"
+          className="btn-quiet mt-2"
         >
           Mark all as read
         </button>

@@ -29,7 +29,11 @@ function statusFor(index: number, draft: StepProps["draft"]): PersonStatus {
   return "complete";
 }
 
-export default function StepCrew({ draft, setDraft, focusPersonIndex }: StepProps & { focusPersonIndex?: number | null }) {
+export default function StepCrew({
+  draft,
+  setDraft,
+  focusPersonIndex,
+}: StepProps & { focusPersonIndex?: number | null }) {
   const { t } = useLanguage();
   const copy = t.preArrival.crew;
   const flags = getVoyageFlags(draft.voyage);

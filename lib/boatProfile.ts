@@ -56,9 +56,7 @@ export function loadBoatProfile(): BoatProfile {
   if (profile.loa || profile.beam || profile.draft) return profile;
   const { boats, activeId } = loadBoats();
   const active = boats.find((b) => b.id === activeId);
-  return active
-    ? { loa: active.loa, beam: active.beam, draft: active.draft }
-    : profile;
+  return active ? { loa: active.loa, beam: active.beam, draft: active.draft } : profile;
 }
 
 export function saveBoatProfile(profile: BoatProfile): void {
@@ -99,8 +97,7 @@ export function loadBoats(): BoatStore {
           }))
       : [];
     const activeId =
-      typeof parsed.activeId === "string" &&
-      boats.some((b) => b.id === parsed.activeId)
+      typeof parsed.activeId === "string" && boats.some((b) => b.id === parsed.activeId)
         ? parsed.activeId
         : null;
     return { boats, activeId };

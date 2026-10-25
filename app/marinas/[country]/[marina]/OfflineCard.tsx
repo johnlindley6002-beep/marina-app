@@ -54,10 +54,7 @@ export default function OfflineCard({
           <Heading className={`type-heading text-ink ${embedded ? "type-h3" : "type-h2"}`}>
             Offline essentials
           </Heading>
-          <p
-            role="status"
-            className={`text-xs font-medium ${online ? "text-ink/70" : "text-ink"}`}
-          >
+          <p role="status" className={`text-xs font-medium ${online ? "text-ink/70" : "text-ink"}`}>
             {online ? "Online" : "You're offline, showing saved details"}
           </p>
         </div>
@@ -100,9 +97,7 @@ export default function OfflineCard({
           </div>
 
           <div className="hairline-top pt-6">
-            <h3 className="type-heading type-h3 text-ink">
-              Your saved enquiry
-            </h3>
+            <h3 className="type-heading type-h3 text-ink">Your saved enquiry</h3>
             {enquiry ? (
               <>
                 <ul className="mt-3 space-y-1 text-sm text-ink/75">
@@ -118,9 +113,7 @@ export default function OfflineCard({
                   </li>
                   <li>
                     Boat: {enquiry.boatName || "-"}
-                    {Number(enquiry.loa) > 0
-                      ? `, ${formatLength(Number(enquiry.loa), units)}`
-                      : ""}
+                    {Number(enquiry.loa) > 0 ? `, ${formatLength(Number(enquiry.loa), units)}` : ""}
                   </li>
                   <li>Berth: {enquiry.berthId || "not selected"}</li>
                 </ul>
@@ -134,8 +127,8 @@ export default function OfflineCard({
               </>
             ) : (
               <p className="mt-3 text-sm text-ink/75">
-                Nothing saved yet. When you send an enquiry, its dates, boat
-                and berth are kept here for offline use.
+                Nothing saved yet. When you send an enquiry, its dates, boat and berth are kept here
+                for offline use.
               </p>
             )}
           </div>

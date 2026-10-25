@@ -39,7 +39,7 @@ function NightChips({
               type="button"
               aria-pressed={on}
               onClick={() => onToggle(night)}
-              className={`min-h-10 rounded-[3px] border px-2 text-xs tabular ${
+              className={`tabular min-h-10 rounded-[3px] border px-2 text-xs ${
                 on ? "border-ink bg-ink text-paper" : "border-ink/30 text-ink/70"
               }`}
             >
@@ -68,7 +68,10 @@ function Item({ item, staffId }: { item: RelettingQueueItem; staffId: string }) 
   const lastNote = request.history[request.history.length - 1]?.note;
   const index = RELETTING_PROGRESS.indexOf(request.status);
   const canAdvance =
-    request.status !== "declined" && request.status !== "cancelled" && index >= 1 && index < RELETTING_PROGRESS.length - 1;
+    request.status !== "declined" &&
+    request.status !== "cancelled" &&
+    index >= 1 &&
+    index < RELETTING_PROGRESS.length - 1;
   const nextStatus = canAdvance ? RELETTING_PROGRESS[index + 1] : undefined;
   const nextLabel = nextStatus ? RELETTING_STATUS_LABELS[nextStatus] : "";
   const rowId = `relet-${request.id}`;
@@ -159,8 +162,8 @@ function Item({ item, staffId }: { item: RelettingQueueItem; staffId: string }) 
                 }
               />
               <p className="mt-1 text-xs text-ink/70">
-                {approvedSet.size} of {offered.length} nights selected. Fewer than all is a
-                partial approval.
+                {approvedSet.size} of {offered.length} nights selected. Fewer than all is a partial
+                approval.
               </p>
 
               <p className="staff-label mt-3">Conditions for a released berth (optional)</p>
@@ -224,7 +227,11 @@ function Item({ item, staffId }: { item: RelettingQueueItem; staffId: string }) 
                 >
                   Approve{approvedSet.size < offered.length ? ` (${approvedSet.size} nights)` : ""}
                 </button>
-                <button type="button" onClick={() => decide("decline")} className="staff-btn staff-btn-danger">
+                <button
+                  type="button"
+                  onClick={() => decide("decline")}
+                  className="staff-btn staff-btn-danger"
+                >
                   Not approved
                 </button>
               </div>
@@ -239,12 +246,16 @@ function Item({ item, staffId }: { item: RelettingQueueItem; staffId: string }) 
             <p className="tabular mt-2 text-ink/70">
               Conditions:{" "}
               {[
-                request.conditions.maxLengthM ? `max ${request.conditions.maxLengthM} m length` : null,
+                request.conditions.maxLengthM
+                  ? `max ${request.conditions.maxLengthM} m length`
+                  : null,
                 request.conditions.maxBeamM ? `max ${request.conditions.maxBeamM} m beam` : null,
                 request.conditions.earliestReletDate
                   ? `not before ${formatLongDate(request.conditions.earliestReletDate)}`
                   : null,
-                request.conditions.bufferDays ? `${request.conditions.bufferDays} day buffer before return` : null,
+                request.conditions.bufferDays
+                  ? `${request.conditions.bufferDays} day buffer before return`
+                  : null,
               ]
                 .filter(Boolean)
                 .join(", ")}

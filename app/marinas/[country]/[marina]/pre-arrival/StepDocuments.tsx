@@ -22,7 +22,11 @@ function savedValueFor(
       return docs.registrationNumber ? { number: docs.registrationNumber } : null;
     case "thirdPartyInsurance":
       return docs.insurancePolicy
-        ? { number: docs.insurancePolicy, insurer: docs.insuranceProvider, expiryDate: docs.insuranceExpiry }
+        ? {
+            number: docs.insurancePolicy,
+            insurer: docs.insuranceProvider,
+            expiryDate: docs.insuranceExpiry,
+          }
         : null;
     case "skipperLicence":
       return docs.competenceCertificate ? { number: docs.competenceCertificate } : null;
@@ -127,7 +131,10 @@ export default function StepDocuments({ draft, setDraft }: StepProps) {
                           ...d,
                           documents: {
                             ...d.documents,
-                            thirdPartyInsurance: { ...d.documents.thirdPartyInsurance, insurer: e.target.value },
+                            thirdPartyInsurance: {
+                              ...d.documents.thirdPartyInsurance,
+                              insurer: e.target.value,
+                            },
                           },
                         }))
                       }

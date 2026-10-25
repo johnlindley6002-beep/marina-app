@@ -1,11 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import {
-  loadFavourites,
-  toggleFavourite,
-  TRIP_CHANGED_EVENT,
-} from "../../lib/tripStore";
+import { loadFavourites, toggleFavourite, TRIP_CHANGED_EVENT } from "../../lib/tripStore";
 import { useLanguage } from "./LanguageProvider";
 
 type Props = {
@@ -37,16 +33,9 @@ export default function FavouriteButton({
     return () => window.removeEventListener(TRIP_CHANGED_EVENT, refresh);
   }, [marinaId]);
 
-  const colour =
-    tone === "light"
-      ? "text-white hover:text-white"
-      : "text-ink hover:text-ink-2";
+  const colour = tone === "light" ? "text-white hover:text-white" : "text-ink hover:text-ink-2";
   const ghost =
-    variant === "ghost"
-      ? tone === "light"
-        ? "chip-dark"
-        : "chip hover:border-ink"
-      : "";
+    variant === "ghost" ? (tone === "light" ? "chip-dark" : "chip hover:border-ink") : "";
 
   return (
     <button

@@ -10,13 +10,7 @@ export function formatFuelPrice(perLitre: number): string {
   return `€${perLitre.toFixed(3)}`;
 }
 
-function FuelCard({
-  label,
-  entry,
-}: {
-  label: string;
-  entry: Timestamped<number | null>;
-}) {
+function FuelCard({ label, entry }: { label: string; entry: Timestamped<number | null> }) {
   return (
     <div className="hairline-top pt-4">
       <dt className="field-label">{label}</dt>

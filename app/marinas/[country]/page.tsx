@@ -7,9 +7,7 @@ type Props = {
   params: Promise<{ country: string }>;
 };
 
-export async function generateMetadata({
-  params,
-}: Props): Promise<Metadata> {
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { country } = await params;
   const marinas = getMarinasByCountry(country);
   const countryName = marinas[0]?.country ?? country;
@@ -26,9 +24,7 @@ export default async function CountryPage({ params }: Props) {
     notFound();
   }
 
-  return (
-    <CountryPageContent marinas={marinas} countryName={marinas[0]?.country ?? country} />
-  );
+  return <CountryPageContent marinas={marinas} countryName={marinas[0]?.country ?? country} />;
 }
 
 export async function generateStaticParams() {

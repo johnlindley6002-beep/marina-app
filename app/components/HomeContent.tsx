@@ -44,10 +44,7 @@ export default function HomeContent() {
             className="hero-rise block h-px w-16 bg-brass"
             style={{ "--d": "0ms" } as React.CSSProperties}
           />
-          <div
-            className="hero-rise mt-8"
-            style={{ "--d": "90ms" } as React.CSSProperties}
-          >
+          <div className="hero-rise mt-8" style={{ "--d": "90ms" } as React.CSSProperties}>
             <Image
               src="/images/aldock-wordmark.png"
               alt="aldock"
@@ -89,20 +86,14 @@ export default function HomeContent() {
 
       <RestingBand image={siteConfig.bandImage} />
 
-      <section
-        id="about"
-        className="defer-paint scroll-mt-20 section-editorial bg-paper-deep"
-      >
+      <section id="about" className="defer-paint section-editorial scroll-mt-20 bg-paper-deep">
         <div className="page-column grid gap-10 md:grid-cols-[1fr_1.2fr] md:gap-24">
           <Reveal>
             <h2 className="type-statement text-ink">{t.home.aboutHeading}</h2>
           </Reveal>
           <Reveal delay={120}>
             <p className="measure text-ink/75">{t.home.aboutBody}</p>
-            <Link
-              href="/marinas"
-              className="mt-8 btn-primary"
-            >
+            <Link href="/marinas" className="btn-primary mt-8">
               {t.home.findMarinas}
             </Link>
           </Reveal>
@@ -111,7 +102,7 @@ export default function HomeContent() {
 
       <section
         id="contact"
-        className="on-ink defer-paint scroll-mt-20 section-editorial bg-ink text-paper"
+        className="on-ink defer-paint section-editorial scroll-mt-20 bg-ink text-paper"
       >
         <div className="page-column grid gap-10 md:grid-cols-[1fr_1.2fr] md:gap-24">
           <Reveal>
@@ -120,10 +111,7 @@ export default function HomeContent() {
           <Reveal delay={120}>
             <p className="measure text-stone">{t.home.contactBody}</p>
             <div className="mt-8 flex flex-col gap-3 text-lg">
-              <a
-                href={`mailto:${siteConfig.contact.email}`}
-                className="btn-quiet w-fit"
-              >
+              <a href={`mailto:${siteConfig.contact.email}`} className="btn-quiet w-fit">
                 {siteConfig.contact.email}
               </a>
               <a

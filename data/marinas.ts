@@ -1,15 +1,5 @@
 export type MarinaClass =
-  | "I"
-  | "IA"
-  | "II"
-  | "III"
-  | "IV"
-  | "V"
-  | "VI"
-  | "VIA"
-  | "VII"
-  | "VIII"
-  | "IX";
+  "I" | "IA" | "II" | "III" | "IV" | "V" | "VI" | "VIA" | "VII" | "VIII" | "IX";
 
 export type Season = "low" | "high";
 
@@ -46,10 +36,7 @@ export const MARINA_CLASS_ORDER: MarinaClass[] = [
 ];
 
 // Length range (metres, LOA) for each class, per the official tariff.
-export const CLASS_LENGTH_RANGES: Record<
-  MarinaClass,
-  { minM: number; maxM: number }
-> = {
+export const CLASS_LENGTH_RANGES: Record<MarinaClass, { minM: number; maxM: number }> = {
   I: { minM: 0, maxM: 6.15 },
   IA: { minM: 6.16, maxM: 6.5 },
   II: { minM: 6.51, maxM: 8.0 },
@@ -92,17 +79,13 @@ export function getMaxBeamM(): number {
 export type BoatDimensions = { loa: number; beam: number; draft: number };
 
 export type BoatFitResult =
-  | { fits: true; marinaClass: MarinaClass }
-  | { fits: false; reason: "length" | "beam" | "draft" };
+  { fits: true; marinaClass: MarinaClass } | { fits: false; reason: "length" | "beam" | "draft" };
 
 // Checks a boat against the marina's REAL class range (up to 45m via
 // Class IX, the mega-yacht allocation) rather than the ~36m figure
 // used in the marina's general description text, which refers to the
 // standard-berth majority, not the marina's true upper limit.
-export function checkBoatFit(
-  marina: Marina,
-  dims: BoatDimensions
-): BoatFitResult {
+export function checkBoatFit(marina: Marina, dims: BoatDimensions): BoatFitResult {
   if (dims.draft > marina.berths.maxDraftM) {
     return { fits: false, reason: "draft" };
   }
@@ -125,9 +108,7 @@ export type PriceBand = "€" | "€€" | "€€€";
 // Generic, not hardcoded per marina: buckets by the cheapest class's
 // low-season nightly rate.
 export function getPriceBand(marina: Marina): PriceBand {
-  const cheapest = Math.min(
-    ...MARINA_CLASS_ORDER.map((c) => marina.transientRates[c].low)
-  );
+  const cheapest = Math.min(...MARINA_CLASS_ORDER.map((c) => marina.transientRates[c].low));
   if (cheapest < 20) return "€";
   if (cheapest < 40) return "€€";
   return "€€€";
@@ -164,11 +145,7 @@ export function getFuelUpdated(marina: Marina): string | null {
 
 // Returns the marina's busy-period note when any night of the stay falls in a
 // busy month, otherwise null. A static indicator from data, not surge pricing.
-export function getDemandFlag(
-  marina: Marina,
-  arrival: string,
-  departure: string
-): string | null {
+export function getDemandFlag(marina: Marina, arrival: string, departure: string): string | null {
   if (!marina.demand) return null;
   const from = parseIsoDate(arrival);
   const to = parseIsoDate(departure);
@@ -220,12 +197,7 @@ export type Localized = { en: string; pt: string };
 export type Point = { x: number; y: number };
 
 export type FacilityIconKey =
-  | FacilityKey
-  | "reception"
-  | "showers"
-  | "heliport"
-  | "waste"
-  | "extras";
+  FacilityKey | "reception" | "showers" | "heliport" | "waste" | "extras";
 
 export type FacilityDetail = {
   id: string;
@@ -352,8 +324,7 @@ export function calculateQuote(
   }
 
   const estimatedTotalEur =
-    berthSubtotalEur +
-    addOnLines.reduce((s, l) => s + (l.amountEur ?? 0), 0);
+    berthSubtotalEur + addOnLines.reduce((s, l) => s + (l.amountEur ?? 0), 0);
 
   return {
     marinaClass,
@@ -706,7 +677,10 @@ const CASCAIS_FACILITY_DETAILS: FacilityDetail[] = [
   },
   {
     id: "dryStorage",
-    name: { en: "Dry / winter storage & repairs", pt: "Armazenamento a seco / invernal e reparações" },
+    name: {
+      en: "Dry / winter storage & repairs",
+      pt: "Armazenamento a seco / invernal e reparações",
+    },
     icon: "dryStorage",
     description: {
       en: "Certified maintenance and out-of-water storage.",
@@ -838,8 +812,7 @@ export const marinas: Marina[] = [
       byTrain: "Cascais train station, then a short walk to the marina",
       byAir: "~35 km from Lisbon Humberto Delgado Airport",
     },
-    arrivalInstructions:
-      "On arrival, berth on the Reception pier and report to the marina office.",
+    arrivalInstructions: "On arrival, berth on the Reception pier and report to the marina office.",
     insuranceMinimumEur: 1_500_000,
     region: "Lisbon Coast",
     outsideHoursInstructions: CASCAIS_OUTSIDE_HOURS,
@@ -850,8 +823,7 @@ export const marinas: Marina[] = [
     // protected), partial (Moderate) or exposed (Exposed).
     protection: {
       level: "partial",
-      description:
-        "Well protected inside; exposed to strong SW/S conditions at the entrance.",
+      description: "Well protected inside; exposed to strong SW/S conditions at the entrance.",
     },
     photos: [
       {
@@ -962,8 +934,7 @@ export const marinas: Marina[] = [
       },
       {
         name: "Santa Marta Lighthouse & Museum",
-        description:
-          "A small lighthouse museum on the waterfront by the marina.",
+        description: "A small lighthouse museum on the waterfront by the marina.",
       },
       {
         name: "The Cidadela",
@@ -972,8 +943,7 @@ export const marinas: Marina[] = [
       },
       {
         name: "Cascais old town & beaches",
-        description:
-          "Shops, cafés and sandy beaches a short walk from the pontoons.",
+        description: "Shops, cafés and sandy beaches a short walk from the pontoons.",
       },
       {
         name: "Train to Lisbon",
@@ -1025,11 +995,6 @@ export function getMarinasByCountry(countrySlug: string): Marina[] {
   return marinas.filter((marina) => marina.countrySlug === countrySlug);
 }
 
-export function getMarina(
-  countrySlug: string,
-  marinaId: string
-): Marina | undefined {
-  return marinas.find(
-    (marina) => marina.countrySlug === countrySlug && marina.id === marinaId
-  );
+export function getMarina(countrySlug: string, marinaId: string): Marina | undefined {
+  return marinas.find((marina) => marina.countrySlug === countrySlug && marina.id === marinaId);
 }

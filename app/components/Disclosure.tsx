@@ -36,10 +36,7 @@ export function Collapse({ open, id, className = "", children }: CollapseProps) 
         open ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
       } ${className}`}
     >
-      <div
-        className={`min-h-0 ${open && settled ? "" : "overflow-hidden"}`}
-        inert={!open}
-      >
+      <div className={`min-h-0 ${open && settled ? "" : "overflow-hidden"}`} inert={!open}>
         {children}
       </div>
     </div>
@@ -106,9 +103,7 @@ export default function Disclosure({
       if (window.location.hash === `#${hashId}`) {
         setOpen(true);
         requestAnimationFrame(() =>
-          document
-            .getElementById(hashId as string)
-            ?.scrollIntoView({ block: "start" })
+          document.getElementById(hashId as string)?.scrollIntoView({ block: "start" })
         );
       }
     }

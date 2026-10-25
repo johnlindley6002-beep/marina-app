@@ -36,10 +36,7 @@ function classifyByBeam(beamM: number): MarinaClass | null {
 
 // The larger of the two classes applies, since a wide, short boat still needs
 // a wide berth and vice versa.
-export function classifyByLengthAndBeam(
-  lengthM: number,
-  beamM: number
-): MarinaClass | null {
+export function classifyByLengthAndBeam(lengthM: number, beamM: number): MarinaClass | null {
   const byLength = classifyByLength(lengthM);
   const byBeam = classifyByBeam(beamM);
   if (!byLength || !byBeam) return byLength ?? byBeam ?? null;
@@ -75,7 +72,13 @@ function parseIsoDate(value: string): Date | null {
 // correctly), then applies the multihull surcharge and VAT.
 export function calculateIndicativeQuote(
   marina: Marina,
-  input: { lengthM: number; beamM: number; isMultihull: boolean; arrival: string; departure: string }
+  input: {
+    lengthM: number;
+    beamM: number;
+    isMultihull: boolean;
+    arrival: string;
+    departure: string;
+  }
 ): IndicativeQuote | null {
   const marinaClass = classifyByLengthAndBeam(input.lengthM, input.beamM);
   const arrival = parseIsoDate(input.arrival);

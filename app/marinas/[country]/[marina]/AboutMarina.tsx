@@ -36,12 +36,8 @@ export default function AboutMarina({ marina, description }: Props) {
 
         <dl className="mt-10">
           <div>
-            <dt className="field-label">
-              {t.keyFacts.berths}
-            </dt>
-            <dd className="tabular mt-1 text-lg font-medium text-ink">
-              {marina.berths.count}
-            </dd>
+            <dt className="field-label">{t.keyFacts.berths}</dt>
+            <dd className="tabular mt-1 text-lg font-medium text-ink">{marina.berths.count}</dd>
           </div>
         </dl>
 

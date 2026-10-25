@@ -27,9 +27,7 @@ export default function Footer() {
             height={108}
             className="h-5 w-auto"
           />
-          <p className="mt-5 max-w-xs text-sm leading-relaxed text-stone">
-            {t.footer.tagline}
-          </p>
+          <p className="mt-5 max-w-xs text-sm leading-relaxed text-stone">{t.footer.tagline}</p>
         </div>
 
         <nav aria-label="Footer">

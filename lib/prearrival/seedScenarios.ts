@@ -231,9 +231,21 @@ export const DRAFT_SCENARIOS = [
   { key: "solo-sailor", label: "1. Solo sailor", build: scenarioSoloSailor },
   { key: "twelve-people", label: "2. Twelve people", build: scenarioTwelvePeople },
   { key: "minor-on-board", label: "3. Minor on board", build: scenarioMinorOnBoard },
-  { key: "non-eu-boat-eu-crew", label: "4. Non-EU flagged boat, EU crew", build: scenarioNonEUBoatEUCrew },
-  { key: "gibraltar-uk-skipper", label: "5. EU boat from Gibraltar, UK skipper", build: scenarioGibraltarUKSkipper },
-  { key: "multihull-season", label: "6. Multihull crossing the season boundary", build: scenarioMultihullSeasonBoundary },
+  {
+    key: "non-eu-boat-eu-crew",
+    label: "4. Non-EU flagged boat, EU crew",
+    build: scenarioNonEUBoatEUCrew,
+  },
+  {
+    key: "gibraltar-uk-skipper",
+    label: "5. EU boat from Gibraltar, UK skipper",
+    build: scenarioGibraltarUKSkipper,
+  },
+  {
+    key: "multihull-season",
+    label: "6. Multihull crossing the season boundary",
+    build: scenarioMultihullSeasonBoundary,
+  },
 ] as const;
 
 // 7. A holder away for three weeks in August, relet for 10 nights.

@@ -243,9 +243,7 @@ export function getRoles(userId: string | null): Role[] {
   if (BERTH_LINKS.some((l) => l.userId === userId && l.active)) {
     roles.push("owner");
   }
-  if (
-    STAFF_INVITATIONS.some((i) => i.userId === userId && i.status === "accepted")
-  ) {
+  if (STAFF_INVITATIONS.some((i) => i.userId === userId && i.status === "accepted")) {
     roles.push("staff");
   }
   return roles;
@@ -264,10 +262,7 @@ export type CurrentUser = {
   roles: Role[];
 };
 
-type ProfileOverrides = Record<
-  string,
-  Partial<Pick<AccountRecord, "name" | "email" | "phone">>
->;
+type ProfileOverrides = Record<string, Partial<Pick<AccountRecord, "name" | "email" | "phone">>>;
 
 function initialsFor(name: string): string {
   const parts = name.trim().split(/\s+/).filter(Boolean);
@@ -377,24 +372,22 @@ export type OwnedBerth = {
 export function getOwnedBerths(userId: string | null): OwnedBerth[] {
   if (!userId || !getRoles(userId).includes("owner")) return [];
   const allBerths = getAllBerths();
-  return BERTH_LINKS.filter((l) => l.userId === userId && l.active).map(
-    (link) => {
-      const marina = marinas.find((m) => m.id === link.marinaId);
-      const berth = allBerths.find((b) => b.id === link.berthId);
-      return {
-        linkId: link.id,
-        marinaId: link.marinaId,
-        marinaName: marina?.name ?? link.marinaId,
-        countrySlug: marina?.countrySlug ?? "",
-        berthId: link.berthId,
-        pontoon: berth?.pontoonId ?? link.berthId.split("-")[0] ?? link.berthId,
-        sizeClass: berth?.sizeClass ?? null,
-        linkedBy: marina?.name ?? link.marinaId,
-        linkedAt: link.linkedAt,
-        boatOnFile: link.boatOnFile,
-      };
-    }
-  );
+  return BERTH_LINKS.filter((l) => l.userId === userId && l.active).map((link) => {
+    const marina = marinas.find((m) => m.id === link.marinaId);
+    const berth = allBerths.find((b) => b.id === link.berthId);
+    return {
+      linkId: link.id,
+      marinaId: link.marinaId,
+      marinaName: marina?.name ?? link.marinaId,
+      countrySlug: marina?.countrySlug ?? "",
+      berthId: link.berthId,
+      pontoon: berth?.pontoonId ?? link.berthId.split("-")[0] ?? link.berthId,
+      sizeClass: berth?.sizeClass ?? null,
+      linkedBy: marina?.name ?? link.marinaId,
+      linkedAt: link.linkedAt,
+      boatOnFile: link.boatOnFile,
+    };
+  });
 }
 
 // ---------------------------------------------------------------------------
@@ -411,17 +404,17 @@ export type StaffMembership = {
 // Only accepted invitations count. Staff tools arrive in the next step.
 export function getStaffMemberships(userId: string | null): StaffMembership[] {
   if (!userId || !getRoles(userId).includes("staff")) return [];
-  return STAFF_INVITATIONS.filter(
-    (i) => i.userId === userId && i.status === "accepted"
-  ).map((invite) => {
-    const marina = marinas.find((m) => m.id === invite.marinaId);
-    return {
-      marinaId: invite.marinaId,
-      marinaName: marina?.name ?? invite.marinaId,
-      invitedBy: marina?.name ?? invite.marinaId,
-      invitedAt: invite.invitedAt,
-    };
-  });
+  return STAFF_INVITATIONS.filter((i) => i.userId === userId && i.status === "accepted").map(
+    (invite) => {
+      const marina = marinas.find((m) => m.id === invite.marinaId);
+      return {
+        marinaId: invite.marinaId,
+        marinaName: marina?.name ?? invite.marinaId,
+        invitedBy: marina?.name ?? invite.marinaId,
+        invitedAt: invite.invitedAt,
+      };
+    }
+  );
 }
 
 // ---------------------------------------------------------------------------
@@ -616,9 +609,7 @@ export function nightDates(startDate: string, endDate: string): string[] {
   const out: string[] = [];
   const cursor = new Date(start);
   for (let i = 0; i < nights; i++) {
-    out.push(
-      `${cursor.getFullYear()}-${pad(cursor.getMonth() + 1)}-${pad(cursor.getDate())}`
-    );
+    out.push(`${cursor.getFullYear()}-${pad(cursor.getMonth() + 1)}-${pad(cursor.getDate())}`);
     cursor.setDate(cursor.getDate() + 1);
   }
   return out;
@@ -763,7 +754,8 @@ function loadReletStore(): ReletStore {
       bookedNights:
         r.bookedNights ??
         (r.nightsRelet ? nightDates(r.startDate, r.endDate).slice(0, r.nightsRelet) : []),
-      approvedNights: r.approvedNights ?? (r.status === "submitted" ? null : nightDates(r.startDate, r.endDate)),
+      approvedNights:
+        r.approvedNights ?? (r.status === "submitted" ? null : nightDates(r.startDate, r.endDate)),
       resubmitOf: r.resubmitOf ?? null,
     })),
   };
@@ -784,12 +776,7 @@ function todayIso(): string {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 }
 
-const ACTIVE_STATUSES: RelettingStatus[] = [
-  "submitted",
-  "approved",
-  "listed",
-  "booked",
-];
+const ACTIVE_STATUSES: RelettingStatus[] = ["submitted", "approved", "listed", "booked"];
 
 // ---- Owner side ----
 
@@ -815,8 +802,7 @@ export type SubmitRelettingInput = {
 };
 
 export type SubmitRelettingResult =
-  | { ok: true; request: RelettingRequest }
-  | { ok: false; error: string };
+  { ok: true; request: RelettingRequest } | { ok: false; error: string };
 
 // This is the marina PRIOR-CONSENT step: it only ever creates a "submitted"
 // request. The real backend must check server-side that the caller holds the
@@ -851,7 +837,10 @@ export function submitRelettingRequest(
     !input.termsAccepted ||
     !input.readinessConfirmed
   ) {
-    return { ok: false, error: "Every confirmation is needed before the marina can consider your request." };
+    return {
+      ok: false,
+      error: "Every confirmation is needed before the marina can consider your request.",
+    };
   }
   const store = loadReletStore();
   if (input.resubmitOf) {
@@ -921,9 +910,7 @@ export function markNotificationsRead(userId: string | null): void {
   const store = loadReletStore();
   saveReletStore({
     ...store,
-    notifications: store.notifications.map((n) =>
-      n.userId === userId ? { ...n, read: true } : n
-    ),
+    notifications: store.notifications.map((n) => (n.userId === userId ? { ...n, read: true } : n)),
   });
 }
 
@@ -943,9 +930,7 @@ function isStaffOfMarina(staffUserId: string | null, marinaId: string): boolean 
 
 function dateLabel(iso: string): string {
   const d = parseIso(iso);
-  return d
-    ? new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "long" }).format(d)
-    : iso;
+  return d ? new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "long" }).format(d) : iso;
 }
 
 function formatWindow(startIso: string, endIso: string): string {
@@ -954,9 +939,7 @@ function formatWindow(startIso: string, endIso: string): string {
 
 // Only requests for marinas the staff member belongs to. The real backend must
 // filter by the staff membership server-side, never trust the client.
-export function getRelettingQueue(
-  staffUserId: string | null
-): RelettingQueueItem[] {
+export function getRelettingQueue(staffUserId: string | null): RelettingQueueItem[] {
   if (!staffUserId) return [];
   const allBerths = getAllBerths();
   return loadReletStore()
@@ -970,8 +953,7 @@ export function getRelettingQueue(
         request,
         ownerName: owner?.name ?? "Berth holder",
         boatName: link?.boatOnFile.name ?? "",
-        berthClass:
-          allBerths.find((b) => b.id === request.berthId)?.sizeClass ?? null,
+        berthClass: allBerths.find((b) => b.id === request.berthId)?.sizeClass ?? null,
         estimate: estimateReletting(
           request.marinaId,
           request.berthId,
@@ -981,7 +963,8 @@ export function getRelettingQueue(
       };
     })
     .sort((a, b) => {
-      const rank = (s: RelettingStatus) => (s === "submitted" ? 0 : ACTIVE_STATUSES.includes(s) ? 1 : 2);
+      const rank = (s: RelettingStatus) =>
+        s === "submitted" ? 0 : ACTIVE_STATUSES.includes(s) ? 1 : 2;
       return (
         rank(a.request.status) - rank(b.request.status) ||
         a.request.startDate.localeCompare(b.request.startDate)
@@ -989,10 +972,7 @@ export function getRelettingQueue(
     });
 }
 
-function withEvent(
-  request: RelettingRequest,
-  status: RelettingStatus
-): RelettingRequest {
+function withEvent(request: RelettingRequest, status: RelettingStatus): RelettingRequest {
   return {
     ...request,
     status,
@@ -1043,9 +1023,8 @@ export function decideReletting(
     return { ok: false, error: "This request has already been decided." };
   }
   const offered = nightDates(request.startDate, request.endDate);
-  const cleared = decision === "approve"
-    ? (approvedNights ?? offered).filter((n) => offered.includes(n))
-    : null;
+  const cleared =
+    decision === "approve" ? (approvedNights ?? offered).filter((n) => offered.includes(n)) : null;
   const span = `${dateLabel(request.startDate)} to ${dateLabel(request.endDate)}`;
   const partial = cleared !== null && cleared.length < offered.length;
   const next = {
@@ -1167,7 +1146,9 @@ export function isRelettingEditable(request: RelettingRequest): boolean {
 }
 
 export function isRelettingLocked(request: RelettingRequest): boolean {
-  return request.status === "booked" || (request.status === "listed" && request.bookedNights.length > 0);
+  return (
+    request.status === "booked" || (request.status === "listed" && request.bookedNights.length > 0)
+  );
 }
 
 function ownedRequest(
@@ -1181,8 +1162,7 @@ function ownedRequest(
 }
 
 export type ChangeRelettingResult =
-  | { ok: true; request: RelettingRequest }
-  | { ok: false; error: string };
+  { ok: true; request: RelettingRequest } | { ok: false; error: string };
 
 // Change the dates of a request that is still Submitted, Approved or Listed
 // with nothing booked. The marina consented to the OLD dates, so an approved or
@@ -1250,7 +1230,10 @@ export function cancelRelettingRequest(
   if (!found) return { ok: false, error: "Only the holder can cancel this request." };
   const { store, request } = found;
   if (!isRelettingEditable(request)) {
-    return { ok: false, error: "A visitor has booked this, so it cannot be cancelled here. Contact the marina." };
+    return {
+      ok: false,
+      error: "A visitor has booked this, so it cannot be cancelled here. Contact the marina.",
+    };
   }
   const next: RelettingRequest = {
     ...request,
@@ -1288,7 +1271,11 @@ export function requestEarlyReturn(
     earlyReturnRequestedAt: new Date().toISOString(),
     history: [
       ...request.history,
-      { status: request.status, at: new Date().toISOString(), note: "Holder asked to return early" },
+      {
+        status: request.status,
+        at: new Date().toISOString(),
+        note: "Holder asked to return early",
+      },
     ],
   };
   saveReletStore({
@@ -1691,7 +1678,16 @@ function buildSeedEnquiryStore(): EnquiryStore {
         phone: "+34 611 222 333",
         email: "marc.duran@example.com",
         peopleOnBoard: "4",
-        services: { shorePower: false, amperage: "", water: true, helpMooring: false, helpSlipping: true, pumpOut: false, fuel: true, laundry: false },
+        services: {
+          shorePower: false,
+          amperage: "",
+          water: true,
+          helpMooring: false,
+          helpSlipping: true,
+          pumpOut: false,
+          fuel: true,
+          laundry: false,
+        },
         decisionAt: addDaysIso(today, -2) + "T10:00:00.000Z",
         documents: {
           registrationNumber: "ES-AU-1029",
@@ -1720,11 +1716,28 @@ function buildSeedEnquiryStore(): EnquiryStore {
         phone: "+33 6 12 34 56 78",
         email: "camille.rousseau@example.com",
         peopleOnBoard: "2",
-        services: { shorePower: true, amperage: "16", water: false, helpMooring: false, helpSlipping: false, pumpOut: false, fuel: false, laundry: true },
+        services: {
+          shorePower: true,
+          amperage: "16",
+          water: false,
+          helpMooring: false,
+          helpSlipping: false,
+          pumpOut: false,
+          fuel: false,
+          laundry: true,
+        },
         vesselUse: "private",
         euStatus: "yes",
         crew: [
-          { personType: "crew", fullName: "Camille Rousseau", dateOfBirth: "", nationality: "French", passportNumber: "", role: "Skipper", joinDate: "" },
+          {
+            personType: "crew",
+            fullName: "Camille Rousseau",
+            dateOfBirth: "",
+            nationality: "French",
+            passportNumber: "",
+            role: "Skipper",
+            joinDate: "",
+          },
         ],
       }),
       // Needs a decision, larger boat, no berth pre-picked: a second inbox item.
@@ -1745,7 +1758,16 @@ function buildSeedEnquiryStore(): EnquiryStore {
         phone: "+44 7700 900555",
         email: "oliver.hart@example.com",
         peopleOnBoard: "6",
-        services: { shorePower: true, amperage: "32", water: true, helpMooring: true, helpSlipping: true, pumpOut: true, fuel: false, laundry: false },
+        services: {
+          shorePower: true,
+          amperage: "32",
+          water: true,
+          helpMooring: true,
+          helpSlipping: true,
+          pumpOut: true,
+          fuel: false,
+          laundry: false,
+        },
         vesselUse: "bareboat",
         operatingEntity: "Solent Yacht Charters Ltd",
         companyRegistration: "GB-08217743",
@@ -1755,8 +1777,24 @@ function buildSeedEnquiryStore(): EnquiryStore {
         lastPort: "Gibraltar",
         nextPort: "Lagos",
         crew: [
-          { personType: "crew", fullName: "Oliver Hart", dateOfBirth: "1985-04-11", nationality: "British", passportNumber: "998211037", role: "Skipper", joinDate: "" },
-          { personType: "guest", fullName: "Amy Hart", dateOfBirth: "1987-09-02", nationality: "British", passportNumber: "998211038", role: "Guest", joinDate: "" },
+          {
+            personType: "crew",
+            fullName: "Oliver Hart",
+            dateOfBirth: "1985-04-11",
+            nationality: "British",
+            passportNumber: "998211037",
+            role: "Skipper",
+            joinDate: "",
+          },
+          {
+            personType: "guest",
+            fullName: "Amy Hart",
+            dateOfBirth: "1987-09-02",
+            nationality: "British",
+            passportNumber: "998211038",
+            role: "Guest",
+            joinDate: "",
+          },
         ],
       }),
       // Declined already: fills out the inbox filter and Records.
@@ -1876,7 +1914,9 @@ export function checkBerthAvailability(
       error: `Berth ${berthId} already holds ${conflict.boatName || "another boat"} for overlapping dates.`,
     };
   }
-  const link = BERTH_LINKS.find((l) => l.marinaId === marinaId && l.berthId === berthId && l.active);
+  const link = BERTH_LINKS.find(
+    (l) => l.marinaId === marinaId && l.berthId === berthId && l.active
+  );
   if (link) {
     const nights = nightDates(arrival, departure);
     const requests = loadReletStore().requests.filter(
@@ -1891,7 +1931,10 @@ export function checkBerthAvailability(
     }
     const alreadyBooked = requests.some((r) => nights.some((n) => r.bookedNights.includes(n)));
     if (alreadyBooked) {
-      return { ok: false, error: `Berth ${berthId} already has a visitor booked on part of these dates.` };
+      return {
+        ok: false,
+        error: `Berth ${berthId} already has a visitor booked on part of these dates.`,
+      };
     }
   }
   if (getOutOfServiceBerths(marinaId).some((m) => m.berthId === berthId)) {
@@ -1988,7 +2031,11 @@ export function markEnquiryArrived(
   if (enquiry.status !== "approved" || enquiry.arrivalStatus !== "pending") {
     return { ok: false, error: "This boat cannot be marked arrived from its current state." };
   }
-  const next: Enquiry = { ...enquiry, arrivalStatus: "arrived", arrivedAt: new Date().toISOString() };
+  const next: Enquiry = {
+    ...enquiry,
+    arrivalStatus: "arrived",
+    arrivedAt: new Date().toISOString(),
+  };
   saveEnquiryStore({ enquiries: store.enquiries.map((e) => (e.id === enquiryId ? next : e)) });
   return { ok: true, enquiry: next };
 }
@@ -2008,7 +2055,11 @@ export function markEnquiryDeparted(
   if (enquiry.arrivalStatus !== "arrived") {
     return { ok: false, error: "Only a boat that has arrived can be marked departed." };
   }
-  const next: Enquiry = { ...enquiry, arrivalStatus: "departed", departedAt: new Date().toISOString() };
+  const next: Enquiry = {
+    ...enquiry,
+    arrivalStatus: "departed",
+    departedAt: new Date().toISOString(),
+  };
   saveEnquiryStore({ enquiries: store.enquiries.map((e) => (e.id === enquiryId ? next : e)) });
   return { ok: true, enquiry: next };
 }
@@ -2104,12 +2155,7 @@ export function resetMockOutOfService(): void {
 // ---- The berth map as an operational tool ----
 
 export type BerthOperationalStatus =
-  | "occupied"
-  | "free"
-  | "reserved"
-  | "owner-away"
-  | "released"
-  | "out-of-service";
+  "occupied" | "free" | "reserved" | "owner-away" | "released" | "out-of-service";
 
 export type BerthOperationalInfo = {
   status: BerthOperationalStatus;
@@ -2194,7 +2240,11 @@ export function getBerthStatuses(
     if (enquiry) {
       out[berth.id] =
         enquiry.arrivalStatus === "arrived"
-          ? { status: "occupied", detail: `${enquiry.boatName || "A visiting boat"}, on site.`, enquiryId: enquiry.id }
+          ? {
+              status: "occupied",
+              detail: `${enquiry.boatName || "A visiting boat"}, on site.`,
+              enquiryId: enquiry.id,
+            }
           : {
               status: "reserved",
               detail: `${enquiry.boatName || "A visiting boat"}, arriving ${enquiry.eta || "soon"}.`,
@@ -2208,7 +2258,9 @@ export function getBerthStatuses(
 }
 
 function boatFitsMarinaClass(dims: { loa: number; beam: number }, sizeClass: MarinaClass): boolean {
-  return dims.loa <= CLASS_LENGTH_RANGES[sizeClass].maxM && dims.beam <= CLASS_BEAM_RANGES[sizeClass];
+  return (
+    dims.loa <= CLASS_LENGTH_RANGES[sizeClass].maxM && dims.beam <= CLASS_BEAM_RANGES[sizeClass]
+  );
 }
 
 export type ReleasedBerthSuggestion = {
@@ -2295,7 +2347,6 @@ export function getMarinaBerthLinks(marinaId: string): MarinaBerthLink[] {
 // front-end mockup of what the marina's own system would record.
 // ============================================================================
 
-
 export type PreArrivalCheckIn = {
   id: string;
   referenceCode: string;
@@ -2316,10 +2367,7 @@ export function getPreArrivalDraft(marinaId: string): PreArrivalDraft | null {
   return readJson<PreArrivalDraftStore>(PREARRIVAL_DRAFT_KEY)?.[marinaId] ?? null;
 }
 
-export function savePreArrivalDraft(
-  marinaId: string,
-  draft: PreArrivalDraft
-): void {
+export function savePreArrivalDraft(marinaId: string, draft: PreArrivalDraft): void {
   const all = readJson<PreArrivalDraftStore>(PREARRIVAL_DRAFT_KEY) ?? {};
   all[marinaId] = draft;
   writeJson(PREARRIVAL_DRAFT_KEY, all);
@@ -2396,7 +2444,9 @@ export function markPreArrivalCheckedIn(id: string): StaffActionResult {
   if (!checkIn) return { ok: false, error: "Check-in not found." };
   if (checkIn.checkedInAt) return { ok: true };
   writeJson(PREARRIVAL_KEY, {
-    checkIns: store.checkIns.map((c) => (c.id === id ? { ...c, checkedInAt: new Date().toISOString() } : c)),
+    checkIns: store.checkIns.map((c) =>
+      c.id === id ? { ...c, checkedInAt: new Date().toISOString() } : c
+    ),
   });
   emitChange();
   return { ok: true };

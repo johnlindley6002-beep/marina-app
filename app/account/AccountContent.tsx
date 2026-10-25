@@ -8,8 +8,7 @@ import { useAuth } from "../components/AuthProvider";
 import PageHeader from "../components/PageHeader";
 import RoleGate from "../components/RoleGate";
 
-const inputClass =
-  "field";
+const inputClass = "field";
 const labelClass = "field-label";
 const errorClass = "field-error";
 
@@ -35,9 +34,7 @@ function ProfileForm({ user }: { user: CurrentUser }) {
     if (Object.keys(next).length > 0) {
       setStatus("");
       requestAnimationFrame(() =>
-        formRef.current
-          ?.querySelector<HTMLElement>('[aria-invalid="true"]')
-          ?.focus()
+        formRef.current?.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus()
       );
       return;
     }
@@ -46,11 +43,7 @@ function ProfileForm({ user }: { user: CurrentUser }) {
       email: email.trim(),
       phone: phone.trim(),
     });
-    setStatus(
-      ok
-        ? "Saved on this device."
-        : "Could not save. Your browser is blocking storage."
-    );
+    setStatus(ok ? "Saved on this device." : "Could not save. Your browser is blocking storage.");
   }
 
   const aria = (key: keyof Errors) => ({
@@ -105,10 +98,7 @@ function ProfileForm({ user }: { user: CurrentUser }) {
         </label>
       </div>
       <div className="mt-6 flex flex-wrap items-center gap-4">
-        <button
-          type="submit"
-          className="btn-primary"
-        >
+        <button type="submit" className="btn-primary">
           Save changes
         </button>
         <p role="status" className="min-h-6 text-sm font-medium text-ink">
@@ -148,19 +138,13 @@ function AccountBody() {
           </p>
         </section>
 
-        <section
-          className="chapter"
-          aria-labelledby="roles-heading"
-        >
+        <section className="chapter" aria-labelledby="roles-heading">
           <h2 id="roles-heading" className="type-heading type-h2 text-ink">
             Your roles
           </h2>
           <ul className="mt-4">
             {user.roles.map((role) => (
-              <li
-                key={role}
-                className="hairline-top py-4 first:border-t-0"
-              >
+              <li key={role} className="hairline-top py-4 first:border-t-0">
                 <p className="type-heading type-h3 text-ink">{copy[role].title}</p>
                 <p className="measure mt-1 text-ink/75">{copy[role].how}</p>
               </li>
@@ -179,13 +163,10 @@ function AccountBody() {
           <section className="chapter">
             <h2 className="type-heading type-h2 text-ink">Owner mode</h2>
             <p className="measure mt-2 text-ink/75">
-              Use the Guest and Owner switch in the top bar to move between
-              booking as a guest and managing the berth you hold.
+              Use the Guest and Owner switch in the top bar to move between booking as a guest and
+              managing the berth you hold.
             </p>
-            <Link
-              href="/owner"
-              className="mt-4 btn-quiet"
-            >
+            <Link href="/owner" className="btn-quiet mt-4">
               Go to My berth
             </Link>
           </section>

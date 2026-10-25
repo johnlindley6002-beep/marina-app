@@ -123,8 +123,7 @@ export function BoatProvider({ children }: { children: ReactNode }) {
     (id: string) => {
       const current = storeRef.current;
       const boats = current.boats.filter((b) => b.id !== id);
-      const activeId =
-        current.activeId === id ? (boats[0]?.id ?? null) : current.activeId;
+      const activeId = current.activeId === id ? (boats[0]?.id ?? null) : current.activeId;
       commit({ boats, activeId });
       if (current.activeId === id) {
         syncWorkingDimensions(boats.find((b) => b.id === activeId));
@@ -163,17 +162,7 @@ export function BoatProvider({ children }: { children: ReactNode }) {
       saveSkipper,
       clearAll,
     }),
-    [
-      ready,
-      storageOk,
-      store,
-      skipper,
-      setActiveId,
-      saveBoat,
-      removeBoat,
-      saveSkipper,
-      clearAll,
-    ]
+    [ready, storageOk, store, skipper, setActiveId, saveBoat, removeBoat, saveSkipper, clearAll]
   );
 
   return <BoatContext.Provider value={value}>{children}</BoatContext.Provider>;

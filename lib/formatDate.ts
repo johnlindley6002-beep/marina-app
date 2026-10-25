@@ -37,9 +37,6 @@ export function addDaysIso(iso: string, days: number): string {
 
 // The day a boat leaves the berth: the departure date, or one night after
 // arrival for an open-ended enquiry with no departure set yet.
-export function effectiveEnquiryDeparture(e: {
-  arrival: string;
-  departure: string;
-}): string {
+export function effectiveEnquiryDeparture(e: { arrival: string; departure: string }): string {
   return e.departure || addDaysIso(e.arrival, 1);
 }

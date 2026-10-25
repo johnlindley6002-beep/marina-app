@@ -1,10 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type FormEvent } from "react";
-import {
-  EMPTY_DOCUMENTS,
-  type SavedBoat,
-} from "../../lib/boatProfile";
+import { EMPTY_DOCUMENTS, type SavedBoat } from "../../lib/boatProfile";
 import { COUNTRIES } from "../../lib/countries";
 import type { BoatInput } from "../components/BoatProvider";
 import LengthInput from "../components/LengthInput";
@@ -17,14 +14,11 @@ const TYPES = [
   { value: "other", label: "Other" },
 ];
 
-const inputClass =
-  "field";
+const inputClass = "field";
 const labelClass = "field-label";
 const errorClass = "field-error";
 
-type Errors = Partial<
-  Record<"name" | "type" | "loa" | "beam" | "draft" | "flag", string>
->;
+type Errors = Partial<Record<"name" | "type" | "loa" | "beam" | "draft" | "flag", string>>;
 
 type Props = {
   initial?: SavedBoat;
@@ -52,9 +46,7 @@ export default function BoatEditor({ initial, onSave, onCancel }: Props) {
   useEffect(() => {
     if (tick === 0) return;
     const frame = requestAnimationFrame(() => {
-      formRef.current
-        ?.querySelector<HTMLElement>('[aria-invalid="true"]')
-        ?.focus();
+      formRef.current?.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus();
     });
     return () => cancelAnimationFrame(frame);
   }, [tick]);
@@ -98,12 +90,7 @@ export default function BoatEditor({ initial, onSave, onCancel }: Props) {
   });
 
   return (
-    <form
-      ref={formRef}
-      onSubmit={handleSubmit}
-      noValidate
-      className="surface-lift mt-6 p-6 sm:p-8"
-    >
+    <form ref={formRef} onSubmit={handleSubmit} noValidate className="surface-lift mt-6 p-6 sm:p-8">
       <h3 className="type-heading type-h3 text-ink">
         {initial ? `Edit ${initial.name}` : "Add a boat"}
       </h3>
@@ -178,9 +165,7 @@ export default function BoatEditor({ initial, onSave, onCancel }: Props) {
             invalid={!!errors.loa}
             describedBy={errors.loa ? "boat-err-loa" : undefined}
           />
-          <span className="mt-1 block text-xs text-ink/70">
-            Including bowsprit, davits, dinghy
-          </span>
+          <span className="mt-1 block text-xs text-ink/70">Including bowsprit, davits, dinghy</span>
           {fieldError("loa")}
         </label>
 
@@ -226,10 +211,7 @@ export default function BoatEditor({ initial, onSave, onCancel }: Props) {
       </div>
 
       <div className="mt-8 flex flex-wrap items-center gap-4">
-        <button
-          type="submit"
-          className="btn-primary"
-        >
+        <button type="submit" className="btn-primary">
           {initial ? "Save changes" : "Save boat"}
         </button>
         <button

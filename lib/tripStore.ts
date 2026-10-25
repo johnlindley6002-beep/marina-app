@@ -107,9 +107,7 @@ function saveFavourites(favourites: Favourite[]): void {
   notify();
 }
 
-export function toggleFavourite(
-  marina: Omit<Favourite, "savedAt">
-): boolean {
+export function toggleFavourite(marina: Omit<Favourite, "savedAt">): boolean {
   const current = loadFavourites();
   const exists = current.some((f) => f.marinaId === marina.marinaId);
   saveFavourites(

@@ -6,7 +6,16 @@
 import { PDFFont, PDFPage, rgb } from "pdf-lib";
 import type { Marina } from "../../data/marinas";
 import type { PreArrivalCheckIn } from "../mockData";
-import { A4_LANDSCAPE, createFlow, MARGIN, row, rule, signatureLine, space, subheading } from "./pdfLayout";
+import {
+  A4_LANDSCAPE,
+  createFlow,
+  MARGIN,
+  row,
+  rule,
+  signatureLine,
+  space,
+  subheading,
+} from "./pdfLayout";
 
 const INK = rgb(0.039, 0.102, 0.184);
 const MUTED = rgb(0.4, 0.44, 0.49);
@@ -50,7 +59,11 @@ export async function generateCrewListPdf(
   row(flow, "2. Port of arrival", marina.name);
   row(flow, "3. Date of arrival", draft.voyage.arrivalDateTime);
   row(flow, "4. Flag state", draft.boatIdentity.flagCountry);
-  row(flow, "5. Last port of call", `${draft.voyage.lastPortName}, ${draft.voyage.lastPortCountry}`);
+  row(
+    flow,
+    "5. Last port of call",
+    `${draft.voyage.lastPortName}, ${draft.voyage.lastPortCountry}`
+  );
   rule(flow);
 
   const rowHeight = 16;
@@ -98,7 +111,13 @@ export async function generateCrewListPdf(
     let x = tableX;
     for (const col of COLUMNS) {
       const text = (values[col.key] || "-").slice(0, 22);
-      flow.page.drawText(text, { x: x + 2, y: flow.y - 10, size: 7.5, font: flow.font, color: INK });
+      flow.page.drawText(text, {
+        x: x + 2,
+        y: flow.y - 10,
+        size: 7.5,
+        font: flow.font,
+        color: INK,
+      });
       x += col.width;
     }
     flow.page.drawLine({

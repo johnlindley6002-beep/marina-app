@@ -1,9 +1,17 @@
 "use client";
 
 import { COUNTRIES } from "../../../../../lib/countries";
-import { buildPtIdentificationSet, NAVIGATION_ZONES } from "../../../../../lib/prearrival/countries";
+import {
+  buildPtIdentificationSet,
+  NAVIGATION_ZONES,
+} from "../../../../../lib/prearrival/countries";
 import { classifyByLengthAndBeam } from "../../../../../lib/prearrival/pricing";
-import { emptyDocuments, VESSEL_USES, type Propulsion, type VesselUseValue } from "../../../../../lib/prearrival/schema";
+import {
+  emptyDocuments,
+  VESSEL_USES,
+  type Propulsion,
+  type VesselUseValue,
+} from "../../../../../lib/prearrival/schema";
 import { VESSEL_USE_LABELS } from "../VesselUseFields";
 import { useBoats } from "../../../../components/BoatProvider";
 import { useLanguage } from "../../../../components/LanguageProvider";
@@ -28,7 +36,8 @@ export default function StepBoat({ marina, draft, setDraft, errors }: StepProps)
         ...d.boatIdentity,
         name: boat.name,
         flagCountry: boat.flag,
-        registrationNumber: d.documents.registration.number || boat.documents?.registrationNumber || "",
+        registrationNumber:
+          d.documents.registration.number || boat.documents?.registrationNumber || "",
         portOfRegistry: d.boatIdentity.portOfRegistry || boat.homePort,
       },
       boatSpecs: {
@@ -36,21 +45,34 @@ export default function StepBoat({ marina, draft, setDraft, errors }: StepProps)
         lengthOverall: boat.loa,
         beam: boat.beam,
         draught: boat.draft,
-        propulsion: (boat.type === "motor" ? "power" : boat.type === "catamaran" ? "sail_and_power" : "sail") as Propulsion,
+        propulsion: (boat.type === "motor"
+          ? "power"
+          : boat.type === "catamaran"
+            ? "sail_and_power"
+            : "sail") as Propulsion,
         isMultihull: boat.type === "catamaran",
       },
       documents: boat.documents
         ? {
             ...emptyDocuments(),
-            registration: { ...d.documents.registration, number: boat.documents.registrationNumber },
+            registration: {
+              ...d.documents.registration,
+              number: boat.documents.registrationNumber,
+            },
             thirdPartyInsurance: {
               ...d.documents.thirdPartyInsurance,
               number: boat.documents.insurancePolicy,
               insurer: boat.documents.insuranceProvider,
               expiryDate: boat.documents.insuranceExpiry,
             },
-            skipperLicence: { ...d.documents.skipperLicence, number: boat.documents.competenceCertificate },
-            radioStationLicence: { ...d.documents.radioStationLicence, number: boat.documents.vhfLicence },
+            skipperLicence: {
+              ...d.documents.skipperLicence,
+              number: boat.documents.competenceCertificate,
+            },
+            radioStationLicence: {
+              ...d.documents.radioStationLicence,
+              number: boat.documents.vhfLicence,
+            },
           }
         : d.documents,
     }));
@@ -87,31 +109,56 @@ export default function StepBoat({ marina, draft, setDraft, errors }: StepProps)
       <p className="mt-6 text-sm font-medium text-ink/80">{copy.orNewBoat}</p>
 
       <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <Field label={copy.nameLabel} htmlFor="boat-name" required error={errors["boatIdentity.name"]}>
+        <Field
+          label={copy.nameLabel}
+          htmlFor="boat-name"
+          required
+          error={errors["boatIdentity.name"]}
+        >
           <input
             id="boat-name"
             type="text"
             value={draft.boatIdentity.name}
-            onChange={(e) => setDraft((d) => ({ ...d, boatIdentity: { ...d.boatIdentity, name: e.target.value } }))}
+            onChange={(e) =>
+              setDraft((d) => ({ ...d, boatIdentity: { ...d.boatIdentity, name: e.target.value } }))
+            }
             className="field"
           />
         </Field>
-        <Field label={copy.registrationLabel} htmlFor="boat-reg" required error={errors["boatIdentity.registrationNumber"]}>
+        <Field
+          label={copy.registrationLabel}
+          htmlFor="boat-reg"
+          required
+          error={errors["boatIdentity.registrationNumber"]}
+        >
           <input
             id="boat-reg"
             type="text"
             value={draft.boatIdentity.registrationNumber}
             onChange={(e) =>
-              setDraft((d) => ({ ...d, boatIdentity: { ...d.boatIdentity, registrationNumber: e.target.value } }))
+              setDraft((d) => ({
+                ...d,
+                boatIdentity: { ...d.boatIdentity, registrationNumber: e.target.value },
+              }))
             }
             className="field"
           />
         </Field>
-        <Field label={copy.flagLabel} htmlFor="boat-flag" required error={errors["boatIdentity.flagCountry"]}>
+        <Field
+          label={copy.flagLabel}
+          htmlFor="boat-flag"
+          required
+          error={errors["boatIdentity.flagCountry"]}
+        >
           <select
             id="boat-flag"
             value={draft.boatIdentity.flagCountry}
-            onChange={(e) => setDraft((d) => ({ ...d, boatIdentity: { ...d.boatIdentity, flagCountry: e.target.value } }))}
+            onChange={(e) =>
+              setDraft((d) => ({
+                ...d,
+                boatIdentity: { ...d.boatIdentity, flagCountry: e.target.value },
+              }))
+            }
             className="field"
           >
             <option value="">Select…</option>
@@ -127,16 +174,31 @@ export default function StepBoat({ marina, draft, setDraft, errors }: StepProps)
             id="boat-callsign"
             type="text"
             value={draft.boatIdentity.callSign}
-            onChange={(e) => setDraft((d) => ({ ...d, boatIdentity: { ...d.boatIdentity, callSign: e.target.value } }))}
+            onChange={(e) =>
+              setDraft((d) => ({
+                ...d,
+                boatIdentity: { ...d.boatIdentity, callSign: e.target.value },
+              }))
+            }
             className="field"
           />
         </Field>
-        <Field label={copy.portOfRegistryLabel} htmlFor="boat-port" required error={errors["boatIdentity.portOfRegistry"]}>
+        <Field
+          label={copy.portOfRegistryLabel}
+          htmlFor="boat-port"
+          required
+          error={errors["boatIdentity.portOfRegistry"]}
+        >
           <input
             id="boat-port"
             type="text"
             value={draft.boatIdentity.portOfRegistry}
-            onChange={(e) => setDraft((d) => ({ ...d, boatIdentity: { ...d.boatIdentity, portOfRegistry: e.target.value } }))}
+            onChange={(e) =>
+              setDraft((d) => ({
+                ...d,
+                boatIdentity: { ...d.boatIdentity, portOfRegistry: e.target.value },
+              }))
+            }
             className="field"
           />
         </Field>
@@ -150,7 +212,9 @@ export default function StepBoat({ marina, draft, setDraft, errors }: StepProps)
                   ...d,
                   boatIdentity: {
                     ...d.boatIdentity,
-                    navigationZoneType: e.target.value ? (Number(e.target.value) as 1 | 2 | 3 | 4 | 5) : null,
+                    navigationZoneType: e.target.value
+                      ? (Number(e.target.value) as 1 | 2 | 3 | 4 | 5)
+                      : null,
                   },
                 }))
               }
@@ -169,30 +233,52 @@ export default function StepBoat({ marina, draft, setDraft, errors }: StepProps)
 
       {isPt && draft.boatIdentity.name ? (
         <p className="tabular mt-3 text-xs text-ink/70">
-          {buildPtIdentificationSet(draft.boatIdentity.name, draft.boatIdentity.registrationNumber || draft.boatIdentity.name)}
+          {buildPtIdentificationSet(
+            draft.boatIdentity.name,
+            draft.boatIdentity.registrationNumber || draft.boatIdentity.name
+          )}
         </p>
       ) : null}
 
       <p className="mt-8 text-sm font-medium text-ink/80">{copy.specificationsHeading}</p>
       <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <Field label={`${copy.lengthLabel.replace("(m)", `(${unit})`)}`} htmlFor="boat-loa" required error={errors["boatSpecs.lengthOverall"]}>
+        <Field
+          label={`${copy.lengthLabel.replace("(m)", `(${unit})`)}`}
+          htmlFor="boat-loa"
+          required
+          error={errors["boatSpecs.lengthOverall"]}
+        >
           <LengthInput
             valueM={draft.boatSpecs.lengthOverall}
-            onChangeM={(v) => setDraft((d) => ({ ...d, boatSpecs: { ...d.boatSpecs, lengthOverall: v } }))}
+            onChangeM={(v) =>
+              setDraft((d) => ({ ...d, boatSpecs: { ...d.boatSpecs, lengthOverall: v } }))
+            }
             className="field"
           />
         </Field>
-        <Field label={`${copy.beamLabel.replace("(m)", `(${unit})`)}`} htmlFor="boat-beam" required error={errors["boatSpecs.beam"]}>
+        <Field
+          label={`${copy.beamLabel.replace("(m)", `(${unit})`)}`}
+          htmlFor="boat-beam"
+          required
+          error={errors["boatSpecs.beam"]}
+        >
           <LengthInput
             valueM={draft.boatSpecs.beam}
             onChangeM={(v) => setDraft((d) => ({ ...d, boatSpecs: { ...d.boatSpecs, beam: v } }))}
             className="field"
           />
         </Field>
-        <Field label={`${copy.draughtLabel.replace("(m)", `(${unit})`)}`} htmlFor="boat-draught" required error={errors["boatSpecs.draught"]}>
+        <Field
+          label={`${copy.draughtLabel.replace("(m)", `(${unit})`)}`}
+          htmlFor="boat-draught"
+          required
+          error={errors["boatSpecs.draught"]}
+        >
           <LengthInput
             valueM={draft.boatSpecs.draught}
-            onChangeM={(v) => setDraft((d) => ({ ...d, boatSpecs: { ...d.boatSpecs, draught: v } }))}
+            onChangeM={(v) =>
+              setDraft((d) => ({ ...d, boatSpecs: { ...d.boatSpecs, draught: v } }))
+            }
             className="field"
           />
         </Field>
@@ -201,7 +287,10 @@ export default function StepBoat({ marina, draft, setDraft, errors }: StepProps)
             id="boat-propulsion"
             value={draft.boatSpecs.propulsion}
             onChange={(e) =>
-              setDraft((d) => ({ ...d, boatSpecs: { ...d.boatSpecs, propulsion: e.target.value as Propulsion } }))
+              setDraft((d) => ({
+                ...d,
+                boatSpecs: { ...d.boatSpecs, propulsion: e.target.value as Propulsion },
+              }))
             }
             className="field"
           >
@@ -214,7 +303,12 @@ export default function StepBoat({ marina, draft, setDraft, errors }: StepProps)
           <input
             type="checkbox"
             checked={draft.boatSpecs.isMultihull}
-            onChange={(e) => setDraft((d) => ({ ...d, boatSpecs: { ...d.boatSpecs, isMultihull: e.target.checked } }))}
+            onChange={(e) =>
+              setDraft((d) => ({
+                ...d,
+                boatSpecs: { ...d.boatSpecs, isMultihull: e.target.checked },
+              }))
+            }
           />
           {copy.multihullLabel}
         </label>
@@ -223,7 +317,9 @@ export default function StepBoat({ marina, draft, setDraft, errors }: StepProps)
       {marinaClass && rate ? (
         <p className="tabular mt-4 text-ink">
           <span className="chip mr-2">{copy.classLabel(marinaClass)}</span>
-          {copy.indicativeNightly(`€${(rate.low * (draft.boatSpecs.isMultihull ? 2 : 1)).toFixed(2)}`)}
+          {copy.indicativeNightly(
+            `€${(rate.low * (draft.boatSpecs.isMultihull ? 2 : 1)).toFixed(2)}`
+          )}
         </p>
       ) : null}
 
@@ -232,7 +328,9 @@ export default function StepBoat({ marina, draft, setDraft, errors }: StepProps)
           <select
             id="boat-vesseluse"
             value={draft.vesselUse}
-            onChange={(e) => setDraft((d) => ({ ...d, vesselUse: e.target.value as VesselUseValue }))}
+            onChange={(e) =>
+              setDraft((d) => ({ ...d, vesselUse: e.target.value as VesselUseValue }))
+            }
             className="field"
           >
             {VESSEL_USES.map((use) => (
@@ -246,29 +344,50 @@ export default function StepBoat({ marina, draft, setDraft, errors }: StepProps)
 
       <p className="mt-8 text-sm font-medium text-ink/80">{copy.ownerHeading}</p>
       <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <Field label={copy.ownerNameLabel} htmlFor="owner-name" required error={errors["owner.fullName"]}>
+        <Field
+          label={copy.ownerNameLabel}
+          htmlFor="owner-name"
+          required
+          error={errors["owner.fullName"]}
+        >
           <input
             id="owner-name"
             type="text"
             value={draft.owner.fullName}
-            onChange={(e) => setDraft((d) => ({ ...d, owner: { ...d.owner, fullName: e.target.value } }))}
+            onChange={(e) =>
+              setDraft((d) => ({ ...d, owner: { ...d.owner, fullName: e.target.value } }))
+            }
             className="field"
           />
         </Field>
-        <Field label={copy.ownerIdLabel} htmlFor="owner-id" required error={errors["owner.idDocumentNumber"]}>
+        <Field
+          label={copy.ownerIdLabel}
+          htmlFor="owner-id"
+          required
+          error={errors["owner.idDocumentNumber"]}
+        >
           <input
             id="owner-id"
             type="text"
             value={draft.owner.idDocumentNumber}
-            onChange={(e) => setDraft((d) => ({ ...d, owner: { ...d.owner, idDocumentNumber: e.target.value } }))}
+            onChange={(e) =>
+              setDraft((d) => ({ ...d, owner: { ...d.owner, idDocumentNumber: e.target.value } }))
+            }
             className="field"
           />
         </Field>
-        <Field label={copy.ownerResidenceLabel} htmlFor="owner-residence" required error={errors["owner.countryOfResidence"]}>
+        <Field
+          label={copy.ownerResidenceLabel}
+          htmlFor="owner-residence"
+          required
+          error={errors["owner.countryOfResidence"]}
+        >
           <select
             id="owner-residence"
             value={draft.owner.countryOfResidence}
-            onChange={(e) => setDraft((d) => ({ ...d, owner: { ...d.owner, countryOfResidence: e.target.value } }))}
+            onChange={(e) =>
+              setDraft((d) => ({ ...d, owner: { ...d.owner, countryOfResidence: e.target.value } }))
+            }
             className="field"
           >
             <option value="">Select…</option>
@@ -284,36 +403,59 @@ export default function StepBoat({ marina, draft, setDraft, errors }: StepProps)
             id="owner-nif"
             type="text"
             value={draft.owner.taxNumber}
-            onChange={(e) => setDraft((d) => ({ ...d, owner: { ...d.owner, taxNumber: e.target.value } }))}
+            onChange={(e) =>
+              setDraft((d) => ({ ...d, owner: { ...d.owner, taxNumber: e.target.value } }))
+            }
             className="field"
           />
         </Field>
         {draft.owner.countryOfResidence && draft.owner.countryOfResidence !== "Portugal" ? (
-          <Field label={copy.ownerAddressLabel} htmlFor="owner-address" required error={errors["owner.address"]}>
+          <Field
+            label={copy.ownerAddressLabel}
+            htmlFor="owner-address"
+            required
+            error={errors["owner.address"]}
+          >
             <input
               id="owner-address"
               type="text"
               value={draft.owner.address}
-              onChange={(e) => setDraft((d) => ({ ...d, owner: { ...d.owner, address: e.target.value } }))}
+              onChange={(e) =>
+                setDraft((d) => ({ ...d, owner: { ...d.owner, address: e.target.value } }))
+              }
               className="field"
             />
           </Field>
         ) : null}
-        <Field label={copy.ownerEmailLabel} htmlFor="owner-email" required error={errors["owner.email"]}>
+        <Field
+          label={copy.ownerEmailLabel}
+          htmlFor="owner-email"
+          required
+          error={errors["owner.email"]}
+        >
           <input
             id="owner-email"
             type="email"
             value={draft.owner.email}
-            onChange={(e) => setDraft((d) => ({ ...d, owner: { ...d.owner, email: e.target.value } }))}
+            onChange={(e) =>
+              setDraft((d) => ({ ...d, owner: { ...d.owner, email: e.target.value } }))
+            }
             className="field"
           />
         </Field>
-        <Field label={copy.ownerPhoneLabel} htmlFor="owner-phone" required error={errors["owner.phone"]}>
+        <Field
+          label={copy.ownerPhoneLabel}
+          htmlFor="owner-phone"
+          required
+          error={errors["owner.phone"]}
+        >
           <input
             id="owner-phone"
             type="tel"
             value={draft.owner.phone}
-            onChange={(e) => setDraft((d) => ({ ...d, owner: { ...d.owner, phone: e.target.value } }))}
+            onChange={(e) =>
+              setDraft((d) => ({ ...d, owner: { ...d.owner, phone: e.target.value } }))
+            }
             className="field"
           />
         </Field>
@@ -323,18 +465,27 @@ export default function StepBoat({ marina, draft, setDraft, errors }: StepProps)
         <input
           type="checkbox"
           checked={draft.owner.isCompany}
-          onChange={(e) => setDraft((d) => ({ ...d, owner: { ...d.owner, isCompany: e.target.checked } }))}
+          onChange={(e) =>
+            setDraft((d) => ({ ...d, owner: { ...d.owner, isCompany: e.target.checked } }))
+          }
         />
         {copy.ownerIsCompanyLabel}
       </label>
       {draft.owner.isCompany ? (
         <div className="mt-3 max-w-xs">
-          <Field label={copy.ownerCompanyTaxIdLabel} htmlFor="owner-nipc" required error={errors["owner.companyTaxId"]}>
+          <Field
+            label={copy.ownerCompanyTaxIdLabel}
+            htmlFor="owner-nipc"
+            required
+            error={errors["owner.companyTaxId"]}
+          >
             <input
               id="owner-nipc"
               type="text"
               value={draft.owner.companyTaxId}
-              onChange={(e) => setDraft((d) => ({ ...d, owner: { ...d.owner, companyTaxId: e.target.value } }))}
+              onChange={(e) =>
+                setDraft((d) => ({ ...d, owner: { ...d.owner, companyTaxId: e.target.value } }))
+              }
               className="field"
             />
           </Field>

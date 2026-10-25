@@ -33,13 +33,7 @@ export function useGallery() {
 
 // Owns the one lightbox on the page, so the hero and the gallery below open
 // the same viewer.
-export function GalleryProvider({
-  photos,
-  children,
-}: {
-  photos: Photo[];
-  children: ReactNode;
-}) {
+export function GalleryProvider({ photos, children }: { photos: Photo[]; children: ReactNode }) {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const opener = useRef<HTMLElement | null>(null);
 
@@ -58,21 +52,13 @@ export function GalleryProvider({
     setTimeout(() => target?.focus(), 0);
   }
 
-  const value = useMemo(
-    () => ({ count: photos.length, open }),
-    [photos.length, open]
-  );
+  const value = useMemo(() => ({ count: photos.length, open }), [photos.length, open]);
 
   return (
     <GalleryContext.Provider value={value}>
       {children}
       {openIndex !== null ? (
-        <Lightbox
-          photos={photos}
-          index={openIndex}
-          onIndexChange={setOpenIndex}
-          onClose={close}
-        />
+        <Lightbox photos={photos} index={openIndex} onIndexChange={setOpenIndex} onClose={close} />
       ) : null}
     </GalleryContext.Provider>
   );
@@ -145,11 +131,7 @@ export default function PhotoGallery({ photos }: { photos: Photo[] }) {
         ))}
       </div>
 
-      <button
-        type="button"
-        onClick={() => open(0)}
-        className="mt-3 btn-quiet"
-      >
+      <button type="button" onClick={() => open(0)} className="btn-quiet mt-3">
         {photos.length === 1 ? "View photo" : `View all ${photos.length} photos`}
       </button>
     </div>

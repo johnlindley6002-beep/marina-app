@@ -42,21 +42,9 @@ export default function BerthOperations() {
   const [error, setError] = useState<string | null>(null);
   const [reassignTo, setReassignTo] = useState("");
 
-  const { value: statuses } = useMock(
-    () => getBerthStatuses(MARINA.id, dateIso),
-    {},
-    dateIso
-  );
-  const { value: enquiries } = useMock(
-    () => getEnquiries(staffId),
-    NONE,
-    staffId ?? ""
-  );
-  const { value: oosMarks } = useMock(
-    () => getOutOfServiceBerths(MARINA.id),
-    [],
-    ""
-  );
+  const { value: statuses } = useMock(() => getBerthStatuses(MARINA.id, dateIso), {}, dateIso);
+  const { value: enquiries } = useMock(() => getEnquiries(staffId), NONE, staffId ?? "");
+  const { value: oosMarks } = useMock(() => getOutOfServiceBerths(MARINA.id), [], "");
 
   const allBerths = useMemo(() => getAllBerths(), []);
   const berthLinks = useMemo(() => getMarinaBerthLinks(MARINA.id), []);
@@ -67,7 +55,7 @@ export default function BerthOperations() {
     if (!berth) return null;
     const info: BerthOperationalInfo = statuses[selectedBerthId] ?? { status: "free", detail: "" };
     const enquiry =
-      info.enquiryId != null ? enquiries.find((e) => e.id === info.enquiryId) ?? null : null;
+      info.enquiryId != null ? (enquiries.find((e) => e.id === info.enquiryId) ?? null) : null;
     return { berthId: berth.id, sizeClass: berth.sizeClass, info, enquiry };
   }, [selectedBerthId, allBerths, statuses, enquiries]);
 
@@ -147,7 +135,12 @@ export default function BerthOperations() {
                     const suggestions = suggestReleasedBerths(
                       MARINA.id,
                       { loa: Number(panel.enquiry.loa) || 0, beam: 0 },
-                      { arrival: panel.enquiry.arrival, departure: panel.enquiry.openEnded ? panel.enquiry.arrival : panel.enquiry.departure }
+                      {
+                        arrival: panel.enquiry.arrival,
+                        departure: panel.enquiry.openEnded
+                          ? panel.enquiry.arrival
+                          : panel.enquiry.departure,
+                      }
                     );
                     return suggestions.length > 0 ? (
                       <div className="mt-2">
@@ -159,7 +152,11 @@ export default function BerthOperations() {
                                 type="button"
                                 onClick={() => {
                                   setReassignTo(s.berthId);
-                                  const result = reassignEnquiryBerth(staffId, panel.enquiry!.id, s.berthId);
+                                  const result = reassignEnquiryBerth(
+                                    staffId,
+                                    panel.enquiry!.id,
+                                    s.berthId
+                                  );
                                   if (result.ok) selectBerth(s.berthId);
                                   setError(result.ok ? null : result.error);
                                 }}

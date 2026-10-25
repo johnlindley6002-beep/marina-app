@@ -1,25 +1,11 @@
-import {
-  classifyBoatLength,
-  marinas,
-  type Marina,
-} from "../data/marinas";
+import { classifyBoatLength, marinas, type Marina } from "../data/marinas";
 
 const normalise = (value: string) =>
-  value
-    .normalize("NFD")
-    .replace(/[̀-ͯ]/g, "")
-    .toLowerCase()
-    .trim();
+  value.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim();
 
 function haystack(marina: Marina): string {
   return normalise(
-    [
-      marina.name,
-      marina.location,
-      marina.region,
-      marina.country,
-      marina.countrySlug,
-    ].join(" ")
+    [marina.name, marina.location, marina.region, marina.country, marina.countrySlug].join(" ")
   );
 }
 
@@ -88,8 +74,6 @@ export function getSuggestions(query: string, limit = 6): Suggestion[] {
     });
   });
 
-  const matches = q
-    ? all.filter((s) => normalise(`${s.label} ${s.detail}`).includes(q))
-    : all;
+  const matches = q ? all.filter((s) => normalise(`${s.label} ${s.detail}`).includes(q)) : all;
   return matches.slice(0, limit);
 }

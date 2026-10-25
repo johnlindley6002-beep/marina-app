@@ -50,9 +50,11 @@ function Row({ checkIn }: { checkIn: PreArrivalCheckIn }) {
   const warnings = [...getExtraErrors(draft), ...getWarnings(draft)];
   const arrivalDate = draft.voyage.arrivalDateTime.slice(0, 10) || draft.stay.requestedArrival;
   const minorOnBoard = draft.people.some((p) => isMinor(p, arrivalDate));
-  const nonEUFlagged = !!draft.boatIdentity.flagCountry && marina && draft.boatIdentity.flagCountry !== "Portugal";
+  const nonEUFlagged =
+    !!draft.boatIdentity.flagCountry && marina && draft.boatIdentity.flagCountry !== "Portugal";
   const insurance = draft.documents.thirdPartyInsurance;
-  const insuranceExpired = !!insurance.expiryDate && insurance.expiryDate < draft.stay.requestedDeparture;
+  const insuranceExpired =
+    !!insurance.expiryDate && insurance.expiryDate < draft.stay.requestedDeparture;
   const rowId = `prearrival-${checkIn.id}`;
 
   if (!marina) return null;
@@ -73,13 +75,19 @@ function Row({ checkIn }: { checkIn: PreArrivalCheckIn }) {
             <span className="staff-badge staff-badge-outline">
               {flags.fromOrToNonEU ? "Non-EU route" : "EU route"}
             </span>
-            {nonEUFlagged ? <span className="staff-badge staff-badge-warn">Non-EU flag</span> : null}
-            {minorOnBoard ? <span className="staff-badge staff-badge-warn">Minor on board</span> : null}
-            {insuranceExpired ? <span className="staff-badge staff-badge-warn">Insurance expired</span> : null}
+            {nonEUFlagged ? (
+              <span className="staff-badge staff-badge-warn">Non-EU flag</span>
+            ) : null}
+            {minorOnBoard ? (
+              <span className="staff-badge staff-badge-warn">Minor on board</span>
+            ) : null}
+            {insuranceExpired ? (
+              <span className="staff-badge staff-badge-warn">Insurance expired</span>
+            ) : null}
           </p>
           <p className="tabular mt-1 text-xs text-ink/70">
-            {draft.stay.requestedArrival || draft.voyage.arrivalDateTime} · {draft.people.length} on board ·
-            ref. {checkIn.referenceCode}
+            {draft.stay.requestedArrival || draft.voyage.arrivalDateTime} · {draft.people.length} on
+            board · ref. {checkIn.referenceCode}
           </p>
         </div>
       </button>

@@ -80,22 +80,13 @@ export default function ArrivalActions({ marina, plan, selectedBerthId }: Props)
     <div className="mt-10 border-t border-hairline pt-8">
       <h3 className="type-heading type-h3 text-ink">Arriving today?</h3>
       <p className="mt-2 text-sm text-ink/75">
-        Each opens a pre-filled email to {marina.name}. Nothing is sent until
-        you press send.
+        Each opens a pre-filled email to {marina.name}. Nothing is sent until you press send.
       </p>
       <div className="mt-4 flex flex-wrap items-center gap-4">
-        <button
-          type="button"
-          onClick={arrivingNow}
-          className="btn-secondary"
-        >
+        <button type="button" onClick={arrivingNow} className="btn-secondary">
           I&apos;m arriving now
         </button>
-        <button
-          type="button"
-          onClick={digitalCheckIn}
-          className="btn-secondary"
-        >
+        <button type="button" onClick={digitalCheckIn} className="btn-secondary">
           Digital check-in
         </button>
         <Link

@@ -2,7 +2,10 @@
 
 import { useState } from "react";
 import type { Marina } from "../../data/marinas";
-import { buildAuthorityReportCsv, buildAuthorityReportJson } from "../../lib/documents/authorityReport";
+import {
+  buildAuthorityReportCsv,
+  buildAuthorityReportJson,
+} from "../../lib/documents/authorityReport";
 import { generateArrivalDeclarationPdf } from "../../lib/documents/arrivalDeclaration";
 import { generateCrewListPdf } from "../../lib/documents/crewList";
 import { downloadBytes, downloadText } from "../../lib/documents/download";
@@ -66,10 +69,20 @@ export default function DocumentButtons({ checkIn, marina, className }: Props) {
   return (
     <div className={className}>
       <div className="flex flex-wrap gap-3">
-        <button type="button" onClick={downloadDeclaration} disabled={busy === "declaration"} className="btn-secondary">
+        <button
+          type="button"
+          onClick={downloadDeclaration}
+          disabled={busy === "declaration"}
+          className="btn-secondary"
+        >
           {busy === "declaration" ? copy.preparing : copy.declarationBtn}
         </button>
-        <button type="button" onClick={downloadCrewList} disabled={busy === "crew"} className="btn-secondary">
+        <button
+          type="button"
+          onClick={downloadCrewList}
+          disabled={busy === "crew"}
+          className="btn-secondary"
+        >
           {busy === "crew" ? copy.preparing : copy.crewListBtn}
         </button>
       </div>

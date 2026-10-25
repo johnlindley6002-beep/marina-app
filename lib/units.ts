@@ -12,11 +12,7 @@ function trim(value: number, digits: number): string {
 
 // Formats a length held in metres for display. `fixed` forces decimals
 // (e.g. "6.0 m").
-export function formatLength(
-  metres: number,
-  units: UnitSystem,
-  fixed?: number
-): string {
+export function formatLength(metres: number, units: UnitSystem, fixed?: number): string {
   if (units === "imperial") {
     const feet = metres * FEET_PER_METRE;
     return `${fixed !== undefined ? feet.toFixed(fixed) : trim(feet, 1)} ft`;
@@ -47,9 +43,7 @@ export function withUnit(label: string, units: UnitSystem): string {
 
 // Renders {{m:25}} tokens in data text as a length in the active unit.
 export function renderLengthTokens(text: string, units: UnitSystem): string {
-  return text.replace(/\{\{m:(\d+(?:\.\d+)?)\}\}/g, (_, m) =>
-    formatLength(Number(m), units)
-  );
+  return text.replace(/\{\{m:(\d+(?:\.\d+)?)\}\}/g, (_, m) => formatLength(Number(m), units));
 }
 
 // A length in metres as a bare number in the active unit (for ranges).

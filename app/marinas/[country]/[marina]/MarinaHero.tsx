@@ -36,10 +36,7 @@ export default function MarinaHero({ marina }: { marina: Marina }) {
     >
       {photo ? (
         <>
-          <div
-            ref={layerRef}
-            className="absolute inset-0 -z-20 will-change-transform"
-          >
+          <div ref={layerRef} className="absolute inset-0 -z-20 will-change-transform">
             <Image
               src={photo.src}
               alt={photo.alt}
@@ -87,10 +84,7 @@ export default function MarinaHero({ marina }: { marina: Marina }) {
         </div>
 
         <div className="pb-2 md:pb-6">
-          <span
-            className="hero-rise mb-6 block h-px w-16 bg-brass"
-            style={rise(0)}
-          />
+          <span className="hero-rise mb-6 block h-px w-16 bg-brass" style={rise(0)} />
           <Image
             src={marina.wordmark}
             alt=""
@@ -106,21 +100,12 @@ export default function MarinaHero({ marina }: { marina: Marina }) {
           >
             {marina.name}
           </h1>
-          <p
-            className="hero-rise mt-4 max-w-md text-stone"
-            style={rise(260)}
-          >
+          <p className="hero-rise mt-4 max-w-md text-stone" style={rise(260)}>
             {marina.location}
           </p>
 
-          <div
-            className="hero-rise mt-8 flex flex-wrap items-center gap-3"
-            style={rise(340)}
-          >
-            <a
-              href="#plan-your-stay"
-              className="btn-primary"
-            >
+          <div className="hero-rise mt-8 flex flex-wrap items-center gap-3" style={rise(340)}>
+            <a href="#plan-your-stay" className="btn-primary">
               Request a berth
             </a>
             <ShareButton title={marina.name} className={chipClass} />
@@ -159,9 +144,7 @@ export default function MarinaHero({ marina }: { marina: Marina }) {
             ) : null}
           </div>
 
-          {!photo ? (
-            <p className="mt-6 text-xs text-white/70">Marina photo coming soon</p>
-          ) : null}
+          {!photo ? <p className="mt-6 text-xs text-white/70">Marina photo coming soon</p> : null}
         </div>
       </div>
     </section>

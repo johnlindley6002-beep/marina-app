@@ -107,7 +107,7 @@ export default function PersonCard({
                   <button
                     type="button"
                     onClick={() => update({ familyName: draft.people[0]?.familyName ?? "" })}
-                    className="shrink-0 whitespace-nowrap text-xs text-ink/65 underline underline-offset-4"
+                    className="shrink-0 text-xs whitespace-nowrap text-ink/65 underline underline-offset-4"
                   >
                     {copy.sameSurnameToggle}
                   </button>
@@ -142,7 +142,7 @@ export default function PersonCard({
                   <button
                     type="button"
                     onClick={() => update({ nationality: draft.people[0]?.nationality ?? "" })}
-                    className="shrink-0 whitespace-nowrap text-xs text-ink/65 underline underline-offset-4"
+                    className="shrink-0 text-xs whitespace-nowrap text-ink/65 underline underline-offset-4"
                   >
                     {copy.sameNationalityToggle}
                   </button>
@@ -252,7 +252,9 @@ export default function PersonCard({
                   id={`p${index}-guardian`}
                   value={person.guardianPersonIndex ?? ""}
                   onChange={(e) =>
-                    update({ guardianPersonIndex: e.target.value === "" ? null : Number(e.target.value) })
+                    update({
+                      guardianPersonIndex: e.target.value === "" ? null : Number(e.target.value),
+                    })
                   }
                   className="field"
                 >

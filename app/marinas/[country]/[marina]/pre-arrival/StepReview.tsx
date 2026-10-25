@@ -26,14 +26,26 @@ function SectionHeading({
   return (
     <div className="flex items-center justify-between gap-3">
       <p className="type-heading type-h3 text-ink">{title}</p>
-      <button type="button" onClick={onEdit} className="text-sm text-ink/70 underline underline-offset-4">
+      <button
+        type="button"
+        onClick={onEdit}
+        className="text-sm text-ink/70 underline underline-offset-4"
+      >
         {editLabel}
       </button>
     </div>
   );
 }
 
-export default function StepReview({ draft, setDraft, errors, quote, warnings, onEdit, onSubmit }: Props) {
+export default function StepReview({
+  draft,
+  setDraft,
+  errors,
+  quote,
+  warnings,
+  onEdit,
+  onSubmit,
+}: Props) {
   const { t } = useLanguage();
   const copy = t.preArrival.review;
   const steps = t.preArrival.steps;
@@ -70,7 +82,9 @@ export default function StepReview({ draft, setDraft, errors, quote, warnings, o
         <SectionHeading title={steps.crew} editLabel={copy.edit} onEdit={() => onEdit(3)} />
         <p className="mt-2 text-sm text-ink/75">
           {copy.peopleCount(draft.people.length)}:{" "}
-          {draft.people.map((p) => [p.givenNames, p.familyName].filter(Boolean).join(" ") || "-").join(", ")}
+          {draft.people
+            .map((p) => [p.givenNames, p.familyName].filter(Boolean).join(" ") || "-")
+            .join(", ")}
         </p>
       </div>
 
@@ -83,7 +97,11 @@ export default function StepReview({ draft, setDraft, errors, quote, warnings, o
             return (
               <li key={req.key}>
                 {documentItems[req.key]}:{" "}
-                {has ? entry.number || entry.fileName : req.required ? copy.documentMissing : copy.documentNotProvided}
+                {has
+                  ? entry.number || entry.fileName
+                  : req.required
+                    ? copy.documentMissing
+                    : copy.documentNotProvided}
               </li>
             );
           })}
@@ -121,7 +139,9 @@ export default function StepReview({ draft, setDraft, errors, quote, warnings, o
             />
             {copy.gdprLabel}
           </label>
-          {errors["consents.gdprConsent"] ? <p className="field-error">{errors["consents.gdprConsent"]}</p> : null}
+          {errors["consents.gdprConsent"] ? (
+            <p className="field-error">{errors["consents.gdprConsent"]}</p>
+          ) : null}
 
           <label className="flex items-start gap-3 text-sm text-ink/80">
             <input
@@ -132,7 +152,9 @@ export default function StepReview({ draft, setDraft, errors, quote, warnings, o
             />
             {copy.termsLabel}
           </label>
-          {errors["consents.termsAccepted"] ? <p className="field-error">{errors["consents.termsAccepted"]}</p> : null}
+          {errors["consents.termsAccepted"] ? (
+            <p className="field-error">{errors["consents.termsAccepted"]}</p>
+          ) : null}
 
           <label className="flex items-start gap-3 text-sm text-ink/80">
             <input

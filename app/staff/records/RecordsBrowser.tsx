@@ -30,17 +30,12 @@ export default function RecordsBrowser() {
 
   const { value: enquiries } = useMock(() => getEnquiries(staffId), NONE, staffId ?? "");
   const links = useMemo(() => getMarinaBerthLinks(MARINA.id), []);
-  const { value: statuses } = useMock(
-    () => getBerthStatuses(MARINA.id, todayIso()),
-    {},
-    ""
-  );
+  const { value: statuses } = useMock(() => getBerthStatuses(MARINA.id, todayIso()), {}, "");
   const berths = useMemo(() => getAllBerths(), []);
 
   const query = q.trim().toLowerCase();
   const matches = useCallback(
-    (...values: string[]) =>
-      query === "" || values.some((v) => v.toLowerCase().includes(query)),
+    (...values: string[]) => query === "" || values.some((v) => v.toLowerCase().includes(query)),
     [query]
   );
 
@@ -67,9 +62,7 @@ export default function RecordsBrowser() {
         berthId: e.assignedBerthId ?? "unassigned",
         kind: "Visiting",
       }));
-    return [...owned, ...transient].filter((r) =>
-      matches(r.name, r.person, r.berthId)
-    );
+    return [...owned, ...transient].filter((r) => matches(r.name, r.person, r.berthId));
   }, [links, enquiries, matches]);
 
   const berthRows = useMemo(
@@ -109,7 +102,11 @@ export default function RecordsBrowser() {
     <div>
       <h1 className="type-heading type-h2 text-ink">Records</h1>
       <div className="mt-3 flex flex-wrap items-center gap-3">
-        <div role="group" aria-label="Records type" className="inline-flex rounded-[3px] border border-ink/25 p-0.5 text-xs">
+        <div
+          role="group"
+          aria-label="Records type"
+          className="inline-flex rounded-[3px] border border-ink/25 p-0.5 text-xs"
+        >
           {TABS.map((t) => (
             <button
               key={t}

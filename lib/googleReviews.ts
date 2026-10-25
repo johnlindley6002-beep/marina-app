@@ -10,9 +10,7 @@ export type GoogleReviewsSummary = {
 // Returns the summary only when every value is real and the review count
 // meets the configured minimum. Anything less returns null, so no partial
 // or padded rating is ever shown.
-export function getGoogleReviewsSummary(
-  marina: Marina
-): GoogleReviewsSummary | null {
+export function getGoogleReviewsSummary(marina: Marina): GoogleReviewsSummary | null {
   const { rating, reviewCount, googleUrl } = marina.googleReviews;
   if (rating === null || reviewCount === null || !googleUrl) return null;
   if (!(rating > 0 && rating <= 5)) return null;

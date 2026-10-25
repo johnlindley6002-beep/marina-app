@@ -176,10 +176,7 @@ function ExtrasIcon({ className }: IconProps) {
   );
 }
 
-const FACILITY_ICONS: Record<
-  FacilityIconKey,
-  (props: IconProps) => ReactElement
-> = {
+const FACILITY_ICONS: Record<FacilityIconKey, (props: IconProps) => ReactElement> = {
   fuel: FuelIcon,
   water: WaterIcon,
   power: PowerIcon,

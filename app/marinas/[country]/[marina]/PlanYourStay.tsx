@@ -1,11 +1,6 @@
 "use client";
 
-import {
-  getSeason,
-  SEASON_LABELS,
-  type Marina,
-  type Season,
-} from "../../../../data/marinas";
+import { getSeason, SEASON_LABELS, type Marina, type Season } from "../../../../data/marinas";
 import { effectiveDeparture, type StayPlan } from "../../../../lib/stayPlan";
 import Link from "next/link";
 import BoatSwitcher from "../../../components/BoatSwitcher";
@@ -14,8 +9,7 @@ import LengthInput from "../../../components/LengthInput";
 import { useUnits } from "../../../components/UnitsProvider";
 import StayDecisionSummary from "./StayDecisionSummary";
 
-const inputClass =
-  "field";
+const inputClass = "field";
 const labelClass = "field-label";
 const errorClass = "field-error";
 
@@ -41,10 +35,7 @@ export default function PlanYourStay({ marina, plan, onPlanChange }: Props) {
   const arrivalDate = parseIso(plan.arrival);
   const departureDate = parseIso(effectiveDeparture(plan));
   const datesInvalid =
-    !plan.openEnded &&
-    !!arrivalDate &&
-    !!departureDate &&
-    departureDate <= arrivalDate;
+    !plan.openEnded && !!arrivalDate && !!departureDate && departureDate <= arrivalDate;
   const datesValid = !!arrivalDate && !!departureDate && !datesInvalid;
 
   const nightsBySeason: Record<Season, number> = { low: 0, high: 0 };
@@ -60,8 +51,7 @@ export default function PlanYourStay({ marina, plan, onPlanChange }: Props) {
   const dim = (v: string) => Number(v);
   const dimError = (v: string) =>
     v !== "" && !(dim(v) > 0) ? "Enter a number greater than 0, for example 12.5." : null;
-  const dimsComplete =
-    dim(plan.loa) > 0 && dim(plan.beam) > 0 && dim(plan.draft) > 0;
+  const dimsComplete = dim(plan.loa) > 0 && dim(plan.beam) > 0 && dim(plan.draft) > 0;
   const boatSizesDiffer =
     !!activeBoat &&
     (plan.loa !== "" || plan.beam !== "" || plan.draft !== "") &&
@@ -80,17 +70,13 @@ export default function PlanYourStay({ marina, plan, onPlanChange }: Props) {
 
   return (
     <div className="surface-lift p-6 sm:p-8 md:p-10">
-      <h2 className="type-heading type-h3 text-ink">
-        Plan your stay
-      </h2>
+      <h2 className="type-heading type-h3 text-ink">Plan your stay</h2>
       <p className="mt-2 text-sm text-ink/75">
         Dates and boat size drive the map, estimate and enquiry below.
       </p>
 
       <BoatSwitcher
-        onSelect={(boat) =>
-          onPlanChange({ loa: boat.loa, beam: boat.beam, draft: boat.draft })
-        }
+        onSelect={(boat) => onPlanChange({ loa: boat.loa, beam: boat.beam, draft: boat.draft })}
       />
 
       {activeBoat ? (
@@ -179,9 +165,7 @@ export default function PlanYourStay({ marina, plan, onPlanChange }: Props) {
             describedBy={dimError(plan.loa) ? "err-plan-loa" : undefined}
             className={inputClass}
           />
-          <p className="mt-1 text-xs text-ink/70">
-            Including bowsprit, davits, dinghy
-          </p>
+          <p className="mt-1 text-xs text-ink/70">Including bowsprit, davits, dinghy</p>
           {dimError(plan.loa) ? (
             <p id="err-plan-loa" role="alert" className={errorClass}>
               {dimError(plan.loa)}

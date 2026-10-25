@@ -6,13 +6,7 @@ import type { ReactNode } from "react";
 // describes actually applies (an outside-Schengen leg, a non-EU flag, and so
 // on). Never an error: it always uses the same quiet ink treatment, whatever
 // it says, so the wizard never looks alarming.
-export function InfoPanel({
-  title,
-  children,
-}: {
-  title: string;
-  children: ReactNode;
-}) {
+export function InfoPanel({ title, children }: { title: string; children: ReactNode }) {
   return (
     <div className="mt-4 max-w-xl border-l-2 border-ink/30 py-1 pl-4">
       <p className="font-medium text-ink">{title}</p>
@@ -47,9 +41,7 @@ export function StatusPill({
       : status === "missing"
         ? "border-error/50 text-error"
         : "border-ink/40 text-ink/75";
-  return (
-    <span className={`chip ${cls}`}>{labels[status]}</span>
-  );
+  return <span className={`chip ${cls}`}>{labels[status]}</span>;
 }
 
 // A field with a label and an error line, matching every other form in the

@@ -8,11 +8,7 @@ import { useLanguage } from "../../../components/LanguageProvider";
 import { useUnits } from "../../../components/UnitsProvider";
 import FacilityIcon from "./facility-icons";
 
-export default function FacilitiesGrid({
-  facilities,
-}: {
-  facilities: FacilityDetail[];
-}) {
+export default function FacilitiesGrid({ facilities }: { facilities: FacilityDetail[] }) {
   const { locale } = useLanguage();
   const cl = contentLocale(locale);
   const { units } = useUnits();
@@ -71,9 +67,7 @@ export default function FacilitiesGrid({
             className="hairline-top flex items-center gap-4 py-4 text-left transition-colors hover:bg-paper-deep/60"
           >
             <FacilityIcon facility={facility.icon} className="h-6 w-6 text-ink" />
-            <span className="text-sm text-ink/75">
-              {facility.name[cl]}
-            </span>
+            <span className="text-sm text-ink/75">{facility.name[cl]}</span>
           </button>
         ))}
       </div>
@@ -94,10 +88,7 @@ export default function FacilitiesGrid({
             <div className="flex items-start justify-between gap-4">
               <div className="flex items-center gap-3">
                 <FacilityIcon facility={open.icon} className="h-6 w-6 shrink-0 text-ink" />
-                <h3
-                  id="facility-dialog-title"
-                  className="type-heading type-h3 text-ink"
-                >
+                <h3 id="facility-dialog-title" className="type-heading type-h3 text-ink">
                   {open.name[cl]}
                 </h3>
               </div>
@@ -111,9 +102,7 @@ export default function FacilitiesGrid({
                 ×
               </button>
             </div>
-            <p className="mt-4 text-sm leading-relaxed text-ink/75">
-              {open.description[cl]}
-            </p>
+            <p className="mt-4 text-sm leading-relaxed text-ink/75">{open.description[cl]}</p>
             <ul className="mt-4 space-y-2 border-t border-hairline pt-4">
               {open.details.map((detail, i) => (
                 <li key={i} className="text-sm text-ink/75">

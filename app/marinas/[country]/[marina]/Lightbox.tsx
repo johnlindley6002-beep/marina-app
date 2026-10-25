@@ -77,9 +77,7 @@ export default function Lightbox({ photos, index, onIndexChange, onClose }: Prop
 
   // The neighbours load quietly so a swipe shows the next photo straight away.
   const neighbours =
-    count > 1
-      ? [...new Set([(index + 1) % count, (index - 1 + count) % count])]
-      : [];
+    count > 1 ? [...new Set([(index + 1) % count, (index - 1 + count) % count])] : [];
   const neighbourPhotos = neighbours.flatMap((n) => {
     const neighbour = photos[n];
     return neighbour ? [neighbour] : [];
@@ -99,12 +97,15 @@ export default function Lightbox({ photos, index, onIndexChange, onClose }: Prop
           <p className="tabular text-sm text-white/80" aria-live="polite">
             Photo {index + 1} of {count}
           </p>
-          <button
-            type="button"
-            onClick={onClose}
-            className={controlClass}
-          >
-            <svg viewBox="0 0 20 20" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={1.75} aria-hidden="true">
+          <button type="button" onClick={onClose} className={controlClass}>
+            <svg
+              viewBox="0 0 20 20"
+              className="h-5 w-5"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={1.75}
+              aria-hidden="true"
+            >
               <path d="M4 4l12 12M16 4L4 16" strokeLinecap="round" />
             </svg>
             <span className="sr-only">Close photo gallery</span>
@@ -135,7 +136,14 @@ export default function Lightbox({ photos, index, onIndexChange, onClose }: Prop
                 onClick={() => go(-1)}
                 className={`${controlClass} absolute top-1/2 left-3 -translate-y-1/2 sm:left-6`}
               >
-                <svg viewBox="0 0 20 20" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={1.75} aria-hidden="true">
+                <svg
+                  viewBox="0 0 20 20"
+                  className="h-5 w-5"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={1.75}
+                  aria-hidden="true"
+                >
                   <path d="M12.5 4l-6 6 6 6" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
                 <span className="sr-only">Previous photo</span>
@@ -145,7 +153,14 @@ export default function Lightbox({ photos, index, onIndexChange, onClose }: Prop
                 onClick={() => go(1)}
                 className={`${controlClass} absolute top-1/2 right-3 -translate-y-1/2 sm:right-6`}
               >
-                <svg viewBox="0 0 20 20" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={1.75} aria-hidden="true">
+                <svg
+                  viewBox="0 0 20 20"
+                  className="h-5 w-5"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={1.75}
+                  aria-hidden="true"
+                >
                   <path d="M7.5 4l6 6-6 6" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
                 <span className="sr-only">Next photo</span>
@@ -157,9 +172,7 @@ export default function Lightbox({ photos, index, onIndexChange, onClose }: Prop
         <div className="min-h-16 px-4 py-4 text-center sm:px-6" aria-live="polite">
           <p className="mx-auto max-w-2xl text-white">{photo.caption}</p>
           {photo.credit ? (
-            <p className="mx-auto mt-1 max-w-2xl text-sm text-white/70">
-              {photo.credit}
-            </p>
+            <p className="mx-auto mt-1 max-w-2xl text-sm text-white/70">{photo.credit}</p>
           ) : null}
         </div>
       </div>

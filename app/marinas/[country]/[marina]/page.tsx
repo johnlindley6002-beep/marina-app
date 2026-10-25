@@ -12,9 +12,7 @@ type Props = {
   }>;
 };
 
-export async function generateMetadata({
-  params,
-}: Props): Promise<Metadata> {
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { country, marina: marinaId } = await params;
   const marina = getMarina(country, marinaId);
   if (!marina) return {};

@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  useEffect,
-  useId,
-  useState,
-  type FormEvent,
-  type KeyboardEvent,
-} from "react";
+import { useEffect, useId, useState, type FormEvent, type KeyboardEvent } from "react";
 import { useRouter } from "next/navigation";
 import { getSuggestions, type Suggestion } from "../../lib/marinaSearch";
 import { loadBoatProfile } from "../../lib/boatProfile";
@@ -100,9 +94,7 @@ export default function DestinationSearch({
             aria-expanded={open && suggestions.length > 0}
             aria-controls={listId}
             aria-autocomplete="list"
-            aria-activedescendant={
-              active >= 0 ? `${uid}-opt-${active}` : undefined
-            }
+            aria-activedescendant={active >= 0 ? `${uid}-opt-${active}` : undefined}
             autoComplete="off"
             value={q}
             placeholder={t.home.destinationPlaceholder}
@@ -133,26 +125,17 @@ export default function DestinationSearch({
                     choose(suggestion);
                   }}
                   onMouseEnter={() => setActive(index)}
-                  className={`cursor-pointer px-4 py-2.5 ${
-                    index === active ? "bg-paper" : ""
-                  }`}
+                  className={`cursor-pointer px-4 py-2.5 ${index === active ? "bg-paper" : ""}`}
                 >
-                  <span className="block text-base font-medium text-ink">
-                    {suggestion.label}
-                  </span>
-                  <span className="block text-sm text-ink/70">
-                    {suggestion.detail}
-                  </span>
+                  <span className="block text-base font-medium text-ink">{suggestion.label}</span>
+                  <span className="block text-sm text-ink/70">{suggestion.detail}</span>
                 </li>
               ))}
             </ul>
           ) : null}
         </div>
 
-        <button
-          type="submit"
-          className="btn-primary"
-        >
+        <button type="submit" className="btn-primary">
           {t.home.findMarinas}
         </button>
       </div>
@@ -193,11 +176,7 @@ export default function DestinationSearch({
           </label>
           <label className="block text-sm font-medium text-ink">
             {withUnit(t.homeSearch.boatLength, units)}
-            <LengthInput
-              valueM={length}
-              onChangeM={setLength}
-              className={fieldClass}
-            />
+            <LengthInput valueM={length} onChangeM={setLength} className={fieldClass} />
           </label>
         </div>
       ) : null}

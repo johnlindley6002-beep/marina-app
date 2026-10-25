@@ -33,7 +33,7 @@ export default function KeyFactsStrip({ marina }: { marina: Marina }) {
   ];
 
   return (
-    <section className="bg-paper-deep section-tight">
+    <section className="section-tight bg-paper-deep">
       <div className="page-column">
         <h2 className="sr-only">{t.keyFacts.heading}</h2>
         <dl className="grid grid-cols-2 gap-x-6 gap-y-5 sm:grid-cols-3 lg:grid-cols-[repeat(5,auto)_minmax(0,1.6fr)]">

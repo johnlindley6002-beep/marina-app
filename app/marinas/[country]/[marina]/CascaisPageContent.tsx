@@ -32,10 +32,7 @@ import { useLanguage } from "../../../components/LanguageProvider";
 const BerthAvailabilityMap = dynamic(() => import("./BerthAvailabilityMap"), {
   ssr: false,
   loading: () => (
-    <div
-      className="surface-lift min-h-[27rem] md:min-h-[48.5rem]"
-      aria-hidden="true"
-    />
+    <div className="surface-lift min-h-[27rem] md:min-h-[48.5rem]" aria-hidden="true" />
   ),
 });
 // The enquiry form is the heaviest client piece. It loads after first paint,
@@ -45,7 +42,7 @@ const RequestBerthForm = dynamic(() => import("./RequestBerthForm"), {
   loading: () => (
     <div
       id="request-berth"
-      className="surface-lift scroll-mt-24 min-h-[226rem] md:min-h-[133rem]"
+      className="surface-lift min-h-[226rem] scroll-mt-24 md:min-h-[133rem]"
       aria-hidden="true"
     />
   ),
@@ -145,8 +142,7 @@ export default function CascaisPageContent({
   }, [readyNow, formOpen]);
 
   const description = content?.description[cl] ?? marina.description;
-  const arrivalInstructions =
-    content?.arrivalInstructions[cl] ?? marina.arrivalInstructions;
+  const arrivalInstructions = content?.arrivalInstructions[cl] ?? marina.arrivalInstructions;
   const gettingThere = {
     byCar: content?.gettingThere.byCar[cl] ?? marina.gettingThere.byCar,
     byTrain: content?.gettingThere.byTrain[cl] ?? marina.gettingThere.byTrain,
@@ -171,16 +167,9 @@ export default function CascaisPageContent({
 
       <KeyFactsStrip marina={marina} />
 
-      <section
-        id="plan-your-stay"
-        className="section-tight scroll-mt-24"
-      >
+      <section id="plan-your-stay" className="section-tight scroll-mt-24">
         <div className="page-column">
-          <PlanYourStay
-            marina={marina}
-            plan={plan}
-            onPlanChange={onPlanChange}
-          />
+          <PlanYourStay marina={marina} plan={plan} onPlanChange={onPlanChange} />
         </div>
       </section>
 
@@ -235,16 +224,8 @@ export default function CascaisPageContent({
           )}
 
           <div>
-            <ArrivalActions
-              marina={marina}
-              plan={plan}
-              selectedBerthId={selectedBerthId}
-            />
-            <StayRecap
-              embedded
-              marina={marina}
-              onRebook={() => setRebookToken((n) => n + 1)}
-            />
+            <ArrivalActions marina={marina} plan={plan} selectedBerthId={selectedBerthId} />
+            <StayRecap embedded marina={marina} onRebook={() => setRebookToken((n) => n + 1)} />
             <div className="hairline-top mt-10 pt-6">
               <a
                 href="#contact-details"
@@ -283,17 +264,12 @@ export default function CascaisPageContent({
 
       <section className="pb-10 md:pb-14">
         <div className="page-column">
-        <div className="hairline-top flex flex-col gap-4 pt-8 sm:flex-row sm:items-center sm:justify-between">
-          <p className="type-heading type-h3 text-ink">
-            Ready to plan your visit?
-          </p>
-          <a
-            href="#plan-your-stay"
-            className="btn-quiet"
-          >
-            Request a berth
-          </a>
-        </div>
+          <div className="hairline-top flex flex-col gap-4 pt-8 sm:flex-row sm:items-center sm:justify-between">
+            <p className="type-heading type-h3 text-ink">Ready to plan your visit?</p>
+            <a href="#plan-your-stay" className="btn-quiet">
+              Request a berth
+            </a>
+          </div>
         </div>
       </section>
 

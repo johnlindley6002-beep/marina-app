@@ -39,11 +39,7 @@ export const PLAN_KEYS = new Set<string>(Object.keys(EMPTY_PLAN));
 export function nextDayIso(iso: string): string {
   const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso);
   if (!match) return "";
-  const next = new Date(
-    Number(match[1]),
-    Number(match[2]) - 1,
-    Number(match[3]) + 1
-  );
+  const next = new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]) + 1);
   const pad = (n: number) => String(n).padStart(2, "0");
   return `${next.getFullYear()}-${pad(next.getMonth() + 1)}-${pad(next.getDate())}`;
 }

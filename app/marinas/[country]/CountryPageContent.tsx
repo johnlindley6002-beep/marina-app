@@ -17,8 +17,7 @@ import { useUnits } from "../../components/UnitsProvider";
 import { withUnit } from "../../../lib/units";
 import { useLanguage } from "../../components/LanguageProvider";
 
-const inputClass =
-  "field";
+const inputClass = "field";
 const labelClass = "field-label";
 
 export default function CountryPageContent({
@@ -55,32 +54,24 @@ export default function CountryPageContent({
   );
   const priceBands = useMemo(
     () =>
-      Array.from(new Set(marinas.map((m) => getPriceBand(m)))).sort(
-        (a, b) => a.length - b.length
-      ),
+      Array.from(new Set(marinas.map((m) => getPriceBand(m)))).sort((a, b) => a.length - b.length),
     [marinas]
   );
   const availableFacilities = useMemo(
-    () =>
-      Array.from(new Set(marinas.flatMap((m) => m.facilities))) as FacilityKey[],
+    () => Array.from(new Set(marinas.flatMap((m) => m.facilities))) as FacilityKey[],
     [marinas]
   );
 
   function toggleFacility(key: FacilityKey) {
     setFacilities((current) =>
-      current.includes(key)
-        ? current.filter((f) => f !== key)
-        : [...current, key]
+      current.includes(key) ? current.filter((f) => f !== key) : [...current, key]
     );
   }
 
   const filtered = marinas.filter((marina) => {
     if (region && marina.region !== region) return false;
     if (priceBand && getPriceBand(marina) !== priceBand) return false;
-    if (
-      facilities.length > 0 &&
-      !facilities.every((f) => marina.facilities.includes(f))
-    ) {
+    if (facilities.length > 0 && !facilities.every((f) => marina.facilities.includes(f))) {
       return false;
     }
     const loaNum = Number(loa);
@@ -98,9 +89,7 @@ export default function CountryPageContent({
     <section className="section">
       <div className="page-column">
         <p className="text-ink/70">{countryName}</p>
-        <h1 className="type-title mt-2 text-ink">
-          {t.countryPage.heading(countryName)}
-        </h1>
+        <h1 className="type-title mt-2 text-ink">{t.countryPage.heading(countryName)}</h1>
 
         <div className="surface-lift mt-10 p-6 md:p-8">
           <BoatSwitcher
@@ -145,29 +134,17 @@ export default function CountryPageContent({
 
             <label className="block text-sm">
               <span className={labelClass}>{withUnit("Boat length (m)", units)}</span>
-              <LengthInput
-                valueM={loa}
-                onChangeM={setLoa}
-                className={inputClass}
-              />
+              <LengthInput valueM={loa} onChangeM={setLoa} className={inputClass} />
             </label>
 
             <div className="grid grid-cols-2 gap-2">
               <label className="block text-sm">
                 <span className={labelClass}>{withUnit("Beam (m)", units)}</span>
-                <LengthInput
-                valueM={beam}
-                onChangeM={setBeam}
-                className={inputClass}
-              />
+                <LengthInput valueM={beam} onChangeM={setBeam} className={inputClass} />
               </label>
               <label className="block text-sm">
                 <span className={labelClass}>{withUnit("Draft (m)", units)}</span>
-                <LengthInput
-                valueM={draft}
-                onChangeM={setDraft}
-                className={inputClass}
-              />
+                <LengthInput valueM={draft} onChangeM={setDraft} className={inputClass} />
               </label>
             </div>
           </div>
@@ -177,10 +154,7 @@ export default function CountryPageContent({
               <span className={labelClass}>Facilities</span>
               <div className="mt-2 flex flex-wrap gap-3">
                 {availableFacilities.map((key) => (
-                  <label
-                    key={key}
-                    className="flex items-center gap-2 text-sm text-ink/75"
-                  >
+                  <label key={key} className="flex items-center gap-2 text-sm text-ink/75">
                     <input
                       type="checkbox"
                       checked={facilities.includes(key)}

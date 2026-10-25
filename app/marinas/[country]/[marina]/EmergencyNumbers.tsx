@@ -13,9 +13,7 @@ export default function EmergencyNumbers({
   const { phones, vhf } = marina.emergency;
   const body = (
     <>
-      <h3 className="type-heading type-h3 text-ink">
-        Emergency &amp; key numbers
-      </h3>
+      <h3 className="type-heading type-h3 text-ink">Emergency &amp; key numbers</h3>
       <div className="mt-6 grid gap-8 sm:grid-cols-2">
         <ul className="space-y-3">
           {phones.map((phone) => (
@@ -39,12 +37,8 @@ export default function EmergencyNumbers({
               key={channel.channel}
               className="flex items-baseline justify-between gap-4 border-b border-hairline pb-3 text-sm"
             >
-              <span className="text-ink/75">
-                {channel.label}
-              </span>
-              <span className="font-medium text-ink">
-                VHF channel {channel.channel}
-              </span>
+              <span className="text-ink/75">{channel.label}</span>
+              <span className="font-medium text-ink">VHF channel {channel.channel}</span>
             </li>
           ))}
         </ul>

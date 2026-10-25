@@ -14,7 +14,10 @@ export default defineConfig({
   reporter: [["list"]],
   use: { baseURL: `http://localhost:${PORT}`, channel, trace: "retain-on-failure" },
   projects: [
-    { name: "mobile", use: { viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true } },
+    {
+      name: "mobile",
+      use: { viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true },
+    },
     { name: "desktop", use: { viewport: { width: 1280, height: 800 } } },
   ],
   webServer: {

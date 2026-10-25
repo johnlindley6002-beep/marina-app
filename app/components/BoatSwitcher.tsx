@@ -14,8 +14,7 @@ type Props = {
   onSelect: (boat: SavedBoat) => void;
 };
 
-const inputClass =
-  "field";
+const inputClass = "field";
 const labelClass = "field-label";
 
 // Pick the active boat, and optionally save what is in the form as a boat.
@@ -47,26 +46,16 @@ export default function BoatSwitcher({ current, heading, onSelect }: Props) {
       setError("Give the boat a name to save it.");
       return;
     }
-    if (
-      !(
-        Number(current.loa) > 0 &&
-        Number(current.beam) > 0 &&
-        Number(current.draft) > 0
-      )
-    ) {
+    if (!(Number(current.loa) > 0 && Number(current.beam) > 0 && Number(current.draft) > 0)) {
       setMessage(null);
       setError("Enter the boat's length, beam and draft above, then save.");
       return;
     }
-    const existing = boats.find(
-      (b) => b.name.trim().toLowerCase() === name.toLowerCase()
-    );
+    const existing = boats.find((b) => b.name.trim().toLowerCase() === name.toLowerCase());
     saveBoat({ ...current, name, id: existing?.id });
     setError(null);
     setMessage(
-      existing
-        ? "Boat and documents updated."
-        : "Boat and documents saved on this device."
+      existing ? "Boat and documents updated." : "Boat and documents saved on this device."
     );
   }
 
@@ -74,15 +63,11 @@ export default function BoatSwitcher({ current, heading, onSelect }: Props) {
 
   const matchesSaved =
     !!current &&
-    boats.some(
-      (b) => b.name.trim().toLowerCase() === current.name.trim().toLowerCase()
-    );
+    boats.some((b) => b.name.trim().toLowerCase() === current.name.trim().toLowerCase());
 
   return (
     <div className="mt-4 rounded-[3px] bg-paper-deep p-4">
-      {heading ? (
-        <p className="mb-3 text-sm font-medium text-ink">{heading}</p>
-      ) : null}
+      {heading ? <p className="mb-3 text-sm font-medium text-ink">{heading}</p> : null}
       <div className="flex flex-wrap items-end gap-3">
         {boats.length > 0 ? (
           <label className="block min-w-[200px] flex-1 text-sm">
@@ -96,9 +81,7 @@ export default function BoatSwitcher({ current, heading, onSelect }: Props) {
               {boats.map((boat) => (
                 <option key={boat.id} value={boat.id}>
                   {boat.name}
-                  {Number(boat.loa) > 0
-                    ? ` - ${formatLength(Number(boat.loa), units)}`
-                    : ""}
+                  {Number(boat.loa) > 0 ? ` - ${formatLength(Number(boat.loa), units)}` : ""}
                 </option>
               ))}
             </select>
@@ -106,11 +89,7 @@ export default function BoatSwitcher({ current, heading, onSelect }: Props) {
         ) : null}
 
         {current ? (
-          <button
-            type="button"
-            onClick={handleSave}
-            className="btn-secondary"
-          >
+          <button type="button" onClick={handleSave} className="btn-secondary">
             {matchesSaved
               ? "Update saved boat"
               : boats.length > 0

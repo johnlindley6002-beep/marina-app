@@ -11,9 +11,7 @@ function Scale({ filled }: { filled: number }) {
       {Array.from({ length: PROTECTION_SEGMENTS }, (_, i) => (
         <span
           key={i}
-          className={`h-2 w-5 rounded-[1px] ${
-            i < filled ? "bg-ink" : "border border-ink/40"
-          }`}
+          className={`h-2 w-5 rounded-[1px] ${i < filled ? "bg-ink" : "border border-ink/40"}`}
         />
       ))}
     </span>

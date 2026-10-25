@@ -16,10 +16,7 @@ type Props = {
   headingLevel?: "h2" | "h3";
 };
 
-export default function SavedMarinas({
-  showEmpty = false,
-  headingLevel = "h2",
-}: Props) {
+export default function SavedMarinas({ showEmpty = false, headingLevel = "h2" }: Props) {
   const { t } = useLanguage();
   const [favourites, setFavourites] = useState<Favourite[]>([]);
 
@@ -42,14 +39,12 @@ export default function SavedMarinas({
 
   return (
     <div className="chapter">
-      <Heading className="type-heading type-h3 text-ink">
-        {t.favourites.savedHeading}
-      </Heading>
+      <Heading className="type-heading type-h3 text-ink">{t.favourites.savedHeading}</Heading>
 
       {favourites.length === 0 ? (
         <p className="measure mt-3 text-ink/75">
-          No saved marinas yet. Use &quot;Save marina&quot; on a marina page and
-          it will appear here.
+          No saved marinas yet. Use &quot;Save marina&quot; on a marina page and it will appear
+          here.
         </p>
       ) : (
         <ul className="mt-4">

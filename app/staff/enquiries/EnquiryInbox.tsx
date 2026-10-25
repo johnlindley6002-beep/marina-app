@@ -191,11 +191,7 @@ function Row({ enquiry, staffId }: { enquiry: Enquiry; staffId: string | null })
 export default function EnquiryInbox() {
   const { user } = useAuth();
   const staffId = user?.id ?? null;
-  const { value: enquiries, ready } = useMock(
-    () => getEnquiries(staffId),
-    NONE,
-    staffId ?? ""
-  );
+  const { value: enquiries, ready } = useMock(() => getEnquiries(staffId), NONE, staffId ?? "");
   const [tab, setTab] = useState<EnquiryStatus | "all">("new");
 
   const filtered = tab === "all" ? enquiries : enquiries.filter((e) => e.status === tab);
@@ -209,7 +205,11 @@ export default function EnquiryInbox() {
     <div>
       <h1 className="type-heading type-h2 text-ink">Enquiries</h1>
 
-      <div role="group" aria-label="Status" className="mt-3 inline-flex rounded-[3px] border border-ink/25 p-0.5 text-xs">
+      <div
+        role="group"
+        aria-label="Status"
+        className="mt-3 inline-flex rounded-[3px] border border-ink/25 p-0.5 text-xs"
+      >
         {STATUS_TABS.map((t) => (
           <button
             key={t.value}

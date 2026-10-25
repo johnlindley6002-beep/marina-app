@@ -62,7 +62,13 @@ export function line(flow: Flow, text: string, size = 10, muted = false): void {
 export function row(flow: Flow, label: string, value: string, size = 10): void {
   ensureRoom(flow, size + 6);
   flow.page.drawText(label, { x: MARGIN, y: flow.y, size, font: flow.bold, color: INK });
-  flow.page.drawText(value || "-", { x: MARGIN + 160, y: flow.y, size, font: flow.font, color: INK });
+  flow.page.drawText(value || "-", {
+    x: MARGIN + 160,
+    y: flow.y,
+    size,
+    font: flow.font,
+    color: INK,
+  });
   flow.y -= size + 6;
 }
 

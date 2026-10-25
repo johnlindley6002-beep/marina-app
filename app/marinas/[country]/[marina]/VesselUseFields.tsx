@@ -22,11 +22,9 @@ export type VesselUseValues = {
 
 export type VesselUseErrors = Partial<Record<keyof VesselUseValues, string>>;
 
-export const isCommercialUse = (use: VesselUse) =>
-  use !== "" && use !== "private";
+export const isCommercialUse = (use: VesselUse) => use !== "" && use !== "private";
 
-const inputClass =
-  "field";
+const inputClass = "field";
 const labelClass = "field-label";
 const errorClass = "field-error";
 
@@ -40,10 +38,7 @@ type Props = {
   skipperName: string;
   notes: string[];
   disclaimer: string;
-  onChange: <K extends keyof VesselUseValues>(
-    key: K,
-    value: VesselUseValues[K]
-  ) => void;
+  onChange: <K extends keyof VesselUseValues>(key: K, value: VesselUseValues[K]) => void;
 };
 
 function FieldError({ id, message }: { id: string; message?: string }) {
@@ -83,26 +78,21 @@ export default function VesselUseFields({
           className={`${inputClass} max-w-md`}
         >
           {use === "" ? <option value="">Select…</option> : null}
-          {(Object.keys(VESSEL_USE_LABELS) as Exclude<VesselUse, "">[]).map(
-            (key) => (
-              <option key={key} value={key}>
-                {VESSEL_USE_LABELS[key]}
-              </option>
-            )
-          )}
+          {(Object.keys(VESSEL_USE_LABELS) as Exclude<VesselUse, "">[]).map((key) => (
+            <option key={key} value={key}>
+              {VESSEL_USE_LABELS[key]}
+            </option>
+          ))}
         </select>
         <FieldError id="err-vesselUse" message={errors.vesselUse} />
       </label>
       <p id="vessel-use-help" className="mt-2 text-xs text-ink/70">
-        Most visiting boats are private pleasure craft. Other choices ask for a
-        few company details.
+        Most visiting boats are private pleasure craft. Other choices ask for a few company details.
       </p>
 
       {commercial ? (
         <div className="hairline-top mt-6 pt-6">
-          <h3 className="type-heading type-h3 text-ink">
-            Commercial / charter details
-          </h3>
+          <h3 className="type-heading type-h3 text-ink">Commercial / charter details</h3>
 
           <div className="mt-4 grid gap-4 sm:grid-cols-2">
             <label className="block text-sm">
@@ -133,7 +123,9 @@ export default function VesselUseFields({
                 type="text"
                 value={values.companyRegistration}
                 aria-invalid={!!errors.companyRegistration}
-                aria-describedby={errors.companyRegistration ? "err-companyRegistration" : undefined}
+                aria-describedby={
+                  errors.companyRegistration ? "err-companyRegistration" : undefined
+                }
                 onChange={(e) => onChange("companyRegistration", e.target.value)}
                 className={inputClass}
               />
@@ -145,8 +137,7 @@ export default function VesselUseFields({
             <p className="mt-4 text-sm text-ink/75">
               <span className={labelClass}>Responsible contracting party: </span>
               the bareboat charterer, who is the skipper
-              {skipperName.trim() ? ` (${skipperName.trim()})` : " named in Skipper & contact"}
-              .
+              {skipperName.trim() ? ` (${skipperName.trim()})` : " named in Skipper & contact"}.
             </p>
           ) : (
             <div className="mt-4 grid gap-4 sm:grid-cols-2">
@@ -197,7 +188,9 @@ export default function VesselUseFields({
                   step="1"
                   value={values.professionalCrewCount}
                   aria-invalid={!!errors.professionalCrewCount}
-                  aria-describedby={errors.professionalCrewCount ? "err-professionalCrewCount" : undefined}
+                  aria-describedby={
+                    errors.professionalCrewCount ? "err-professionalCrewCount" : undefined
+                  }
                   onChange={(e) => onChange("professionalCrewCount", e.target.value)}
                   className={inputClass}
                 />

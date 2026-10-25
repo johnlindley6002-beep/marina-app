@@ -90,15 +90,13 @@ export const siteConfig: {
     contractNote:
       "Your berth is a right of use under the marina's concession. Letting it through the marina keeps you compliant. Check your own contract, which may contain extra clauses. This is not legal advice.",
     primaryAction: "Make my berth available while I am away",
-    placeholderNote:
-      "Placeholder terms for the mockup. The marina sets the final amounts.",
+    placeholderNote: "Placeholder terms for the mockup. The marina sets the final amounts.",
     steps: ["Absence", "Authorize", "Terms", "Readiness", "Send"],
     absenceTitle: "When will you be away?",
     absenceBody: "Choose the day you leave and the day you return.",
     absenceConfirm: "My boat will be removed from the berth for these dates.",
     authorizeTitle: "Let the marina relet your berth",
-    authorizeToggle:
-      "Allow Marina de Cascais to relet my berth during my absence",
+    authorizeToggle: "Allow Marina de Cascais to relet my berth during my absence",
     authorizeLine:
       "Your berth is a right of use, so it can be relet only with the marina's consent. The marina manages and approves every stay.",
     authorizeWhyLabel: "Why this",
@@ -167,10 +165,8 @@ export const siteConfig: {
       "The staff tools are built in the next step. This page is the shell they will live in.",
   },
   decision: {
-    availabilityNote:
-      "Illustrative, not live. The marina confirms availability by email.",
-    requestNote:
-      "This sends an enquiry; the marina confirms availability by email.",
+    availabilityNote: "Illustrative, not live. The marina confirms availability by email.",
+    requestNote: "This sends an enquiry; the marina confirms availability by email.",
   },
   hub: {
     intro:

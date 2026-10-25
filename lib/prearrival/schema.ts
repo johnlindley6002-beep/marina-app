@@ -26,12 +26,8 @@ export type PersonRole = (typeof PERSON_ROLES)[number];
 export const ID_TYPES = ["passport", "national_id"] as const;
 export type IdType = (typeof ID_TYPES)[number];
 
-const isoDate = z
-  .string()
-  .regex(/^\d{4}-\d{2}-\d{2}$/, "Use the date picker, or type YYYY-MM-DD.");
-const isoDateTime = z
-  .string()
-  .min(1, "Choose a date and time.");
+const isoDate = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Use the date picker, or type YYYY-MM-DD.");
+const isoDateTime = z.string().min(1, "Choose a date and time.");
 const optionalIsoDate = z.union([isoDate, z.literal("")]);
 
 // ---------------------------------------------------------------------------
@@ -90,9 +86,9 @@ export const boatIdentitySchema = z.object({
   registrationNumber: z.string().min(1, "Enter the registration number."),
   flagCountry: z.string().min(1, "Choose the flag country."),
   portOfRegistry: z.string().min(1, "Enter the port of registry."),
-  navigationZoneType: z.union([
-    z.literal(1), z.literal(2), z.literal(3), z.literal(4), z.literal(5),
-  ]).nullable(),
+  navigationZoneType: z
+    .union([z.literal(1), z.literal(2), z.literal(3), z.literal(4), z.literal(5)])
+    .nullable(),
   // Auto-built for a Portuguese boat; see buildPtIdentificationSet.
   ptIdentificationSet: z.string(),
   // Optional: used as IMO FAL Form 5's call sign field (1.3) when the boat
@@ -208,10 +204,7 @@ export const voyageSchema = z
     departureDateTime: z.string(),
   })
   .refine(
-    (v) =>
-      !v.departureDateTime ||
-      !v.arrivalDateTime ||
-      v.departureDateTime > v.arrivalDateTime,
+    (v) => !v.departureDateTime || !v.arrivalDateTime || v.departureDateTime > v.arrivalDateTime,
     { message: "Departure must be after arrival.", path: ["departureDateTime"] }
   );
 export type Voyage = z.infer<typeof voyageSchema>;
@@ -233,10 +226,8 @@ export type VoyageFlags = {
 };
 
 export function getVoyageFlags(voyage: Voyage): VoyageFlags {
-  const fromOutsideSchengen =
-    !!voyage.lastPortCountry && !isSchengen(voyage.lastPortCountry);
-  const toOutsideSchengen =
-    !!voyage.nextPortCountry && !isSchengen(voyage.nextPortCountry);
+  const fromOutsideSchengen = !!voyage.lastPortCountry && !isSchengen(voyage.lastPortCountry);
+  const toOutsideSchengen = !!voyage.nextPortCountry && !isSchengen(voyage.nextPortCountry);
   return {
     arrivingFromOutsideSchengen: fromOutsideSchengen,
     leavingToOutsideSchengen: toOutsideSchengen,
@@ -303,10 +294,9 @@ export const peopleSchema = z
   .array(personSchema)
   .min(1, "Add at least one person on board.")
   .max(12, "This form covers up to 12 people; contact the marina for a larger group.")
-  .refine(
-    (people) => people.filter((p) => p.role === "skipper").length === 1,
-    { message: "Exactly one person must be the skipper." }
-  );
+  .refine((people) => people.filter((p) => p.role === "skipper").length === 1, {
+    message: "Exactly one person must be the skipper.",
+  });
 
 // ---------------------------------------------------------------------------
 // Stay
@@ -351,15 +341,9 @@ export const EMPTY_STAY: Stay = {
 // ---------------------------------------------------------------------------
 
 export const consentsSchema = z.object({
-  gdprConsent: z
-    .boolean()
-    .refine((v) => v, "Confirm you understand how your data is used."),
-  termsAccepted: z
-    .boolean()
-    .refine((v) => v, "Accept the marina regulation to continue."),
-  declarationTrue: z
-    .boolean()
-    .refine((v) => v, "Confirm the declaration is true."),
+  gdprConsent: z.boolean().refine((v) => v, "Confirm you understand how your data is used."),
+  termsAccepted: z.boolean().refine((v) => v, "Accept the marina regulation to continue."),
+  declarationTrue: z.boolean().refine((v) => v, "Confirm the declaration is true."),
 });
 export type Consents = z.infer<typeof consentsSchema>;
 

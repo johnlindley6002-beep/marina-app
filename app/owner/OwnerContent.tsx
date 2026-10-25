@@ -42,11 +42,7 @@ function OwnerBody() {
     NO_REQUESTS,
     userId ?? ""
   );
-  const { value: notes } = useMock(
-    () => getNotifications(userId),
-    NO_NOTES,
-    userId ?? ""
-  );
+  const { value: notes } = useMock(() => getNotifications(userId), NO_NOTES, userId ?? "");
   const { value: draft } = useMock<RelettingDraft | null>(
     () => getRelettingDraft(userId),
     null,
@@ -71,14 +67,8 @@ function OwnerBody() {
         {berths.map((berth) => {
           const boat = berth.boatOnFile;
           return (
-            <section
-              key={berth.linkId}
-              className="stack-md"
-              aria-label={`Berth ${berth.berthId}`}
-            >
-              <h2 className="type-heading type-h2 text-ink">
-                Berth {berth.berthId}
-              </h2>
+            <section key={berth.linkId} className="stack-md" aria-label={`Berth ${berth.berthId}`}>
+              <h2 className="type-heading type-h2 text-ink">Berth {berth.berthId}</h2>
               <p className="mt-1 flex flex-wrap items-center text-ink/75">
                 <Link
                   href={`/marinas/${berth.countrySlug}/${berth.marinaId}`}
@@ -105,9 +95,7 @@ function OwnerBody() {
 
               {firstTime ? (
                 <div className="stack-sm">
-                  <h3 className="type-heading type-h3 text-ink">
-                    {copy.firstTimeTitle}
-                  </h3>
+                  <h3 className="type-heading type-h3 text-ink">{copy.firstTimeTitle}</h3>
                   <p className="measure mt-2 text-ink/75">{copy.firstTimeBody}</p>
                 </div>
               ) : null}

@@ -25,8 +25,7 @@ function daysBetween(a: string, b: string): number {
 
 export function getExtraErrors(draft: PreArrivalDraft): Flag[] {
   const errors: Flag[] = [];
-  const departure =
-    draft.voyage.departureDateTime.slice(0, 10) || draft.stay.requestedDeparture;
+  const departure = draft.voyage.departureDateTime.slice(0, 10) || draft.stay.requestedDeparture;
 
   for (const [index, person] of draft.people.entries()) {
     if (person.idExpiryDate && departure && person.idExpiryDate < departure) {
@@ -61,8 +60,7 @@ export function getExtraErrors(draft: PreArrivalDraft): Flag[] {
 
 export function getWarnings(draft: PreArrivalDraft): Flag[] {
   const warnings: Flag[] = [];
-  const departure =
-    draft.voyage.departureDateTime.slice(0, 10) || draft.stay.requestedDeparture;
+  const departure = draft.voyage.departureDateTime.slice(0, 10) || draft.stay.requestedDeparture;
 
   for (const [index, person] of draft.people.entries()) {
     const label = person.givenNames || `Person ${index + 1}`;

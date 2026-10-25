@@ -24,14 +24,11 @@ import RoleGate from "../../components/RoleGate";
 const copy = siteConfig.relet;
 const TOTAL = copy.steps.length;
 
-const inputClass =
-  "field";
+const inputClass = "field";
 const labelClass = "field-label";
 const errorClass = "field-error";
-const primaryClass =
-  "btn-primary";
-const quietClass =
-  "btn-quiet";
+const primaryClass = "btn-primary";
+const quietClass = "btn-quiet";
 
 function todayIso(): string {
   const d = new Date();
@@ -172,19 +169,15 @@ function Wizard() {
   ]);
 
   if (!berth || !marina || !terms || terms.reletAllowed === "none") {
-    return (
-      <p className="measure text-ink/75">
-        Reletting is not available for this berth.
-      </p>
-    );
+    return <p className="measure text-ink/75">Reletting is not available for this berth.</p>;
   }
 
   if (!mediated) {
     return (
       <div>
         <p className="measure text-ink/75">
-          This marina does not mediate a paid relet of your berth. You may lend
-          it for free with written notice to the marina.
+          This marina does not mediate a paid relet of your berth. You may lend it for free with
+          written notice to the marina.
         </p>
       </div>
     );
@@ -281,11 +274,7 @@ function Wizard() {
   if (submitted) {
     return (
       <div className="step-forward">
-        <h2
-          ref={headingRef}
-          tabIndex={-1}
-          className="type-heading type-h2 text-ink outline-none"
-        >
+        <h2 ref={headingRef} tabIndex={-1} className="type-heading type-h2 text-ink outline-none">
           {copy.pendingTitle}
         </h2>
         <p role="status" className="measure mt-4 text-lg text-ink/75">
@@ -307,9 +296,7 @@ function Wizard() {
       {mode !== "new" ? (
         <p className="measure mb-6 text-ink/75">
           {mode === "edit" ? copy.editTitle : copy.resubmitTitle}. The marina
-          {mode === "edit"
-            ? " will need to consent to the new dates."
-            : " will look at it again."}
+          {mode === "edit" ? " will need to consent to the new dates." : " will look at it again."}
         </p>
       ) : null}
       {resumed ? (
@@ -323,10 +310,7 @@ function Wizard() {
       {/* Progress: one idea per step */}
       <div className="flex items-center gap-2" aria-hidden="true">
         {copy.steps.map((_, i) => (
-          <span
-            key={i}
-            className={`h-px flex-1 ${i < step ? "bg-ink" : "bg-ink/20"}`}
-          />
+          <span key={i} className={`h-px flex-1 ${i < step ? "bg-ink" : "bg-ink/20"}`} />
         ))}
       </div>
       <p className="mt-3 text-sm text-ink/70" aria-live="polite">
@@ -336,7 +320,11 @@ function Wizard() {
       <div key={step} className={`${stepClass} mt-10`}>
         {step === 1 ? (
           <>
-            <h2 ref={headingRef} tabIndex={-1} className="type-heading type-h2 text-ink outline-none">
+            <h2
+              ref={headingRef}
+              tabIndex={-1}
+              className="type-heading type-h2 text-ink outline-none"
+            >
               {copy.absenceTitle}
             </h2>
             <p className="measure mt-3 text-ink/75">{copy.absenceBody}</p>
@@ -375,7 +363,11 @@ function Wizard() {
 
         {step === 2 ? (
           <>
-            <h2 ref={headingRef} tabIndex={-1} className="type-heading type-h2 text-ink outline-none">
+            <h2
+              ref={headingRef}
+              tabIndex={-1}
+              className="type-heading type-h2 text-ink outline-none"
+            >
               {copy.authorizeTitle}
             </h2>
             <div className="mt-6 flex items-start gap-4">
@@ -413,7 +405,10 @@ function Wizard() {
               <p className="measure pb-2 text-ink/75">{copy.authorizeWhy}</p>
             </Disclosure>
             <div className="mt-6">
-              <Check checked={outsideArrangementConfirmed} onChange={setOutsideArrangementConfirmed}>
+              <Check
+                checked={outsideArrangementConfirmed}
+                onChange={setOutsideArrangementConfirmed}
+              >
                 I will not arrange any paid use of my berth outside the marina.
               </Check>
             </div>
@@ -423,7 +418,11 @@ function Wizard() {
 
         {step === 3 ? (
           <>
-            <h2 ref={headingRef} tabIndex={-1} className="type-heading type-h2 text-ink outline-none">
+            <h2
+              ref={headingRef}
+              tabIndex={-1}
+              className="type-heading type-h2 text-ink outline-none"
+            >
               {copy.termsTitle}
             </h2>
             <dl className="mt-8 grid max-w-md gap-6 sm:grid-cols-2">
@@ -451,21 +450,16 @@ function Wizard() {
             </p>
             {estimate ? (
               <p className="measure tabular mt-4 text-ink/75">
-                <span className="chip mr-2">Estimate</span>{" "}
-                If every one of your {estimate.nights} nights were relet, about{" "}
-                {eur(estimate.netEur)} would be{" "}
-                {terms.settlement === "credit" ? "credited" : "paid"} after the
-                fee. {copy.estimateNote}
+                <span className="chip mr-2">Estimate</span> If every one of your {estimate.nights}{" "}
+                nights were relet, about {eur(estimate.netEur)} would be{" "}
+                {terms.settlement === "credit" ? "credited" : "paid"} after the fee.{" "}
+                {copy.estimateNote}
               </p>
             ) : null}
             {siteConfig.mockMode ? (
               <p className="mt-3 text-sm text-ink/70">{copy.placeholderNote}</p>
             ) : null}
-            <Disclosure
-              className="mt-2"
-              label={copy.taxLabel}
-              openLabel={copy.taxLabel}
-            >
+            <Disclosure className="mt-2" label={copy.taxLabel} openLabel={copy.taxLabel}>
               <p className="measure pb-2 text-ink/75">{terms.taxNote}</p>
             </Disclosure>
             {terms.mooringLetFeeSchedule.length > 0 ? (
@@ -475,10 +469,9 @@ function Wizard() {
                 openLabel="If you arrange a paid let yourself"
               >
                 <p className="measure pb-2 text-ink/75">
-                  Letting your berth for payment outside the marina still needs
-                  its prior written authorisation, and is a different path from
-                  the one on this page. If authorised, the marina&apos;s own
-                  processing fee is{" "}
+                  Letting your berth for payment outside the marina still needs its prior written
+                  authorisation, and is a different path from the one on this page. If authorised,
+                  the marina&apos;s own processing fee is{" "}
                   {terms.mooringLetFeeSchedule
                     .map((tier) => `€${tier.feeEur} up to ${tier.maxDays} days`)
                     .join(", ")}{" "}
@@ -508,15 +501,16 @@ function Wizard() {
 
         {step === 4 ? (
           <>
-            <h2 ref={headingRef} tabIndex={-1} className="type-heading type-h2 text-ink outline-none">
+            <h2
+              ref={headingRef}
+              tabIndex={-1}
+              className="type-heading type-h2 text-ink outline-none"
+            >
               {copy.readinessTitle}
             </h2>
             <div className="mt-8 space-y-4">
               <Check checked={boatReady} onChange={setBoatReady}>
-                {copy.readinessBoat.replace(
-                  "the start date",
-                  formatLongDate(startDate)
-                )}
+                {copy.readinessBoat.replace("the start date", formatLongDate(startDate))}
               </Check>
               <Check checked={berthReady} onChange={setBerthReady}>
                 {copy.readinessBerth}
@@ -528,7 +522,11 @@ function Wizard() {
 
         {step === 5 ? (
           <>
-            <h2 ref={headingRef} tabIndex={-1} className="type-heading type-h2 text-ink outline-none">
+            <h2
+              ref={headingRef}
+              tabIndex={-1}
+              className="type-heading type-h2 text-ink outline-none"
+            >
               {copy.submitTitle}
             </h2>
             <dl className="mt-8 grid max-w-lg gap-x-8 gap-y-4 text-ink sm:grid-cols-[auto_1fr]">
@@ -538,29 +536,28 @@ function Wizard() {
               </dd>
               <dt className="text-ink/70">Away</dt>
               <dd>
-                {formatLongDate(startDate)} to {formatLongDate(endDate)} ({nights}{" "}
-                nights)
+                {formatLongDate(startDate)} to {formatLongDate(endDate)} ({nights} nights)
               </dd>
               <dt className="text-ink/70">Reletting</dt>
               <dd>The marina may relet it, with its approval</dd>
               <dt className="text-ink/70">Terms</dt>
               <dd>
-                {creditModelHeadline(terms.creditModel)} credit, {terms.processingFeePercent}%
-                fee, {terms.settlement}
+                {creditModelHeadline(terms.creditModel)} credit, {terms.processingFeePercent}% fee,{" "}
+                {terms.settlement}
               </dd>
               {estimate ? (
                 <>
                   <dt className="text-ink/70">Estimate</dt>
                   <dd className="tabular">
-                    About {eur(estimate.netEur)} if every night were relet. The
-                    marina may relet only some of them.
+                    About {eur(estimate.netEur)} if every night were relet. The marina may relet
+                    only some of them.
                   </dd>
                 </>
               ) : null}
             </dl>
             <p className="measure mt-6 text-sm text-ink/70">
-              Sending this asks for the marina&apos;s consent. Nothing is relet
-              until the marina approves.
+              Sending this asks for the marina&apos;s consent. Nothing is relet until the marina
+              approves.
             </p>
           </>
         ) : null}
@@ -607,9 +604,7 @@ export default function RelettingWizard() {
           >
             My berth
           </Link>
-          <h1 className="type-title mt-6 text-ink">
-            {copy.primaryAction}
-          </h1>
+          <h1 className="type-title mt-6 text-ink">{copy.primaryAction}</h1>
           <div className="stack-md">
             <Wizard />
           </div>

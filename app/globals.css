@@ -14,8 +14,7 @@
   --paper-deep: color-mix(in srgb, var(--paper) 74%, var(--stone));
   --hairline: color-mix(in srgb, var(--ink) 16%, var(--paper));
   --lift:
-    0 1px 0 color-mix(in srgb, var(--ink) 8%, transparent),
-    0 24px 48px -28px rgb(10 26 47 / 0.45);
+    0 1px 0 color-mix(in srgb, var(--ink) 8%, transparent), 0 24px 48px -28px rgb(10 26 47 / 0.45);
 
   /* Error and warning text. Deep enough to pass contrast on paper and white. */
   --error: #b3261e;

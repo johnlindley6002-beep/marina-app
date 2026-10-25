@@ -96,16 +96,14 @@ export default function FeaturedMarina() {
               {facts.map((fact) => (
                 <div key={fact.label} className="hairline-top pt-3 pr-4">
                   <dt className="text-sm text-ink/70">{fact.label}</dt>
-                  <dd className="tabular mt-1 text-lg font-medium text-ink">
-                    {fact.value}
-                  </dd>
+                  <dd className="tabular mt-1 text-lg font-medium text-ink">{fact.value}</dd>
                 </div>
               ))}
             </dl>
 
             <Link
               href={`/marinas/${flagship.countrySlug}/${flagship.id}`}
-              className="mt-8 btn-quiet text-lg"
+              className="btn-quiet mt-8 text-lg"
             >
               {t.countryPage.viewMarina}
             </Link>
@@ -116,9 +114,7 @@ export default function FeaturedMarina() {
 
         {others.length > 0 ? (
           <div className="stack-lg">
-            <h3 className="type-heading type-h3 text-ink">
-              {t.home.moreMarinas}
-            </h3>
+            <h3 className="type-heading type-h3 text-ink">{t.home.moreMarinas}</h3>
             <ul className="mt-4 max-w-3xl">
               {others.map((marina) => (
                 <MarinaRow key={marina.id} marina={marina} />

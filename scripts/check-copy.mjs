@@ -71,7 +71,9 @@ for (const dir of DIRS) {
 }
 
 if (problems.length > 0) {
-  console.error(`check-copy: ${problems.length} problem(s)\n` + problems.map((p) => "  " + p).join("\n"));
+  console.error(
+    `check-copy: ${problems.length} problem(s)\n` + problems.map((p) => "  " + p).join("\n")
+  );
   process.exit(1);
 }
 console.log("check-copy: ok");

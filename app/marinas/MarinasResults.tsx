@@ -43,24 +43,15 @@ export default function MarinasResults({ q, arrival, departure, length }: Props)
   return (
     <section className="section">
       <div className="page-column">
-        <h1 className="type-title text-ink">
-          {q ? t.results.forQuery(q) : t.results.heading}
-        </h1>
-        <p className="tabular mt-3 text-ink/70">
-          {t.results.count(results.length)}
-        </p>
+        <h1 className="type-title text-ink">{q ? t.results.forQuery(q) : t.results.heading}</h1>
+        <p className="tabular mt-3 text-ink/70">{t.results.count(results.length)}</p>
 
-        <DestinationSearch
-          className="mt-8 max-w-3xl"
-          initial={{ q, arrival, departure, length }}
-        />
+        <DestinationSearch className="mt-8 max-w-3xl" initial={{ q, arrival, departure, length }} />
 
         <SavedMarinas />
 
         <div
-          className={`stack-md grid gap-12 ${
-            MARINAS_MAP_READY ? "lg:grid-cols-[1fr_1.1fr]" : ""
-          }`}
+          className={`stack-md grid gap-12 ${MARINAS_MAP_READY ? "lg:grid-cols-[1fr_1.1fr]" : ""}`}
         >
           {results.length > 0 ? (
             <ul className="max-w-3xl">
@@ -78,11 +69,7 @@ export default function MarinasResults({ q, arrival, departure, length }: Props)
             <p className="measure text-lg text-ink/75">{t.results.none}</p>
           )}
           {MARINAS_MAP_READY ? (
-            <MarinasMap
-              pins={pins}
-              highlightedId={highlightedId}
-              onHover={setHighlightedId}
-            />
+            <MarinasMap pins={pins} highlightedId={highlightedId} onHover={setHighlightedId} />
           ) : null}
         </div>
       </div>

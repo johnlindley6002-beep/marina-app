@@ -8,11 +8,7 @@ import { MOCK_CHANGED_EVENT, MOCK_STORAGE_KEYS } from "./mockData";
 // staff act. The value is the fallback until the first client read, which keeps
 // server and client output identical. Pass a key (for example the user's id)
 // that changes when the reader should be run again.
-export function useMock<T>(
-  read: () => T,
-  fallback: T,
-  key = ""
-): { value: T; ready: boolean } {
+export function useMock<T>(read: () => T, fallback: T, key = ""): { value: T; ready: boolean } {
   const [value, setValue] = useState<T>(fallback);
   const [ready, setReady] = useState(false);
   const readRef = useRef(read);

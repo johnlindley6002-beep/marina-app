@@ -31,10 +31,7 @@ function Trail({ request }: { request: RelettingRequest }) {
   }
   const current = RELETTING_PROGRESS.indexOf(request.status);
   return (
-    <ol
-      aria-label="Progress"
-      className="mt-5 flex flex-wrap gap-x-5 gap-y-2 text-sm"
-    >
+    <ol aria-label="Progress" className="mt-5 flex flex-wrap gap-x-5 gap-y-2 text-sm">
       {RELETTING_PROGRESS.map((status, i) => {
         const reached = i <= current;
         return (
@@ -47,9 +44,7 @@ function Trail({ request }: { request: RelettingRequest }) {
           >
             <span
               aria-hidden="true"
-              className={`h-2 w-2 rounded-full border border-ink ${
-                reached ? "bg-ink" : ""
-              }`}
+              className={`h-2 w-2 rounded-full border border-ink ${reached ? "bg-ink" : ""}`}
             />
             {RELETTING_STATUS_LABELS[status]}
           </li>
@@ -75,11 +70,7 @@ function NightStrip({ request }: { request: RelettingRequest }) {
           {booked} of {nights.length} nights booked
         </span>
         <span className="text-ink/75">
-          {open > 0
-            ? finished
-              ? `, ${open} not booked`
-              : `, ${open} still open`
-            : ""}
+          {open > 0 ? (finished ? `, ${open} not booked` : `, ${open} still open`) : ""}
         </span>
       </p>
       <ul className="mt-2 flex flex-wrap gap-1" aria-label="Nights">
@@ -88,9 +79,7 @@ function NightStrip({ request }: { request: RelettingRequest }) {
           return (
             <li
               key={night}
-              className={`h-4 w-4 rounded-[2px] border border-ink ${
-                isBooked ? "bg-ink" : ""
-              }`}
+              className={`h-4 w-4 rounded-[2px] border border-ink ${isBooked ? "bg-ink" : ""}`}
             >
               <span className="sr-only">
                 {formatLongDate(night)}: {isBooked ? "booked" : "open"}
@@ -190,8 +179,8 @@ function Actions({ request }: { request: RelettingRequest }) {
         ) : null}
         {request.status !== "submitted" ? (
           <p className="mt-2 text-sm text-ink/70">
-            Changing the dates sends the request to the marina again, because it
-            approved the earlier dates.
+            Changing the dates sends the request to the marina again, because it approved the
+            earlier dates.
           </p>
         ) : null}
         {error ? (
@@ -257,8 +246,7 @@ export default function RelettingLedger() {
   if (ready && requests.length === 0) {
     return (
       <p className="measure mt-4 text-ink/75">
-        No absences yet. When you make your berth available, each one is tracked
-        here.
+        No absences yet. When you make your berth available, each one is tracked here.
       </p>
     );
   }
@@ -274,8 +262,7 @@ export default function RelettingLedger() {
             <div className="flex flex-wrap items-start justify-between gap-x-6 gap-y-2">
               <div>
                 <p className="text-lg font-medium text-ink">
-                  {formatLongDate(request.startDate)} to{" "}
-                  {formatLongDate(request.endDate)}
+                  {formatLongDate(request.startDate)} to {formatLongDate(request.endDate)}
                 </p>
                 <p className="tabular text-sm text-ink/70">
                   {nights} nights away, berth {request.berthId}
@@ -296,34 +283,22 @@ export default function RelettingLedger() {
             ) : request.status === "submitted" ||
               request.status === "approved" ||
               request.status === "listed" ? (
-              <p className="mt-5 text-ink/75">
-                The credit appears once a stay is booked.
-              </p>
+              <p className="mt-5 text-ink/75">The credit appears once a stay is booked.</p>
             ) : null}
 
             {settled ? (
-              <Disclosure
-                label="See the breakdown"
-                openLabel="Hide the breakdown"
-                className="mt-1"
-              >
+              <Disclosure label="See the breakdown" openLabel="Hide the breakdown" className="mt-1">
                 <dl className="tabular grid max-w-md grid-cols-[1fr_auto] gap-x-8 gap-y-2 pb-2 text-ink/75">
                   <dt>Nights relet</dt>
                   <dd className="text-right text-ink">{request.nightsRelet}</dd>
                   <dt>Berth income</dt>
                   <dd className="text-right text-ink">{eur(request.grossEur ?? 0)}</dd>
                   <dt>Your credit ({terms ? creditModelHeadline(terms.creditModel) : ""})</dt>
-                  <dd className="text-right text-ink">
-                    {eur(request.ownerShareEur ?? 0)}
-                  </dd>
+                  <dd className="text-right text-ink">{eur(request.ownerShareEur ?? 0)}</dd>
                   <dt>Marina fee ({terms?.processingFeePercent}%)</dt>
-                  <dd className="text-right text-ink">
-                    -{eur(request.feeEur ?? 0)}
-                  </dd>
+                  <dd className="text-right text-ink">-{eur(request.feeEur ?? 0)}</dd>
                   <dt className="font-medium text-ink">Net</dt>
-                  <dd className="text-right font-medium text-ink">
-                    {eur(request.netEur ?? 0)}
-                  </dd>
+                  <dd className="text-right font-medium text-ink">{eur(request.netEur ?? 0)}</dd>
                 </dl>
               </Disclosure>
             ) : null}

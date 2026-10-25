@@ -5,16 +5,9 @@ import { useEffect, useRef, useState } from "react";
 import { useAuth } from "./AuthProvider";
 import ModeSwitch from "./ModeSwitch";
 
-const itemClass =
-  "flex min-h-11 items-center text-paper transition-colors hover:text-stone";
+const itemClass = "flex min-h-11 items-center text-paper transition-colors hover:text-stone";
 
-function MenuBody({
-  onNavigate,
-  showSwitch,
-}: {
-  onNavigate: () => void;
-  showSwitch: boolean;
-}) {
+function MenuBody({ onNavigate, showSwitch }: { onNavigate: () => void; showSwitch: boolean }) {
   const { user, signOut } = useAuth();
   if (!user) return null;
   const isStaff = user.roles.includes("staff");
@@ -122,10 +115,7 @@ export default function AccountMenu({
           className="absolute top-full right-0 z-50 mt-2 w-64 rounded-[3px] border border-paper/15 bg-ink px-4 py-3 shadow-lg"
         >
           {/* Below lg the navbar has no room for the switch, so it lives here. */}
-          <MenuBody
-            onNavigate={() => setOpen(false)}
-            showSwitch={canSwitchMode}
-          />
+          <MenuBody onNavigate={() => setOpen(false)} showSwitch={canSwitchMode} />
         </div>
       ) : null}
     </div>

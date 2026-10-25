@@ -2,8 +2,7 @@ import type { Marina } from "../../../../data/marinas";
 import ChartDivider from "../../../components/ChartDivider";
 import { telHref } from "./EmergencyNumbers";
 
-const itemLink =
-  "btn-quiet text-lg";
+const itemLink = "btn-quiet text-lg";
 
 // The one prominent contact block: phone, VHF, email and postal address,
 // each reachable in one tap on a phone. All values come from the marina entry.

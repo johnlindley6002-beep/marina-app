@@ -2,10 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import {
-  MARINA_CLASS_ORDER,
-  type Marina,
-} from "../../data/marinas";
+import { MARINA_CLASS_ORDER, type Marina } from "../../data/marinas";
 import { formatLength } from "../../lib/units";
 import FavouriteButton from "./FavouriteButton";
 import { useLanguage } from "./LanguageProvider";
@@ -20,24 +17,15 @@ type Props = {
   onHover?: (id: string | null) => void;
 };
 
-export default function MarinaRow({
-  marina,
-  search = "",
-  highlighted,
-  onHover,
-}: Props) {
+export default function MarinaRow({ marina, search = "", highlighted, onHover }: Props) {
   const { t } = useLanguage();
   const { units } = useUnits();
 
-  const cheapest = Math.min(
-    ...MARINA_CLASS_ORDER.map((c) => marina.transientRates[c].low)
-  );
+  const cheapest = Math.min(...MARINA_CLASS_ORDER.map((c) => marina.transientRates[c].low));
 
   return (
     <li
-      className={`hairline-top relative first:border-t-0 ${
-        highlighted ? "bg-paper-deep/60" : ""
-      }`}
+      className={`hairline-top relative first:border-t-0 ${highlighted ? "bg-paper-deep/60" : ""}`}
       onMouseEnter={() => onHover?.(marina.id)}
       onMouseLeave={() => onHover?.(null)}
     >
@@ -74,9 +62,7 @@ export default function MarinaRow({
           <dl className="mt-5 flex flex-wrap gap-x-8 gap-y-3">
             <div>
               <dt className="text-sm text-ink/70">{t.keyFacts.berths}</dt>
-              <dd className="tabular font-medium text-ink">
-                {marina.berths.count}
-              </dd>
+              <dd className="tabular font-medium text-ink">{marina.berths.count}</dd>
             </div>
             <div>
               <dt className="text-sm text-ink/70">{t.keyFacts.maxLength}</dt>
@@ -86,9 +72,7 @@ export default function MarinaRow({
             </div>
             <div>
               <dt className="text-sm text-ink/70">{t.results.from}</dt>
-              <dd className="tabular font-medium text-ink">
-                €{cheapest.toFixed(2)}
-              </dd>
+              <dd className="tabular font-medium text-ink">€{cheapest.toFixed(2)}</dd>
             </div>
             <div>
               <dt className="text-sm text-ink/70">Protection</dt>
@@ -101,10 +85,7 @@ export default function MarinaRow({
 
         {/* Both actions are right-aligned inside the row on every screen size. */}
         <div className="flex items-center justify-end gap-6 sm:col-start-3 sm:row-start-1 sm:flex-col sm:items-end sm:justify-between">
-          <span
-            aria-hidden="true"
-            className="link text-ink"
-          >
+          <span aria-hidden="true" className="link text-ink">
             {t.countryPage.viewMarina}
           </span>
           <FavouriteButton

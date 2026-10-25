@@ -3,8 +3,7 @@
 import Disclosure from "../../../components/Disclosure";
 import type { BoatDocuments } from "../../../../lib/boatProfile";
 
-const inputClass =
-  "field";
+const inputClass = "field";
 const labelClass = "field-label";
 
 type Props = {
@@ -30,30 +29,23 @@ export default function DocumentWallet({
   }
 
   const expiresBeforeArrival =
-    !!documents.insuranceExpiry &&
-    !!arrival &&
-    documents.insuranceExpiry < arrival;
+    !!documents.insuranceExpiry && !!arrival && documents.insuranceExpiry < arrival;
 
   return (
     <div>
       <p className="mt-4 text-sm leading-relaxed text-ink/75">
         All optional. The documents themselves must be shown on arrival.
       </p>
-      <Disclosure
-        label="More about saving these details"
-        openLabel="Hide"
-      >
+      <Disclosure label="More about saving these details" openLabel="Hide">
         <p className="pb-2 text-sm leading-relaxed text-ink/75">
-          Save these details with your boat to reuse them next time, or leave
-          any blank and give them to the marina staff in person. Only the text
-          is stored here, in this browser.
+          Save these details with your boat to reuse them next time, or leave any blank and give
+          them to the marina staff in person. Only the text is stored here, in this browser.
         </p>
       </Disclosure>
       <p className="mt-2 text-xs text-ink/70">
-        Bring: boat registration (Portugal requires originals, not laminated
-        copies), proof of third-party insurance (min {insuranceMinimumLabel},
-        certificate in Portuguese if possible), and the skipper&apos;s
-        certificate of competence.
+        Bring: boat registration (Portugal requires originals, not laminated copies), proof of
+        third-party insurance (min {insuranceMinimumLabel}, certificate in Portuguese if possible),
+        and the skipper&apos;s certificate of competence.
       </p>
 
       <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -93,9 +85,7 @@ export default function DocumentWallet({
             className={inputClass}
           />
           {expiresBeforeArrival ? (
-            <p className="field-error">
-              This expires before your arrival date.
-            </p>
+            <p className="field-error">This expires before your arrival date.</p>
           ) : null}
         </label>
         <label className="block text-sm">

@@ -53,20 +53,34 @@ export function getReadiness(draft: PreArrivalDraft): Readiness {
   if (!structural.success) {
     for (const issue of structural.error.issues) {
       const path = issue.path.join(".");
-      items.push({ message: issue.message, step: stepForPath(path), personIndex: personIndexForPath(path) });
+      items.push({
+        message: issue.message,
+        step: stepForPath(path),
+        personIndex: personIndexForPath(path),
+      });
     }
   }
   for (const req of getMissingRequiredDocuments(draft)) {
     items.push({ message: `${req.label} is required.`, step: 4 });
   }
   for (const flag of getExtraErrors(draft)) {
-    items.push({ message: flag.message, step: stepForPath(flag.path), personIndex: personIndexForPath(flag.path) });
+    items.push({
+      message: flag.message,
+      step: stepForPath(flag.path),
+      personIndex: personIndexForPath(flag.path),
+    });
   }
   for (const flag of getWarnings(draft)) {
-    items.push({ message: flag.message, step: stepForPath(flag.path), personIndex: personIndexForPath(flag.path) });
+    items.push({
+      message: flag.message,
+      step: stepForPath(flag.path),
+      personIndex: personIndexForPath(flag.path),
+    });
   }
 
-  const sectionsWithIssues = new Set(items.map((i) => i.step).filter((s) => SECTION_STEPS.includes(s)));
+  const sectionsWithIssues = new Set(
+    items.map((i) => i.step).filter((s) => SECTION_STEPS.includes(s))
+  );
   const complete = SECTION_STEPS.length - sectionsWithIssues.size;
   return { complete, total: SECTION_STEPS.length, items };
 }

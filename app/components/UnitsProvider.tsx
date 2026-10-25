@@ -1,13 +1,6 @@
 "use client";
 
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-  type ReactNode,
-} from "react";
+import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import { unitLabel, type UnitSystem } from "../../lib/units";
 
 type UnitsContextValue = {
@@ -47,9 +40,7 @@ export function UnitsProvider({ children }: { children: ReactNode }) {
     [units]
   );
 
-  return (
-    <UnitsContext.Provider value={value}>{children}</UnitsContext.Provider>
-  );
+  return <UnitsContext.Provider value={value}>{children}</UnitsContext.Provider>;
 }
 
 export function useUnits() {

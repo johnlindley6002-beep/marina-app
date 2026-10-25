@@ -55,7 +55,8 @@ export default function PreArrivalWizard({ marina }: { marina: Marina }) {
 
   // Jumped to directly, e.g. from a readiness checklist in My boat.
   const focusStep = Number(searchParams.get("step"));
-  const focusPersonIndex = searchParams.get("person") !== null ? Number(searchParams.get("person")) : null;
+  const focusPersonIndex =
+    searchParams.get("person") !== null ? Number(searchParams.get("person")) : null;
 
   useEffect(() => {
     const saved = getPreArrivalDraft(marina.id);
@@ -121,7 +122,8 @@ export default function PreArrivalWizard({ marina }: { marina: Marina }) {
       // Send the boater back to the earliest step with a problem.
       if (!structural.success) {
         const firstPath = structural.error.issues[0]?.path[0];
-        if (firstPath === "owner" || firstPath === "boatIdentity" || firstPath === "boatSpecs") jumpTo(1);
+        if (firstPath === "owner" || firstPath === "boatIdentity" || firstPath === "boatSpecs")
+          jumpTo(1);
         else if (firstPath === "voyage") jumpTo(2);
         else if (firstPath === "people") jumpTo(3);
         else if (firstPath === "stay") jumpTo(5);
@@ -186,10 +188,7 @@ export default function PreArrivalWizard({ marina }: { marina: Marina }) {
         {/* Progress */}
         <div className="mt-8 flex items-center gap-2" aria-hidden="true">
           {stepLabels.map((_, i) => (
-            <span
-              key={i}
-              className={`h-px flex-1 ${i < step ? "bg-ink" : "bg-ink/20"}`}
-            />
+            <span key={i} className={`h-px flex-1 ${i < step ? "bg-ink" : "bg-ink/20"}`} />
           ))}
         </div>
         <p className="mt-3 text-sm text-ink/70" aria-live="polite">
@@ -198,7 +197,11 @@ export default function PreArrivalWizard({ marina }: { marina: Marina }) {
 
         <div className="mt-10 grid gap-10 lg:grid-cols-[1fr_20rem]">
           <div key={step} className="step-forward min-w-0">
-            <h2 ref={headingRef} tabIndex={-1} className="type-heading type-h2 text-ink outline-none">
+            <h2
+              ref={headingRef}
+              tabIndex={-1}
+              className="type-heading type-h2 text-ink outline-none"
+            >
               {stepLabels[step - 1]}
             </h2>
 
@@ -244,7 +247,8 @@ export default function PreArrivalWizard({ marina }: { marina: Marina }) {
               {quote ? (
                 <>
                   <p className="tabular mt-3 text-sm text-ink/75">
-                    {copy.boat.classLabel(quote.marinaClass)} · {copy.page.nightsCount(quote.nights)}
+                    {copy.boat.classLabel(quote.marinaClass)} ·{" "}
+                    {copy.page.nightsCount(quote.nights)}
                   </p>
                   <p className="tabular mt-1 text-2xl font-medium text-ink">
                     €{quote.totalIncVatEur.toFixed(2)}

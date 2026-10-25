@@ -14,25 +14,19 @@ export default function GoogleReviewsBlock({ marina }: { marina: Marina }) {
       <ChartDivider className="mb-10" />
       <h3 className="type-heading type-h3 text-ink">Google reviews</h3>
       <p className="mt-4 text-ink">
-        <span className="type-heading tabular text-3xl">
-          {summary.rating.toFixed(1)}
-        </span>{" "}
-        <span className="text-ink/75">
-          out of 5, from {summary.reviewCount} Google reviews
-        </span>
+        <span className="type-heading tabular text-3xl">{summary.rating.toFixed(1)}</span>{" "}
+        <span className="text-ink/75">out of 5, from {summary.reviewCount} Google reviews</span>
       </p>
       <a
         href={summary.googleUrl}
         target="_blank"
         rel="noopener noreferrer"
-        className="mt-4 btn-quiet"
+        className="btn-quiet mt-4"
       >
         Read reviews on Google
         <span className="sr-only"> (opens in a new tab)</span>
       </a>
-      <p className="mt-2 text-sm text-ink/70">
-        Rating and review count from Google.
-      </p>
+      <p className="mt-2 text-sm text-ink/70">Rating and review count from Google.</p>
     </div>
   );
 }

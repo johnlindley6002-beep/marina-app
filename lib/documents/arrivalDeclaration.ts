@@ -7,7 +7,17 @@ import type { Marina } from "../../data/marinas";
 import type { PreArrivalCheckIn } from "../mockData";
 import { getDocumentRequirements } from "../prearrival/documentRules";
 import { calculateIndicativeQuote } from "../prearrival/pricing";
-import { A4_PORTRAIT, createFlow, heading, line, row, rule, signatureLine, space, subheading } from "./pdfLayout";
+import {
+  A4_PORTRAIT,
+  createFlow,
+  heading,
+  line,
+  row,
+  rule,
+  signatureLine,
+  space,
+  subheading,
+} from "./pdfLayout";
 
 export async function generateArrivalDeclarationPdf(
   checkIn: PreArrivalCheckIn,
@@ -45,8 +55,16 @@ export async function generateArrivalDeclarationPdf(
   rule(flow);
 
   subheading(flow, "Voyage / Viagem");
-  row(flow, "Last port / Último porto", `${draft.voyage.lastPortName}, ${draft.voyage.lastPortCountry}`);
-  row(flow, "Next port / Próximo porto", `${draft.voyage.nextPortName}, ${draft.voyage.nextPortCountry}`);
+  row(
+    flow,
+    "Last port / Último porto",
+    `${draft.voyage.lastPortName}, ${draft.voyage.lastPortCountry}`
+  );
+  row(
+    flow,
+    "Next port / Próximo porto",
+    `${draft.voyage.nextPortName}, ${draft.voyage.nextPortCountry}`
+  );
   row(flow, "Arrival / Chegada", draft.voyage.arrivalDateTime);
   row(flow, "Departure / Partida", draft.voyage.departureDateTime);
   rule(flow);

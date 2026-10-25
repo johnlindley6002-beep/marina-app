@@ -2,11 +2,7 @@
 
 import { useState } from "react";
 import { formatLongDate } from "../../lib/formatDate";
-import {
-  getBerthCalendar,
-  type CalendarDay,
-  type CalendarState,
-} from "../../lib/mockData";
+import { getBerthCalendar, type CalendarDay, type CalendarState } from "../../lib/mockData";
 import { useMock } from "../../lib/useMock";
 import { useAuth } from "../components/AuthProvider";
 
@@ -32,12 +28,7 @@ const STATE_WORDS: Record<CalendarState, string> = {
   away: "away",
 };
 
-const LEGEND: Exclude<CalendarState, "none">[] = [
-  "booked",
-  "open",
-  "awaiting",
-  "away",
-];
+const LEGEND: Exclude<CalendarState, "none">[] = ["booked", "open", "awaiting", "away"];
 
 const LEGEND_LABEL: Record<Exclude<CalendarState, "none">, string> = {
   booked: "Booked",
@@ -90,7 +81,14 @@ export default function OwnerCalendar() {
             aria-label="Previous month"
             className="btn-secondary min-w-11 px-0"
           >
-            <svg viewBox="0 0 20 20" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={1.75} aria-hidden="true">
+            <svg
+              viewBox="0 0 20 20"
+              className="h-4 w-4"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={1.75}
+              aria-hidden="true"
+            >
               <path d="M12.5 4l-6 6 6 6" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </button>
@@ -100,7 +98,14 @@ export default function OwnerCalendar() {
             aria-label="Next month"
             className="btn-secondary min-w-11 px-0"
           >
-            <svg viewBox="0 0 20 20" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={1.75} aria-hidden="true">
+            <svg
+              viewBox="0 0 20 20"
+              className="h-4 w-4"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={1.75}
+              aria-hidden="true"
+            >
               <path d="M7.5 4l6 6-6 6" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </button>

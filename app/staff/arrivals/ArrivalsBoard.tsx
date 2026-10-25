@@ -86,7 +86,9 @@ function EventRow({ event, staffId }: { event: BoardEvent; staffId: string | nul
           </p>
         </div>
         <div className="tabular text-right text-sm text-ink">
-          <p className="font-medium">{kind === "arrival" ? enquiry.eta || "ETA n/a" : enquiry.etd || "ETD n/a"}</p>
+          <p className="font-medium">
+            {kind === "arrival" ? enquiry.eta || "ETA n/a" : enquiry.etd || "ETD n/a"}
+          </p>
           <p className="text-xs text-ink/70">{event.date}</p>
         </div>
       </button>
@@ -172,11 +174,7 @@ function EventRow({ event, staffId }: { event: BoardEvent; staffId: string | nul
               </button>
             ) : null}
             {!editingFlag ? (
-              <button
-                type="button"
-                onClick={() => setEditingFlag(true)}
-                className="staff-btn"
-              >
+              <button type="button" onClick={() => setEditingFlag(true)} className="staff-btn">
                 {enquiry.flagNote ? "Edit flag" : "Flag an issue"}
               </button>
             ) : null}
@@ -204,7 +202,11 @@ function EventRow({ event, staffId }: { event: BoardEvent; staffId: string | nul
                 >
                   Save
                 </button>
-                <button type="button" onClick={() => setEditingFlag(false)} className="staff-btn staff-btn-ghost">
+                <button
+                  type="button"
+                  onClick={() => setEditingFlag(false)}
+                  className="staff-btn staff-btn-ghost"
+                >
                   Cancel
                 </button>
               </div>
@@ -227,11 +229,7 @@ function EventRow({ event, staffId }: { event: BoardEvent; staffId: string | nul
 export default function ArrivalsBoard() {
   const { user } = useAuth();
   const staffId = user?.id ?? null;
-  const { value: enquiries, ready } = useMock(
-    () => getEnquiries(staffId),
-    NONE,
-    staffId ?? ""
-  );
+  const { value: enquiries, ready } = useMock(() => getEnquiries(staffId), NONE, staffId ?? "");
   const [when, setWhen] = useState<"today" | "upcoming">("upcoming");
   const [type, setType] = useState<"all" | "arrival" | "departure">("all");
 
@@ -263,7 +261,11 @@ export default function ArrivalsBoard() {
       </div>
 
       <div className="mt-3 flex flex-wrap gap-4">
-        <div role="group" aria-label="When" className="inline-flex rounded-[3px] border border-ink/25 p-0.5 text-xs">
+        <div
+          role="group"
+          aria-label="When"
+          className="inline-flex rounded-[3px] border border-ink/25 p-0.5 text-xs"
+        >
           {(["today", "upcoming"] as const).map((v) => (
             <button
               key={v}
@@ -276,7 +278,11 @@ export default function ArrivalsBoard() {
             </button>
           ))}
         </div>
-        <div role="group" aria-label="Type" className="inline-flex rounded-[3px] border border-ink/25 p-0.5 text-xs">
+        <div
+          role="group"
+          aria-label="Type"
+          className="inline-flex rounded-[3px] border border-ink/25 p-0.5 text-xs"
+        >
           {(["all", "arrival", "departure"] as const).map((v) => (
             <button
               key={v}

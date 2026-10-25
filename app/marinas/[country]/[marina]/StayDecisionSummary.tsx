@@ -1,18 +1,10 @@
 "use client";
 
 import { useMemo, type ReactNode } from "react";
-import {
-  calculateQuote,
-  checkBoatFit,
-  type Marina,
-} from "../../../../data/marinas";
+import { calculateQuote, checkBoatFit, type Marina } from "../../../../data/marinas";
 import { siteConfig } from "../../../../data/site";
 import { getSimulatedAvailability } from "../../../../lib/simulatedAvailability";
-import {
-  effectiveDeparture,
-  isPlanReady,
-  type StayPlan,
-} from "../../../../lib/stayPlan";
+import { effectiveDeparture, isPlanReady, type StayPlan } from "../../../../lib/stayPlan";
 import { formatLength } from "../../../../lib/units";
 import { Collapse } from "../../../components/Disclosure";
 import { useUnits } from "../../../components/UnitsProvider";
@@ -30,11 +22,7 @@ const eur = (n: number) => `€${n.toFixed(2)}`;
 
 function StatusIcon({ tone }: { tone: Tone }) {
   const path =
-    tone === "yes"
-      ? "M4 10.5l4 4 8-9"
-      : tone === "no"
-        ? "M5 5l10 10M15 5L5 15"
-        : "M5 10h10";
+    tone === "yes" ? "M4 10.5l4 4 8-9" : tone === "no" ? "M5 5l10 10M15 5L5 15" : "M5 10h10";
   return (
     <svg
       viewBox="0 0 20 20"
@@ -59,12 +47,7 @@ type Props = {
 // The three answers a boater wants together: does it fit, is there space,
 // and roughly what does it cost. Availability is the simulated pattern and the
 // estimate is the same calculation as Your estimate below.
-export default function StayDecisionSummary({
-  marina,
-  plan,
-  stayLine,
-  datesValid,
-}: Props) {
+export default function StayDecisionSummary({ marina, plan, stayLine, datesValid }: Props) {
   const { units } = useUnits();
   const loa = Number(plan.loa);
   const beam = Number(plan.beam);
@@ -109,9 +92,7 @@ export default function StayDecisionSummary({
       tone: "yes",
       headline: "Yes, it fits",
       detail: `Class ${fit.marinaClass} berth for ${formatLength(loa, units)}. Beam and draft are within the marina's limits.${
-        fit.marinaClass === "IX"
-          ? " This is the mega-yacht allocation on the outer pontoon."
-          : ""
+        fit.marinaClass === "IX" ? " This is the mega-yacht allocation on the outer pontoon." : ""
       }`,
     };
   } else {
@@ -196,8 +177,8 @@ export default function StayDecisionSummary({
           {plan.openEnded
             ? "Nightly rate"
             : `${quote.nights} night${quote.nights === 1 ? "" : "s"}`}
-          , Class {quote.marinaClass}, excluding{" "}
-          {Math.round(marina.vatRate * 100)}% VAT and utilities.{" "}
+          , Class {quote.marinaClass}, excluding {Math.round(marina.vatRate * 100)}% VAT and
+          utilities.{" "}
           <a
             href="#price-estimate"
             className="inline-flex min-h-11 items-center text-ink underline underline-offset-4"
@@ -236,9 +217,7 @@ export default function StayDecisionSummary({
   return (
     <div className="mt-6 border-t border-hairline pt-6" aria-live="polite">
       {!ready ? (
-        <p className="text-sm text-ink/75">
-          Add {missing} to see fit, space and price.
-        </p>
+        <p className="text-sm text-ink/75">Add {missing} to see fit, space and price.</p>
       ) : null}
       <Collapse open={ready}>
         <p className="text-sm text-ink/75">

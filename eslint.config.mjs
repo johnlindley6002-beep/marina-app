@@ -20,5 +20,15 @@ export default defineConfig([
       "no-console": ["error", { allow: ["warn", "error"] }],
     },
   },
-  globalIgnores([".next/**", "out/**", "build/**", "next-env.d.ts", "coverage/**", "playwright-report/**", "test-results/**"]),
+  // Node scripts report with console.log; the app itself may not.
+  { files: ["scripts/**"], rules: { "no-console": "off" } },
+  globalIgnores([
+    ".next/**",
+    "out/**",
+    "build/**",
+    "next-env.d.ts",
+    "coverage/**",
+    "playwright-report/**",
+    "test-results/**",
+  ]),
 ]);

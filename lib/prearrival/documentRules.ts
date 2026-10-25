@@ -21,10 +21,7 @@ const SMALL_CLASSES: MarinaClass[] = ["I", "IA", "II", "III", "IV"];
 // though every foreign boat is treated as required regardless of class.
 function isInsuranceRequired(draft: PreArrivalDraft): boolean {
   const lengthM = Number(draft.boatSpecs.lengthOverall) || 0;
-  const marinaClass = classifyByLengthAndBeam(
-    lengthM,
-    Number(draft.boatSpecs.beam) || 0
-  );
+  const marinaClass = classifyByLengthAndBeam(lengthM, Number(draft.boatSpecs.beam) || 0);
   const isForeign = draft.boatIdentity.flagCountry !== "Portugal";
   if (isForeign) return true;
   if (!marinaClass) return true;
@@ -36,15 +33,11 @@ function isInsuranceRequired(draft: PreArrivalDraft): boolean {
   return true;
 }
 
-export function getDocumentRequirements(
-  draft: PreArrivalDraft
-): DocumentRequirement[] {
+export function getDocumentRequirements(draft: PreArrivalDraft): DocumentRequirement[] {
   const isPortuguese = draft.boatIdentity.flagCountry === "Portugal";
   const voyageFlags = getVoyageFlags(draft.voyage);
   const isNonEUFlagged =
-    !isPortuguese &&
-    !!draft.boatIdentity.flagCountry &&
-    !isEU(draft.boatIdentity.flagCountry);
+    !isPortuguese && !!draft.boatIdentity.flagCountry && !isEU(draft.boatIdentity.flagCountry);
 
   const list: DocumentRequirement[] = [
     {
@@ -96,8 +89,7 @@ export function getDocumentRequirements(
       key: "temporaryAdmissionEvidence",
       label: "Evidence of Temporary Admission (customs)",
       required: false,
-      reason:
-        "Optional here, but the marina will ask for it on arrival for a non-EU-flagged boat.",
+      reason: "Optional here, but the marina will ask for it on arrival for a non-EU-flagged boat.",
     });
   }
 
@@ -108,9 +100,7 @@ export function getDocumentRequirements(
 // True once every required document has a number or a mock upload; used to
 // gate Review as a hard error (a missing required document is not merely a
 // warning), separately from the Zod pass in schema.ts.
-export function getMissingRequiredDocuments(
-  draft: PreArrivalDraft
-): DocumentRequirement[] {
+export function getMissingRequiredDocuments(draft: PreArrivalDraft): DocumentRequirement[] {
   return getDocumentRequirements(draft).filter((req) => {
     if (!req.required) return false;
     const entry = draft.documents[req.key];

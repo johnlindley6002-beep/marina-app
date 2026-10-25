@@ -51,12 +51,7 @@ const STATUS_FILL: Record<BerthStatus, string> = {
 // consumer palette's soft tones, since this is a working tool, not a photo of
 // availability.
 export type StaffBerthState =
-  | "occupied"
-  | "free"
-  | "reserved"
-  | "owner-away"
-  | "released"
-  | "out-of-service";
+  "occupied" | "free" | "reserved" | "owner-away" | "released" | "out-of-service";
 
 const STAFF_STATUS_FILL: Record<StaffBerthState, string> = {
   occupied: "#0a1a2f",
@@ -225,17 +220,12 @@ export default function BerthAvailabilityMap({
   const matchingBerths = result?.boatClass
     ? allBerths.filter((b) => b.sizeClass === result.boatClass)
     : [];
-  const availableBerths = matchingBerths.filter((b) =>
-    isSimulatedAvailable(b.id)
-  );
+  const availableBerths = matchingBerths.filter((b) => isSimulatedAvailable(b.id));
 
-  const selectedBerth = selectedBerthId
-    ? allBerths.find((b) => b.id === selectedBerthId)
-    : null;
+  const selectedBerth = selectedBerthId ? allBerths.find((b) => b.id === selectedBerthId) : null;
 
   const totalNights = result ? result.lowNights + result.highNights : 0;
-  const selectedPrice =
-    selectedBerth && result?.totalPrice != null ? result.totalPrice : null;
+  const selectedPrice = selectedBerth && result?.totalPrice != null ? result.totalPrice : null;
 
   const arrivalValue = controlled ? controlled.arrival : arrival;
   const departureValue = controlled ? controlled.departure : departure;
@@ -262,71 +252,69 @@ export default function BerthAvailabilityMap({
   })();
 
   return (
-    <div className={staffMode ? "" : "rounded-sm border border-neutral-200/80 bg-white p-8 md:p-10"}>
+    <div
+      className={staffMode ? "" : "rounded-sm border border-neutral-200/80 bg-white p-8 md:p-10"}
+    >
       {!staffMode ? (
         <>
-          <h2 className="text-lg font-normal tracking-tight text-navy">
-            {t.berthSearch.heading}
-          </h2>
+          <h2 className="text-lg font-normal tracking-tight text-navy">{t.berthSearch.heading}</h2>
           <p className="mt-2 text-sm font-light text-neutral-500">
             {t.berthSearch.subheading(marinaName)}
           </p>
-          <p className="mt-1 text-xs font-light text-neutral-400">
-            {t.berthSearch.illustrative}
-          </p>
+          <p className="mt-1 text-xs font-light text-neutral-400">{t.berthSearch.illustrative}</p>
         </>
       ) : null}
 
       {!controlled && !staffMode ? (
-      <form onSubmit={handleSubmit} className="mt-6 grid gap-4 sm:grid-cols-4">
-        <label className="block text-sm">
-          <span className="text-xs font-normal tracking-wide text-navy/60 uppercase">
-            {t.berthSearch.arrival}
-          </span>
-          <input
-            type="date"
-            value={arrival}
-            onChange={(event) => setArrival(event.target.value)}
-            className="mt-2 w-full border border-neutral-200 px-3 py-2 text-sm text-navy focus:border-navy/40 focus:outline-none"
-          />
-        </label>
+        <form onSubmit={handleSubmit} className="mt-6 grid gap-4 sm:grid-cols-4">
+          <label className="block text-sm">
+            <span className="text-xs font-normal tracking-wide text-navy/60 uppercase">
+              {t.berthSearch.arrival}
+            </span>
+            <input
+              type="date"
+              value={arrival}
+              onChange={(event) => setArrival(event.target.value)}
+              className="mt-2 w-full border border-neutral-200 px-3 py-2 text-sm text-navy focus:border-navy/40 focus:outline-none"
+            />
+          </label>
 
-        <label className="block text-sm">
-          <span className="text-xs font-normal tracking-wide text-navy/60 uppercase">
-            {t.berthSearch.departure}
-          </span>
-          <input
-            type="date"
-            value={departure}
-            onChange={(event) => setDeparture(event.target.value)}
-            className="mt-2 w-full border border-neutral-200 px-3 py-2 text-sm text-navy focus:border-navy/40 focus:outline-none"
-          />
-        </label>
+          <label className="block text-sm">
+            <span className="text-xs font-normal tracking-wide text-navy/60 uppercase">
+              {t.berthSearch.departure}
+            </span>
+            <input
+              type="date"
+              value={departure}
+              onChange={(event) => setDeparture(event.target.value)}
+              className="mt-2 w-full border border-neutral-200 px-3 py-2 text-sm text-navy focus:border-navy/40 focus:outline-none"
+            />
+          </label>
 
-        <label className="block text-sm">
-          <span className="text-xs font-normal tracking-wide text-navy/60 uppercase">
-            {t.berthSearch.boatLength}
-          </span>
-          <input
-            type="number"
-            min="1"
-            step="0.1"
-            value={length}
-            onChange={(event) => setLength(event.target.value)}
-            placeholder={t.berthSearch.lengthPlaceholder}
-            className="mt-2 w-full border border-neutral-200 px-3 py-2 text-sm text-navy focus:border-navy/40 focus:outline-none"
-          />
-        </label>
+          <label className="block text-sm">
+            <span className="text-xs font-normal tracking-wide text-navy/60 uppercase">
+              {t.berthSearch.boatLength}
+            </span>
+            <input
+              type="number"
+              min="1"
+              step="0.1"
+              value={length}
+              onChange={(event) => setLength(event.target.value)}
+              placeholder={t.berthSearch.lengthPlaceholder}
+              className="mt-2 w-full border border-neutral-200 px-3 py-2 text-sm text-navy focus:border-navy/40 focus:outline-none"
+            />
+          </label>
 
-        <div className="flex items-end">
-          <button
-            type="submit"
-            className="w-full bg-navy px-6 py-3 text-sm font-normal tracking-wide text-white hover:bg-navy-accent"
-          >
-            {t.berthSearch.searchButton}
-          </button>
-        </div>
-      </form>
+          <div className="flex items-end">
+            <button
+              type="submit"
+              className="w-full bg-navy px-6 py-3 text-sm font-normal tracking-wide text-white hover:bg-navy-accent"
+            >
+              {t.berthSearch.searchButton}
+            </button>
+          </div>
+        </form>
       ) : null}
 
       {error && !controlled && !staffMode ? (
@@ -339,16 +327,16 @@ export default function BerthAvailabilityMap({
         </p>
       ) : null}
 
-      {!staffMode && result && result.boatClass && matchingBerths.length > 0 && availableBerths.length === 0 ? (
-        <p className="mt-4 text-sm font-light text-neutral-500">
-          {t.berthSearch.noAvailable}
-        </p>
+      {!staffMode &&
+      result &&
+      result.boatClass &&
+      matchingBerths.length > 0 &&
+      availableBerths.length === 0 ? (
+        <p className="mt-4 text-sm font-light text-neutral-500">{t.berthSearch.noAvailable}</p>
       ) : null}
 
       {!staffMode && result && !result.boatClass ? (
-        <p className="mt-4 text-sm font-light text-neutral-500">
-          {t.berthSearch.noFit}
-        </p>
+        <p className="mt-4 text-sm font-light text-neutral-500">{t.berthSearch.noFit}</p>
       ) : null}
 
       {result && result.boatClass && totalNights > 0 && !controlled && !staffMode ? (
@@ -403,23 +391,11 @@ export default function BerthAvailabilityMap({
             </defs>
           ) : null}
           {/* Water fills the whole canvas; land and breakwater are drawn on top. */}
-          <rect
-            x={0}
-            y={0}
-            width={MAP_WIDTH}
-            height={MAP_HEIGHT}
-            fill={MAP_COLORS.water}
-          />
+          <rect x={0} y={0} width={MAP_WIDTH} height={MAP_HEIGHT} fill={MAP_COLORS.water} />
 
           {/* Land: promenade strip along the top, plus the Casa de São
               Bernardo corner where the west-quay pontoons (P-K) anchor. */}
-          <rect
-            x={0}
-            y={0}
-            width={MAP_WIDTH}
-            height={LAND_TOP_HEIGHT}
-            fill={MAP_COLORS.land}
-          />
+          <rect x={0} y={0} width={MAP_WIDTH} height={LAND_TOP_HEIGHT} fill={MAP_COLORS.land} />
           <rect
             x={0}
             y={0}
@@ -576,31 +552,19 @@ export default function BerthAvailabilityMap({
         ) : (
           <div className="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-xs font-light text-neutral-500">
             <span className="flex items-center gap-2">
-              <span
-                className="h-3 w-3 rounded-sm"
-                style={{ background: STATUS_FILL.available }}
-              />
+              <span className="h-3 w-3 rounded-sm" style={{ background: STATUS_FILL.available }} />
               {t.berthSearch.legendAvailable}
             </span>
             <span className="flex items-center gap-2">
-              <span
-                className="h-3 w-3 rounded-sm"
-                style={{ background: STATUS_FILL.occupied }}
-              />
+              <span className="h-3 w-3 rounded-sm" style={{ background: STATUS_FILL.occupied }} />
               {t.berthSearch.legendOccupied}
             </span>
             <span className="flex items-center gap-2">
-              <span
-                className="h-3 w-3 rounded-sm"
-                style={{ background: STATUS_FILL.unfit }}
-              />
+              <span className="h-3 w-3 rounded-sm" style={{ background: STATUS_FILL.unfit }} />
               {t.berthSearch.legendUnfit}
             </span>
             <span className="flex items-center gap-2">
-              <span
-                className="h-3 w-3 rounded-sm"
-                style={{ background: STATUS_FILL.neutral }}
-              />
+              <span className="h-3 w-3 rounded-sm" style={{ background: STATUS_FILL.neutral }} />
               {t.berthSearch.legendNeutral}
             </span>
           </div>
@@ -608,23 +572,15 @@ export default function BerthAvailabilityMap({
       </div>
 
       {!result && !controlled && !staffMode ? (
-        <p className="mt-6 text-sm font-light text-neutral-400">
-          {t.berthSearch.hintBeforeSearch}
-        </p>
+        <p className="mt-6 text-sm font-light text-neutral-400">{t.berthSearch.hintBeforeSearch}</p>
       ) : null}
 
       {selectedBerth && result?.boatClass && selectedPrice !== null && !controlled && !staffMode ? (
         <div className="mt-6 border-t border-neutral-200 pt-6">
           <p className="text-sm font-light text-neutral-500">
-            {t.berthSearch.priceBerthLine(
-              selectedBerth.id,
-              selectedBerth.sizeClass,
-              totalNights
-            )}
+            {t.berthSearch.priceBerthLine(selectedBerth.id, selectedBerth.sizeClass, totalNights)}
           </p>
-          <p className="mt-2 text-xl font-normal text-navy">
-            €{selectedPrice.toFixed(2)}
-          </p>
+          <p className="mt-2 text-xl font-normal text-navy">€{selectedPrice.toFixed(2)}</p>
           <p className="mt-1 text-xs font-light text-neutral-400">
             {t.berthSearch.vatNote(Math.round(vatRate * 100))}
           </p>
@@ -632,17 +588,17 @@ export default function BerthAvailabilityMap({
       ) : null}
 
       {!controlled && !staffMode ? (
-      <div className="mt-6 border-t border-neutral-200 pt-6">
-        <p className="text-sm font-light text-neutral-500">
-          {t.berthSearch.ctaHeading(marinaName)}
-        </p>
-        <a
-          href={mailtoHref}
-          className="mt-3 inline-block bg-navy-accent px-6 py-3 text-sm font-normal tracking-wide text-white hover:bg-[#254a75]"
-        >
-          {t.berthSearch.ctaButton}
-        </a>
-      </div>
+        <div className="mt-6 border-t border-neutral-200 pt-6">
+          <p className="text-sm font-light text-neutral-500">
+            {t.berthSearch.ctaHeading(marinaName)}
+          </p>
+          <a
+            href={mailtoHref}
+            className="mt-3 inline-block bg-navy-accent px-6 py-3 text-sm font-normal tracking-wide text-white hover:bg-[#254a75]"
+          >
+            {t.berthSearch.ctaButton}
+          </a>
+        </div>
       ) : null}
     </div>
   );

@@ -32,8 +32,7 @@ export default function DevPersonaSwitcher() {
         >
           <p className="font-medium">Mock / dev only</p>
           <p className="mt-1 text-xs text-stone">
-            Sign in as a sample account to preview each experience. Not part of
-            the real product.
+            Sign in as a sample account to preview each experience. Not part of the real product.
           </p>
           <ul className="mt-2">
             {personas.map((persona) => {
@@ -49,9 +48,7 @@ export default function DevPersonaSwitcher() {
                     }`}
                   >
                     <span className="font-medium">{persona.label}</span>
-                    <span
-                      className={`text-xs ${selected ? "text-ink/80" : "text-stone"}`}
-                    >
+                    <span className={`text-xs ${selected ? "text-ink/80" : "text-stone"}`}>
                       {persona.description}
                     </span>
                   </button>

@@ -38,7 +38,12 @@ export default function Navbar() {
   return (
     <header className="sticky top-0 z-50 border-b border-paper/10 bg-ink text-paper">
       <div className="page-column flex h-16 items-center gap-10">
-        <Link href="/" onClick={closeMenu} aria-label="aldock" className="flex min-h-11 items-center">
+        <Link
+          href="/"
+          onClick={closeMenu}
+          aria-label="aldock"
+          className="flex min-h-11 items-center"
+        >
           <Image
             src="/images/aldock-wordmark.png"
             alt="aldock"
@@ -100,23 +105,23 @@ export default function Navbar() {
       {menuOpen ? (
         <div className="border-t border-paper/10 md:hidden">
           <div className="page-column py-8">
-          <nav className="flex flex-col gap-6" aria-label="Main">
-            {links.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                onClick={closeMenu}
-                className="type-heading flex min-h-11 items-center text-2xl text-paper"
-              >
-                {link.label}
-              </Link>
-            ))}
-          </nav>
-          <div className="mt-10 flex flex-wrap items-center gap-3">
-            <UnitSegmented />
-            <LanguageSelect />
-          </div>
-          <AccountMenu variant="inline" onNavigate={closeMenu} />
+            <nav className="flex flex-col gap-6" aria-label="Main">
+              {links.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  onClick={closeMenu}
+                  className="type-heading flex min-h-11 items-center text-2xl text-paper"
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </nav>
+            <div className="mt-10 flex flex-wrap items-center gap-3">
+              <UnitSegmented />
+              <LanguageSelect />
+            </div>
+            <AccountMenu variant="inline" onNavigate={closeMenu} />
           </div>
         </div>
       ) : null}

@@ -17,8 +17,7 @@ import DocumentWallet from "../marinas/[country]/[marina]/DocumentWallet";
 import BoatEditor from "./BoatEditor";
 import UpcomingStays from "./UpcomingStays";
 
-const inputClass =
-  "field";
+const inputClass = "field";
 const labelClass = "field-label";
 
 function formatInsurance(amount: number): string {
@@ -63,25 +62,15 @@ export default function MyBoatContent() {
   return (
     <div className="section">
       <div className="page-column page-reading">
-        <h1 className="type-title text-ink">
-          My boat
-        </h1>
+        <h1 className="type-title text-ink">My boat</h1>
         <p className="measure mt-4 text-lg text-ink/75">{siteConfig.hub.intro}</p>
-        <Disclosure
-          label="Where is this stored?"
-          openLabel="Hide where this is stored"
-        >
-          <p className="measure pb-2 text-ink/75">
-            {siteConfig.hub.deviceNote}
-          </p>
+        <Disclosure label="Where is this stored?" openLabel="Hide where this is stored">
+          <p className="measure pb-2 text-ink/75">{siteConfig.hub.deviceNote}</p>
         </Disclosure>
         {!storageOk ? (
-          <p
-            role="alert"
-            className="measure mt-4 border-l-2 border-error pl-3 text-sm text-error"
-          >
-            Your browser is blocking storage, so what you enter here is kept only
-            until you close this tab.
+          <p role="alert" className="measure mt-4 border-l-2 border-error pl-3 text-sm text-error">
+            Your browser is blocking storage, so what you enter here is kept only until you close
+            this tab.
           </p>
         ) : null}
         <p role="status" className="mt-4 min-h-6 text-sm font-medium text-ink">
@@ -105,11 +94,7 @@ export default function MyBoatContent() {
               Your boats
             </h2>
             {editing === null && ready ? (
-              <button
-                type="button"
-                onClick={() => setEditing("new")}
-                className="btn-quiet"
-              >
+              <button type="button" onClick={() => setEditing("new")} className="btn-quiet">
                 Add a boat
               </button>
             ) : null}
@@ -117,8 +102,8 @@ export default function MyBoatContent() {
 
           {ready && boats.length === 0 && editing === null ? (
             <p className="measure mt-4 text-ink/75">
-              No boat saved yet. Add yours and the boat-fit check, Plan your
-              stay and Request a berth will fill in automatically.
+              No boat saved yet. Add yours and the boat-fit check, Plan your stay and Request a
+              berth will fill in automatically.
             </p>
           ) : null}
 
@@ -127,19 +112,12 @@ export default function MyBoatContent() {
               {boats.map((boat) => {
                 const active = activeBoat?.id === boat.id;
                 return (
-                  <li
-                    key={boat.id}
-                    className="hairline-top py-5 first:border-t-0"
-                  >
+                  <li key={boat.id} className="hairline-top py-5 first:border-t-0">
                     <div className="flex flex-wrap items-start justify-between gap-x-6 gap-y-3">
                       <div className="min-w-0">
                         <h3 className="type-heading type-h3 flex flex-wrap items-center gap-3 text-ink">
                           {boat.name}
-                          {active ? (
-                            <span className="chip">
-                              Active boat
-                            </span>
-                          ) : null}
+                          {active ? <span className="chip">Active boat</span> : null}
                         </h3>
                         <p className="tabular mt-1 text-ink/75">
                           {formatLength(Number(boat.loa), units)} long,{" "}
@@ -148,9 +126,7 @@ export default function MyBoatContent() {
                         </p>
                         <p className="mt-1 text-sm text-ink/70">
                           {[
-                            boat.type &&
-                              boat.type.charAt(0).toUpperCase() +
-                                boat.type.slice(1),
+                            boat.type && boat.type.charAt(0).toUpperCase() + boat.type.slice(1),
                             boat.flag,
                             boat.homePort && `Home port ${boat.homePort}`,
                           ]
@@ -195,9 +171,7 @@ export default function MyBoatContent() {
                         aria-label={`Remove ${boat.name}`}
                         className="mt-3 flex flex-wrap items-center gap-x-4 text-sm text-ink"
                       >
-                        <span>
-                          Remove {boat.name} and its documents from this device?
-                        </span>
+                        <span>Remove {boat.name} and its documents from this device?</span>
                         <button
                           type="button"
                           onClick={() => {
@@ -243,9 +217,7 @@ export default function MyBoatContent() {
           <h2 id="docs-heading" className="type-heading type-h2 text-ink">
             Documents
           </h2>
-          <p className="measure mt-2 text-sm text-ink/70">
-            {siteConfig.hub.documentsNote}
-          </p>
+          <p className="measure mt-2 text-sm text-ink/70">{siteConfig.hub.documentsNote}</p>
           {activeBoat ? (
             <>
               <p className="mt-3 text-ink/75">
@@ -271,8 +243,8 @@ export default function MyBoatContent() {
             </>
           ) : (
             <p className="measure mt-3 text-ink/75">
-              Add a boat first, then you can keep its registration, insurance,
-              certificate and VHF licence details here.
+              Add a boat first, then you can keep its registration, insurance, certificate and VHF
+              licence details here.
             </p>
           )}
         </section>
@@ -282,8 +254,8 @@ export default function MyBoatContent() {
             About you
           </h2>
           <p className="measure mt-2 text-sm text-ink/70">
-            Optional. The skipper&apos;s contact details, so you do not retype
-            them in every enquiry.
+            Optional. The skipper&apos;s contact details, so you do not retype them in every
+            enquiry.
           </p>
           <div className="mt-4 grid gap-4 sm:grid-cols-3">
             <label className="block text-sm">
@@ -343,10 +315,7 @@ export default function MyBoatContent() {
           <h2 id="clear-heading" className="type-heading type-h2 text-ink">
             Data on this device
           </h2>
-          <Disclosure
-            label="How your data is handled"
-            openLabel="Hide how your data is handled"
-          >
+          <Disclosure label="How your data is handled" openLabel="Hide how your data is handled">
             <p className="measure pb-2 text-ink/75">{siteConfig.privacyNote}</p>
           </Disclosure>
           {confirmClear ? (

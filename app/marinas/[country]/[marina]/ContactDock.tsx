@@ -90,9 +90,7 @@ export default function ContactDock({ marina }: { marina: Marina }) {
           aria-label={t.dock.heading}
           className="surface-lift w-72"
         >
-          <p className="type-label px-4 pt-4 pb-2">
-            {t.dock.heading}
-          </p>
+          <p className="type-label px-4 pt-4 pb-2">{t.dock.heading}</p>
           <ContactList marina={marina} />
         </div>
       ) : null}

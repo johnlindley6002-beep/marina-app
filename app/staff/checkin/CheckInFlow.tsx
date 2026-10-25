@@ -92,13 +92,18 @@ function BoatCard({
                 value={
                   enquiry.documents.insuranceProvider
                     ? `${enquiry.documents.insuranceProvider}${
-                        enquiry.documents.insurancePolicy ? `, ${enquiry.documents.insurancePolicy}` : ""
+                        enquiry.documents.insurancePolicy
+                          ? `, ${enquiry.documents.insurancePolicy}`
+                          : ""
                       }`
                     : ""
                 }
               />
               <DocRow label="Insurance expiry" value={enquiry.documents.insuranceExpiry} />
-              <DocRow label="Competence certificate" value={enquiry.documents.competenceCertificate} />
+              <DocRow
+                label="Competence certificate"
+                value={enquiry.documents.competenceCertificate}
+              />
               <DocRow label="VHF licence" value={enquiry.documents.vhfLicence} />
             </div>
           ) : (
@@ -146,11 +151,7 @@ function BoatCard({
 export default function CheckInFlow() {
   const { user } = useAuth();
   const staffId = user?.id ?? null;
-  const { value: enquiries, ready } = useMock(
-    () => getEnquiries(staffId),
-    NONE,
-    staffId ?? ""
-  );
+  const { value: enquiries, ready } = useMock(() => getEnquiries(staffId), NONE, staffId ?? "");
   const today = todayIso();
 
   const { arriving, onSite, departing } = useMemo(() => {

@@ -8,9 +8,7 @@ import { useLanguage } from "../../../components/LanguageProvider";
 import ChartDivider from "../../../components/ChartDivider";
 import Disclosure from "../../../components/Disclosure";
 import Reveal from "../../../components/Reveal";
-import ProtectionIndicator, {
-  ProtectionWhy,
-} from "../../../components/ProtectionIndicator";
+import ProtectionIndicator, { ProtectionWhy } from "../../../components/ProtectionIndicator";
 import { useUnits } from "../../../components/UnitsProvider";
 import ContactBlock from "./ContactBlock";
 import EmergencyNumbers from "./EmergencyNumbers";
@@ -26,24 +24,15 @@ type Props = {
 const labelClass = "field-label";
 const valueClass = "mt-2 text-ink/75";
 
-export default function ApproachInfo({
-  marina,
-  arrivalInstructions,
-  gettingThere,
-}: Props) {
+export default function ApproachInfo({ marina, arrivalInstructions, gettingThere }: Props) {
   const { t } = useLanguage();
   const { units } = useUnits();
 
   return (
-    <section
-      id="practical-info"
-      className="section-editorial scroll-mt-20"
-    >
+    <section id="practical-info" className="section-editorial scroll-mt-20">
       <div className="page-column">
         <Reveal>
-          <h2 className="type-statement text-ink">
-            Approach &amp; practical info
-          </h2>
+          <h2 className="type-statement text-ink">Approach &amp; practical info</h2>
         </Reveal>
 
         {/* The four essentials */}
@@ -62,9 +51,7 @@ export default function ApproachInfo({
           </div>
           <div>
             <p className={labelClass}>Minimum depth</p>
-            <p className={valueClass}>
-              {formatLength(marina.berths.minDepthM, units, 1)}
-            </p>
+            <p className={valueClass}>{formatLength(marina.berths.minDepthM, units, 1)}</p>
           </div>
           <div>
             <p className={labelClass}>Protection</p>
@@ -83,27 +70,21 @@ export default function ApproachInfo({
               <p className="measure text-ink/75">{marina.entryNote}</p>
               <p className={`${labelClass} mt-6`}>{t.visiting.onArrival}</p>
               <ul className="mt-3 space-y-2">
-                {[arrivalInstructions, ...marina.preArrivalChecklist].map(
-                  (item) => (
-                    <li key={item} className="flex items-start gap-2 text-ink/75">
-                      <svg
-                        viewBox="0 0 20 20"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth={1.5}
-                        className="mt-1 h-4 w-4 shrink-0 text-ink"
-                        aria-hidden="true"
-                      >
-                        <path
-                          d="M4 10.5l4 4 8-9"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                      {item}
-                    </li>
-                  )
-                )}
+                {[arrivalInstructions, ...marina.preArrivalChecklist].map((item) => (
+                  <li key={item} className="flex items-start gap-2 text-ink/75">
+                    <svg
+                      viewBox="0 0 20 20"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth={1.5}
+                      className="mt-1 h-4 w-4 shrink-0 text-ink"
+                      aria-hidden="true"
+                    >
+                      <path d="M4 10.5l4 4 8-9" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                    {item}
+                  </li>
+                ))}
               </ul>
             </div>
           </Disclosure>
@@ -125,10 +106,7 @@ export default function ApproachInfo({
               <div>
                 <p className={labelClass}>{t.keyFacts.coordinates}</p>
                 <p className={`${valueClass} tabular`}>
-                  {formatCoordinates(
-                    marina.coordinates.lat,
-                    marina.coordinates.lng
-                  )}
+                  {formatCoordinates(marina.coordinates.lat, marina.coordinates.lng)}
                 </p>
               </div>
             </div>
@@ -148,9 +126,7 @@ export default function ApproachInfo({
             openLabel="Hide how your data is handled"
             className="mt-4"
           >
-            <p className="measure pt-2 pb-2 text-ink/75">
-              {siteConfig.privacyNote}
-            </p>
+            <p className="measure pt-2 pb-2 text-ink/75">{siteConfig.privacyNote}</p>
           </Disclosure>
         </div>
 

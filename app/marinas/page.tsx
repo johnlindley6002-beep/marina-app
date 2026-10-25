@@ -16,14 +16,6 @@ type Props = {
 };
 
 export default async function MarinasPage({ searchParams }: Props) {
-  const { q = "", arrival = "", departure = "", length = "" } =
-    await searchParams;
-  return (
-    <MarinasResults
-      q={q}
-      arrival={arrival}
-      departure={departure}
-      length={length}
-    />
-  );
+  const { q = "", arrival = "", departure = "", length = "" } = await searchParams;
+  return <MarinasResults q={q} arrival={arrival} departure={departure} length={length} />;
 }

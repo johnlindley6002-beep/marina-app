@@ -24,7 +24,8 @@ export default function PreArrivalScenariosPage() {
   }
 
   function runReletScenario(kind: "away-relet" | "early-return") {
-    const result = kind === "away-relet" ? seedHolderAwayReletTenNights() : seedHolderReturnsEarlyWhileLet();
+    const result =
+      kind === "away-relet" ? seedHolderAwayReletTenNights() : seedHolderReturnsEarlyWhileLet();
     setMessage(
       result
         ? `Created reletting request ${result.id}, status ${result.status}. See /owner or /staff/reletting.`
@@ -37,8 +38,8 @@ export default function PreArrivalScenariosPage() {
       <div className="page-column page-reading">
         <h1 className="type-title text-ink">Pre-arrival test scenarios</h1>
         <p className="measure mt-4 text-ink/75">
-          Dev only. Loads a scenario into the mock data layer, the same as if a
-          boater or berth holder had entered it by hand.
+          Dev only. Loads a scenario into the mock data layer, the same as if a boater or berth
+          holder had entered it by hand.
         </p>
 
         <section className="chapter">
@@ -60,8 +61,8 @@ export default function PreArrivalScenariosPage() {
         <section className="chapter">
           <h2 className="type-heading type-h2 text-ink">Reletting scenarios</h2>
           <p className="mt-1 text-sm text-ink/70">
-            Creates and, where relevant, approves a reletting request for the
-            seed owner&apos;s berth (G-14).
+            Creates and, where relevant, approves a reletting request for the seed owner&apos;s
+            berth (G-14).
           </p>
           <ul className="mt-4 space-y-2">
             <li>

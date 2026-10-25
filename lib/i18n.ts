@@ -395,8 +395,7 @@ const baseTranslations: Record<"en" | "pt", Dictionary> = {
       aboutBody:
         "aldock brings clarity to marina management, from berth reservations to guest communications. We believe booking a slip should feel as calm as a morning on the water.",
       contactHeading: "Get in touch",
-      contactBody:
-        "Questions about berths, bookings, or partnerships? We'd love to hear from you.",
+      contactBody: "Questions about berths, bookings, or partnerships? We'd love to hear from you.",
       destinationLabel: "Where are you heading?",
       destinationPlaceholder: "Marina, region or country",
       addFilters: "Add dates and boat length",
@@ -427,8 +426,7 @@ const baseTranslations: Record<"en" | "pt", Dictionary> = {
     },
     berthSearch: {
       heading: "Available berths",
-      subheading: (marinaName) =>
-        `Check simulated availability at ${marinaName}.`,
+      subheading: (marinaName) => `Check simulated availability at ${marinaName}.`,
       illustrative: "Berth availability shown is illustrative for now.",
       arrival: "Arrival",
       departure: "Departure",
@@ -451,18 +449,15 @@ const baseTranslations: Record<"en" | "pt", Dictionary> = {
       legendOccupied: "Occupied",
       legendUnfit: "Doesn't fit your boat",
       legendNeutral: "Not searched yet",
-      hintBeforeSearch:
-        "Enter your dates and boat length, then search to see berth availability.",
+      hintBeforeSearch: "Enter your dates and boat length, then search to see berth availability.",
       priceBerthLine: (id, cls, nights) =>
         `Berth ${id} · Class ${cls} · ${nights} night${nights === 1 ? "" : "s"}`,
-      vatNote: (rate) =>
-        `+ ${rate}% VAT and utilities. Estimate, confirm with marina.`,
+      vatNote: (rate) => `+ ${rate}% VAT and utilities. Estimate, confirm with marina.`,
       ctaHeading: (marinaName) => `Questions about a berth at ${marinaName}?`,
       ctaButton: "Contact marina",
       mailSubject: "Berth request - Marina de Cascais",
       mailGreeting: "Hello,",
-      mailIntro:
-        "I'd like to enquire about berth availability at Marina de Cascais.",
+      mailIntro: "I'd like to enquire about berth availability at Marina de Cascais.",
       mailArrival: "Arrival",
       mailDeparture: "Departure",
       mailBoatLength: "Boat length",
@@ -556,8 +551,10 @@ const baseTranslations: Record<"en" | "pt", Dictionary> = {
         reviewBtn: "Review",
         continueBtn: "Continue",
         nothingOutstanding: "Nothing outstanding.",
-        idExpiring: (name, days) => `${name}'s ID expires in ${days} ${days === 1 ? "day" : "days"}.`,
-        insuranceExpiring: (days) => `Third-party insurance expires in ${days} ${days === 1 ? "day" : "days"}.`,
+        idExpiring: (name, days) =>
+          `${name}'s ID expires in ${days} ${days === 1 ? "day" : "days"}.`,
+        insuranceExpiring: (days) =>
+          `Third-party insurance expires in ${days} ${days === 1 ? "day" : "days"}.`,
       },
       page: {
         title: "Pre-arrival check-in",
@@ -777,8 +774,7 @@ const baseTranslations: Record<"en" | "pt", Dictionary> = {
     },
     home: {
       tagline: "Reserve a sua amarração, sem complicações",
-      valueProp:
-        "Encontre e reserve a sua amarração nas marinas de Portugal.",
+      valueProp: "Encontre e reserve a sua amarração nas marinas de Portugal.",
       browseMarinas: "Ou explore as marinas",
       aboutHeading: "A reserva de amarração, reinventada",
       aboutBody:
@@ -830,8 +826,7 @@ const baseTranslations: Record<"en" | "pt", Dictionary> = {
       errorDeparture: "A partida deve ser posterior à chegada.",
       noClass: (cls) =>
         `Ainda não há amarrações da Classe ${cls} neste esquema. As classes de embarcações maiores serão adicionadas em breve.`,
-      noAvailable:
-        "Não há amarrações disponíveis para estas datas. Experimente outras datas.",
+      noAvailable: "Não há amarrações disponíveis para estas datas. Experimente outras datas.",
       noFit:
         "Nenhuma classe de amarração serve uma embarcação com este comprimento no tarifário atual (máx. 45 m). Contacte a marina diretamente.",
       seasonBoth: (low, high) =>
@@ -846,10 +841,8 @@ const baseTranslations: Record<"en" | "pt", Dictionary> = {
         "Indique as datas e o comprimento do barco e pesquise para ver a disponibilidade.",
       priceBerthLine: (id, cls, nights) =>
         `Amarração ${id} · Classe ${cls} · ${nights} noite${nights === 1 ? "" : "s"}`,
-      vatNote: (rate) =>
-        `+ IVA (${rate}%) e consumos. Valor estimado, a confirmar com a marina.`,
-      ctaHeading: (marinaName) =>
-        `Dúvidas sobre uma amarração em ${marinaName}?`,
+      vatNote: (rate) => `+ IVA (${rate}%) e consumos. Valor estimado, a confirmar com a marina.`,
+      ctaHeading: (marinaName) => `Dúvidas sobre uma amarração em ${marinaName}?`,
       ctaButton: "Contactar a marina",
       mailSubject: "Pedido de amarração - Marina de Cascais",
       mailGreeting: "Boa tarde,",
@@ -948,7 +941,8 @@ const baseTranslations: Record<"en" | "pt", Dictionary> = {
         reviewBtn: "Rever",
         continueBtn: "Continuar",
         nothingOutstanding: "Nada pendente.",
-        idExpiring: (name, days) => `O documento de ${name} expira em ${days} ${days === 1 ? "dia" : "dias"}.`,
+        idExpiring: (name, days) =>
+          `O documento de ${name} expira em ${days} ${days === 1 ? "dia" : "dias"}.`,
         insuranceExpiring: (days) =>
           `O seguro de responsabilidade civil expira em ${days} ${days === 1 ? "dia" : "dias"}.`,
       },
@@ -1156,19 +1150,10 @@ type DeepPartial<T> = T extends (...args: never[]) => unknown
     ? { [K in keyof T]?: DeepPartial<T[K]> }
     : T;
 
-function mergeDictionary(
-  base: Dictionary,
-  override: DeepPartial<Dictionary>
-): Dictionary {
+function mergeDictionary(base: Dictionary, override: DeepPartial<Dictionary>): Dictionary {
   const merge = (b: unknown, o: unknown): unknown => {
     if (o === undefined) return b;
-    if (
-      o &&
-      b &&
-      typeof o === "object" &&
-      typeof b === "object" &&
-      !Array.isArray(o)
-    ) {
+    if (o && b && typeof o === "object" && typeof b === "object" && !Array.isArray(o)) {
       const result: Record<string, unknown> = { ...(b as object) };
       for (const key of Object.keys(o)) {
         result[key] = merge(
@@ -1250,8 +1235,7 @@ const es: DeepPartial<Dictionary> = {
     departure: "Salida",
     boatLength: "Eslora total (m)",
     searchButton: "Buscar",
-    illustrative:
-      "La disponibilidad de amarres que se muestra es solo ilustrativa por ahora.",
+    illustrative: "La disponibilidad de amarres que se muestra es solo ilustrativa por ahora.",
     ctaButton: "Contactar con la marina",
   },
   rates: {
@@ -1342,8 +1326,7 @@ const fr: DeepPartial<Dictionary> = {
   },
   home: {
     tagline: "Réservez votre place de port, en toute simplicité",
-    valueProp:
-      "Trouvez et réservez votre place de port dans les marinas du Portugal.",
+    valueProp: "Trouvez et réservez votre place de port dans les marinas du Portugal.",
     browseMarinas: "Ou parcourez les marinas",
     aboutHeading: "La réservation de place de port, réinventée",
     aboutBody:

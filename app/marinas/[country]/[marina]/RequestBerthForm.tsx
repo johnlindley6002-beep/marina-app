@@ -2,17 +2,8 @@
 
 import { siteConfig } from "../../../../data/site";
 import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from "react";
-import {
-  calculateQuote,
-  SEASON_LABELS,
-  type Marina,
-  type Quote,
-} from "../../../../data/marinas";
-import {
-  EMPTY_DOCUMENTS,
-  loadBoatProfile,
-  type BoatDocuments,
-} from "../../../../lib/boatProfile";
+import { calculateQuote, SEASON_LABELS, type Marina, type Quote } from "../../../../data/marinas";
+import { EMPTY_DOCUMENTS, loadBoatProfile, type BoatDocuments } from "../../../../lib/boatProfile";
 import { COUNTRIES } from "../../../../lib/countries";
 import BoatSwitcher from "../../../components/BoatSwitcher";
 import Disclosure from "../../../components/Disclosure";
@@ -107,26 +98,29 @@ function validate(form: FormData): Errors {
   if (!form.eta) errors.eta = "Enter your expected arrival time, for example 15:30.";
 
   if (!form.openEnded) {
-    if (!form.departure) errors.departure = "Choose your departure date in Plan your stay, or tick open-ended stay.";
+    if (!form.departure)
+      errors.departure = "Choose your departure date in Plan your stay, or tick open-ended stay.";
     if (!form.etd) errors.etd = "Enter your expected departure time, for example 10:00.";
-    if (
-      form.arrival &&
-      form.departure &&
-      new Date(form.departure) <= new Date(form.arrival)
-    ) {
-      errors.departure = "Departure must be after arrival. Choose a later departure date in Plan your stay.";
+    if (form.arrival && form.departure && new Date(form.departure) <= new Date(form.arrival)) {
+      errors.departure =
+        "Departure must be after arrival. Choose a later departure date in Plan your stay.";
     }
   }
 
   if (!form.boatName.trim()) errors.boatName = "Enter your boat's name.";
-  if (!form.vesselType) errors.vesselType = "Choose a vessel type: sail, motor, catamaran or other.";
-  if (!form.loa || Number(form.loa) <= 0) errors.loa = "Enter your boat's length overall, for example 12.5.";
-  if (!form.beam || Number(form.beam) <= 0) errors.beam = "Enter your boat's beam, for example 4.2.";
-  if (!form.draft || Number(form.draft) <= 0) errors.draft = "Enter your boat's draft, for example 1.8.";
+  if (!form.vesselType)
+    errors.vesselType = "Choose a vessel type: sail, motor, catamaran or other.";
+  if (!form.loa || Number(form.loa) <= 0)
+    errors.loa = "Enter your boat's length overall, for example 12.5.";
+  if (!form.beam || Number(form.beam) <= 0)
+    errors.beam = "Enter your boat's beam, for example 4.2.";
+  if (!form.draft || Number(form.draft) <= 0)
+    errors.draft = "Enter your boat's draft, for example 1.8.";
   if (!form.flagCountry) errors.flagCountry = "Choose the country your boat is registered in.";
 
   if (!form.skipperName.trim()) errors.skipperName = "Enter the skipper's full name.";
-  if (!form.phone.trim()) errors.phone = "Enter a phone number the marina can reach you on, including the country code.";
+  if (!form.phone.trim())
+    errors.phone = "Enter a phone number the marina can reach you on, including the country code.";
   if (!form.email.trim()) {
     errors.email = "Enter your email address so the marina can reply.";
   } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
@@ -172,17 +166,16 @@ function validate(form: FormData): Errors {
     }
   }
 
-  if (!form.euStatus) errors.euStatus = "Answer Yes or No so the marina knows which paperwork applies.";
+  if (!form.euStatus)
+    errors.euStatus = "Answer Yes or No so the marina knows which paperwork applies.";
   if (form.euStatus === "no") {
     if (!form.lastPort.trim()) errors.lastPort = "Enter the port you are arriving from.";
     if (!form.nextPort.trim()) errors.nextPort = "Enter the port you are heading to next.";
     const hasCompleteCrewRow = form.crew.some(
-      (c) =>
-        c.fullName.trim() && c.nationality && c.role.trim()
+      (c) => c.fullName.trim() && c.nationality && c.role.trim()
     );
     if (!hasCompleteCrewRow) {
-      errors.crew =
-        "Add at least one crew member with a name, nationality and role.";
+      errors.crew = "Add at least one crew member with a name, nationality and role.";
     }
   }
 
@@ -275,8 +268,7 @@ function buildSummary(
       docs.insuranceProvider && `Insurance provider: ${docs.insuranceProvider}`,
       docs.insurancePolicy && `Insurance policy: ${docs.insurancePolicy}`,
       docs.insuranceExpiry && `Insurance expiry: ${docs.insuranceExpiry}`,
-      docs.competenceCertificate &&
-        `Competence certificate: ${docs.competenceCertificate}`,
+      docs.competenceCertificate && `Competence certificate: ${docs.competenceCertificate}`,
       docs.vhfLicence && `VHF licence: ${docs.vhfLicence}`,
     ].filter(Boolean) as string[];
     if (docLines.length > 0) {
@@ -353,10 +345,8 @@ function buildSummary(
   return lines.join("\n").trim();
 }
 
-const inputClass =
-  "field";
-const labelClass =
-  "field-label";
+const inputClass = "field";
+const labelClass = "field-label";
 const errorClass = "field-error";
 
 function RequiredMark() {
@@ -421,10 +411,7 @@ export default function RequestBerthForm({
 
   // Dates, dimensions, ETA/ETD and priced extras live in the shared plan;
   // everything else is local to this form.
-  const form: FormData = useMemo(
-    () => ({ ...localForm, ...plan }),
-    [localForm, plan]
-  );
+  const form: FormData = useMemo(() => ({ ...localForm, ...plan }), [localForm, plan]);
   const formRef = useRef(form);
   formRef.current = form;
 
@@ -468,8 +455,7 @@ export default function RequestBerthForm({
 
   // Pre-fill from the active boat: into empty fields on first load, and over
   // the boat details when the visitor switches boats (here or in My boat).
-  const { ready: boatsReady, activeBoat, skipper: savedSkipper, saveSkipper } =
-    useBoats();
+  const { ready: boatsReady, activeBoat, skipper: savedSkipper, saveSkipper } = useBoats();
   const appliedBoatId = useRef<string | null | undefined>(undefined);
   const skipperApplied = useRef(false);
   const [rememberSkipper, setRememberSkipper] = useState(false);
@@ -484,9 +470,7 @@ export default function RequestBerthForm({
     if (activeBoat) {
       setDocs(activeBoat.documents ?? { ...EMPTY_DOCUMENTS });
       const vesselType =
-        (["sail", "motor", "catamaran", "other"] as const).find(
-          (v) => v === activeBoat.type
-        ) ?? "";
+        (["sail", "motor", "catamaran", "other"] as const).find((v) => v === activeBoat.type) ?? "";
       setForm((f) =>
         first
           ? {
@@ -553,9 +537,8 @@ export default function RequestBerthForm({
         openEnded: false,
         boatName: last.boatName,
         vesselType:
-          (["sail", "motor", "catamaran", "other"] as const).find(
-            (v) => v === last.vesselType
-          ) ?? "",
+          (["sail", "motor", "catamaran", "other"] as const).find((v) => v === last.vesselType) ??
+          "",
         loa: last.loa,
         beam: last.beam,
         draft: last.draft,
@@ -623,16 +606,15 @@ export default function RequestBerthForm({
     form.laundry,
   ]);
 
-  const listedCrew = form.crew.filter(
-    (c) => c.fullName.trim() && c.personType === "crew"
-  ).length;
+  const listedCrew = form.crew.filter((c) => c.fullName.trim() && c.personType === "crew").length;
   const listedGuests = form.crew.filter(
     (c) => c.fullName.trim() && c.personType === "guest"
   ).length;
 
   const planErrorLabels: string[] = [];
   if (errors.arrival || errors.departure) planErrorLabels.push("dates");
-  if (errors.loa || errors.beam || errors.draft) planErrorLabels.push("boat length, beam and draft");
+  if (errors.loa || errors.beam || errors.draft)
+    planErrorLabels.push("boat length, beam and draft");
 
   function setField<K extends keyof FormData>(key: K, value: FormData[K]) {
     setForm((f) => ({ ...f, [key]: value }));
@@ -768,46 +750,29 @@ export default function RequestBerthForm({
   }
 
   return (
-    <div
-      id="request-berth"
-      className="surface-lift scroll-mt-24 p-6 sm:p-8 md:p-10"
-    >
-      <h2 className="type-heading type-h3 text-ink">
-        Request a berth
-      </h2>
+    <div id="request-berth" className="surface-lift scroll-mt-24 p-6 sm:p-8 md:p-10">
+      <h2 className="type-heading type-h3 text-ink">Request a berth</h2>
       <p className="mt-2 text-sm text-ink/70">
-        Opens a pre-filled email to {marina.name}. Nothing is submitted to a
-        server.
+        Opens a pre-filled email to {marina.name}. Nothing is submitted to a server.
       </p>
 
       <form ref={formElRef} onSubmit={handleSubmit} noValidate className="mt-8 space-y-12">
         {/* 1. Your visit */}
         <fieldset>
-          <legend className="type-heading text-xl text-ink">
-            Your visit
-          </legend>
+          <legend className="type-heading text-xl text-ink">Your visit</legend>
           <p className="mt-4 text-sm text-ink/75">
             <span className={labelClass}>Your stay: </span>
             {form.arrival
               ? `${form.arrival} → ${form.openEnded ? "open-ended" : form.departure || "-"}`
               : "not set yet"}
             {nights ? ` · ${nights} night${nights === 1 ? "" : "s"}` : ""}
-            {Number(form.loa) > 0
-              ? ` · length ${formatLength(Number(form.loa), units)}`
-              : ""}
-            {Number(form.beam) > 0
-              ? `, beam ${formatLength(Number(form.beam), units)}`
-              : ""}
-            {Number(form.draft) > 0
-              ? `, draft ${formatLength(Number(form.draft), units)}`
-              : ""}
+            {Number(form.loa) > 0 ? ` · length ${formatLength(Number(form.loa), units)}` : ""}
+            {Number(form.beam) > 0 ? `, beam ${formatLength(Number(form.beam), units)}` : ""}
+            {Number(form.draft) > 0 ? `, draft ${formatLength(Number(form.draft), units)}` : ""}
           </p>
           <p className="mt-1 text-xs text-ink/70">
             Edit them in{" "}
-            <a
-              href="#plan-your-stay"
-              className="text-ink underline underline-offset-4"
-            >
+            <a href="#plan-your-stay" className="text-ink underline underline-offset-4">
               Plan your stay
             </a>
             .
@@ -858,9 +823,7 @@ export default function RequestBerthForm({
 
         {/* 2. Your boat */}
         <fieldset>
-          <legend className="type-heading text-xl text-ink">
-            Your boat
-          </legend>
+          <legend className="type-heading text-xl text-ink">Your boat</legend>
           <BoatSwitcher
             current={{
               name: form.boatName,
@@ -877,9 +840,9 @@ export default function RequestBerthForm({
               setForm((f) => ({
                 ...f,
                 boatName: boat.name,
-                vesselType: (["sail", "motor", "catamaran", "other"] as const).find(
-                  (v) => v === boat.type
-                ) ?? "",
+                vesselType:
+                  (["sail", "motor", "catamaran", "other"] as const).find((v) => v === boat.type) ??
+                  "",
                 loa: boat.loa,
                 beam: boat.beam,
                 draft: boat.draft,
@@ -918,9 +881,7 @@ export default function RequestBerthForm({
                 value={form.vesselType}
                 aria-invalid={!!errors.vesselType}
                 aria-describedby={errors.vesselType ? "err-vesselType" : undefined}
-                onChange={(e) =>
-                  setField("vesselType", e.target.value as VesselType | "")
-                }
+                onChange={(e) => setField("vesselType", e.target.value as VesselType | "")}
                 className={inputClass}
               >
                 <option value="">Select…</option>
@@ -977,18 +938,14 @@ export default function RequestBerthForm({
                 placeholder="e.g. I-4"
                 className={inputClass}
               />
-              <p className="mt-1 text-xs text-ink/70">
-                Auto-filled if you selected one above
-              </p>
+              <p className="mt-1 text-xs text-ink/70">Auto-filled if you selected one above</p>
             </label>
           </div>
         </fieldset>
 
         {/* 3. Skipper & contact */}
         <fieldset>
-          <legend className="type-heading text-xl text-ink">
-            Skipper &amp; contact
-          </legend>
+          <legend className="type-heading text-xl text-ink">Skipper &amp; contact</legend>
           <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <label className="block text-sm">
               <span className={labelClass}>
@@ -1090,17 +1047,15 @@ export default function RequestBerthForm({
               className="mt-1"
             />
             <span>
-              Remember my name, phone and email on this device for next time.
-              You can change or remove them in My boat.
+              Remember my name, phone and email on this device for next time. You can change or
+              remove them in My boat.
             </span>
           </label>
         </fieldset>
 
         {/* 4. Assistance */}
         <fieldset>
-          <legend className="type-heading text-xl text-ink">
-            Services &amp; assistance
-          </legend>
+          <legend className="type-heading text-xl text-ink">Services &amp; assistance</legend>
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
             <label className="flex items-center gap-2 text-sm text-ink/75">
               <input
@@ -1122,9 +1077,7 @@ export default function RequestBerthForm({
           <p className="mt-4 text-xs text-ink/70">
             Extras chosen in Price estimate &amp; extras:{" "}
             {[
-              form.shorePower
-                ? `shore power${form.amperage ? ` (${form.amperage}A)` : ""}`
-                : "",
+              form.shorePower ? `shore power${form.amperage ? ` (${form.amperage}A)` : ""}` : "",
               form.water ? "water" : "",
               form.pumpOut ? "pump-out" : "",
               form.fuel ? "fuel" : "",
@@ -1138,9 +1091,7 @@ export default function RequestBerthForm({
 
         {/* 5. Vessel status */}
         <fieldset>
-          <legend className="type-heading text-xl text-ink">
-            Vessel use and status
-          </legend>
+          <legend className="type-heading text-xl text-ink">Vessel use and status</legend>
           <div className="mt-4">
             <VesselUseFields
               values={form}
@@ -1148,15 +1099,12 @@ export default function RequestBerthForm({
               skipperName={form.skipperName}
               notes={marina.vesselStatusNotes.commercialUseNotes}
               disclaimer={marina.vesselStatusNotes.commercialUseDisclaimer}
-              onChange={(key, value) =>
-                setForm((f) => ({ ...f, [key]: value }))
-              }
+              onChange={(key, value) => setForm((f) => ({ ...f, [key]: value }))}
             />
           </div>
           <div className="hairline-top mt-8 pt-6" />
           <p className="text-sm text-ink/75">
-            Is your vessel EU-flagged AND is all crew EU/Schengen, arriving
-            from another EU port?
+            Is your vessel EU-flagged AND is all crew EU/Schengen, arriving from another EU port?
             <RequiredMark />
           </p>
           <div className="mt-3 flex gap-3">
@@ -1184,10 +1132,10 @@ export default function RequestBerthForm({
             </button>
           </div>
           {errors.euStatus ? (
-                <p id="err-euStatus" role="alert" className={errorClass}>
-                  {errors.euStatus}
-                </p>
-              ) : null}
+            <p id="err-euStatus" role="alert" className={errorClass}>
+              {errors.euStatus}
+            </p>
+          ) : null}
 
           {form.euStatus === "yes" ? (
             <div className="mt-4 space-y-1 text-sm text-ink/70">
@@ -1214,10 +1162,10 @@ export default function RequestBerthForm({
                     className={inputClass}
                   />
                   {errors.lastPort ? (
-                <p id="err-lastPort" role="alert" className={errorClass}>
-                  {errors.lastPort}
-                </p>
-              ) : null}
+                    <p id="err-lastPort" role="alert" className={errorClass}>
+                      {errors.lastPort}
+                    </p>
+                  ) : null}
                 </label>
 
                 <label className="block text-sm">
@@ -1234,10 +1182,10 @@ export default function RequestBerthForm({
                     className={inputClass}
                   />
                   {errors.nextPort ? (
-                <p id="err-nextPort" role="alert" className={errorClass}>
-                  {errors.nextPort}
-                </p>
-              ) : null}
+                    <p id="err-nextPort" role="alert" className={errorClass}>
+                      {errors.nextPort}
+                    </p>
+                  ) : null}
                 </label>
               </div>
 
@@ -1248,22 +1196,18 @@ export default function RequestBerthForm({
                 </p>
                 {form.vesselUse === "crewed" ? (
                   <p className="mt-2 text-xs text-ink/75">
-                    List professional crew and guests or passengers separately:
-                    choose the type for each person. Border control treats them
-                    differently.
+                    List professional crew and guests or passengers separately: choose the type for
+                    each person. Border control treats them differently.
                   </p>
                 ) : null}
-                <p className="mt-2 text-xs text-ink/70">
-                  Required: name, nationality and role.
-                </p>
+                <p className="mt-2 text-xs text-ink/70">Required: name, nationality and role.</p>
                 <Disclosure
                   label="About the optional details"
                   openLabel="Hide the optional details"
                 >
                   <p className="pb-2 text-xs text-ink/70">
-                    Date of birth, passport number and join date are optional.
-                    Passport numbers and other private details can be given to
-                    the marina staff in person instead.
+                    Date of birth, passport number and join date are optional. Passport numbers and
+                    other private details can be given to the marina staff in person instead.
                   </p>
                 </Disclosure>
                 <div className="mt-3 space-y-4">
@@ -1291,26 +1235,20 @@ export default function RequestBerthForm({
                         type="text"
                         placeholder="Full name"
                         value={member.fullName}
-                        onChange={(e) =>
-                          updateCrew(index, { fullName: e.target.value })
-                        }
+                        onChange={(e) => updateCrew(index, { fullName: e.target.value })}
                         className={`${inputClass} mt-0`}
                       />
                       <input
                         type="date"
                         aria-label="Date of birth (optional)"
                         value={member.dateOfBirth}
-                        onChange={(e) =>
-                          updateCrew(index, { dateOfBirth: e.target.value })
-                        }
+                        onChange={(e) => updateCrew(index, { dateOfBirth: e.target.value })}
                         className={`${inputClass} mt-0`}
                       />
                       <select
                         aria-label="Nationality"
                         value={member.nationality}
-                        onChange={(e) =>
-                          updateCrew(index, { nationality: e.target.value })
-                        }
+                        onChange={(e) => updateCrew(index, { nationality: e.target.value })}
                         className={`${inputClass} mt-0`}
                       >
                         <option value="">Nationality…</option>
@@ -1324,18 +1262,14 @@ export default function RequestBerthForm({
                         type="text"
                         placeholder="Passport number (optional)"
                         value={member.passportNumber}
-                        onChange={(e) =>
-                          updateCrew(index, { passportNumber: e.target.value })
-                        }
+                        onChange={(e) => updateCrew(index, { passportNumber: e.target.value })}
                         className={`${inputClass} mt-0`}
                       />
                       <input
                         type="text"
                         placeholder="Role on board"
                         value={member.role}
-                        onChange={(e) =>
-                          updateCrew(index, { role: e.target.value })
-                        }
+                        onChange={(e) => updateCrew(index, { role: e.target.value })}
                         className={`${inputClass} mt-0`}
                       />
                       <div className="flex gap-2">
@@ -1343,9 +1277,7 @@ export default function RequestBerthForm({
                           type="date"
                           aria-label="Join date (optional)"
                           value={member.joinDate}
-                          onChange={(e) =>
-                            updateCrew(index, { joinDate: e.target.value })
-                          }
+                          onChange={(e) => updateCrew(index, { joinDate: e.target.value })}
                           className={`${inputClass} mt-0`}
                         />
                         <button
@@ -1362,10 +1294,10 @@ export default function RequestBerthForm({
                   ))}
                 </div>
                 {errors.crew ? (
-                <p id="err-crew" role="alert" className={errorClass}>
-                  {errors.crew}
-                </p>
-              ) : null}
+                  <p id="err-crew" role="alert" className={errorClass}>
+                    {errors.crew}
+                  </p>
+                ) : null}
                 <button
                   type="button"
                   onClick={addCrewRow}
@@ -1378,10 +1310,10 @@ export default function RequestBerthForm({
                   listedGuests !== Number(form.guestCount)) &&
                 (form.professionalCrewCount || form.guestCount) ? (
                   <p className="mt-2 text-xs text-ink/70">
-                    Your list shows {listedCrew} professional crew and{" "}
-                    {listedGuests} {listedGuests === 1 ? "guest" : "guests"}, while you entered{" "}
-                    {form.professionalCrewCount || 0} and {form.guestCount || 0}{" "}
-                    above. Please check the numbers match.
+                    Your list shows {listedCrew} professional crew and {listedGuests}{" "}
+                    {listedGuests === 1 ? "guest" : "guests"}, while you entered{" "}
+                    {form.professionalCrewCount || 0} and {form.guestCount || 0} above. Please check
+                    the numbers match.
                   </p>
                 ) : null}
               </div>
@@ -1409,9 +1341,7 @@ export default function RequestBerthForm({
 
         {/* 6. Document wallet */}
         <fieldset>
-          <legend className="type-heading text-xl text-ink">
-            Document wallet
-          </legend>
+          <legend className="type-heading text-xl text-ink">Document wallet</legend>
           <DocumentWallet
             documents={docs}
             onChange={setDocs}
@@ -1438,9 +1368,8 @@ export default function RequestBerthForm({
                 ...f,
                 boatName: boat.name,
                 vesselType:
-                  (["sail", "motor", "catamaran", "other"] as const).find(
-                    (v) => v === boat.type
-                  ) ?? "",
+                  (["sail", "motor", "catamaran", "other"] as const).find((v) => v === boat.type) ??
+                  "",
                 loa: boat.loa,
                 beam: boat.beam,
                 draft: boat.draft,
@@ -1471,16 +1400,12 @@ export default function RequestBerthForm({
         ) : null}
 
         <div>
-          <p className="field-label">
-            Cancellation policy
-          </p>
+          <p className="field-label">Cancellation policy</p>
           <p className="mt-2 text-sm text-ink/75">
             {marina.cancellationPolicy ??
               "Cancellation terms are confirmed by the marina. Ask when they reply to your enquiry."}
           </p>
-          <p className="mt-4 text-sm text-ink/75">
-            {siteConfig.decision.requestNote}
-          </p>
+          <p className="mt-4 text-sm text-ink/75">{siteConfig.decision.requestNote}</p>
           <p className="mt-2 text-sm text-ink/70">
             Your details go only to the marina, by email.{" "}
             <a href="#privacy" className="underline underline-offset-4">
@@ -1488,10 +1413,7 @@ export default function RequestBerthForm({
             </a>
             .
           </p>
-          <button
-            type="submit"
-            className="mt-6 btn-primary"
-          >
+          <button type="submit" className="btn-primary mt-6">
             Send enquiry
           </button>
         </div>
@@ -1499,21 +1421,15 @@ export default function RequestBerthForm({
 
       {summary ? (
         <div className="mt-10 border-t border-hairline pt-8">
-          <h3 className="type-heading type-h3 text-ink">
-            Enquiry summary
-          </h3>
+          <h3 className="type-heading type-h3 text-ink">Enquiry summary</h3>
           <p className="mt-2 text-xs text-ink/70">
-            Your email app should have opened with this pre-filled. If it
-            didn&apos;t, copy the text below and send it manually.
+            Your email app should have opened with this pre-filled. If it didn&apos;t, copy the text
+            below and send it manually.
           </p>
-          <pre className="mt-4 max-h-96 overflow-auto whitespace-pre-wrap border border-hairline bg-paper-deep p-4 text-xs text-ink/75">
+          <pre className="mt-4 max-h-96 overflow-auto border border-hairline bg-paper-deep p-4 text-xs whitespace-pre-wrap text-ink/75">
             {summary}
           </pre>
-          <button
-            type="button"
-            onClick={handleCopy}
-            className="mt-4 btn-dark"
-          >
+          <button type="button" onClick={handleCopy} className="btn-dark mt-4">
             {copied ? "Copied" : "Copy to clipboard"}
           </button>
         </div>
