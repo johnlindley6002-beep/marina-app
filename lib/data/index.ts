@@ -19,6 +19,7 @@ export {
   RELETTING_PROGRESS,
   RELETTING_STATUS_LABELS,
   type RelettingDraft,
+  type ReletSplit,
   type RelettingQueueItem,
   type RelettingRequest,
   advanceRelettingStatus,
@@ -44,6 +45,7 @@ export {
 } from "@/data/mock/reletting";
 
 export {
+  type OwnedBerth,
   type CurrentUser,
   type DevPersona,
   type Mode,

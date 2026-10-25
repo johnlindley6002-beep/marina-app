@@ -2,10 +2,8 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { creditModelCaption, creditModelHeadline, marinas } from "@/data/marinas";
-import { siteConfig } from "@/data/site";
+import { marinas } from "@/data/marinas";
 import { formatLongDate, todayIso, countNights } from "@/lib/dates";
-import { eur } from "@/lib/money";
 import {
   clearRelettingDraft,
   estimateReletting,
@@ -18,45 +16,19 @@ import {
   type RelettingRequest,
 } from "@/lib/data";
 import { useAuth } from "@/components/providers/AuthProvider";
-import Disclosure from "@/components/ui/Disclosure";
 import RoleGate from "@/components/layout/RoleGate";
+import { copy } from "./relet-steps/shared";
+import type { ReletScope } from "./relet-steps/ReletScope";
+import StepAbsence from "./relet-steps/StepAbsence";
+import StepAuthorize from "./relet-steps/StepAuthorize";
+import StepTerms from "./relet-steps/StepTerms";
+import StepReadiness from "./relet-steps/StepReadiness";
+import StepSend from "./relet-steps/StepSend";
 
-const copy = siteConfig.relet;
 const TOTAL = copy.steps.length;
-
-const inputClass = "field";
-const labelClass = "field-label";
 const errorClass = "field-error";
 const primaryClass = "btn-primary";
 const quietClass = "btn-quiet";
-
-function Check({
-  checked,
-  onChange,
-  children,
-  invalid,
-  describedBy,
-}: {
-  checked: boolean;
-  onChange: (value: boolean) => void;
-  children: React.ReactNode;
-  invalid?: boolean;
-  describedBy?: string;
-}) {
-  return (
-    <label className="flex items-start gap-3 text-ink">
-      <input
-        type="checkbox"
-        checked={checked}
-        onChange={(e) => onChange(e.target.checked)}
-        aria-invalid={invalid}
-        aria-describedby={describedBy}
-        className="mt-1"
-      />
-      <span>{children}</span>
-    </label>
-  );
-}
 
 function Wizard() {
   const { user } = useAuth();
@@ -285,6 +257,33 @@ function Wizard() {
     );
   }
 
+  const scope: ReletScope = {
+    startDate,
+    setStartDate,
+    endDate,
+    setEndDate,
+    nights,
+    today,
+    boatRemoval,
+    setBoatRemoval,
+    consent,
+    setConsent,
+    outsideArrangementConfirmed,
+    setOutsideArrangementConfirmed,
+    termsAccepted,
+    setTermsAccepted,
+    boatReady,
+    setBoatReady,
+    berthReady,
+    setBerthReady,
+    error,
+    headingRef,
+    terms,
+    estimate,
+    berth,
+    marina,
+  };
+
   return (
     <div>
       {mode !== "new" ? (
@@ -312,250 +311,11 @@ function Wizard() {
       </p>
 
       <div key={step} className={`${stepClass} mt-10`}>
-        {step === 1 ? (
-          <>
-            <h2
-              ref={headingRef}
-              tabIndex={-1}
-              className="type-heading type-h2 text-ink outline-none"
-            >
-              {copy.absenceTitle}
-            </h2>
-            <p className="measure mt-3 text-ink/75">{copy.absenceBody}</p>
-            <div className="mt-8 grid max-w-md gap-4 sm:grid-cols-2">
-              <label className="block text-sm">
-                <span className={labelClass}>I leave on</span>
-                <input
-                  type="date"
-                  value={startDate}
-                  min={today}
-                  onChange={(e) => setStartDate(e.target.value)}
-                  className={inputClass}
-                />
-              </label>
-              <label className="block text-sm">
-                <span className={labelClass}>I return on</span>
-                <input
-                  type="date"
-                  value={endDate}
-                  min={startDate || today}
-                  onChange={(e) => setEndDate(e.target.value)}
-                  className={inputClass}
-                />
-              </label>
-            </div>
-            <p className="mt-3 min-h-6 text-sm text-ink/75" aria-live="polite">
-              {nights > 0 ? `${nights} night${nights === 1 ? "" : "s"} away.` : ""}
-            </p>
-            <div className="mt-4">
-              <Check checked={boatRemoval} onChange={setBoatRemoval}>
-                {copy.absenceConfirm}
-              </Check>
-            </div>
-          </>
-        ) : null}
-
-        {step === 2 ? (
-          <>
-            <h2
-              ref={headingRef}
-              tabIndex={-1}
-              className="type-heading type-h2 text-ink outline-none"
-            >
-              {copy.authorizeTitle}
-            </h2>
-            <div className="mt-6 flex items-start gap-4">
-              <button
-                type="button"
-                role="switch"
-                aria-checked={consent}
-                aria-labelledby="consent-label"
-                onClick={() => setConsent((c) => !c)}
-                className="flex h-11 w-14 shrink-0 items-center"
-              >
-                <span
-                  aria-hidden="true"
-                  className={`relative block h-8 w-14 rounded-full border transition-colors motion-reduce:transition-none ${
-                    consent ? "border-ink bg-ink" : "border-ink/40 bg-paper-deep"
-                  }`}
-                >
-                  <span
-                    className={`absolute top-0.5 left-0.5 h-6 w-6 rounded-full transition-transform motion-reduce:transition-none ${
-                      consent ? "translate-x-6 bg-paper" : "bg-white shadow-sm"
-                    }`}
-                  />
-                </span>
-              </button>
-              <p id="consent-label" className="text-lg text-ink">
-                {copy.authorizeToggle}
-              </p>
-            </div>
-            <p className="measure mt-4 text-ink/75">{copy.authorizeLine}</p>
-            <Disclosure
-              className="mt-2"
-              label={copy.authorizeWhyLabel}
-              openLabel={copy.authorizeWhyLabel}
-            >
-              <p className="measure pb-2 text-ink/75">{copy.authorizeWhy}</p>
-            </Disclosure>
-            <div className="mt-6">
-              <Check
-                checked={outsideArrangementConfirmed}
-                onChange={setOutsideArrangementConfirmed}
-              >
-                I will not arrange any paid use of my berth outside the marina.
-              </Check>
-            </div>
-            <p className="measure mt-4 text-sm text-ink/70">{terms.noticeRuleNote}</p>
-          </>
-        ) : null}
-
-        {step === 3 ? (
-          <>
-            <h2
-              ref={headingRef}
-              tabIndex={-1}
-              className="type-heading type-h2 text-ink outline-none"
-            >
-              {copy.termsTitle}
-            </h2>
-            <dl className="mt-8 grid max-w-md gap-6 sm:grid-cols-2">
-              <div>
-                <dt className="text-sm text-ink/70">Your credit</dt>
-                <dd className="tabular mt-1 text-2xl font-medium text-ink">
-                  {creditModelHeadline(terms.creditModel)}
-                </dd>
-                <dd className="mt-1 text-sm text-ink/70">
-                  {creditModelCaption(terms.creditModel)}
-                </dd>
-              </div>
-              <div>
-                <dt className="text-sm text-ink/70">Marina processing fee</dt>
-                <dd className="tabular mt-1 text-2xl font-medium text-ink">
-                  {terms.processingFeePercent}%
-                </dd>
-                <dd className="mt-1 text-sm text-ink/70">taken from your share</dd>
-              </div>
-            </dl>
-            <p className="measure mt-6 text-ink/75">
-              {terms.settlement === "credit"
-                ? "This is a credit against your berth fees, not a payment to you."
-                : "This is paid to you after the marina has processed it."}
-            </p>
-            {estimate ? (
-              <p className="measure tabular mt-4 text-ink/75">
-                <span className="chip mr-2">Estimate</span> If every one of your {estimate.nights}{" "}
-                nights were relet, about {eur(estimate.netEur)} would be{" "}
-                {terms.settlement === "credit" ? "credited" : "paid"} after the fee.{" "}
-                {copy.estimateNote}
-              </p>
-            ) : null}
-            {siteConfig.mockMode ? (
-              <p className="mt-3 text-sm text-ink/70">{copy.placeholderNote}</p>
-            ) : null}
-            <Disclosure className="mt-2" label={copy.taxLabel} openLabel={copy.taxLabel}>
-              <p className="measure pb-2 text-ink/75">{terms.taxNote}</p>
-            </Disclosure>
-            {terms.mooringLetFeeSchedule.length > 0 ? (
-              <Disclosure
-                className="mt-2"
-                label="If you arrange a paid let yourself"
-                openLabel="If you arrange a paid let yourself"
-              >
-                <p className="measure pb-2 text-ink/75">
-                  Letting your berth for payment outside the marina still needs its prior written
-                  authorisation, and is a different path from the one on this page. If authorised,
-                  the marina&apos;s own processing fee is{" "}
-                  {terms.mooringLetFeeSchedule
-                    .map((tier) => `€${tier.feeEur} up to ${tier.maxDays} days`)
-                    .join(", ")}{" "}
-                  (excl. VAT).
-                </p>
-              </Disclosure>
-            ) : null}
-            <div className="mt-6">
-              <Check
-                checked={termsAccepted}
-                onChange={setTermsAccepted}
-                invalid={!!error && !termsAccepted}
-              >
-                {copy.termsAccept}.{" "}
-                <Link
-                  href={terms.termsHref}
-                  target="_blank"
-                  className="underline underline-offset-4"
-                >
-                  Read the full terms
-                  <span className="sr-only"> (opens in a new tab)</span>
-                </Link>
-              </Check>
-            </div>
-          </>
-        ) : null}
-
-        {step === 4 ? (
-          <>
-            <h2
-              ref={headingRef}
-              tabIndex={-1}
-              className="type-heading type-h2 text-ink outline-none"
-            >
-              {copy.readinessTitle}
-            </h2>
-            <div className="mt-8 space-y-4">
-              <Check checked={boatReady} onChange={setBoatReady}>
-                {copy.readinessBoat.replace("the start date", formatLongDate(startDate))}
-              </Check>
-              <Check checked={berthReady} onChange={setBerthReady}>
-                {copy.readinessBerth}
-              </Check>
-            </div>
-            <p className="measure mt-8 text-ink/75">{copy.readinessInsurance}</p>
-          </>
-        ) : null}
-
-        {step === 5 ? (
-          <>
-            <h2
-              ref={headingRef}
-              tabIndex={-1}
-              className="type-heading type-h2 text-ink outline-none"
-            >
-              {copy.submitTitle}
-            </h2>
-            <dl className="mt-8 grid max-w-lg gap-x-8 gap-y-4 text-ink sm:grid-cols-[auto_1fr]">
-              <dt className="text-ink/70">Berth</dt>
-              <dd>
-                {berth.berthId}, {berth.marinaName}
-              </dd>
-              <dt className="text-ink/70">Away</dt>
-              <dd>
-                {formatLongDate(startDate)} to {formatLongDate(endDate)} ({nights} nights)
-              </dd>
-              <dt className="text-ink/70">Reletting</dt>
-              <dd>The marina may relet it, with its approval</dd>
-              <dt className="text-ink/70">Terms</dt>
-              <dd>
-                {creditModelHeadline(terms.creditModel)} credit, {terms.processingFeePercent}% fee,{" "}
-                {terms.settlement}
-              </dd>
-              {estimate ? (
-                <>
-                  <dt className="text-ink/70">Estimate</dt>
-                  <dd className="tabular">
-                    About {eur(estimate.netEur)} if every night were relet. The marina may relet
-                    only some of them.
-                  </dd>
-                </>
-              ) : null}
-            </dl>
-            <p className="measure mt-6 text-sm text-ink/70">
-              Sending this asks for the marina&apos;s consent. Nothing is relet until the marina
-              approves.
-            </p>
-          </>
-        ) : null}
-
+        {step === 1 ? <StepAbsence scope={scope} /> : null}
+        {step === 2 ? <StepAuthorize scope={scope} /> : null}
+        {step === 3 ? <StepTerms scope={scope} /> : null}
+        {step === 4 ? <StepReadiness scope={scope} /> : null}
+        {step === 5 ? <StepSend scope={scope} /> : null}
         {error ? (
           <p role="alert" className={errorClass}>
             {error}
