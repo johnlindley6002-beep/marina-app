@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { siteConfig } from "@/data/site";
+import { DEV_TOOLS_ENABLED } from "@/lib/devTools";
 import {
   emptyMockReletting,
   resetMockEnquiries,
@@ -13,12 +14,13 @@ import { useAuth } from "@/components/providers/AuthProvider";
 // MOCK / DEV ONLY. Stands in for signing in so each experience can be
 // previewed: a visitor with no account, a plain voyager, a voyager who is also
 // an owner, and a marina staff member. It does not exist in the real product.
-// Hide it with siteConfig.mockMode = false, and delete it before launch.
+// It renders only when dev tools are enabled (lib/devTools.ts) and
+// siteConfig.mockMode is on. Delete it before launch.
 export default function DevPersonaSwitcher() {
   const { personas, activePersonaId, signInAs } = useAuth();
   const [open, setOpen] = useState(false);
 
-  if (!siteConfig.mockMode) return null;
+  if (!DEV_TOOLS_ENABLED || !siteConfig.mockMode) return null;
 
   const active = personas.find((p) => p.id === activePersonaId);
 

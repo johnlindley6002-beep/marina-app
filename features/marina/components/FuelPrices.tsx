@@ -1,5 +1,3 @@
-"use client";
-
 import type { Marina, Timestamped } from "@/data/marinas";
 import LastUpdated from "@/components/ui/LastUpdated";
 

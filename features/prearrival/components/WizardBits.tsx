@@ -1,5 +1,3 @@
-"use client";
-
 import type { ReactNode } from "react";
 
 // A calm, non-blocking information panel, shown only when the situation it

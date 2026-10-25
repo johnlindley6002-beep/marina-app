@@ -3,6 +3,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { siteConfig } from "@/data/site";
+import { DEV_TOOLS_ENABLED } from "@/lib/devTools";
 import type { Role } from "@/lib/data";
 import { useAuth } from "@/components/providers/AuthProvider";
 
@@ -34,7 +35,11 @@ export default function RoleGate({ role, children }: { role?: Role; children: Re
     return (
       <Message
         title="Sign in to continue"
-        body={siteConfig.mockMode ? siteConfig.accounts.signedOut : "You are not signed in."}
+        body={
+          siteConfig.mockMode && DEV_TOOLS_ENABLED
+            ? siteConfig.accounts.signedOut
+            : "You are not signed in. Sign-in is not available in this preview."
+        }
       />
     );
   }
