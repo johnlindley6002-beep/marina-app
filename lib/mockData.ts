@@ -272,8 +272,8 @@ type ProfileOverrides = Record<
 function initialsFor(name: string): string {
   const parts = name.trim().split(/\s+/).filter(Boolean);
   if (parts.length === 0) return "?";
-  const first = parts[0][0];
-  const last = parts.length > 1 ? parts[parts.length - 1][0] : "";
+  const first = parts[0]?.[0] ?? "";
+  const last = parts.length > 1 ? (parts[parts.length - 1]?.[0] ?? "") : "";
   return (first + last).toUpperCase();
 }
 
@@ -387,7 +387,7 @@ export function getOwnedBerths(userId: string | null): OwnedBerth[] {
         marinaName: marina?.name ?? link.marinaId,
         countrySlug: marina?.countrySlug ?? "",
         berthId: link.berthId,
-        pontoon: berth?.pontoonId ?? link.berthId.split("-")[0],
+        pontoon: berth?.pontoonId ?? link.berthId.split("-")[0] ?? link.berthId,
         sizeClass: berth?.sizeClass ?? null,
         linkedBy: marina?.name ?? link.marinaId,
         linkedAt: link.linkedAt,
@@ -1092,10 +1092,10 @@ export function advanceRelettingStatus(
     return { ok: false, error: "Only staff of this marina can do this." };
   }
   const index = RELETTING_PROGRESS.indexOf(request.status);
-  if (request.status === "declined" || index < 1 || index >= RELETTING_PROGRESS.length - 1) {
+  const nextStatus = RELETTING_PROGRESS[index + 1];
+  if (request.status === "declined" || index < 1 || !nextStatus) {
     return { ok: false, error: "There is no next step for this request." };
   }
-  const nextStatus = RELETTING_PROGRESS[index + 1];
   let next = withEvent(request, nextStatus);
   const added: MockNotification[] = [];
 

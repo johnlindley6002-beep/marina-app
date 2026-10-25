@@ -995,6 +995,15 @@ export const marinas: Marina[] = [
   },
 ];
 
+// The marina the single-marina screens (staff back office, footer) operate on
+// today. Throws at startup if none is configured, instead of letting every
+// caller handle "maybe undefined" for a case that cannot happen in practice.
+export function getPrimaryMarina(): Marina {
+  const marina = marinas[0];
+  if (!marina) throw new Error("No marina is configured in data/marinas.ts");
+  return marina;
+}
+
 export function getCountries(): {
   slug: string;
   name: string;

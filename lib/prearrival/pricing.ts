@@ -45,7 +45,7 @@ export function classifyByLengthAndBeam(
   if (!byLength || !byBeam) return byLength ?? byBeam ?? null;
   const li = MARINA_CLASS_ORDER.indexOf(byLength);
   const bi = MARINA_CLASS_ORDER.indexOf(byBeam);
-  return MARINA_CLASS_ORDER[Math.max(li, bi)];
+  return MARINA_CLASS_ORDER[Math.max(li, bi)] ?? null;
 }
 
 export type NightlyBreakdownLine = {

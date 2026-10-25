@@ -61,7 +61,7 @@ export default function PreArrivalScenariosPage() {
           <h2 className="type-heading type-h2 text-ink">Reletting scenarios</h2>
           <p className="mt-1 text-sm text-ink/70">
             Creates and, where relevant, approves a reletting request for the
-            seed owner's berth (G-14).
+            seed owner&apos;s berth (G-14).
           </p>
           <ul className="mt-4 space-y-2">
             <li>

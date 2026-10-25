@@ -34,7 +34,7 @@ export function useParallax(
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        visible = entry.isIntersecting;
+        visible = entry?.isIntersecting ?? false;
       },
       { threshold: 0 }
     );

@@ -1,0 +1,10 @@
+.next
+node_modules
+coverage
+playwright-report
+test-results
+package-lock.json
+public
+docs/audit/screens
+next-env.d.ts
+*.tsbuildinfo

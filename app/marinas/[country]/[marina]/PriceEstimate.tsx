@@ -179,7 +179,9 @@ export default function PriceEstimate({
               ·{" "}
               {quote.berthLines.length > 1
                 ? "both seasons"
-                : SEASON_LABELS[quote.berthLines[0].season]}
+                : quote.berthLines[0]
+                  ? SEASON_LABELS[quote.berthLines[0].season]
+                  : ""}
               {selectedBerthId ? ` · Berth ${selectedBerthId}` : ""}
             </p>
             {demandNote ? (

@@ -80,6 +80,12 @@ export default function Lightbox({ photos, index, onIndexChange, onClose }: Prop
     count > 1
       ? [...new Set([(index + 1) % count, (index - 1 + count) % count])]
       : [];
+  const neighbourPhotos = neighbours.flatMap((n) => {
+    const neighbour = photos[n];
+    return neighbour ? [neighbour] : [];
+  });
+
+  if (!photo) return null;
 
   return (
     <dialog
@@ -159,10 +165,10 @@ export default function Lightbox({ photos, index, onIndexChange, onClose }: Prop
       </div>
 
       <div className="hidden" aria-hidden="true">
-        {neighbours.map((n) => (
+        {neighbourPhotos.map((n) => (
           <Image
-            key={photos[n].src}
-            src={photos[n].src}
+            key={n.src}
+            src={n.src}
             alt=""
             width={1600}
             height={1200}

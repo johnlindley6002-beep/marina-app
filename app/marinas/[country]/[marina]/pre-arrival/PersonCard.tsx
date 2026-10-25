@@ -106,7 +106,7 @@ export default function PersonCard({
                 {index > 0 ? (
                   <button
                     type="button"
-                    onClick={() => update({ familyName: draft.people[0].familyName })}
+                    onClick={() => update({ familyName: draft.people[0]?.familyName ?? "" })}
                     className="shrink-0 whitespace-nowrap text-xs text-ink/65 underline underline-offset-4"
                   >
                     {copy.sameSurnameToggle}
@@ -141,7 +141,7 @@ export default function PersonCard({
                 {index > 0 ? (
                   <button
                     type="button"
-                    onClick={() => update({ nationality: draft.people[0].nationality })}
+                    onClick={() => update({ nationality: draft.people[0]?.nationality ?? "" })}
                     className="shrink-0 whitespace-nowrap text-xs text-ink/65 underline underline-offset-4"
                   >
                     {copy.sameNationalityToggle}

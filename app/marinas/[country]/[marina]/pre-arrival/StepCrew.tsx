@@ -12,6 +12,7 @@ import type { PersonStatus } from "./WizardBits";
 
 function statusFor(index: number, draft: StepProps["draft"]): PersonStatus {
   const person = draft.people[index];
+  if (!person) return "missing";
   const prefix = `people.${index}`;
   const hasError = getExtraErrors(draft).some((f) => f.path?.startsWith(prefix));
   if (hasError) return "check-dates";
@@ -44,8 +45,9 @@ export default function StepCrew({ draft, setDraft, focusPersonIndex }: StepProp
           role: people.length === 0 ? "skipper" : "crew",
         });
       }
-      if (!people.some((p) => p.role === "skipper") && people.length > 0) {
-        people[0] = { ...people[0], role: "skipper" };
+      const first = people[0];
+      if (first && !people.some((p) => p.role === "skipper")) {
+        people[0] = { ...first, role: "skipper" };
       }
       return { ...d, people };
     });
@@ -54,8 +56,9 @@ export default function StepCrew({ draft, setDraft, focusPersonIndex }: StepProp
   function removePerson(index: number) {
     setDraft((d) => {
       const people = d.people.filter((_, i) => i !== index);
-      if (people.length > 0 && !people.some((p) => p.role === "skipper")) {
-        people[0] = { ...people[0], role: "skipper" };
+      const first = people[0];
+      if (first && !people.some((p) => p.role === "skipper")) {
+        people[0] = { ...first, role: "skipper" };
       }
       return { ...d, people };
     });

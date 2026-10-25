@@ -1,8 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { getAllBerths } from "../../../data/berths";
-import { marinas } from "../../../data/marinas";
+import { getPrimaryMarina } from "../../../data/marinas";
 import { todayIso } from "../../../lib/formatDate";
 import {
   getBerthStatuses,
@@ -16,7 +16,7 @@ import { useAuth } from "../../components/AuthProvider";
 import { STAFF_STATUS_LABEL } from "../../marinas/[country]/[marina]/BerthAvailabilityMap";
 import { useUnits } from "../../components/UnitsProvider";
 
-const MARINA = marinas[0];
+const MARINA = getPrimaryMarina();
 const NONE: Enquiry[] = [];
 const TABS = ["Boats", "Berths", "Customers"] as const;
 type Tab = (typeof TABS)[number];
@@ -38,8 +38,11 @@ export default function RecordsBrowser() {
   const berths = useMemo(() => getAllBerths(), []);
 
   const query = q.trim().toLowerCase();
-  const matches = (...values: string[]) =>
-    query === "" || values.some((v) => v.toLowerCase().includes(query));
+  const matches = useCallback(
+    (...values: string[]) =>
+      query === "" || values.some((v) => v.toLowerCase().includes(query)),
+    [query]
+  );
 
   const boatRows = useMemo(() => {
     const owned = links.map((l) => ({
@@ -67,7 +70,7 @@ export default function RecordsBrowser() {
     return [...owned, ...transient].filter((r) =>
       matches(r.name, r.person, r.berthId)
     );
-  }, [links, enquiries, query]);
+  }, [links, enquiries, matches]);
 
   const berthRows = useMemo(
     () =>
@@ -79,7 +82,7 @@ export default function RecordsBrowser() {
           detail: statuses[b.id]?.detail ?? "",
         }))
         .filter((r) => matches(r.id, r.sizeClass)),
-    [berths, statuses, query]
+    [berths, statuses, matches]
   );
 
   const customerRows = useMemo(() => {
@@ -100,7 +103,7 @@ export default function RecordsBrowser() {
         kind: "Enquiry contact",
       }));
     return [...owners, ...skippers].filter((r) => matches(r.name, r.boat));
-  }, [links, enquiries, query]);
+  }, [links, enquiries, matches]);
 
   return (
     <div>

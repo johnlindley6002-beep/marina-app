@@ -4,7 +4,6 @@ import { siteConfig } from "../../../../data/site";
 import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import {
   calculateQuote,
-  classifyBoatLength,
   SEASON_LABELS,
   type Marina,
   type Quote,
@@ -465,7 +464,7 @@ export default function RequestBerthForm({
     if (selectedBerthId) {
       setForm((f) => ({ ...f, berthId: selectedBerthId }));
     }
-  }, [selectedBerthId]);
+  }, [selectedBerthId, setForm]);
 
   // Pre-fill from the active boat: into empty fields on first load, and over
   // the boat details when the visitor switches boats (here or in My boat).
@@ -570,7 +569,7 @@ export default function RequestBerthForm({
     document
       .getElementById("request-berth")
       ?.scrollIntoView({ behavior: "smooth", block: "start" });
-  }, [rebookToken, marina.id]);
+  }, [rebookToken, marina.id, setForm]);
 
   useEffect(() => {
     if (submitted) setErrors(validate(form));
@@ -1515,7 +1514,7 @@ export default function RequestBerthForm({
             onClick={handleCopy}
             className="mt-4 btn-dark"
           >
-            {copied ? "Copied!" : "Copy to clipboard"}
+            {copied ? "Copied" : "Copy to clipboard"}
           </button>
         </div>
       ) : null}

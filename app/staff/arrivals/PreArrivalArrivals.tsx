@@ -40,7 +40,7 @@ const STATUS_CLASS: Record<PreArrivalStatus, string> = {
   border: "staff-badge-accent",
 };
 
-function Row({ checkIn, staffId }: { checkIn: PreArrivalCheckIn; staffId: string | null }) {
+function Row({ checkIn }: { checkIn: PreArrivalCheckIn }) {
   const { draft } = checkIn;
   const [open, setOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -199,7 +199,7 @@ export default function PreArrivalArrivals() {
 
       <ul className="mt-3 space-y-2">
         {filtered.map((checkIn) => (
-          <Row key={checkIn.id} checkIn={checkIn} staffId={staffId} />
+          <Row key={checkIn.id} checkIn={checkIn} />
         ))}
       </ul>
 

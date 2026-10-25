@@ -69,7 +69,8 @@ function Item({ item, staffId }: { item: RelettingQueueItem; staffId: string }) 
   const index = RELETTING_PROGRESS.indexOf(request.status);
   const canAdvance =
     request.status !== "declined" && request.status !== "cancelled" && index >= 1 && index < RELETTING_PROGRESS.length - 1;
-  const nextLabel = canAdvance ? RELETTING_STATUS_LABELS[RELETTING_PROGRESS[index + 1]] : "";
+  const nextStatus = canAdvance ? RELETTING_PROGRESS[index + 1] : undefined;
+  const nextLabel = nextStatus ? RELETTING_STATUS_LABELS[nextStatus] : "";
   const rowId = `relet-${request.id}`;
 
   function decide(decision: "approve" | "decline") {

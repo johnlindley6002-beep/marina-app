@@ -27,7 +27,7 @@ export default async function CountryPage({ params }: Props) {
   }
 
   return (
-    <CountryPageContent marinas={marinas} countryName={marinas[0].country} />
+    <CountryPageContent marinas={marinas} countryName={marinas[0]?.country ?? country} />
   );
 }
 

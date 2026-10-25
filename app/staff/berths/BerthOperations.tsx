@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { getAllBerths } from "../../../data/berths";
-import { marinas } from "../../../data/marinas";
+import { getPrimaryMarina } from "../../../data/marinas";
 import { formatLongDate, todayIso } from "../../../lib/formatDate";
 import {
   clearBerthOutOfService,
@@ -13,6 +13,7 @@ import {
   reassignEnquiryBerth,
   setBerthOutOfService,
   suggestReleasedBerths,
+  type BerthOperationalInfo,
   type Enquiry,
 } from "../../../lib/mockData";
 import { useMock } from "../../../lib/useMock";
@@ -22,7 +23,7 @@ import BerthAvailabilityMap, {
 } from "../../marinas/[country]/[marina]/BerthAvailabilityMap";
 import BerthPicker from "../BerthPicker";
 
-const MARINA = marinas[0];
+const MARINA = getPrimaryMarina();
 const NONE: Enquiry[] = [];
 
 type PanelData = {
@@ -64,7 +65,7 @@ export default function BerthOperations() {
     if (!selectedBerthId) return null;
     const berth = allBerths.find((b) => b.id === selectedBerthId);
     if (!berth) return null;
-    const info = statuses[selectedBerthId] ?? { status: "free" as const };
+    const info: BerthOperationalInfo = statuses[selectedBerthId] ?? { status: "free", detail: "" };
     const enquiry =
       info.enquiryId != null ? enquiries.find((e) => e.id === info.enquiryId) ?? null : null;
     return { berthId: berth.id, sizeClass: berth.sizeClass, info, enquiry };

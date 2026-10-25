@@ -251,6 +251,7 @@ function Wizard() {
   }
 
   function onSubmit() {
+    if (!berth) return;
     const result =
       mode === "edit" && requestId
         ? updateRelettingRequest(userId, requestId, { startDate, endDate })
