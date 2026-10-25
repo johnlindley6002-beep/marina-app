@@ -75,10 +75,6 @@ export const CLASS_BEAM_RANGES: Record<MarinaClass, number> = {
   IX: 10.0,
 };
 
-export function getMaxBeamM(): number {
-  return Math.max(...Object.values(CLASS_BEAM_RANGES));
-}
-
 export type BoatDimensions = { loa: number; beam: number; draft: number };
 
 export type BoatFitResult =

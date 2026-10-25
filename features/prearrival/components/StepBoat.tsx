@@ -4,7 +4,6 @@ import { COUNTRIES } from "@/lib/countries";
 import { buildPtIdentificationSet, NAVIGATION_ZONES } from "@/features/prearrival/lib/portugal";
 import { classifyByLengthAndBeam } from "@/features/prearrival/lib/pricing";
 import {
-  emptyDocuments,
   VESSEL_USES,
   type Propulsion,
   type VesselUseValue,
@@ -15,6 +14,7 @@ import { useLanguage } from "@/components/providers/LanguageProvider";
 import LengthInput from "@/components/ui/LengthInput";
 import { useUnits } from "@/components/providers/UnitsProvider";
 import type { StepProps } from "./PreArrivalWizard";
+import { applySavedBoatToDraft } from "@/features/prearrival/lib/boatMapping";
 import { Field } from "./WizardBits";
 
 export default function StepBoat({ marina, draft, setDraft, errors }: StepProps) {
@@ -26,53 +26,7 @@ export default function StepBoat({ marina, draft, setDraft, errors }: StepProps)
   function chooseSaved(boatId: string) {
     const boat = boats.find((b) => b.id === boatId);
     if (!boat) return;
-    setDraft((d) => ({
-      ...d,
-      boatId: boat.id,
-      boatIdentity: {
-        ...d.boatIdentity,
-        name: boat.name,
-        flagCountry: boat.flag,
-        registrationNumber:
-          d.documents.registration.number || boat.documents?.registrationNumber || "",
-        portOfRegistry: d.boatIdentity.portOfRegistry || boat.homePort,
-      },
-      boatSpecs: {
-        ...d.boatSpecs,
-        lengthOverall: boat.loa,
-        beam: boat.beam,
-        draught: boat.draft,
-        propulsion: (boat.type === "motor"
-          ? "power"
-          : boat.type === "catamaran"
-            ? "sail_and_power"
-            : "sail") as Propulsion,
-        isMultihull: boat.type === "catamaran",
-      },
-      documents: boat.documents
-        ? {
-            ...emptyDocuments(),
-            registration: {
-              ...d.documents.registration,
-              number: boat.documents.registrationNumber,
-            },
-            thirdPartyInsurance: {
-              ...d.documents.thirdPartyInsurance,
-              number: boat.documents.insurancePolicy,
-              insurer: boat.documents.insuranceProvider,
-              expiryDate: boat.documents.insuranceExpiry,
-            },
-            skipperLicence: {
-              ...d.documents.skipperLicence,
-              number: boat.documents.competenceCertificate,
-            },
-            radioStationLicence: {
-              ...d.documents.radioStationLicence,
-              number: boat.documents.vhfLicence,
-            },
-          }
-        : d.documents,
-    }));
+    setDraft((d) => applySavedBoatToDraft(d, boat));
   }
 
   const lengthM = Number(draft.boatSpecs.lengthOverall) || 0;

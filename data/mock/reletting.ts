@@ -659,12 +659,6 @@ export function isRelettingEditable(request: RelettingRequest): boolean {
   );
 }
 
-export function isRelettingLocked(request: RelettingRequest): boolean {
-  return (
-    request.status === "booked" || (request.status === "listed" && request.bookedNights.length > 0)
-  );
-}
-
 export function ownedRequest(
   userId: string | null,
   requestId: string

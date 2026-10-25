@@ -22,10 +22,8 @@ export const VESSEL_USES = ["private", "bareboat", "crewed", "commercial"] as co
 export type VesselUseValue = (typeof VESSEL_USES)[number];
 
 export const PERSON_ROLES = ["skipper", "crew", "guest"] as const;
-export type PersonRole = (typeof PERSON_ROLES)[number];
 
 export const ID_TYPES = ["passport", "national_id"] as const;
-export type IdType = (typeof ID_TYPES)[number];
 
 const isoDate = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Use the date picker, or type YYYY-MM-DD.");
 const isoDateTime = z.string().min(1, "Choose a date and time.");

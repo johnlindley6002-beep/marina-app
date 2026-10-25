@@ -147,7 +147,7 @@ export const STAFF_INVITATIONS: StaffInvitationRecord[] = [
 // Role rules (mocked here, enforced by the real backend later)
 // ---------------------------------------------------------------------------
 
-// Whether a person can grant themselves a role.
+// Whether a person can grant themselves a role:
 //
 //   voyager: YES. It is the default for anyone who signs up.
 //   owner:   NO. Only a marina linking a berth to them creates it. In the real
@@ -156,9 +156,8 @@ export const STAFF_INVITATIONS: StaffInvitationRecord[] = [
 //            berth links), never trusted from the client.
 //   staff:   NO. Only a marina inviting them, and them accepting, creates it.
 //            The real backend must verify the invitation server-side too.
-export function canSelfAssignRole(role: Role): boolean {
-  return role === "voyager";
-}
+//
+// So roles are derived from records (see getRoles), never set by the user.
 
 // Roles are DERIVED from records, never stored on the account, so there is no
 // field the UI could set to grant one. The real backend should derive them the

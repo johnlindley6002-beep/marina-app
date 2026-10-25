@@ -90,10 +90,6 @@ export function submitPreArrivalCheckIn(
   return checkIn;
 }
 
-export function getPreArrivalCheckIn(id: string): PreArrivalCheckIn | null {
-  return loadPreArrivalStore().checkIns.find((c) => c.id === id) ?? null;
-}
-
 // Every submitted check-in on this device, newest first. A boater is not
 // signed in, so this is device-only, exactly like the drafts above.
 export function getAllPreArrivalCheckIns(): PreArrivalCheckIn[] {

@@ -118,7 +118,6 @@ export function saveBoats(store: BoatStore): boolean {
 }
 
 export const BOATS_STORAGE_KEY = BOATS_KEY;
-export const PROFILE_STORAGE_KEY = PROFILE_KEY;
 
 // The skipper's own contact details, stored once for every enquiry. Optional,
 // and only written when the visitor asks for it.

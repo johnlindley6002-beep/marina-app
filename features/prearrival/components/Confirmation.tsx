@@ -7,13 +7,9 @@ import { saveFrequentPerson } from "@/features/my-boat/lib/boatProfile";
 import { getDocumentRequirements } from "@/features/prearrival/lib/documentRules";
 import type { PreArrivalCheckIn } from "@/lib/data";
 import { useBoats, type BoatInput } from "@/components/providers/BoatProvider";
+import { draftToSavedBoat } from "@/features/prearrival/lib/boatMapping";
 import DocumentButtons from "./DocumentButtons";
 import { useLanguage } from "@/components/providers/LanguageProvider";
-
-function boatTypeFor(propulsion: string, isMultihull: boolean): string {
-  if (isMultihull) return "catamaran";
-  return propulsion === "power" ? "motor" : "sail";
-}
 
 function SaveToMyBoat({ checkIn }: { checkIn: PreArrivalCheckIn }) {
   const { t } = useLanguage();
@@ -22,24 +18,8 @@ function SaveToMyBoat({ checkIn }: { checkIn: PreArrivalCheckIn }) {
   const [saved, setSaved] = useState(false);
 
   function save() {
-    const { boatIdentity, boatSpecs, owner, documents, people } = checkIn.draft;
-    const input: BoatInput = {
-      name: boatIdentity.name,
-      type: boatTypeFor(boatSpecs.propulsion, boatSpecs.isMultihull),
-      loa: boatSpecs.lengthOverall,
-      beam: boatSpecs.beam,
-      draft: boatSpecs.draught,
-      flag: boatIdentity.flagCountry,
-      homePort: boatIdentity.portOfRegistry,
-      documents: {
-        registrationNumber: documents.registration.number,
-        insuranceProvider: documents.thirdPartyInsurance.insurer,
-        insurancePolicy: documents.thirdPartyInsurance.number,
-        insuranceExpiry: documents.thirdPartyInsurance.expiryDate,
-        competenceCertificate: documents.skipperLicence.number,
-        vhfLicence: documents.radioStationLicence.number,
-      },
-    };
+    const { owner, people } = checkIn.draft;
+    const input: BoatInput = draftToSavedBoat(checkIn.draft);
     saveBoat(input);
     for (const person of people) {
       saveFrequentPerson({
