@@ -37,7 +37,7 @@ const BerthAvailabilityMap = dynamic(() => import("./BerthAvailabilityMap"), {
 });
 // The enquiry form is the heaviest client piece. It loads after first paint,
 // and its measured height is reserved (with the anchor id) so nothing shifts.
-const RequestBerthForm = dynamic(() => import("./RequestBerthForm"), {
+const RequestBerthForm = dynamic(() => import("./request-berth/RequestBerthForm"), {
   ssr: false,
   loading: () => (
     <div
