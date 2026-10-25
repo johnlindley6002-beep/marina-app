@@ -9,7 +9,7 @@ import {
 import { generateArrivalDeclarationPdf } from "@/features/prearrival/lib/documents/arrivalDeclaration";
 import { generateCrewListPdf } from "@/features/prearrival/lib/documents/crewList";
 import { downloadBytes, downloadText } from "@/features/prearrival/lib/documents/download";
-import type { PreArrivalCheckIn } from "@/data/mock/mockData";
+import type { PreArrivalCheckIn } from "@/lib/data";
 import { getVoyageFlags } from "@/features/prearrival/lib/schema";
 import { useLanguage } from "@/components/providers/LanguageProvider";
 

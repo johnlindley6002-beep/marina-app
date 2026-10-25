@@ -15,8 +15,8 @@ import {
   RELETTING_STATUS_LABELS,
   startRelettingDraftFrom,
   type RelettingRequest,
-} from "@/data/mock/mockData";
-import { useMock } from "@/lib/useMock";
+  useMock,
+} from "@/lib/data";
 import { useAuth } from "@/components/providers/AuthProvider";
 import Disclosure from "@/components/ui/Disclosure";
 import StatusChip from "@/components/ui/StatusChip";

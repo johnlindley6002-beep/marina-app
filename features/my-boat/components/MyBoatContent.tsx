@@ -5,7 +5,7 @@ import { useRef, useState } from "react";
 import { marinas } from "@/data/marinas";
 import { siteConfig } from "@/data/site";
 import { clearFrequentCrew } from "@/features/my-boat/lib/boatProfile";
-import { resetMockPreArrival } from "@/data/mock/mockData";
+import { resetMockPreArrival } from "@/lib/data";
 import { formatLength } from "@/lib/units";
 import { useBoats } from "@/components/providers/BoatProvider";
 import Disclosure from "@/components/ui/Disclosure";

@@ -2,8 +2,7 @@
 
 import { useState } from "react";
 import { formatLongDate, todayIso } from "@/lib/dates";
-import { getBerthCalendar, type CalendarDay, type CalendarState } from "@/data/mock/mockData";
-import { useMock } from "@/lib/useMock";
+import { getBerthCalendar, type CalendarDay, type CalendarState, useMock } from "@/lib/data";
 import { useAuth } from "@/components/providers/AuthProvider";
 
 const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];

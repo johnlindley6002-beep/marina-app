@@ -13,8 +13,8 @@ import {
   type MockNotification,
   type RelettingDraft,
   type RelettingRequest,
-} from "@/data/mock/mockData";
-import { useMock } from "@/lib/useMock";
+  useMock,
+} from "@/lib/data";
 import { formatLength } from "@/lib/units";
 import { useAuth } from "@/components/providers/AuthProvider";
 import PageHeader from "@/components/layout/PageHeader";

@@ -2,14 +2,8 @@
 
 import { useState } from "react";
 import { formatLongDate } from "@/lib/dates";
-import {
-  decideEnquiry,
-  getEnquiries,
-  type Enquiry,
-  type EnquiryStatus,
-} from "@/data/mock/mockData";
+import { decideEnquiry, getEnquiries, type Enquiry, type EnquiryStatus, useMock } from "@/lib/data";
 import { formatLength } from "@/lib/units";
-import { useMock } from "@/lib/useMock";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { Collapse } from "@/components/ui/Disclosure";
 import { useUnits } from "@/components/providers/UnitsProvider";

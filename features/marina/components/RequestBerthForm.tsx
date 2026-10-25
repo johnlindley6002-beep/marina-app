@@ -20,7 +20,7 @@ import VesselUseFields, {
 } from "./VesselUseFields";
 import { useUnits } from "@/components/providers/UnitsProvider";
 import { loadLastEnquiry, saveLastEnquiry } from "@/features/marina/lib/tripStore";
-import { EMPTY_ENQUIRY_DOCUMENTS, submitEnquiry } from "@/data/mock/mockData";
+import { EMPTY_ENQUIRY_DOCUMENTS, submitEnquiry } from "@/lib/data";
 import { effectiveDeparture, PLAN_KEYS, type StayPlan } from "@/features/marina/lib/stayPlan";
 import { formatLength } from "@/lib/units";
 

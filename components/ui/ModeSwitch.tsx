@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/providers/AuthProvider";
-import type { Mode } from "@/data/mock/mockData";
+import type { Mode } from "@/lib/data";
 
 const OPTIONS: { value: Mode; label: string }[] = [
   { value: "guest", label: "Guest" },

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRef, useState, type FormEvent } from "react";
 import { siteConfig } from "@/data/site";
-import type { CurrentUser } from "@/data/mock/mockData";
+import type { CurrentUser } from "@/lib/data";
 import { useAuth } from "@/components/providers/AuthProvider";
 import PageHeader from "@/components/layout/PageHeader";
 import RoleGate from "@/components/layout/RoleGate";

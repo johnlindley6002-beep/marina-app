@@ -15,8 +15,8 @@ import {
   suggestReleasedBerths,
   type BerthOperationalInfo,
   type Enquiry,
-} from "@/data/mock/mockData";
-import { useMock } from "@/lib/useMock";
+  useMock,
+} from "@/lib/data";
 import { useAuth } from "@/components/providers/AuthProvider";
 import BerthAvailabilityMap, {
   type StaffBerthInfo,

@@ -7,9 +7,9 @@ import {
   markEnquiryArrived,
   markEnquiryDeparted,
   type Enquiry,
-} from "@/data/mock/mockData";
+  useMock,
+} from "@/lib/data";
 import { formatLength } from "@/lib/units";
-import { useMock } from "@/lib/useMock";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { useUnits } from "@/components/providers/UnitsProvider";
 

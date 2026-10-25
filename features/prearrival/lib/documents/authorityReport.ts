@@ -3,7 +3,7 @@
 // EU. This is illustrative only: the official field list is confirmed with
 // the marina, not invented here. See getVoyageFlags for when this applies.
 
-import type { PreArrivalCheckIn } from "@/data/mock/mockData";
+import type { PreArrivalCheckIn } from "@/lib/data";
 import { getVoyageFlags } from "@/features/prearrival/lib/schema";
 
 type FlatRow = Record<string, string>;

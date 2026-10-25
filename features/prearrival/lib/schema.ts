@@ -6,7 +6,7 @@
 // These schemas catch structural and hard-rule errors (see the "Errors" list
 // in the brief). Softer, non-blocking guidance (passport expiring soon, the
 // 90/180 day rule, and so on) is deliberately NOT here, so it can never block
-// submission; see lib/prearrival/warnings.ts for that.
+// submission; see features/prearrival/lib/warnings.ts for that.
 
 import { z } from "zod";
 import { ageOn } from "@/lib/dates";

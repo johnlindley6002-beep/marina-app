@@ -3,7 +3,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { siteConfig } from "@/data/site";
-import type { Role } from "@/data/mock/mockData";
+import type { Role } from "@/lib/data";
 import { useAuth } from "@/components/providers/AuthProvider";
 
 function Message({ title, body }: { title: string; body: string }) {

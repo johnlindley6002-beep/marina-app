@@ -5,7 +5,7 @@ import { useState } from "react";
 import type { Marina } from "@/data/marinas";
 import { saveFrequentPerson } from "@/features/my-boat/lib/boatProfile";
 import { getDocumentRequirements } from "@/features/prearrival/lib/documentRules";
-import type { PreArrivalCheckIn } from "@/data/mock/mockData";
+import type { PreArrivalCheckIn } from "@/lib/data";
 import { useBoats, type BoatInput } from "@/components/providers/BoatProvider";
 import DocumentButtons from "./DocumentButtons";
 import { useLanguage } from "@/components/providers/LanguageProvider";

@@ -4,7 +4,7 @@
 // immigration form; a calm paper record for the skipper to bring to the desk.
 
 import type { Marina } from "@/data/marinas";
-import type { PreArrivalCheckIn } from "@/data/mock/mockData";
+import type { PreArrivalCheckIn } from "@/lib/data";
 import { getDocumentRequirements } from "@/features/prearrival/lib/documentRules";
 import { calculateIndicativeQuote } from "@/features/prearrival/lib/pricing";
 import {

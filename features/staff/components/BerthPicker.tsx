@@ -3,7 +3,7 @@
 import { useMemo } from "react";
 import { getAllBerths } from "@/data/berths";
 import { classifyBoatLength } from "@/data/marinas";
-import { getBerthStatuses } from "@/data/mock/mockData";
+import { getBerthStatuses } from "@/lib/data";
 import { STAFF_STATUS_LABEL } from "@/features/marina/components/BerthAvailabilityMap";
 
 // Lists the berths modelled for the boat's class, each showing its status on

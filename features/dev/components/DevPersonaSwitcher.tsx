@@ -7,7 +7,7 @@ import {
   resetMockEnquiries,
   resetMockOutOfService,
   resetMockReletting,
-} from "@/data/mock/mockData";
+} from "@/lib/data";
 import { useAuth } from "@/components/providers/AuthProvider";
 
 // MOCK / DEV ONLY. Stands in for signing in so each experience can be

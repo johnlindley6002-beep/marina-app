@@ -6,11 +6,11 @@ import {
   getAllPreArrivalCheckIns,
   getAllPreArrivalDrafts,
   type PreArrivalCheckIn,
-} from "@/data/mock/mockData";
+  useMock,
+} from "@/lib/data";
 import { daysBetween, todayIso } from "@/lib/dates";
 import { getReadiness, type ReadinessItem } from "@/features/prearrival/lib/readiness";
 import type { PreArrivalDraft } from "@/features/prearrival/lib/schema";
-import { useMock } from "@/lib/useMock";
 import DocumentButtons from "@/features/prearrival/components/DocumentButtons";
 import { useLanguage } from "@/components/providers/LanguageProvider";
 

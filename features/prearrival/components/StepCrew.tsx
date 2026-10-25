@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { loadFrequentCrew, type FrequentPerson } from "@/features/my-boat/lib/boatProfile";
-import { getLastSubmittedCrew } from "@/data/mock/mockData";
+import { getLastSubmittedCrew } from "@/lib/data";
 import { EMPTY_PERSON, getVoyageFlags } from "@/features/prearrival/lib/schema";
 import { getExtraErrors, getWarnings } from "@/features/prearrival/lib/warnings";
 import { useLanguage } from "@/components/providers/LanguageProvider";

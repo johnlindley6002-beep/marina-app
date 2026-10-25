@@ -5,7 +5,7 @@
 
 import { PDFFont, PDFPage, rgb } from "pdf-lib";
 import type { Marina } from "@/data/marinas";
-import type { PreArrivalCheckIn } from "@/data/mock/mockData";
+import type { PreArrivalCheckIn } from "@/lib/data";
 import {
   A4_LANDSCAPE,
   createFlow,

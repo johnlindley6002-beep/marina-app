@@ -16,7 +16,7 @@ import {
   updateRelettingRequest,
   type RelettingDraft,
   type RelettingRequest,
-} from "@/data/mock/mockData";
+} from "@/lib/data";
 import { useAuth } from "@/components/providers/AuthProvider";
 import Disclosure from "@/components/ui/Disclosure";
 import RoleGate from "@/components/layout/RoleGate";

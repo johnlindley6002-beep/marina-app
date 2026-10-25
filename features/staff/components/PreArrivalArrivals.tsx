@@ -6,12 +6,12 @@ import {
   getPreArrivalCheckInsForStaff,
   markPreArrivalCheckedIn,
   type PreArrivalCheckIn,
-} from "@/data/mock/mockData";
+  useMock,
+} from "@/lib/data";
 import { maskIdNumber } from "@/features/prearrival/lib/mask";
 import { getVoyageFlags, isMinor } from "@/features/prearrival/lib/schema";
 import { getExtraErrors, getWarnings } from "@/features/prearrival/lib/warnings";
 import { getMissingRequiredDocuments } from "@/features/prearrival/lib/documentRules";
-import { useMock } from "@/lib/useMock";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { Collapse } from "@/components/ui/Disclosure";
 import DocumentButtons from "@/features/prearrival/components/DocumentButtons";

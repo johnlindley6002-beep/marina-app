@@ -12,8 +12,8 @@ import {
   RELETTING_PROGRESS,
   RELETTING_STATUS_LABELS,
   type RelettingQueueItem,
-} from "@/data/mock/mockData";
-import { useMock } from "@/lib/useMock";
+  useMock,
+} from "@/lib/data";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { Collapse } from "@/components/ui/Disclosure";
 

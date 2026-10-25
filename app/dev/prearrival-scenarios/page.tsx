@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { savePreArrivalDraft } from "@/data/mock/mockData";
+import { savePreArrivalDraft } from "@/lib/data";
 import {
   DRAFT_SCENARIOS,
   seedHolderAwayReletTenNights,

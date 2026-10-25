@@ -24,7 +24,7 @@ import {
   type CurrentUser,
   type DevPersona,
   type Mode,
-} from "@/data/mock/mockData";
+} from "@/lib/data";
 
 type AuthContextValue = {
   ready: boolean;
@@ -43,7 +43,7 @@ type AuthContextValue = {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
-// MOCK. A thin context over lib/mockData so screens never touch the mock
+// MOCK. A thin context over lib/data so screens never touch the mock
 // layer's storage directly. It re-reads whenever the mock data changes here or
 // in another tab.
 export function AuthProvider({ children }: { children: ReactNode }) {

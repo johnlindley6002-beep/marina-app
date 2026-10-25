@@ -10,7 +10,7 @@ import {
   requestEarlyReturn,
   submitRelettingRequest,
   type RelettingRequest,
-} from "@/data/mock/mockData";
+} from "@/lib/data";
 
 function freshRequest(id: string): RelettingRequest | null {
   return getRelettingRequests("u-owner").find((r) => r.id === id) ?? null;

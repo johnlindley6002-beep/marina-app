@@ -10,7 +10,7 @@ import {
   savePreArrivalDraft,
   submitPreArrivalCheckIn,
   type PreArrivalCheckIn,
-} from "@/data/mock/mockData";
+} from "@/lib/data";
 import {
   draftSchema,
   emptyDraft,
