@@ -29,14 +29,19 @@ ESLint is on 9.x because eslint-config-next 16 targets it; 9.x is marked depreca
 
 ## Behaviour changes
 
-None yet.
+1. **Dev tools hidden in production.** The persona switcher (sign in as owner or staff) and /dev/prearrival-scenarios now exist only in development, or in a build made with NEXT_PUBLIC_ENABLE_DEV_TOOLS=1. A normal production build returns 404 for the dev page and shows no switcher. **If you deploy this mock site to Vercel as a demo and want the owner and staff areas reachable, set NEXT_PUBLIC_ENABLE_DEV_TOOLS=1 in the Vercel project.** When the switcher is absent, the sign-in gate says sign-in is not available in this preview.
+2. **"Today" is the Lisbon calendar day**, not the device date. A boater abroad near midnight now sees the marina day.
+3. **Money is summed in whole cents**, VAT rounded once. Quotes can differ by one cent from before in rare cases (about 1 in 450 in a 28,000 sample), always towards the correct half-up value.
+4. **Impossible calendar dates are rejected** (2026-02-31 used to roll into March).
+5. **Gibraltar added to the country list**, classed as outside the EU and Schengen.
+6. **"Copied!" is now "Copied"** on the enquiry summary.
 
 ## Phases
 
 - [x] Phase 0 baseline
 - [x] Phase 1 audit
 - [x] Phase 2 tooling
-- [ ] Phase 3 architecture
+- [x] Phase 3 architecture
 - [ ] Phase 4 design system
 - [ ] Phase 5 copy and i18n
 - [ ] Phase 6 accessibility and mobile
@@ -63,6 +68,19 @@ Audit written to AUDIT.md with a ranked top 20.
 - scripts/check-copy.mjs fails on em dashes, spaced en dashes, filler words and exclamation marks in copy.
 - .github/workflows/ci.yml runs npm run check then the Playwright suite.
 - Lint baseline was none (no linter existed). Now 0 errors, 17 warnings.
+
+### Phase 3
+
+- **Structure.** app/ holds routes only. 112 files moved with git mv into features/<area>/{components,lib}, components/{layout,providers,ui}, data/mock, lib/data. Imports rewritten by script to the @/ alias (tsc clean afterwards).
+- **One country module** (lib/countries): list, EU, Schengen and free-movement sets. Portugal-only helpers (navigation zones, identification string) moved to features/prearrival/lib/portugal.ts.
+- **RequestBerthForm kept, split.** It is the berth enquiry sent by email (mailto plus a mock enquiry record for staff), a different job from the pre-arrival wizard (what a boater submits before arriving), so merging would lose behaviour. It is now a state hook (useRequestBerthForm), pure logic in features/marina/lib/enquiry (types, validation, summary text, payload builders) and seven section components plus CrewList. Verified in the browser: validation, a valid submit, the enquiry record and the summary. Largest piece is the hook at 397 lines (state, effects and submit).
+- **mockData split** into data/mock/{storage,accounts,reletting,enquiries,berthStatus,prearrival}. lib/data/index.ts is the only surface the UI imports (explicit export list; storage keys, seed arrays and store loaders are not exported). useMock moved to lib/data. To move to Supabase, replace the bodies behind lib/data exports.
+- **i18n split** into lib/i18n/types.ts, locales/en/<namespace>.ts, locales/pt/<namespace>.ts, partial es.ts and fr.ts. Keys are typed by the Dictionary type; @/lib/i18n exports are unchanged.
+- **lib/dates.ts and lib/money.ts.** Replace formatDate.ts and three copies of date helpers; all day maths in UTC day numbers; pricing, the marina-page quote and the reletting split use integer cents.
+- **Boat mapping** between My boat and the wizard draft is now one module (features/prearrival/lib/boatMapping.ts).
+- **Server components.** Only 3 of the 80 use-client files needed no client features (the audit guessed more); directive removed from those.
+- **Dead code.** knip configured. Removed unused exports and the 5 create-next-app SVGs. Remaining knip items are the three test libraries (used in Phase 8) and money.formatEur (used in Phase 5).
+- Still over 300 lines: RelettingQueue (429), MyBoatContent (361), ArrivalsBoard (316), RelettingLedger (312), each a single flow; deferred. The berth map (605) is off limits.
 
 ## Deferred
 
