@@ -79,8 +79,12 @@ export function useRequestBerthForm({
   // Dates, dimensions, ETA/ETD and priced extras live in the shared plan;
   // everything else is local to this form.
   const form: FormData = useMemo(() => ({ ...localForm, ...plan }), [localForm, plan]);
+  // setForm reads the latest form from this ref. It is synced in an effect that
+  // is declared before every other effect, so it is current whenever they run.
   const formRef = useRef(form);
-  formRef.current = form;
+  useEffect(() => {
+    formRef.current = form;
+  });
 
   const setForm = useCallback(
     (updater: FormData | ((f: FormData) => FormData)) => {
