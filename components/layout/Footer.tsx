@@ -17,7 +17,7 @@ export default function Footer() {
   ];
 
   return (
-    <footer className="bg-ink text-paper">
+    <footer className="bg-ink pb-[env(safe-area-inset-bottom)] text-paper">
       <div className="page-column grid gap-12 py-16 md:grid-cols-[1.4fr_1fr_1.2fr] md:py-20">
         <div>
           <Image

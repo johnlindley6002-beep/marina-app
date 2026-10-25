@@ -5,11 +5,8 @@ import Link from "next/link";
 import { marinas, type Marina } from "@/data/marinas";
 import { contentLocale, marinaContent } from "@/lib/i18n";
 import { formatLength } from "@/lib/units";
-import ChartDivider from "@/components/ui/ChartDivider";
-import ChartLinework from "@/components/ui/ChartLinework";
 import { useLanguage } from "@/components/providers/LanguageProvider";
 import MarinaRow from "./MarinaRow";
-import Reveal from "@/components/ui/Reveal";
 import { useUnits } from "@/components/providers/UnitsProvider";
 
 function formatCoordinates(lat: number, lng: number) {
@@ -26,17 +23,16 @@ function Plate({ marina }: { marina: Marina }) {
         alt={marina.coverImage.alt}
         width={900}
         height={700}
-        className="aspect-[4/3] w-full rounded-[3px] object-cover"
+        className="aspect-[4/3] w-full rounded-md object-cover"
       />
     );
   }
   return (
     <div
-      className="on-ink relative isolate aspect-[4/3] w-full overflow-hidden rounded-[3px] bg-gradient-to-br from-ink to-ink-2"
+      className="on-ink relative isolate aspect-[4/3] w-full overflow-hidden rounded-md bg-ink"
       role="img"
       aria-label={`${marina.name}, ${formatCoordinates(marina.coordinates.lat, marina.coordinates.lng)}`}
     >
-      <ChartLinework className="absolute inset-0 -z-10 h-full w-full text-paper opacity-[0.12]" />
       <span
         aria-hidden="true"
         className="absolute top-[46%] left-[52%] h-3 w-3 rounded-full bg-paper ring-8 ring-paper/25"
@@ -71,13 +67,11 @@ export default function FeaturedMarina() {
   return (
     <section className="section-editorial">
       <div className="page-column">
-        <Reveal>
-          <h2 className="type-statement text-ink">{t.home.featuredHeading}</h2>
-        </Reveal>
-        <ChartDivider className="stack-md" />
+        <h2 className="type-statement text-ink">{t.home.featuredHeading}</h2>
+        <hr className="stack-md border-hairline" />
 
         <div className="stack-md grid gap-12 lg:grid-cols-[1.05fr_1fr] lg:items-center lg:gap-24">
-          <Reveal>
+          <div>
             <h3 className="type-card flex flex-wrap items-center gap-x-4 text-ink">
               {flagship.name}
               {flagship.clubBurgee ? (
@@ -90,12 +84,12 @@ export default function FeaturedMarina() {
                 />
               ) : null}
             </h3>
-            <p className="measure mt-6 text-ink/75">{description}</p>
+            <p className="measure mt-6 text-ink-soft">{description}</p>
 
             <dl className="mt-8 grid max-w-md grid-cols-3">
               {facts.map((fact) => (
                 <div key={fact.label} className="hairline-top pt-3 pr-4">
-                  <dt className="text-sm text-ink/70">{fact.label}</dt>
+                  <dt className="text-sm text-ink-muted">{fact.label}</dt>
                   <dd className="tabular mt-1 text-lg font-medium text-ink">{fact.value}</dd>
                 </div>
               ))}
@@ -107,7 +101,7 @@ export default function FeaturedMarina() {
             >
               {t.countryPage.viewMarina}
             </Link>
-          </Reveal>
+          </div>
 
           <Plate marina={flagship} />
         </div>

@@ -16,9 +16,9 @@ export default function PageHeader({
   return (
     <header>
       <h1 className="type-title text-ink">{title}</h1>
-      {children ? <div className="measure mt-4 text-lg text-ink/75">{children}</div> : null}
+      {children ? <div className="measure mt-4 text-lg text-ink-soft">{children}</div> : null}
       {mock && siteConfig.mockMode ? (
-        <p className="mt-3 text-sm text-ink/70">{siteConfig.accounts.mockNote}</p>
+        <p className="mt-3 text-sm text-ink-muted">{siteConfig.accounts.mockNote}</p>
       ) : null}
     </header>
   );

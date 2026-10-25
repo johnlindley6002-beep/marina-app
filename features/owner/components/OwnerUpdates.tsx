@@ -22,7 +22,7 @@ export default function OwnerUpdates() {
   const unread = notes.filter((n) => !n.read).length;
 
   if (ready && notes.length === 0) {
-    return <p className="measure mt-4 text-ink/75">No updates yet.</p>;
+    return <p className="measure mt-4 text-ink-soft">No updates yet.</p>;
   }
 
   return (
@@ -42,8 +42,8 @@ export default function OwnerUpdates() {
               ) : null}
               {note.title}
             </p>
-            <p className="mt-1 text-ink/75">{note.body}</p>
-            <p className="mt-1 text-sm text-ink/70">{formatLongDate(note.at)}</p>
+            <p className="mt-1 text-ink-soft">{note.body}</p>
+            <p className="mt-1 text-sm text-ink-muted">{formatLongDate(note.at)}</p>
           </li>
         ))}
       </ul>

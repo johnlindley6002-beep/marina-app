@@ -7,7 +7,6 @@ import ChartLinework from "@/components/ui/ChartLinework";
 import DestinationSearch from "./DestinationSearch";
 import FeaturedMarina from "./FeaturedMarina";
 import RestingBand from "@/components/ui/RestingBand";
-import Reveal from "@/components/ui/Reveal";
 import { useLanguage } from "@/components/providers/LanguageProvider";
 
 export default function HomeContent() {
@@ -16,7 +15,7 @@ export default function HomeContent() {
 
   return (
     <>
-      <section className="on-ink relative isolate overflow-hidden bg-gradient-to-br from-ink via-ink to-ink-2 text-paper">
+      <section className="on-ink relative isolate overflow-hidden bg-ink text-paper">
         {hero ? (
           <Image
             src={hero.src}
@@ -25,7 +24,7 @@ export default function HomeContent() {
             loading="eager"
             fetchPriority="high"
             sizes="100vw"
-            className="hero-settle -z-20 object-cover"
+            className="-z-20 object-cover"
           />
         ) : null}
         <div
@@ -40,11 +39,8 @@ export default function HomeContent() {
         <ChartLinework className="absolute inset-0 -z-10 h-full w-full text-paper opacity-[0.07]" />
 
         <div className="page-column pt-28 pb-32 md:pt-44 md:pb-52">
-          <span
-            className="hero-rise block h-px w-16 bg-brass"
-            style={{ "--d": "0ms" } as React.CSSProperties}
-          />
-          <div className="hero-rise mt-8" style={{ "--d": "90ms" } as React.CSSProperties}>
+          <span className="block h-px w-16 bg-brass" />
+          <div className="mt-8">
             <Image
               src="/images/aldock-wordmark.png"
               alt="aldock"
@@ -54,23 +50,10 @@ export default function HomeContent() {
               className="h-7 w-auto"
             />
           </div>
-          <h1
-            className="type-display hero-rise measure mt-6 max-w-3xl"
-            style={{ "--d": "180ms" } as React.CSSProperties}
-          >
-            {t.home.tagline}
-          </h1>
-          <p
-            className="hero-rise mt-5 max-w-xl text-lg text-stone"
-            style={{ "--d": "270ms" } as React.CSSProperties}
-          >
-            {t.home.valueProp}
-          </p>
+          <h1 className="type-display measure mt-6 max-w-3xl">{t.home.tagline}</h1>
+          <p className="mt-5 max-w-xl text-lg text-stone">{t.home.valueProp}</p>
 
-          <div
-            className="hero-rise mt-10 max-w-3xl"
-            style={{ "--d": "360ms" } as React.CSSProperties}
-          >
+          <div className="mt-10 max-w-3xl">
             <DestinationSearch />
             <Link
               href="/marinas"
@@ -88,15 +71,13 @@ export default function HomeContent() {
 
       <section id="about" className="defer-paint section-editorial scroll-mt-20 bg-paper-deep">
         <div className="page-column grid gap-10 md:grid-cols-[1fr_1.2fr] md:gap-24">
-          <Reveal>
-            <h2 className="type-statement text-ink">{t.home.aboutHeading}</h2>
-          </Reveal>
-          <Reveal delay={120}>
-            <p className="measure text-ink/75">{t.home.aboutBody}</p>
+          <h2 className="type-statement text-ink">{t.home.aboutHeading}</h2>
+          <div>
+            <p className="measure text-ink-soft">{t.home.aboutBody}</p>
             <Link href="/marinas" className="btn-primary mt-8">
               {t.home.findMarinas}
             </Link>
-          </Reveal>
+          </div>
         </div>
       </section>
 
@@ -105,13 +86,11 @@ export default function HomeContent() {
         className="on-ink defer-paint section-editorial scroll-mt-20 bg-ink text-paper"
       >
         <div className="page-column grid gap-10 md:grid-cols-[1fr_1.2fr] md:gap-24">
-          <Reveal>
-            <h2 className="type-statement">{t.home.contactHeading}</h2>
-          </Reveal>
-          <Reveal delay={120}>
+          <h2 className="type-statement">{t.home.contactHeading}</h2>
+          <div>
             <p className="measure text-stone">{t.home.contactBody}</p>
             <div className="mt-8 flex flex-col gap-3 text-lg">
-              <a href={`mailto:${siteConfig.contact.email}`} className="btn-quiet w-fit">
+              <a href={`mailto:${siteConfig.contact.email}`} className="btn-quiet w-fit text-paper">
                 {siteConfig.contact.email}
               </a>
               <a
@@ -121,7 +100,7 @@ export default function HomeContent() {
                 {siteConfig.contact.phone}
               </a>
             </div>
-          </Reveal>
+          </div>
         </div>
       </section>
     </>

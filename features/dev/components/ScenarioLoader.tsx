@@ -37,14 +37,14 @@ export default function ScenarioLoader() {
     <div className="section">
       <div className="page-column page-reading">
         <h1 className="type-title text-ink">Pre-arrival test scenarios</h1>
-        <p className="measure mt-4 text-ink/75">
+        <p className="measure mt-4 text-ink-soft">
           Dev only. Loads a scenario into the mock data layer, the same as if a boater or berth
           holder had entered it by hand.
         </p>
 
         <section className="chapter">
           <h2 className="type-heading type-h2 text-ink">Wizard drafts</h2>
-          <p className="mt-1 text-sm text-ink/70">
+          <p className="mt-1 text-sm text-ink-muted">
             Saves the scenario as the Cascais draft, then opens the wizard on it.
           </p>
           <ul className="mt-4 space-y-2">
@@ -60,7 +60,7 @@ export default function ScenarioLoader() {
 
         <section className="chapter">
           <h2 className="type-heading type-h2 text-ink">Reletting scenarios</h2>
-          <p className="mt-1 text-sm text-ink/70">
+          <p className="mt-1 text-sm text-ink-muted">
             Creates and, where relevant, approves a reletting request for the seed owner&apos;s
             berth (G-14).
           </p>

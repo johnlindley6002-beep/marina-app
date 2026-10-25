@@ -102,7 +102,7 @@ export default function SkipperSection({ ctx }: { ctx: RequestBerthCtx }) {
             ) : null}
           </label>
         </div>
-        <label className="mt-4 flex items-start gap-3 text-sm text-ink/75">
+        <label className="mt-4 flex items-start gap-3 text-sm text-ink-soft">
           <input
             type="checkbox"
             checked={rememberSkipper}

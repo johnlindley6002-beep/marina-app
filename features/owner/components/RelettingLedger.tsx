@@ -38,7 +38,7 @@ function Trail({ request }: { request: RelettingRequest }) {
             key={status}
             aria-current={i === current ? "step" : undefined}
             className={`flex items-center gap-2 ${
-              reached ? "text-ink" : "text-ink/60"
+              reached ? "text-ink" : "text-ink-muted"
             } ${i === current ? "font-medium" : ""}`}
           >
             <span
@@ -68,7 +68,7 @@ function NightStrip({ request }: { request: RelettingRequest }) {
         <span className="tabular font-medium">
           {booked} of {nights.length} nights booked
         </span>
-        <span className="text-ink/75">
+        <span className="text-ink-soft">
           {open > 0 ? (finished ? `, ${open} not booked` : `, ${open} still open`) : ""}
         </span>
       </p>
@@ -78,7 +78,7 @@ function NightStrip({ request }: { request: RelettingRequest }) {
           return (
             <li
               key={night}
-              className={`h-4 w-4 rounded-[2px] border border-ink ${isBooked ? "bg-ink" : ""}`}
+              className={`h-4 w-4 rounded-sm border border-ink ${isBooked ? "bg-ink" : ""}`}
             >
               <span className="sr-only">
                 {formatLongDate(night)}: {isBooked ? "booked" : "open"}
@@ -97,7 +97,7 @@ function EarlyReturn({ request }: { request: RelettingRequest }) {
   if (!["approved", "listed", "booked"].includes(request.status)) return null;
   if (request.earlyReturnRequestedAt) {
     return (
-      <p className="mt-3 text-sm text-ink/70">
+      <p className="mt-3 text-sm text-ink-muted">
         You told the marina you are returning early.
         {request.status === "booked"
           ? " Since a visitor is aboard, the marina will offer you a temporary berth or ask you to coordinate a handover."
@@ -177,7 +177,7 @@ function Actions({ request }: { request: RelettingRequest }) {
           </div>
         ) : null}
         {request.status !== "submitted" ? (
-          <p className="mt-2 text-sm text-ink/70">
+          <p className="mt-2 text-sm text-ink-muted">
             Changing the dates sends the request to the marina again, because it approved the
             earlier dates.
           </p>
@@ -194,7 +194,7 @@ function Actions({ request }: { request: RelettingRequest }) {
   if (request.status === "declined") {
     return (
       <div className="mt-5">
-        <p className="text-ink/75">
+        <p className="text-ink-soft">
           {copy.notApprovedLead}
           {request.decisionNote ? ` Reason: ${request.decisionNote}` : ""}
         </p>
@@ -211,12 +211,12 @@ function Actions({ request }: { request: RelettingRequest }) {
   }
 
   if (request.status === "cancelled") {
-    return <p className="mt-5 text-ink/75">You cancelled this request.</p>;
+    return <p className="mt-5 text-ink-soft">You cancelled this request.</p>;
   }
 
   if (request.status === "booked") {
     return (
-      <p className="mt-5 max-w-xl text-ink/75">
+      <p className="mt-5 max-w-xl text-ink-soft">
         {copy.lockedNote}
         {marina ? (
           <>
@@ -244,7 +244,7 @@ export default function RelettingLedger() {
 
   if (ready && requests.length === 0) {
     return (
-      <p className="measure mt-4 text-ink/75">
+      <p className="measure mt-4 text-ink-soft">
         No absences yet. When you make your berth available, each one is tracked here.
       </p>
     );
@@ -263,7 +263,7 @@ export default function RelettingLedger() {
                 <p className="text-lg font-medium text-ink">
                   {formatLongDate(request.startDate)} to {formatLongDate(request.endDate)}
                 </p>
-                <p className="tabular text-sm text-ink/70">
+                <p className="tabular text-sm text-ink-muted">
                   {nights} nights away, berth {request.berthId}
                   {request.resubmitOf ? ", sent again" : ""}
                 </p>
@@ -282,12 +282,12 @@ export default function RelettingLedger() {
             ) : request.status === "submitted" ||
               request.status === "approved" ||
               request.status === "listed" ? (
-              <p className="mt-5 text-ink/75">The credit appears once a stay is booked.</p>
+              <p className="mt-5 text-ink-soft">The credit appears once a stay is booked.</p>
             ) : null}
 
             {settled ? (
               <Disclosure label="See the breakdown" openLabel="Hide the breakdown" className="mt-1">
-                <dl className="tabular grid max-w-md grid-cols-[1fr_auto] gap-x-8 gap-y-2 pb-2 text-ink/75">
+                <dl className="tabular grid max-w-md grid-cols-[1fr_auto] gap-x-8 gap-y-2 pb-2 text-ink-soft">
                   <dt>Nights relet</dt>
                   <dd className="text-right text-ink">{request.nightsRelet}</dd>
                   <dt>Berth income</dt>

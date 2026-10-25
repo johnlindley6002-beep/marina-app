@@ -38,8 +38,8 @@ function NightChips({
               type="button"
               aria-pressed={on}
               onClick={() => onToggle(night)}
-              className={`tabular min-h-10 rounded-[3px] border px-2 text-xs ${
-                on ? "border-ink bg-ink text-paper" : "border-ink/30 text-ink/70"
+              className={`tabular min-h-10 rounded-md border px-2 text-xs ${
+                on ? "border-ink bg-ink text-paper" : "border-ink/30 text-ink-muted"
               }`}
             >
               {formatLongDate(night).replace(/\s\d{4}$/, "")}
@@ -108,7 +108,7 @@ function Item({ item, staffId }: { item: RelettingQueueItem; staffId: string }) 
             {ownerName}, berth {request.berthId}
             {berthClass ? ` (Class ${berthClass})` : ""}
           </p>
-          <p className="tabular text-xs text-ink/70">
+          <p className="tabular text-xs text-ink-muted">
             {formatLongDate(request.startDate)} to {formatLongDate(request.endDate)}, {nights}{" "}
             nights{boatName ? `, ${boatName}` : ""}
           </p>
@@ -130,16 +130,16 @@ function Item({ item, staffId }: { item: RelettingQueueItem; staffId: string }) 
             </p>
           ) : null}
           {request.status === "cancelled" ? (
-            <p className="text-ink/75">Cancelled by the holder.</p>
+            <p className="text-ink-soft">Cancelled by the holder.</p>
           ) : null}
 
-          <ul className="mt-2 space-y-0.5 text-ink/75">
+          <ul className="mt-2 space-y-0.5 text-ink-soft">
             <li>Boat removal confirmed: {request.boatRemovalConfirmed ? "yes" : "no"}</li>
             <li>Terms accepted: {formatLongDate(request.termsAcceptedAt)}</li>
           </ul>
 
           {estimate ? (
-            <p className="tabular mt-2 text-ink/70">
+            <p className="tabular mt-2 text-ink-muted">
               If every night were relet: income {eur(estimate.grossEur)}, holder share{" "}
               {eur(estimate.ownerShareEur)}, fee {eur(estimate.feeEur)}, net {eur(estimate.netEur)}.
             </p>
@@ -160,7 +160,7 @@ function Item({ item, staffId }: { item: RelettingQueueItem; staffId: string }) 
                   })
                 }
               />
-              <p className="mt-1 text-xs text-ink/70">
+              <p className="mt-1 text-xs text-ink-muted">
                 {approvedSet.size} of {offered.length} nights selected. Fewer than all is a partial
                 approval.
               </p>
@@ -242,7 +242,7 @@ function Item({ item, staffId }: { item: RelettingQueueItem; staffId: string }) 
             request.conditions.maxBeamM ||
             request.conditions.earliestReletDate ||
             request.conditions.bufferDays) ? (
-            <p className="tabular mt-2 text-ink/70">
+            <p className="tabular mt-2 text-ink-muted">
               Conditions:{" "}
               {[
                 request.conditions.maxLengthM
@@ -292,14 +292,14 @@ function Item({ item, staffId }: { item: RelettingQueueItem; staffId: string }) 
               >
                 Mock: mark as {nextLabel}
               </button>
-              <p className="mt-1 text-xs text-ink/70">
+              <p className="mt-1 text-xs text-ink-muted">
                 Preview only. In the real product this comes from real visitor bookings.
               </p>
             </div>
           ) : null}
 
           {request.decisionNote ? (
-            <p className="mt-2 text-ink/75">Note sent: {request.decisionNote}</p>
+            <p className="mt-2 text-ink-soft">Note sent: {request.decisionNote}</p>
           ) : null}
           {error ? (
             <p role="alert" className="field-error mt-2">
@@ -385,7 +385,7 @@ export default function RelettingQueue() {
   return (
     <div>
       <h1 className="type-heading type-h2 text-ink">Reletting approvals</h1>
-      <p className="mt-1 max-w-2xl text-sm text-ink/70">{siteConfig.relet.queueIntro}</p>
+      <p className="mt-1 max-w-2xl text-sm text-ink-muted">{siteConfig.relet.queueIntro}</p>
 
       <h2 className="type-heading type-h3 mt-6 text-ink">
         Waiting for your decision ({pending.length})

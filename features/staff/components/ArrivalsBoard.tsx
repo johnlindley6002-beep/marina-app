@@ -78,7 +78,7 @@ function EventRow({ event, staffId }: { event: BoardEvent; staffId: string | nul
               <span className="staff-badge staff-badge-accent">Released holder berth</span>
             ) : null}
           </p>
-          <p className="tabular mt-1 text-xs text-ink/70">
+          <p className="tabular mt-1 text-xs text-ink-muted">
             {formatLength(Number(enquiry.loa), units)} LOA ·{" "}
             {formatLength(Number(enquiry.beam), units)} beam ·{" "}
             {formatLength(Number(enquiry.draft), units)} draft · Berth{" "}
@@ -89,7 +89,7 @@ function EventRow({ event, staffId }: { event: BoardEvent; staffId: string | nul
           <p className="font-medium">
             {kind === "arrival" ? enquiry.eta || "ETA n/a" : enquiry.etd || "ETD n/a"}
           </p>
-          <p className="text-xs text-ink/70">{event.date}</p>
+          <p className="text-xs text-ink-muted">{event.date}</p>
         </div>
       </button>
 
@@ -99,29 +99,29 @@ function EventRow({ event, staffId }: { event: BoardEvent; staffId: string | nul
             <div>
               <p className="staff-label">Skipper</p>
               <p className="text-ink">{enquiry.skipperName || "Not given"}</p>
-              <p className="text-ink/70">{enquiry.phone}</p>
-              <p className="text-ink/70">{enquiry.email}</p>
+              <p className="text-ink-muted">{enquiry.phone}</p>
+              <p className="text-ink-muted">{enquiry.email}</p>
             </div>
             <div>
               <p className="staff-label">Stay</p>
               <p className="text-ink">
                 {enquiry.arrival} to {enquiry.openEnded ? "open-ended" : enquiry.departure}
               </p>
-              <p className="text-ink/70">{enquiry.peopleOnBoard} on board</p>
+              <p className="text-ink-muted">{enquiry.peopleOnBoard} on board</p>
             </div>
           </div>
 
           {serviceList(enquiry).length > 0 ? (
             <div className="mt-3">
               <p className="staff-label">Services requested</p>
-              <p className="text-ink/80">{serviceList(enquiry).join(", ")}</p>
+              <p className="text-ink-soft">{serviceList(enquiry).join(", ")}</p>
             </div>
           ) : null}
 
           {enquiry.crew.length > 0 ? (
             <div className="mt-3">
               <p className="staff-label">Crew and guests ({enquiry.crew.length})</p>
-              <ul className="text-ink/80">
+              <ul className="text-ink-soft">
                 {enquiry.crew.map((c, i) => (
                   <li key={i}>
                     {c.fullName || "Unnamed"}, {c.role || c.personType}
@@ -264,7 +264,7 @@ export default function ArrivalsBoard() {
         <div
           role="group"
           aria-label="When"
-          className="inline-flex rounded-[3px] border border-ink/25 p-0.5 text-xs"
+          className="inline-flex rounded-md border border-ink/25 p-0.5 text-xs"
         >
           {(["today", "upcoming"] as const).map((v) => (
             <button
@@ -272,7 +272,7 @@ export default function ArrivalsBoard() {
               type="button"
               aria-pressed={when === v}
               onClick={() => setWhen(v)}
-              className={`min-h-10 rounded-[2px] px-3 ${when === v ? "bg-ink text-paper" : "text-ink/70"}`}
+              className={`min-h-10 rounded-sm px-3 ${when === v ? "bg-ink text-paper" : "text-ink-muted"}`}
             >
               {v === "today" ? "Today" : `Next ${WINDOW_DAYS} days`}
             </button>
@@ -281,7 +281,7 @@ export default function ArrivalsBoard() {
         <div
           role="group"
           aria-label="Type"
-          className="inline-flex rounded-[3px] border border-ink/25 p-0.5 text-xs"
+          className="inline-flex rounded-md border border-ink/25 p-0.5 text-xs"
         >
           {(["all", "arrival", "departure"] as const).map((v) => (
             <button
@@ -289,7 +289,7 @@ export default function ArrivalsBoard() {
               type="button"
               aria-pressed={type === v}
               onClick={() => setType(v)}
-              className={`min-h-10 rounded-[2px] px-3 ${type === v ? "bg-ink text-paper" : "text-ink/70"}`}
+              className={`min-h-10 rounded-sm px-3 ${type === v ? "bg-ink text-paper" : "text-ink-muted"}`}
             >
               {v === "all" ? "All" : v === "arrival" ? "Arrivals" : "Departures"}
             </button>

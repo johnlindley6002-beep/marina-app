@@ -129,7 +129,7 @@ function AccountBody() {
             {/* Keyed so switching account resets the form to that person. */}
             <ProfileForm key={user.id} user={user} />
           </div>
-          <p className="measure mt-6 text-sm text-ink/70">
+          <p className="measure mt-6 text-sm text-ink-muted">
             The skipper details used to fill your enquiries are kept separately in{" "}
             <Link href="/my-boat" className="underline underline-offset-4">
               My boat
@@ -146,13 +146,13 @@ function AccountBody() {
             {user.roles.map((role) => (
               <li key={role} className="hairline-top py-4 first:border-t-0">
                 <p className="type-heading type-h3 text-ink">{copy[role].title}</p>
-                <p className="measure mt-1 text-ink/75">{copy[role].how}</p>
+                <p className="measure mt-1 text-ink-soft">{copy[role].how}</p>
               </li>
             ))}
           </ul>
 
           <p className="type-label mt-6">How roles work</p>
-          <ul className="mt-2 space-y-1 text-sm text-ink/75">
+          <ul className="mt-2 space-y-1 text-sm text-ink-soft">
             {siteConfig.accounts.rules.map((rule) => (
               <li key={rule}>{rule}</li>
             ))}
@@ -162,7 +162,7 @@ function AccountBody() {
         {canSwitchMode ? (
           <section className="chapter">
             <h2 className="type-heading type-h2 text-ink">Owner mode</h2>
-            <p className="measure mt-2 text-ink/75">
+            <p className="measure mt-2 text-ink-soft">
               Use the Guest and Owner switch in the top bar to move between booking as a guest and
               managing the berth you hold.
             </p>

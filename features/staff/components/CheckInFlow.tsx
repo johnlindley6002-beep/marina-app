@@ -18,7 +18,7 @@ const NONE: Enquiry[] = [];
 function DocRow({ label, value }: { label: string; value: string }) {
   if (!value) return null;
   return (
-    <p className="text-ink/80">
+    <p className="text-ink-soft">
       <span className="staff-label mb-0 inline">{label}: </span>
       {value}
     </p>
@@ -47,11 +47,11 @@ function BoatCard({
         <div>
           <p className="font-medium text-ink">
             {enquiry.boatName || "Unnamed boat"}{" "}
-            <span className="tabular text-xs font-normal text-ink/70">
+            <span className="tabular text-xs font-normal text-ink-muted">
               Berth {enquiry.assignedBerthId}
             </span>
           </p>
-          <p className="tabular text-xs text-ink/70">
+          <p className="tabular text-xs text-ink-muted">
             {formatLength(Number(enquiry.loa), units)} LOA · ETA {enquiry.eta || "n/a"} · ETD{" "}
             {enquiry.etd || "n/a"}
           </p>
@@ -79,7 +79,7 @@ function BoatCard({
         <div className="mt-3 border-t border-hairline pt-3 text-sm">
           <p className="staff-label">Skipper</p>
           <p className="text-ink">{enquiry.skipperName || "Not given"}</p>
-          <p className="text-ink/70">
+          <p className="text-ink-muted">
             {enquiry.phone} · {enquiry.email}
           </p>
 
@@ -107,13 +107,15 @@ function BoatCard({
               <DocRow label="VHF licence" value={enquiry.documents.vhfLicence} />
             </div>
           ) : (
-            <p className="text-ink/60">Nothing on file. Check the physical documents on arrival.</p>
+            <p className="text-ink-muted">
+              Nothing on file. Check the physical documents on arrival.
+            </p>
           )}
 
           {enquiry.crew.length > 0 ? (
             <>
               <p className="staff-label mt-3">Crew list ({enquiry.crew.length})</p>
-              <ul className="space-y-0.5 text-ink/80">
+              <ul className="space-y-0.5 text-ink-soft">
                 {enquiry.crew.map((c, i) => (
                   <li key={i}>
                     {c.fullName || "Unnamed"}, {c.role || c.personType}
@@ -128,7 +130,7 @@ function BoatCard({
           {enquiry.vesselUse && enquiry.vesselUse !== "private" ? (
             <>
               <p className="staff-label mt-3">Commercial / charter</p>
-              <p className="text-ink/80">
+              <p className="text-ink-soft">
                 {enquiry.vesselUse}
                 {enquiry.operatingEntity ? `, ${enquiry.operatingEntity}` : ""}
                 {enquiry.companyRegistration ? `, reg. ${enquiry.companyRegistration}` : ""}
@@ -168,20 +170,20 @@ export default function CheckInFlow() {
   return (
     <div>
       <h1 className="type-heading type-h2 text-ink">Check-in / check-out</h1>
-      <p className="mt-1 text-sm text-ink/70">{formatLongDate(today)}</p>
+      <p className="mt-1 text-sm text-ink-muted">{formatLongDate(today)}</p>
 
       <div className="mt-3 grid gap-3 sm:grid-cols-3">
         <div className="staff-kpi">
           <p className="staff-kpi-value tabular">{arriving.length}</p>
-          <p className="text-xs text-ink/70">Arriving, not yet checked in</p>
+          <p className="text-xs text-ink-muted">Arriving, not yet checked in</p>
         </div>
         <div className="staff-kpi">
           <p className="staff-kpi-value tabular">{onSite.length}</p>
-          <p className="text-xs text-ink/70">On site</p>
+          <p className="text-xs text-ink-muted">On site</p>
         </div>
         <div className="staff-kpi">
           <p className="staff-kpi-value tabular">{departing.length}</p>
-          <p className="text-xs text-ink/70">Departing today</p>
+          <p className="text-xs text-ink-muted">Departing today</p>
         </div>
       </div>
 

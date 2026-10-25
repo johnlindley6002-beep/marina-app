@@ -44,7 +44,7 @@ export default function MarinasResults({ q, arrival, departure, length }: Props)
     <section className="section">
       <div className="page-column">
         <h1 className="type-title text-ink">{q ? t.results.forQuery(q) : t.results.heading}</h1>
-        <p className="tabular mt-3 text-ink/70">{t.results.count(results.length)}</p>
+        <p className="tabular mt-3 text-ink-muted">{t.results.count(results.length)}</p>
 
         <DestinationSearch className="mt-8 max-w-3xl" initial={{ q, arrival, departure, length }} />
 
@@ -66,7 +66,7 @@ export default function MarinasResults({ q, arrival, departure, length }: Props)
               ))}
             </ul>
           ) : (
-            <p className="measure text-lg text-ink/75">{t.results.none}</p>
+            <p className="measure text-lg text-ink-soft">{t.results.none}</p>
           )}
           {MARINAS_MAP_READY ? (
             <MarinasMap pins={pins} highlightedId={highlightedId} onHover={setHighlightedId} />

@@ -67,7 +67,7 @@ export default function FacilitiesGrid({ facilities }: { facilities: FacilityDet
             className="hairline-top flex items-center gap-4 py-4 text-left transition-colors hover:bg-paper-deep/60"
           >
             <FacilityIcon facility={facility.icon} className="h-6 w-6 text-ink" />
-            <span className="text-sm text-ink/75">{facility.name[cl]}</span>
+            <span className="text-sm text-ink-soft">{facility.name[cl]}</span>
           </button>
         ))}
       </div>
@@ -97,15 +97,15 @@ export default function FacilitiesGrid({ facilities }: { facilities: FacilityDet
                 type="button"
                 onClick={() => setOpenId(null)}
                 aria-label="Close"
-                className="-mt-1 -mr-2 px-2 py-1 text-2xl leading-none text-ink/70 hover:text-ink"
+                className="-mt-1 -mr-2 px-2 py-1 text-2xl leading-none text-ink-muted hover:text-ink"
               >
                 ×
               </button>
             </div>
-            <p className="mt-4 text-sm leading-relaxed text-ink/75">{open.description[cl]}</p>
+            <p className="mt-4 text-sm leading-relaxed text-ink-soft">{open.description[cl]}</p>
             <ul className="mt-4 space-y-2 border-t border-hairline pt-4">
               {open.details.map((detail, i) => (
-                <li key={i} className="text-sm text-ink/75">
+                <li key={i} className="text-sm text-ink-soft">
                   {renderLengthTokens(detail[cl], units)}
                 </li>
               ))}

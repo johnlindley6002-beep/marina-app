@@ -25,7 +25,7 @@ export default function LastUpdated({ date, className = "" }: Props) {
   }).format(parsed);
 
   return (
-    <span className={`text-xs text-ink/70 ${className}`}>
+    <span className={`text-xs text-ink-muted ${className}`}>
       Updated <time dateTime={date}>{text}</time>
     </span>
   );

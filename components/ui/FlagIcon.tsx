@@ -18,7 +18,7 @@ export default function FlagIcon({
       aria-hidden
       width={900}
       height={600}
-      className={`inline-block rounded-[1px] align-middle ${className}`}
+      className={`inline-block rounded-sm align-middle ${className}`}
     />
   );
 }

@@ -26,7 +26,7 @@ export default function StaffShell({ children }: { children: ReactNode }) {
       <div className="staff-topbar flex-wrap gap-y-2 py-2">
         <div className="flex min-w-0 items-center gap-4">
           <Link href="/staff/arrivals" className="shrink-0 text-sm font-semibold text-ink">
-            aldock <span className="font-normal text-ink/75">staff</span>
+            aldock <span className="font-normal text-ink-soft">staff</span>
           </Link>
           <nav className="staff-nav overflow-x-auto" aria-label="Staff">
             {NAV.map((item) => {
@@ -46,7 +46,7 @@ export default function StaffShell({ children }: { children: ReactNode }) {
         </div>
         <div className="flex shrink-0 items-center gap-3">
           {user ? (
-            <span className="text-xs text-ink/70">
+            <span className="text-xs text-ink-muted">
               Signed in as <span className="font-medium text-ink">{user.name}</span>
             </span>
           ) : null}
@@ -59,7 +59,7 @@ export default function StaffShell({ children }: { children: ReactNode }) {
         </div>
       </div>
       {siteConfig.mockMode ? (
-        <p className="border-b border-hairline bg-paper px-4 py-1.5 text-xs text-ink/70">
+        <p className="border-b border-hairline bg-paper px-4 py-1.5 text-xs text-ink-muted">
           {siteConfig.accounts.mockNote}
         </p>
       ) : null}

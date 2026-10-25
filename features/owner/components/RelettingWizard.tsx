@@ -17,6 +17,7 @@ import {
 } from "@/lib/data";
 import { useAuth } from "@/components/providers/AuthProvider";
 import RoleGate from "@/components/layout/RoleGate";
+import ProgressSteps from "@/components/ui/ProgressSteps";
 import { copy } from "./relet-steps/shared";
 import type { ReletScope } from "./relet-steps/ReletScope";
 import StepAbsence from "./relet-steps/StepAbsence";
@@ -135,13 +136,13 @@ function Wizard() {
   ]);
 
   if (!berth || !marina || !terms || terms.reletAllowed === "none") {
-    return <p className="measure text-ink/75">Reletting is not available for this berth.</p>;
+    return <p className="measure text-ink-soft">Reletting is not available for this berth.</p>;
   }
 
   if (!mediated) {
     return (
       <div>
-        <p className="measure text-ink/75">
+        <p className="measure text-ink-soft">
           This marina does not mediate a paid relet of your berth. You may lend it for free with
           written notice to the marina.
         </p>
@@ -243,10 +244,10 @@ function Wizard() {
         <h2 ref={headingRef} tabIndex={-1} className="type-heading type-h2 text-ink outline-none">
           {copy.pendingTitle}
         </h2>
-        <p role="status" className="measure mt-4 text-lg text-ink/75">
+        <p role="status" className="measure mt-4 text-lg text-ink-soft">
           {copy.pendingBody}
         </p>
-        <p className="tabular mt-6 text-ink/75">
+        <p className="tabular mt-6 text-ink-soft">
           Berth {berth.berthId}, {formatLongDate(submitted.startDate)} to{" "}
           {formatLongDate(submitted.endDate)} ({nights} nights)
         </p>
@@ -287,28 +288,24 @@ function Wizard() {
   return (
     <div>
       {mode !== "new" ? (
-        <p className="measure mb-6 text-ink/75">
+        <p className="measure mb-6 text-ink-soft">
           {mode === "edit" ? copy.editTitle : copy.resubmitTitle}. The marina
           {mode === "edit" ? " will need to consent to the new dates." : " will look at it again."}
         </p>
       ) : null}
       {resumed ? (
-        <p role="status" className="mb-6 text-sm text-ink/75">
+        <p role="status" className="mb-6 text-sm text-ink-soft">
           {copy.resumeBanner}{" "}
           <button type="button" onClick={startOver} className="link text-ink">
             Start over
           </button>
         </p>
       ) : null}
-      {/* Progress: one idea per step */}
-      <div className="flex items-center gap-2" aria-hidden="true">
-        {copy.steps.map((_, i) => (
-          <span key={i} className={`h-px flex-1 ${i < step ? "bg-ink" : "bg-ink/20"}`} />
-        ))}
-      </div>
-      <p className="mt-3 text-sm text-ink/70" aria-live="polite">
-        Step {step} of {TOTAL}: {copy.steps[step - 1]}
-      </p>
+      <ProgressSteps
+        total={TOTAL}
+        current={step}
+        label={`Step ${step} of ${TOTAL}: ${copy.steps[step - 1]}`}
+      />
 
       <div key={step} className={`${stepClass} mt-10`}>
         {step === 1 ? <StepAbsence scope={scope} /> : null}
@@ -354,7 +351,7 @@ export default function RelettingWizard() {
         <div className="page-column page-reading">
           <Link
             href="/owner"
-            className="inline-flex min-h-11 items-center text-sm text-ink/70 underline underline-offset-4"
+            className="inline-flex min-h-11 items-center text-sm text-ink-muted underline underline-offset-4"
           >
             My berth
           </Link>

@@ -33,16 +33,16 @@ export default function DocumentWallet({
 
   return (
     <div>
-      <p className="mt-4 text-sm leading-relaxed text-ink/75">
+      <p className="mt-4 text-sm leading-relaxed text-ink-soft">
         All optional. The documents themselves must be shown on arrival.
       </p>
       <Disclosure label="More about saving these details" openLabel="Hide">
-        <p className="pb-2 text-sm leading-relaxed text-ink/75">
+        <p className="pb-2 text-sm leading-relaxed text-ink-soft">
           Save these details with your boat to reuse them next time, or leave any blank and give
           them to the marina staff in person. Only the text is stored here, in this browser.
         </p>
       </Disclosure>
-      <p className="mt-2 text-xs text-ink/70">
+      <p className="mt-2 text-xs text-ink-muted">
         Bring: boat registration (Portugal requires originals, not laminated copies), proof of
         third-party insurance (min {insuranceMinimumLabel}, certificate in Portuguese if possible),
         and the skipper&apos;s certificate of competence.
@@ -109,7 +109,7 @@ export default function DocumentWallet({
       </div>
 
       {onIncludeChange ? (
-        <label className="mt-4 flex items-center gap-2 text-sm text-ink/75">
+        <label className="mt-4 flex items-center gap-2 text-sm text-ink-soft">
           <input
             type="checkbox"
             checked={includeInEnquiry}

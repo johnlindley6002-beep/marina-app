@@ -87,7 +87,7 @@ export default function PriceEstimate({
         />
         <span>
           <span className="font-medium text-ink">{label}</span>
-          <span className="block text-xs text-ink/70">{hint}</span>
+          <span className="block text-xs text-ink-muted">{hint}</span>
         </span>
       </label>
       {more}
@@ -99,7 +99,7 @@ export default function PriceEstimate({
       <h2 className="type-heading type-h2 text-ink">Your estimate</h2>
 
       {!ready ? (
-        <p className="measure mt-3 text-ink/75">
+        <p className="measure mt-3 text-ink-soft">
           From {eur(cheapestNightly)} per night, depending on boat length and season. Add your dates
           and length overall for your own estimate.
         </p>
@@ -108,7 +108,7 @@ export default function PriceEstimate({
       <Collapse open={ready}>
         <fieldset className="mt-6">
           <legend className={labelClass}>Extras</legend>
-          <p className="mt-1 text-xs text-ink/70">
+          <p className="mt-1 text-xs text-ink-muted">
             Pick what you need. Each one is added to the breakdown below.
           </p>
           <div className="mt-3 grid gap-x-8 gap-y-3 sm:grid-cols-2">
@@ -160,7 +160,7 @@ export default function PriceEstimate({
         <div className="mt-8" aria-live="polite">
           {quote ? (
             <>
-              <p className="text-sm text-ink/75">
+              <p className="text-sm text-ink-soft">
                 Class {quote.marinaClass} berth ·{" "}
                 {plan.openEnded
                   ? "nightly rate (open-ended stay)"
@@ -174,18 +174,18 @@ export default function PriceEstimate({
                 {selectedBerthId ? ` · Berth ${selectedBerthId}` : ""}
               </p>
               {demandNote ? (
-                <p className="mt-2 max-w-xl border-l-2 border-ink/40 pl-3 text-sm text-ink/75">
+                <p className="mt-2 max-w-xl border-l-2 border-ink/40 pl-3 text-sm text-ink-soft">
                   {demandNote}
                 </p>
               ) : null}
               <table className="mt-3 w-full max-w-xl border-collapse text-left text-sm">
                 <tbody>
                   {quote.berthLines.map((line) => (
-                    <tr key={line.season} className="border-b border-hairline text-ink/75">
+                    <tr key={line.season} className="border-b border-hairline text-ink-soft">
                       <td className="py-2 pr-4">
                         {line.nights} night{line.nights === 1 ? "" : "s"} at {eur(line.rateEur)} per
                         night
-                        <span className="block text-xs text-ink/70">
+                        <span className="block text-xs text-ink-muted">
                           {SEASON_LABELS[line.season]}
                         </span>
                       </td>
@@ -195,7 +195,7 @@ export default function PriceEstimate({
                     </tr>
                   ))}
                   {quote.berthLines.length > 1 || quote.addOnLines.length > 0 ? (
-                    <tr className="border-b border-hairline text-ink/75">
+                    <tr className="border-b border-hairline text-ink-soft">
                       <td className="py-2 pr-4">Berth subtotal</td>
                       <td className="py-2 text-right font-medium text-ink">
                         {eur(quote.berthSubtotalEur)}
@@ -203,11 +203,11 @@ export default function PriceEstimate({
                     </tr>
                   ) : null}
                   {quote.addOnLines.map((line) => (
-                    <tr key={line.label} className="border-b border-hairline text-ink/75">
+                    <tr key={line.label} className="border-b border-hairline text-ink-soft">
                       <td className="py-2 pr-4">
                         {line.label}
                         {line.note ? (
-                          <span className="block text-xs text-ink/70">{line.note}</span>
+                          <span className="block text-xs text-ink-muted">{line.note}</span>
                         ) : null}
                       </td>
                       <td className="py-2 text-right font-medium text-ink">
@@ -225,7 +225,7 @@ export default function PriceEstimate({
                   </tr>
                 </tbody>
               </table>
-              <p className="mt-3 text-xs text-ink/70">
+              <p className="mt-3 text-xs text-ink-muted">
                 Excl. {Math.round(marina.vatRate * 100)}% VAT and utilities, estimate, confirm with
                 the marina.
               </p>
@@ -233,11 +233,11 @@ export default function PriceEstimate({
                 <a href="#request-berth" className="btn-primary">
                   Request a berth
                 </a>
-                <p className="mt-2 text-sm text-ink/75">{siteConfig.decision.requestNote}</p>
+                <p className="mt-2 text-sm text-ink-soft">{siteConfig.decision.requestNote}</p>
               </div>
             </>
           ) : (
-            <p className="text-sm text-ink/75">
+            <p className="text-sm text-ink-soft">
               {loa > 0 && classifyBoatLength(loa) === null
                 ? "Your length is outside the standard berth classes, so contact the marina for a quote."
                 : "Enter your dates and boat length above to see a price estimate."}
@@ -263,7 +263,7 @@ export default function PriceEstimate({
                 const range = CLASS_LENGTH_RANGES[marinaClass];
                 const rate = marina.transientRates[marinaClass];
                 return (
-                  <tr key={marinaClass} className="border-b border-hairline text-ink/75">
+                  <tr key={marinaClass} className="border-b border-hairline text-ink-soft">
                     <td className="py-3 pr-4 font-medium text-ink">{marinaClass}</td>
                     <td className="py-3 pr-4">{formatLengthRange(range.minM, range.maxM)}</td>
                     <td className="py-3 pr-4">€{rate.low.toFixed(2)}</td>
@@ -274,7 +274,7 @@ export default function PriceEstimate({
             </tbody>
           </table>
         </div>
-        <p className="mt-4 pb-2 text-xs text-ink/70">
+        <p className="mt-4 pb-2 text-xs text-ink-muted">
           {t.rates.caption(Math.round(marina.vatRate * 100))}
         </p>
       </Disclosure>

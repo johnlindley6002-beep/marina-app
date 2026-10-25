@@ -217,10 +217,10 @@ export default function StayDecisionSummary({ marina, plan, stayLine, datesValid
   return (
     <div className="mt-6 border-t border-hairline pt-6" aria-live="polite">
       {!ready ? (
-        <p className="text-sm text-ink/75">Add {missing} to see fit, space and price.</p>
+        <p className="text-sm text-ink-soft">Add {missing} to see fit, space and price.</p>
       ) : null}
       <Collapse open={ready}>
-        <p className="text-sm text-ink/75">
+        <p className="text-sm text-ink-soft">
           <span className="field-label">Stay: </span>
           {stayLine}
         </p>
@@ -231,7 +231,7 @@ export default function StayDecisionSummary({ marina, plan, stayLine, datesValid
               <div className="min-w-0">
                 <p className="field-label">{row.label}</p>
                 <p className="mt-1 font-medium text-ink">{row.headline}</p>
-                <p className="mt-1 text-sm text-ink/75">{row.detail}</p>
+                <p className="mt-1 text-sm text-ink-soft">{row.detail}</p>
               </div>
             </li>
           ))}

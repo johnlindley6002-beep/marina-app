@@ -35,6 +35,9 @@ ESLint is on 9.x because eslint-config-next 16 targets it; 9.x is marked depreca
 4. **Impossible calendar dates are rejected** (2026-02-31 used to roll into March).
 5. **Gibraltar added to the country list**, classed as outside the EU and Schengen.
 6. **"Copied!" is now "Copied"** on the enquiry summary.
+7. **Decoration removed (Phase 4).** No scroll reveal, no hero image drift on scroll (parallax), no hero load animation or image zoom, no photo zoom on hover, no chart-scale dividers between sections (now a plain hairline), no gradients on navy plates, and the chart linework survives only in the two heroes. The empty navy "resting band" shown when no photo is supplied is no longer rendered (it was a 30 rem blank block); with a photo it is unchanged.
+8. **Contact email on the home page was invisible** (navy text on a navy section). It is now paper-coloured.
+9. **Secondary text is slightly darker** where it used 60 or 65 percent ink (now the 70 percent floor that passes 4.5:1 on paper).
 
 ## Phases
 
@@ -42,7 +45,7 @@ ESLint is on 9.x because eslint-config-next 16 targets it; 9.x is marked depreca
 - [x] Phase 1 audit
 - [x] Phase 2 tooling
 - [x] Phase 3 architecture
-- [ ] Phase 4 design system
+- [x] Phase 4 design system
 - [ ] Phase 5 copy and i18n
 - [ ] Phase 6 accessibility and mobile
 - [ ] Phase 7 performance and PWA
@@ -82,6 +85,15 @@ Audit written to AUDIT.md with a ranked top 20.
 - **Dead code.** knip configured. Removed unused exports and the 5 create-next-app SVGs. Remaining knip items are the three test libraries (used in Phase 8) and money.formatEur (used in Phase 5).
 - Still over 300 lines: RelettingQueue (429), MyBoatContent (361), ArrivalsBoard (316), RelettingLedger (312), each a single flow; deferred. The berth map (605) is off limits.
 
+### Phase 4
+
+- **Tokens** in globals.css: radius (sm 2, md 3, lg 4 px; every rounded-[Npx] replaced), elevation (shadow-raised, shadow-overlay; every other shadow removed), motion (150, 220, 320 ms and one easing; CSS and Tailwind use the variables), text steps (ink, ink-soft, ink-muted replace five opacity variants), surface white. Spacing was already Tailwind's 4 px grid.
+- **Primitives added** in components/ui: SegmentedControl (UnitSegmented and ModeSwitch are now thin wrappers), Field (promoted from the pre-arrival wizard, 9 files), Toggle, ProgressSteps (two identical hand-built bars). PageHeader now also used by My boat, Reletting terms and the booking confirmation.
+- **Safe area.** viewport-fit=cover, and the contact dock, the pre-arrival sticky bar, the footer and the dev switcher clear the home indicator.
+- **Before and after screenshots** of 17 routes at 375, 768 and 1280 are in docs/audit/screens (scripts/screens.mjs). No horizontal overflow at any size.
+
 ## Deferred
+
+- **Phase 4, not done, on purpose.** Button, TextField, Select, Badge and EmptyState as React components: the app already has one CSS source for each (the btn, field, staff-btn, staff-badge and staff-empty classes) used 20 to 120 times, and wrapping them would add no behaviour for a large diff. Sheet, Dialog, Toast, Skeleton, IconButton, Card and ListRow were not built because no screen needs them yet (an unused primitive is dead code). Titillium Web and the accent #1e3a5f were not adopted (see Decisions). Status colours (success, warning, info) were not added: the product conveys status with words, ink, brass and one error red, and nothing would use them. Dark mode was never intended (no dark styles existed), so it was not added. Staff pages keep their own denser heading style on purpose. The berth map keeps its own greys and navy classes because its internals are off limits.
 
 - react-hooks/set-state-in-effect warnings (17): convert the localStorage hydration effects to useSyncExternalStore.

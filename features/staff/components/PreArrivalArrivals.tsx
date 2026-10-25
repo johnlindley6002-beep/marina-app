@@ -85,7 +85,7 @@ function Row({ checkIn }: { checkIn: PreArrivalCheckIn }) {
               <span className="staff-badge staff-badge-warn">Insurance expired</span>
             ) : null}
           </p>
-          <p className="tabular mt-1 text-xs text-ink/70">
+          <p className="tabular mt-1 text-xs text-ink-muted">
             {draft.stay.requestedArrival || draft.voyage.arrivalDateTime} · {draft.people.length} on
             board · ref. {checkIn.referenceCode}
           </p>
@@ -98,8 +98,8 @@ function Row({ checkIn }: { checkIn: PreArrivalCheckIn }) {
             <div>
               <p className="staff-label">Skipper / owner</p>
               <p className="text-ink">{draft.owner.fullName || "Not given"}</p>
-              <p className="text-ink/70">{draft.owner.phone}</p>
-              <p className="text-ink/70">{draft.owner.email}</p>
+              <p className="text-ink-muted">{draft.owner.phone}</p>
+              <p className="text-ink-muted">{draft.owner.email}</p>
             </div>
             <div>
               <p className="staff-label">Voyage</p>
@@ -113,7 +113,7 @@ function Row({ checkIn }: { checkIn: PreArrivalCheckIn }) {
           {draft.people.length > 0 ? (
             <div className="mt-3">
               <p className="staff-label">Crew and guests ({draft.people.length})</p>
-              <ul className="text-ink/80">
+              <ul className="text-ink-soft">
                 {draft.people.map((p, i) => (
                   <li key={i}>
                     {[p.givenNames, p.familyName].filter(Boolean).join(" ") || "Unnamed"}, {p.role},{" "}
@@ -127,7 +127,7 @@ function Row({ checkIn }: { checkIn: PreArrivalCheckIn }) {
           {warnings.length > 0 ? (
             <div className="mt-3">
               <p className="staff-label">Flags</p>
-              <ul className="text-ink/80">
+              <ul className="text-ink-soft">
                 {warnings.map((w, i) => (
                   <li key={i}>{w.message}</li>
                 ))}

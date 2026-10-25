@@ -12,10 +12,8 @@ import {
   type StayPlan,
 } from "@/features/marina/lib/stayPlan";
 import { useBoats } from "@/components/providers/BoatProvider";
-import ChartLinework from "@/components/ui/ChartLinework";
 import { Collapse } from "@/components/ui/Disclosure";
 import RestingBand from "@/components/ui/RestingBand";
-import Reveal from "@/components/ui/Reveal";
 import FuelPrices from "./FuelPrices";
 import MarinaHero from "./MarinaHero";
 import { GalleryProvider } from "./PhotoGallery";
@@ -155,7 +153,7 @@ export default function CascaisPageContent({
     <GalleryProvider photos={galleryPhotos}>
       <MarinaHero marina={marina} />
 
-      <div className="page-column py-4 text-ink/70">
+      <div className="page-column py-4 text-ink-muted">
         <Breadcrumbs
           items={[
             { label: t.breadcrumbs.marinas, href: "/marinas" },
@@ -173,10 +171,9 @@ export default function CascaisPageContent({
         </div>
       </section>
 
-      {/* The map is the focal moment: a quiet ink stage with the chart lines
-          and generous space around it. The map itself is unchanged. */}
+      {/* The map is the focal moment: a quiet ink stage with generous
+          space around it. The map itself is unchanged. */}
       <section className="relative isolate overflow-hidden bg-ink py-20 md:py-36">
-        <ChartLinework className="absolute inset-0 -z-10 h-full w-full text-paper opacity-[0.07]" />
         <div className="page-column">
           <BerthAvailabilityMap
             marinaName={marina.name}
@@ -207,7 +204,7 @@ export default function CascaisPageContent({
           {!formMounted ? (
             <div id="request-berth" className="hairline-top scroll-mt-24 pt-6">
               <h2 className="type-heading type-h3 text-ink">Request a berth</h2>
-              <p className="mt-2 text-ink/75">
+              <p className="mt-2 text-ink-soft">
                 Add your dates and length overall above to request a berth.
               </p>
             </div>
@@ -248,9 +245,7 @@ export default function CascaisPageContent({
 
       <section className="section-editorial bg-paper-deep">
         <div className="page-column">
-          <Reveal>
-            <h2 className="type-statement text-ink">{t.facilities.heading}</h2>
-          </Reveal>
+          <h2 className="type-statement text-ink">{t.facilities.heading}</h2>
           <div className="stack-md">
             <FacilitiesGrid facilities={marina.facilityDetails} />
           </div>

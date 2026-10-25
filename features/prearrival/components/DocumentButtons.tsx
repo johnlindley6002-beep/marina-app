@@ -88,7 +88,7 @@ export default function DocumentButtons({ checkIn, marina, className }: Props) {
       </div>
       {nonEUMovement ? (
         <div className="mt-4">
-          <p className="text-sm text-ink/70">{copy.authorityNote}</p>
+          <p className="text-sm text-ink-muted">{copy.authorityNote}</p>
           <div className="mt-2 flex flex-wrap gap-3">
             <button type="button" onClick={downloadAuthorityJson} className="btn-quiet text-sm">
               {copy.authorityJsonBtn}

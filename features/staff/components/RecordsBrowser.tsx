@@ -105,7 +105,7 @@ export default function RecordsBrowser() {
         <div
           role="group"
           aria-label="Records type"
-          className="inline-flex rounded-[3px] border border-ink/25 p-0.5 text-xs"
+          className="inline-flex rounded-md border border-ink/25 p-0.5 text-xs"
         >
           {TABS.map((t) => (
             <button
@@ -113,7 +113,7 @@ export default function RecordsBrowser() {
               type="button"
               aria-pressed={tab === t}
               onClick={() => setTab(t)}
-              className={`min-h-10 rounded-[2px] px-3 ${tab === t ? "bg-ink text-paper" : "text-ink/70"}`}
+              className={`min-h-10 rounded-sm px-3 ${tab === t ? "bg-ink text-paper" : "text-ink-muted"}`}
             >
               {t}
             </button>
@@ -175,7 +175,7 @@ export default function RecordsBrowser() {
                   <td className="tabular font-medium text-ink">{r.id}</td>
                   <td>{r.sizeClass}</td>
                   <td>{STAFF_STATUS_LABEL[r.status]}</td>
-                  <td className="text-ink/70">{r.detail}</td>
+                  <td className="text-ink-muted">{r.detail}</td>
                 </tr>
               ))}
             </tbody>
@@ -196,7 +196,7 @@ export default function RecordsBrowser() {
               {customerRows.map((r) => (
                 <tr key={r.key}>
                   <td className="font-medium text-ink">{r.name}</td>
-                  <td className="text-ink/70">{r.contact}</td>
+                  <td className="text-ink-muted">{r.contact}</td>
                   <td>{r.boat}</td>
                   <td>{r.kind}</td>
                 </tr>

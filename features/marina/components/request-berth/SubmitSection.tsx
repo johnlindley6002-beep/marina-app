@@ -26,12 +26,12 @@ export default function SubmitSection({ ctx }: { ctx: RequestBerthCtx }) {
 
       <div>
         <p className="field-label">Cancellation policy</p>
-        <p className="mt-2 text-sm text-ink/75">
+        <p className="mt-2 text-sm text-ink-soft">
           {marina.cancellationPolicy ??
             "Cancellation terms are confirmed by the marina. Ask when they reply to your enquiry."}
         </p>
-        <p className="mt-4 text-sm text-ink/75">{siteConfig.decision.requestNote}</p>
-        <p className="mt-2 text-sm text-ink/70">
+        <p className="mt-4 text-sm text-ink-soft">{siteConfig.decision.requestNote}</p>
+        <p className="mt-2 text-sm text-ink-muted">
           Your details go only to the marina, by email.{" "}
           <a href="#privacy" className="underline underline-offset-4">
             Read the privacy note

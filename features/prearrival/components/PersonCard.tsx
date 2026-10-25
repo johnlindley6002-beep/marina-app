@@ -5,7 +5,8 @@ import { COUNTRIES } from "@/lib/countries";
 import { isMinor, type Person } from "@/features/prearrival/lib/schema";
 import { useLanguage } from "@/components/providers/LanguageProvider";
 import type { StepProps } from "./PreArrivalWizard";
-import { Field, StatusPill, type PersonStatus } from "./WizardBits";
+import Field from "@/components/ui/Field";
+import { StatusPill, type PersonStatus } from "./WizardBits";
 
 type Props = {
   index: number;
@@ -76,7 +77,9 @@ export default function PersonCard({
           </button>
         ) : null}
       </div>
-      {index === 0 ? <p className="mt-1 text-xs text-ink/65">{copy.skipperDefaultNote}</p> : null}
+      {index === 0 ? (
+        <p className="mt-1 text-xs text-ink-muted">{copy.skipperDefaultNote}</p>
+      ) : null}
 
       {open ? (
         <div id={panelId} className="mt-4">
@@ -107,7 +110,7 @@ export default function PersonCard({
                   <button
                     type="button"
                     onClick={() => update({ familyName: draft.people[0]?.familyName ?? "" })}
-                    className="shrink-0 text-xs whitespace-nowrap text-ink/65 underline underline-offset-4"
+                    className="shrink-0 text-xs whitespace-nowrap text-ink-muted underline underline-offset-4"
                   >
                     {copy.sameSurnameToggle}
                   </button>
@@ -142,7 +145,7 @@ export default function PersonCard({
                   <button
                     type="button"
                     onClick={() => update({ nationality: draft.people[0]?.nationality ?? "" })}
-                    className="shrink-0 text-xs whitespace-nowrap text-ink/65 underline underline-offset-4"
+                    className="shrink-0 text-xs whitespace-nowrap text-ink-muted underline underline-offset-4"
                   >
                     {copy.sameNationalityToggle}
                   </button>
@@ -279,7 +282,7 @@ export default function PersonCard({
             className="btn-secondary mt-4 opacity-60"
           >
             {copy.scanPassport}
-            <span className="ml-2 text-xs text-ink/65">{copy.scanComingSoon}</span>
+            <span className="ml-2 text-xs text-ink-muted">{copy.scanComingSoon}</span>
           </button>
         </div>
       ) : null}

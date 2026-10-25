@@ -79,7 +79,7 @@ export default function ArrivalActions({ marina, plan, selectedBerthId }: Props)
   return (
     <div className="mt-10 border-t border-hairline pt-8">
       <h3 className="type-heading type-h3 text-ink">Arriving today?</h3>
-      <p className="mt-2 text-sm text-ink/75">
+      <p className="mt-2 text-sm text-ink-soft">
         Each opens a pre-filled email to {marina.name}. Nothing is sent until you press send.
       </p>
       <div className="mt-4 flex flex-wrap items-center gap-4">

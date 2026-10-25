@@ -16,7 +16,7 @@ export default function RequestBerthForm(props: RequestBerthProps) {
   return (
     <div id="request-berth" className="surface-lift scroll-mt-24 p-6 sm:p-8 md:p-10">
       <h2 className="type-heading type-h3 text-ink">Request a berth</h2>
-      <p className="mt-2 text-sm text-ink/70">
+      <p className="mt-2 text-sm text-ink-muted">
         Opens a pre-filled email to {marina.name}. Nothing is submitted to a server.
       </p>
 

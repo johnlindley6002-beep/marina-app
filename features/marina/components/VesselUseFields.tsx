@@ -86,7 +86,7 @@ export default function VesselUseFields({
         </select>
         <FieldError id="err-vesselUse" message={errors.vesselUse} />
       </label>
-      <p id="vessel-use-help" className="mt-2 text-xs text-ink/70">
+      <p id="vessel-use-help" className="mt-2 text-xs text-ink-muted">
         Most visiting boats are private pleasure craft. Other choices ask for a few company details.
       </p>
 
@@ -108,7 +108,7 @@ export default function VesselUseFields({
                 onChange={(e) => onChange("operatingEntity", e.target.value)}
                 className={inputClass}
               />
-              <span className="mt-1 block text-xs text-ink/70">
+              <span className="mt-1 block text-xs text-ink-muted">
                 The charter operator or owning company name.
               </span>
               <FieldError id="err-operatingEntity" message={errors.operatingEntity} />
@@ -134,7 +134,7 @@ export default function VesselUseFields({
           </div>
 
           {use === "bareboat" ? (
-            <p className="mt-4 text-sm text-ink/75">
+            <p className="mt-4 text-sm text-ink-soft">
               <span className={labelClass}>Responsible contracting party: </span>
               the bareboat charterer, who is the skipper
               {skipperName.trim() ? ` (${skipperName.trim()})` : " named in Skipper & contact"}.
@@ -217,7 +217,7 @@ export default function VesselUseFields({
           ) : null}
 
           <div className="mt-4">
-            <label className="flex items-start gap-3 text-sm text-ink/80">
+            <label className="flex items-start gap-3 text-sm text-ink-soft">
               <input
                 type="checkbox"
                 checked={values.insuranceConfirmed}
@@ -234,11 +234,11 @@ export default function VesselUseFields({
             <FieldError id="err-insuranceConfirmed" message={errors.insuranceConfirmed} />
           </div>
 
-          <div className="mt-6 space-y-1 text-sm text-ink/75">
+          <div className="mt-6 space-y-1 text-sm text-ink-soft">
             {notes.map((note) => (
               <p key={note}>{note}</p>
             ))}
-            <p className="pt-1 text-xs text-ink/70">{disclaimer}</p>
+            <p className="pt-1 text-xs text-ink-muted">{disclaimer}</p>
           </div>
         </div>
       ) : null}

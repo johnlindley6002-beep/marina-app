@@ -32,7 +32,7 @@ export function Collapse({ open, id, className = "", children }: CollapseProps) 
   return (
     <div
       id={id}
-      className={`grid transition-[grid-template-rows,opacity] duration-500 ease-out motion-reduce:transition-none ${
+      className={`grid transition-[grid-template-rows,opacity] duration-(--duration-slow) ease-(--ease-standard) motion-reduce:transition-none ${
         open ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
       } ${className}`}
     >
@@ -47,7 +47,7 @@ function Chevron({ open }: { open: boolean }) {
   return (
     <svg
       viewBox="0 0 20 20"
-      className={`h-4 w-4 shrink-0 transition-transform duration-500 motion-reduce:transition-none ${
+      className={`h-4 w-4 shrink-0 transition-transform duration-(--duration-slow) motion-reduce:transition-none ${
         open ? "rotate-180" : ""
       }`}
       fill="none"

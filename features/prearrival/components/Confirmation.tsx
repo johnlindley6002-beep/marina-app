@@ -8,6 +8,7 @@ import { getDocumentRequirements } from "@/features/prearrival/lib/documentRules
 import type { PreArrivalCheckIn } from "@/lib/data";
 import { useBoats, type BoatInput } from "@/components/providers/BoatProvider";
 import { draftToSavedBoat } from "@/features/prearrival/lib/boatMapping";
+import PageHeader from "@/components/layout/PageHeader";
 import DocumentButtons from "./DocumentButtons";
 import { useLanguage } from "@/components/providers/LanguageProvider";
 
@@ -37,12 +38,12 @@ function SaveToMyBoat({ checkIn }: { checkIn: PreArrivalCheckIn }) {
   }
 
   if (saved) {
-    return <p className="mt-4 text-sm text-ink/75">{copy.savedNote}</p>;
+    return <p className="mt-4 text-sm text-ink-soft">{copy.savedNote}</p>;
   }
   return (
     <div className="surface-lift mt-8 p-6">
       <p className="font-medium text-ink">{copy.saveOfferHeading}</p>
-      <p className="mt-1 text-sm text-ink/75">{copy.saveOfferBody}</p>
+      <p className="mt-1 text-sm text-ink-soft">{copy.saveOfferBody}</p>
       <button type="button" onClick={save} className="btn-secondary mt-4">
         {copy.saveOfferBtn}
       </button>
@@ -65,7 +66,7 @@ export default function Confirmation({
   return (
     <div className="section-tight">
       <div className="page-column page-reading">
-        <h1 className="type-title text-ink">{copy.heading}</h1>
+        <PageHeader title={copy.heading} />
 
         <div className="surface-lift mt-8 p-6">
           <p className="type-label">{copy.referenceLabel}</p>
@@ -74,12 +75,12 @@ export default function Confirmation({
 
         <div className="mt-8">
           <p className="type-heading type-h3 text-ink">{copy.whatNextHeading}</p>
-          <p className="mt-2 text-ink/75">{copy.whatNextBody}</p>
+          <p className="mt-2 text-ink-soft">{copy.whatNextBody}</p>
         </div>
 
         <div className="mt-8">
           <p className="type-heading type-h3 text-ink">{copy.bringHeading}</p>
-          <ul className="mt-3 space-y-1 text-sm text-ink/75">
+          <ul className="mt-3 space-y-1 text-sm text-ink-soft">
             {requiredDocs.map((req) => (
               <li key={req.key}>{documentItems[req.key]}</li>
             ))}

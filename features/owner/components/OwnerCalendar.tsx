@@ -114,7 +114,7 @@ export default function OwnerCalendar() {
         <thead>
           <tr>
             {WEEKDAYS.map((d) => (
-              <th key={d} scope="col" className="pb-2 text-xs font-medium text-ink/70">
+              <th key={d} scope="col" className="pb-2 text-xs font-medium text-ink-muted">
                 {d}
               </th>
             ))}
@@ -127,7 +127,7 @@ export default function OwnerCalendar() {
                 <td key={day.iso} className="p-0.5">
                   <div
                     aria-current={day.iso === today ? "date" : undefined}
-                    className={`tabular flex h-10 items-center justify-center rounded-[2px] text-sm md:h-12 ${
+                    className={`tabular flex h-10 items-center justify-center rounded-sm text-sm md:h-12 ${
                       day.inMonth ? "text-ink" : "text-ink/40"
                     } ${STATE_CLASS[day.state]} ${
                       day.iso === today ? "font-bold underline underline-offset-4" : ""
@@ -147,12 +147,12 @@ export default function OwnerCalendar() {
         </tbody>
       </table>
 
-      <ul className="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-sm text-ink/75" aria-label="Key">
+      <ul className="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-sm text-ink-soft" aria-label="Key">
         {LEGEND.map((state) => (
           <li key={state} className="flex items-center gap-2">
             <span
               aria-hidden="true"
-              className={`inline-block h-4 w-4 rounded-[2px] ${STATE_CLASS[state]}`}
+              className={`inline-block h-4 w-4 rounded-sm ${STATE_CLASS[state]}`}
             />
             {LEGEND_LABEL[state]}
           </li>

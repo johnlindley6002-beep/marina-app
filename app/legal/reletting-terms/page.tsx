@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import PageHeader from "@/components/layout/PageHeader";
 
 export const metadata: Metadata = {
   title: "Reletting terms - aldock",
@@ -12,11 +13,10 @@ export default function ReletingTermsPage() {
   return (
     <div className="section">
       <div className="page-column page-reading">
-        <h1 className="type-title text-ink">Reletting terms</h1>
-        <p className="measure mt-6 text-lg text-ink/75">
+        <PageHeader title="Reletting terms">
           The full terms for reletting a berth are provided by the marina. This is a placeholder
           page for the mockup, and it contains no legal text.
-        </p>
+        </PageHeader>
         <Link href="/owner" className="btn-quiet mt-8">
           Back to My berth
         </Link>

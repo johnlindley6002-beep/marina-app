@@ -19,7 +19,7 @@ export default function StepReadiness({ scope }: { scope: ReletScope }) {
           {copy.readinessBerth}
         </Check>
       </div>
-      <p className="measure mt-8 text-ink/75">{copy.readinessInsurance}</p>
+      <p className="measure mt-8 text-ink-soft">{copy.readinessInsurance}</p>
     </>
   );
 }

@@ -5,9 +5,7 @@ import { siteConfig } from "@/data/site";
 import { formatCoordinates } from "@/lib/geo";
 import { formatLength } from "@/lib/units";
 import { useLanguage } from "@/components/providers/LanguageProvider";
-import ChartDivider from "@/components/ui/ChartDivider";
 import Disclosure from "@/components/ui/Disclosure";
-import Reveal from "@/components/ui/Reveal";
 import ProtectionIndicator, { ProtectionWhy } from "./ProtectionIndicator";
 import { useUnits } from "@/components/providers/UnitsProvider";
 import ContactBlock from "./ContactBlock";
@@ -22,7 +20,7 @@ type Props = {
 };
 
 const labelClass = "field-label";
-const valueClass = "mt-2 text-ink/75";
+const valueClass = "mt-2 text-ink-soft";
 
 export default function ApproachInfo({ marina, arrivalInstructions, gettingThere }: Props) {
   const { t } = useLanguage();
@@ -31,9 +29,7 @@ export default function ApproachInfo({ marina, arrivalInstructions, gettingThere
   return (
     <section id="practical-info" className="section-editorial scroll-mt-20">
       <div className="page-column">
-        <Reveal>
-          <h2 className="type-statement text-ink">Approach &amp; practical info</h2>
-        </Reveal>
+        <h2 className="type-statement text-ink">Approach &amp; practical info</h2>
 
         {/* The four essentials */}
         <div className="stack-md grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
@@ -67,11 +63,11 @@ export default function ApproachInfo({ marina, arrivalInstructions, gettingThere
         <div className="mt-10 space-y-1">
           <Disclosure label="More arrival details" openLabel="Fewer arrival details">
             <div className="pt-2 pb-4">
-              <p className="measure text-ink/75">{marina.entryNote}</p>
+              <p className="measure text-ink-soft">{marina.entryNote}</p>
               <p className={`${labelClass} mt-6`}>{t.visiting.onArrival}</p>
               <ul className="mt-3 space-y-2">
                 {[arrivalInstructions, ...marina.preArrivalChecklist].map((item) => (
-                  <li key={item} className="flex items-start gap-2 text-ink/75">
+                  <li key={item} className="flex items-start gap-2 text-ink-soft">
                     <svg
                       viewBox="0 0 20 20"
                       fill="none"
@@ -117,16 +113,16 @@ export default function ApproachInfo({ marina, arrivalInstructions, gettingThere
         <EmergencyNumbers marina={marina} embedded />
 
         <div id="cancellation" className="stack-lg scroll-mt-24">
-          <ChartDivider className="mb-10" />
+          <hr className="mb-10 border-hairline" />
           <h3 className="type-heading type-h3 text-ink">Cancellation policy</h3>
-          <p className="measure mt-3 text-ink/75">{marina.cancellationPolicy}</p>
+          <p className="measure mt-3 text-ink-soft">{marina.cancellationPolicy}</p>
           <Disclosure
             hashId="privacy"
             label="How your data is handled"
             openLabel="Hide how your data is handled"
             className="mt-4"
           >
-            <p className="measure pt-2 pb-2 text-ink/75">{siteConfig.privacyNote}</p>
+            <p className="measure pt-2 pb-2 text-ink-soft">{siteConfig.privacyNote}</p>
           </Disclosure>
         </div>
 

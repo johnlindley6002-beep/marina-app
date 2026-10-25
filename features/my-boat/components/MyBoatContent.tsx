@@ -11,6 +11,7 @@ import { useBoats } from "@/components/providers/BoatProvider";
 import Disclosure from "@/components/ui/Disclosure";
 import { useLanguage } from "@/components/providers/LanguageProvider";
 import SavedMarinas from "@/features/discovery/components/SavedMarinas";
+import PageHeader from "@/components/layout/PageHeader";
 import UnitSegmented from "@/components/ui/UnitSegmented";
 import { useUnits } from "@/components/providers/UnitsProvider";
 import DocumentWallet from "@/features/marina/components/DocumentWallet";
@@ -62,10 +63,9 @@ export default function MyBoatContent() {
   return (
     <div className="section">
       <div className="page-column page-reading">
-        <h1 className="type-title text-ink">My boat</h1>
-        <p className="measure mt-4 text-lg text-ink/75">{siteConfig.hub.intro}</p>
+        <PageHeader title="My boat">{siteConfig.hub.intro}</PageHeader>
         <Disclosure label="Where is this stored?" openLabel="Hide where this is stored">
-          <p className="measure pb-2 text-ink/75">{siteConfig.hub.deviceNote}</p>
+          <p className="measure pb-2 text-ink-soft">{siteConfig.hub.deviceNote}</p>
         </Disclosure>
         {!storageOk ? (
           <p role="alert" className="measure mt-4 border-l-2 border-error pl-3 text-sm text-error">
@@ -101,7 +101,7 @@ export default function MyBoatContent() {
           </div>
 
           {ready && boats.length === 0 && editing === null ? (
-            <p className="measure mt-4 text-ink/75">
+            <p className="measure mt-4 text-ink-soft">
               No boat saved yet. Add yours and the boat-fit check, Plan your stay and Request a
               berth will fill in automatically.
             </p>
@@ -119,12 +119,12 @@ export default function MyBoatContent() {
                           {boat.name}
                           {active ? <span className="chip">Active boat</span> : null}
                         </h3>
-                        <p className="tabular mt-1 text-ink/75">
+                        <p className="tabular mt-1 text-ink-soft">
                           {formatLength(Number(boat.loa), units)} long,{" "}
                           {formatLength(Number(boat.beam), units)} beam,{" "}
                           {formatLength(Number(boat.draft), units)} draft
                         </p>
-                        <p className="mt-1 text-sm text-ink/70">
+                        <p className="mt-1 text-sm text-ink-muted">
                           {[
                             boat.type && boat.type.charAt(0).toUpperCase() + boat.type.slice(1),
                             boat.flag,
@@ -158,7 +158,7 @@ export default function MyBoatContent() {
                         <button
                           type="button"
                           onClick={() => setConfirmRemove(boat.id)}
-                          className="inline-flex min-h-11 items-center text-ink/70 hover:text-error"
+                          className="inline-flex min-h-11 items-center text-ink-muted hover:text-error"
                         >
                           Remove<span className="sr-only"> {boat.name}</span>
                         </button>
@@ -217,10 +217,10 @@ export default function MyBoatContent() {
           <h2 id="docs-heading" className="type-heading type-h2 text-ink">
             Documents
           </h2>
-          <p className="measure mt-2 text-sm text-ink/70">{siteConfig.hub.documentsNote}</p>
+          <p className="measure mt-2 text-sm text-ink-muted">{siteConfig.hub.documentsNote}</p>
           {activeBoat ? (
             <>
-              <p className="mt-3 text-ink/75">
+              <p className="mt-3 text-ink-soft">
                 For your active boat, <strong>{activeBoat.name}</strong>.
               </p>
               <DocumentWallet
@@ -242,7 +242,7 @@ export default function MyBoatContent() {
               />
             </>
           ) : (
-            <p className="measure mt-3 text-ink/75">
+            <p className="measure mt-3 text-ink-soft">
               Add a boat first, then you can keep its registration, insurance, certificate and VHF
               licence details here.
             </p>
@@ -253,7 +253,7 @@ export default function MyBoatContent() {
           <h2 id="you-heading" className="type-heading type-h2 text-ink">
             About you
           </h2>
-          <p className="measure mt-2 text-sm text-ink/70">
+          <p className="measure mt-2 text-sm text-ink-muted">
             Optional. The skipper&apos;s contact details, so you do not retype them in every
             enquiry.
           </p>
@@ -301,7 +301,7 @@ export default function MyBoatContent() {
           <h2 id="units-heading" className="type-heading type-h2 text-ink">
             Units
           </h2>
-          <p className="measure mt-2 text-sm text-ink/70">
+          <p className="measure mt-2 text-sm text-ink-muted">
             Applied across the whole site, and remembered on this device.
           </p>
           <div className="mt-4">
@@ -316,7 +316,7 @@ export default function MyBoatContent() {
             Data on this device
           </h2>
           <Disclosure label="How your data is handled" openLabel="Hide how your data is handled">
-            <p className="measure pb-2 text-ink/75">{siteConfig.privacyNote}</p>
+            <p className="measure pb-2 text-ink-soft">{siteConfig.privacyNote}</p>
           </Disclosure>
           {confirmClear ? (
             <div role="alertdialog" aria-label="Clear saved data" className="mt-4">

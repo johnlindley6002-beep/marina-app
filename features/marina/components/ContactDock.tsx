@@ -81,7 +81,7 @@ export default function ContactDock({ marina }: { marina: Marina }) {
   }, [open]);
 
   return (
-    <div className="fixed right-4 bottom-4 z-40 flex flex-col items-end gap-2">
+    <div className="fixed right-4 bottom-[max(1rem,env(safe-area-inset-bottom))] z-40 flex flex-col items-end gap-2">
       {open ? (
         <div
           ref={panelRef}
@@ -101,7 +101,7 @@ export default function ContactDock({ marina }: { marina: Marina }) {
         aria-controls="contact-dock-panel"
         aria-label={open ? t.dock.close : t.dock.open}
         onClick={() => setOpen((v) => !v)}
-        className="flex h-11 w-11 items-center justify-center rounded-full bg-ink text-white shadow-lg hover:bg-ink-2"
+        className="flex h-11 w-11 items-center justify-center rounded-full bg-ink text-white shadow-overlay hover:bg-ink-2"
       >
         <svg
           viewBox="0 0 24 24"

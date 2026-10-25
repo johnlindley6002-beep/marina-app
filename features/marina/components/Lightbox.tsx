@@ -14,7 +14,7 @@ type Props = {
 const SWIPE_DISTANCE = 50;
 
 const controlClass =
-  "inline-flex h-12 w-12 items-center justify-center rounded-full border border-white/40 bg-ink/60 text-white transition-colors hover:bg-white/15";
+  "inline-flex h-12 w-12 items-center justify-center rounded-full border border-white/40 bg-ink/60 text-white transition-colors hover:bg-surface/15";
 
 // A full-screen viewer on the native dialog element: it traps focus, closes
 // on Escape and makes the page behind it inert without any library.

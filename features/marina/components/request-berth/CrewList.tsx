@@ -15,14 +15,14 @@ export default function CrewList({ ctx }: { ctx: RequestBerthCtx }) {
         <RequiredMark />
       </p>
       {form.vesselUse === "crewed" ? (
-        <p className="mt-2 text-xs text-ink/75">
+        <p className="mt-2 text-xs text-ink-soft">
           List professional crew and guests or passengers separately: choose the type for each
           person. Border control treats them differently.
         </p>
       ) : null}
-      <p className="mt-2 text-xs text-ink/70">Required: name, nationality and role.</p>
+      <p className="mt-2 text-xs text-ink-muted">Required: name, nationality and role.</p>
       <Disclosure label="About the optional details" openLabel="Hide the optional details">
-        <p className="pb-2 text-xs text-ink/70">
+        <p className="pb-2 text-xs text-ink-muted">
           Date of birth, passport number and join date are optional. Passport numbers and other
           private details can be given to the marina staff in person instead.
         </p>
@@ -101,7 +101,7 @@ export default function CrewList({ ctx }: { ctx: RequestBerthCtx }) {
                 type="button"
                 onClick={() => removeCrewRow(index)}
                 disabled={form.crew.length === 1}
-                className="px-2 text-xs font-medium text-ink/70 hover:text-error disabled:cursor-not-allowed disabled:opacity-40"
+                className="px-2 text-xs font-medium text-ink-muted hover:text-error disabled:cursor-not-allowed disabled:opacity-40"
                 aria-label="Remove crew member"
               >
                 Remove
@@ -126,7 +126,7 @@ export default function CrewList({ ctx }: { ctx: RequestBerthCtx }) {
       (listedCrew !== Number(form.professionalCrewCount) ||
         listedGuests !== Number(form.guestCount)) &&
       (form.professionalCrewCount || form.guestCount) ? (
-        <p className="mt-2 text-xs text-ink/70">
+        <p className="mt-2 text-xs text-ink-muted">
           Your list shows {listedCrew} professional crew and {listedGuests}{" "}
           {listedGuests === 1 ? "guest" : "guests"}, while you entered{" "}
           {form.professionalCrewCount || 0} and {form.guestCount || 0} above. Please check the

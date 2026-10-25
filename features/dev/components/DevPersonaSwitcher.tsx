@@ -25,12 +25,12 @@ export default function DevPersonaSwitcher() {
   const active = personas.find((p) => p.id === activePersonaId);
 
   return (
-    <div className="on-ink fixed bottom-3 left-3 z-[60] max-w-[calc(100vw-1.5rem)] text-sm">
+    <div className="on-ink fixed bottom-[max(0.75rem,env(safe-area-inset-bottom))] left-3 z-[60] max-w-[calc(100vw-1.5rem)] text-sm">
       {open ? (
         <div
           role="group"
           aria-label="Mock sign in, dev only"
-          className="mb-2 w-72 max-w-full rounded-[3px] border border-paper/20 bg-ink p-3 text-paper shadow-lg"
+          className="mb-2 w-72 max-w-full rounded-md border border-paper/20 bg-ink p-3 text-paper shadow-overlay"
         >
           <p className="font-medium">Mock / dev only</p>
           <p className="mt-1 text-xs text-stone">
@@ -45,12 +45,12 @@ export default function DevPersonaSwitcher() {
                     type="button"
                     aria-pressed={selected}
                     onClick={() => signInAs(persona.userId)}
-                    className={`flex min-h-11 w-full flex-col items-start justify-center rounded-[3px] px-3 text-left transition-colors ${
+                    className={`flex min-h-11 w-full flex-col items-start justify-center rounded-md px-3 text-left transition-colors ${
                       selected ? "bg-paper text-ink" : "hover:bg-paper/10"
                     }`}
                   >
                     <span className="font-medium">{persona.label}</span>
-                    <span className={`text-xs ${selected ? "text-ink/80" : "text-stone"}`}>
+                    <span className={`text-xs ${selected ? "text-ink-soft" : "text-stone"}`}>
                       {persona.description}
                     </span>
                   </button>
@@ -61,14 +61,14 @@ export default function DevPersonaSwitcher() {
           <button
             type="button"
             onClick={resetMockReletting}
-            className="mt-2 flex min-h-11 w-full items-center rounded-[3px] px-3 text-left text-xs text-stone hover:bg-paper/10"
+            className="mt-2 flex min-h-11 w-full items-center rounded-md px-3 text-left text-xs text-stone hover:bg-paper/10"
           >
             Reset mock reletting data
           </button>
           <button
             type="button"
             onClick={emptyMockReletting}
-            className="flex min-h-11 w-full items-center rounded-[3px] px-3 text-left text-xs text-stone hover:bg-paper/10"
+            className="flex min-h-11 w-full items-center rounded-md px-3 text-left text-xs text-stone hover:bg-paper/10"
           >
             Show first-time owner view
           </button>
@@ -78,7 +78,7 @@ export default function DevPersonaSwitcher() {
               resetMockEnquiries();
               resetMockOutOfService();
             }}
-            className="flex min-h-11 w-full items-center rounded-[3px] px-3 text-left text-xs text-stone hover:bg-paper/10"
+            className="flex min-h-11 w-full items-center rounded-md px-3 text-left text-xs text-stone hover:bg-paper/10"
           >
             Reset mock staff data
           </button>
@@ -88,7 +88,7 @@ export default function DevPersonaSwitcher() {
         type="button"
         aria-expanded={open}
         onClick={() => setOpen((o) => !o)}
-        className="inline-flex min-h-11 items-center gap-2 rounded-full border border-paper/30 bg-ink px-4 text-paper shadow-lg transition-colors hover:border-paper"
+        className="inline-flex min-h-11 items-center gap-2 rounded-full border border-paper/30 bg-ink px-4 text-paper shadow-overlay transition-colors hover:border-paper"
       >
         <span className="text-xs font-medium">Mock</span>
         <span className="text-stone">{active?.label ?? "Signed out"}</span>

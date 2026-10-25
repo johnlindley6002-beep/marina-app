@@ -7,14 +7,14 @@ import {
 } from "@/features/prearrival/lib/schema";
 import { VESSEL_USE_LABELS } from "@/features/marina/components/VesselUseFields";
 import LengthInput from "@/components/ui/LengthInput";
-import { Field } from "./WizardBits";
+import Field from "@/components/ui/Field";
 import type { BoatScope } from "./BoatScope";
 
 export default function BoatSpecsFields({ scope }: { scope: BoatScope }) {
   const { draft, setDraft, errors, copy, unit, marinaClass, rate } = scope;
   return (
     <>
-      <p className="mt-8 text-sm font-medium text-ink/80">{copy.specificationsHeading}</p>
+      <p className="mt-8 text-sm font-medium text-ink-soft">{copy.specificationsHeading}</p>
       <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <Field
           label={`${copy.lengthLabel.replace("(m)", `(${unit})`)}`}
@@ -73,7 +73,7 @@ export default function BoatSpecsFields({ scope }: { scope: BoatScope }) {
             <option value="sail_and_power">{copy.propulsionBoth}</option>
           </select>
         </Field>
-        <label className="flex items-center gap-2 self-end pb-2 text-sm text-ink/75">
+        <label className="flex items-center gap-2 self-end pb-2 text-sm text-ink-soft">
           <input
             type="checkbox"
             checked={draft.boatSpecs.isMultihull}

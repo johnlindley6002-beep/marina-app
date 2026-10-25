@@ -29,7 +29,7 @@ function SectionHeading({
       <button
         type="button"
         onClick={onEdit}
-        className="text-sm text-ink/70 underline underline-offset-4"
+        className="text-sm text-ink-muted underline underline-offset-4"
       >
         {editLabel}
       </button>
@@ -60,27 +60,27 @@ export default function StepReview({
     <div>
       <div className="mt-6">
         <SectionHeading title={steps.boat} editLabel={copy.edit} onEdit={() => onEdit(1)} />
-        <p className="mt-2 text-sm text-ink/75">
+        <p className="mt-2 text-sm text-ink-soft">
           {draft.boatIdentity.name || "-"} · {draft.boatIdentity.flagCountry || "-"} ·{" "}
           {draft.boatSpecs.lengthOverall || "-"} m
         </p>
-        <p className="mt-1 text-sm text-ink/75">{draft.owner.fullName || "-"}</p>
+        <p className="mt-1 text-sm text-ink-soft">{draft.owner.fullName || "-"}</p>
       </div>
 
       <div className="hairline-top mt-6 pt-6">
         <SectionHeading title={steps.voyage} editLabel={copy.edit} onEdit={() => onEdit(2)} />
-        <p className="mt-2 text-sm text-ink/75">
+        <p className="mt-2 text-sm text-ink-soft">
           {draft.voyage.lastPortName || "-"} ({draft.voyage.lastPortCountry || "-"}) →{" "}
           {draft.voyage.nextPortName || "-"} ({draft.voyage.nextPortCountry || "-"})
         </p>
-        <p className="mt-1 text-sm text-ink/75">
+        <p className="mt-1 text-sm text-ink-soft">
           {draft.voyage.arrivalDateTime || "-"} → {draft.voyage.departureDateTime || "-"}
         </p>
       </div>
 
       <div className="hairline-top mt-6 pt-6">
         <SectionHeading title={steps.crew} editLabel={copy.edit} onEdit={() => onEdit(3)} />
-        <p className="mt-2 text-sm text-ink/75">
+        <p className="mt-2 text-sm text-ink-soft">
           {copy.peopleCount(draft.people.length)}:{" "}
           {draft.people
             .map((p) => [p.givenNames, p.familyName].filter(Boolean).join(" ") || "-")
@@ -90,7 +90,7 @@ export default function StepReview({
 
       <div className="hairline-top mt-6 pt-6">
         <SectionHeading title={steps.documents} editLabel={copy.edit} onEdit={() => onEdit(4)} />
-        <ul className="mt-2 space-y-1 text-sm text-ink/75">
+        <ul className="mt-2 space-y-1 text-sm text-ink-soft">
           {requirements.map((req) => {
             const entry = draft.documents[req.key];
             const has = entry.uploaded || !!entry.number.trim();
@@ -110,11 +110,11 @@ export default function StepReview({
 
       <div className="hairline-top mt-6 pt-6">
         <SectionHeading title={steps.stay} editLabel={copy.edit} onEdit={() => onEdit(5)} />
-        <p className="mt-2 text-sm text-ink/75">
+        <p className="mt-2 text-sm text-ink-soft">
           {draft.stay.requestedArrival || "-"} → {draft.stay.requestedDeparture || "-"}
         </p>
         {quote ? (
-          <p className="tabular mt-1 text-sm text-ink/75">€{quote.totalIncVatEur.toFixed(2)}</p>
+          <p className="tabular mt-1 text-sm text-ink-soft">€{quote.totalIncVatEur.toFixed(2)}</p>
         ) : null}
       </div>
 
@@ -128,9 +128,9 @@ export default function StepReview({
 
       <div className="hairline-top mt-6 pt-6">
         <p className="type-heading type-h3 text-ink">{copy.consentsHeading}</p>
-        <p className="mt-2 max-w-xl text-xs text-ink/65">{t.preArrival.privacyNote}</p>
+        <p className="mt-2 max-w-xl text-xs text-ink-muted">{t.preArrival.privacyNote}</p>
         <div className="mt-4 space-y-3">
-          <label className="flex items-start gap-3 text-sm text-ink/80">
+          <label className="flex items-start gap-3 text-sm text-ink-soft">
             <input
               type="checkbox"
               checked={draft.consents.gdprConsent}
@@ -143,7 +143,7 @@ export default function StepReview({
             <p className="field-error">{errors["consents.gdprConsent"]}</p>
           ) : null}
 
-          <label className="flex items-start gap-3 text-sm text-ink/80">
+          <label className="flex items-start gap-3 text-sm text-ink-soft">
             <input
               type="checkbox"
               checked={draft.consents.termsAccepted}
@@ -156,7 +156,7 @@ export default function StepReview({
             <p className="field-error">{errors["consents.termsAccepted"]}</p>
           ) : null}
 
-          <label className="flex items-start gap-3 text-sm text-ink/80">
+          <label className="flex items-start gap-3 text-sm text-ink-soft">
             <input
               type="checkbox"
               checked={draft.consents.declarationTrue}

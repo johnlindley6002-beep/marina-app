@@ -1,6 +1,5 @@
 "use client";
 
-import ChartDivider from "@/components/ui/ChartDivider";
 import { useEffect, useState } from "react";
 import type { Marina } from "@/data/marinas";
 import {
@@ -48,24 +47,27 @@ export default function OfflineCard({
 
   return (
     <div className={embedded ? "stack-lg" : "section"}>
-      {embedded ? <ChartDivider className="mb-10" /> : null}
+      {embedded ? <hr className="mb-10 border-hairline" /> : null}
       <div className={embedded ? "" : "page-column"}>
         <div className="flex flex-wrap items-baseline justify-between gap-3">
           <Heading className={`type-heading text-ink ${embedded ? "type-h3" : "type-h2"}`}>
             Offline essentials
           </Heading>
-          <p role="status" className={`text-xs font-medium ${online ? "text-ink/70" : "text-ink"}`}>
+          <p
+            role="status"
+            className={`text-xs font-medium ${online ? "text-ink-muted" : "text-ink"}`}
+          >
             {online ? "Online" : "You're offline, showing saved details"}
           </p>
         </div>
-        <p className="mt-2 max-w-2xl text-sm text-ink/75">
+        <p className="mt-2 max-w-2xl text-sm text-ink-soft">
           Kept on this device, so they work without a signal.
         </p>
 
         <div className="mt-6 grid gap-6 md:grid-cols-2">
           <div className="hairline-top pt-6">
             <h3 className="type-heading type-h3 text-ink">Contact &amp; VHF</h3>
-            <ul className="mt-3 space-y-2 text-sm text-ink/75">
+            <ul className="mt-3 space-y-2 text-sm text-ink-soft">
               <li>
                 <a
                   href={telHref(marina.phone)}
@@ -100,7 +102,7 @@ export default function OfflineCard({
             <h3 className="type-heading type-h3 text-ink">Your saved enquiry</h3>
             {enquiry ? (
               <>
-                <ul className="mt-3 space-y-1 text-sm text-ink/75">
+                <ul className="mt-3 space-y-1 text-sm text-ink-soft">
                   <li>
                     Arrival: {enquiry.arrival}
                     {enquiry.eta ? ` (ETA ${enquiry.eta})` : ""}
@@ -120,13 +122,13 @@ export default function OfflineCard({
                 <button
                   type="button"
                   onClick={clearLastEnquiry}
-                  className="mt-2 inline-flex min-h-11 items-center text-sm text-ink/70 underline underline-offset-4 hover:text-error"
+                  className="mt-2 inline-flex min-h-11 items-center text-sm text-ink-muted underline underline-offset-4 hover:text-error"
                 >
                   Clear saved enquiry
                 </button>
               </>
             ) : (
-              <p className="mt-3 text-sm text-ink/75">
+              <p className="mt-3 text-sm text-ink-soft">
                 Nothing saved yet. When you send an enquiry, its dates, boat and berth are kept here
                 for offline use.
               </p>

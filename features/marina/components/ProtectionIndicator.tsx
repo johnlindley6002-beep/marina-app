@@ -11,7 +11,7 @@ function Scale({ filled }: { filled: number }) {
       {Array.from({ length: PROTECTION_SEGMENTS }, (_, i) => (
         <span
           key={i}
-          className={`h-2 w-5 rounded-[1px] ${i < filled ? "bg-ink" : "border border-ink/40"}`}
+          className={`h-2 w-5 rounded-sm ${i < filled ? "bg-ink" : "border border-ink/40"}`}
         />
       ))}
     </span>
@@ -36,9 +36,9 @@ export default function ProtectionIndicator({ protection }: Props) {
 // is shown in full, because it is the safety point.
 export function ProtectionWhy({ protection }: Props) {
   return (
-    <p className="measure text-ink/75">
+    <p className="measure text-ink-soft">
       {protection.description}{" "}
-      <span className="text-sm text-ink/70">General guide, not a forecast.</span>
+      <span className="text-sm text-ink-muted">General guide, not a forecast.</span>
     </p>
   );
 }

@@ -29,6 +29,7 @@ import StepDocuments from "./StepDocuments";
 import StepReview from "./StepReview";
 import StepStay from "./StepStay";
 import StepVoyage from "./StepVoyage";
+import ProgressSteps from "@/components/ui/ProgressSteps";
 
 const TOTAL_STEPS = 6;
 
@@ -169,15 +170,15 @@ export default function PreArrivalWizard({ marina }: { marina: Marina }) {
       <div className="page-column">
         <Link
           href={`/marinas/${marina.countrySlug}/${marina.id}`}
-          className="text-sm text-ink/70 underline underline-offset-4"
+          className="text-sm text-ink-muted underline underline-offset-4"
         >
           {marina.name}
         </Link>
         <h1 className="type-title mt-4 text-ink">{copy.page.title}</h1>
-        <p className="measure mt-3 text-ink/75">{copy.page.subtitle}</p>
+        <p className="measure mt-3 text-ink-soft">{copy.page.subtitle}</p>
 
         {resumed ? (
-          <p role="status" className="mt-4 text-sm text-ink/75">
+          <p role="status" className="mt-4 text-sm text-ink-soft">
             {copy.page.resumeBanner}{" "}
             <button type="button" onClick={startOver} className="link text-ink">
               {copy.page.startOver}
@@ -185,15 +186,12 @@ export default function PreArrivalWizard({ marina }: { marina: Marina }) {
           </p>
         ) : null}
 
-        {/* Progress */}
-        <div className="mt-8 flex items-center gap-2" aria-hidden="true">
-          {stepLabels.map((_, i) => (
-            <span key={i} className={`h-px flex-1 ${i < step ? "bg-ink" : "bg-ink/20"}`} />
-          ))}
-        </div>
-        <p className="mt-3 text-sm text-ink/70" aria-live="polite">
-          {copy.page.stepOf(step, TOTAL_STEPS)}: {stepLabels[step - 1]}
-        </p>
+        <ProgressSteps
+          className="mt-8"
+          total={TOTAL_STEPS}
+          current={step}
+          label={`${copy.page.stepOf(step, TOTAL_STEPS)}: ${stepLabels[step - 1]}`}
+        />
 
         <div className="mt-10 grid gap-10 lg:grid-cols-[1fr_20rem]">
           <div key={step} className="step-forward min-w-0">
@@ -232,7 +230,7 @@ export default function PreArrivalWizard({ marina }: { marina: Marina }) {
                 </button>
               ) : null}
             </div>
-            <p className="mt-4 text-xs text-ink/65">{copy.page.autosaveNote}</p>
+            <p className="mt-4 text-xs text-ink-muted">{copy.page.autosaveNote}</p>
           </div>
 
           {/* Sticky summary on desktop; the same numbers appear inside Step 5
@@ -246,19 +244,19 @@ export default function PreArrivalWizard({ marina }: { marina: Marina }) {
               </p>
               {quote ? (
                 <>
-                  <p className="tabular mt-3 text-sm text-ink/75">
+                  <p className="tabular mt-3 text-sm text-ink-soft">
                     {copy.boat.classLabel(quote.marinaClass)} ·{" "}
                     {copy.page.nightsCount(quote.nights)}
                   </p>
                   <p className="tabular mt-1 text-2xl font-medium text-ink">
                     €{quote.totalIncVatEur.toFixed(2)}
                   </p>
-                  <p className="mt-1 text-xs text-ink/65">{copy.stay.indicativeNote}</p>
+                  <p className="mt-1 text-xs text-ink-muted">{copy.stay.indicativeNote}</p>
                 </>
               ) : (
-                <p className="mt-3 text-sm text-ink/70">{copy.stay.askMarina}</p>
+                <p className="mt-3 text-sm text-ink-muted">{copy.stay.askMarina}</p>
               )}
-              <div className="mt-4 border-t border-hairline pt-4 text-sm text-ink/75">
+              <div className="mt-4 border-t border-hairline pt-4 text-sm text-ink-soft">
                 <p className="tabular">{copy.page.peopleOnBoard(draft.people.length)}</p>
               </div>
             </div>
@@ -268,9 +266,9 @@ export default function PreArrivalWizard({ marina }: { marina: Marina }) {
 
       {/* The same summary, condensed, as a bottom sheet on a phone: the
           brief's sticky card is the aside above; this is its mobile form. */}
-      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-hairline bg-paper px-5 py-3 lg:hidden">
+      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-hairline bg-paper px-5 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] lg:hidden">
         <div className="flex items-center justify-between gap-3">
-          <p className="min-w-0 truncate text-sm text-ink/75">
+          <p className="min-w-0 truncate text-sm text-ink-soft">
             {copy.page.stepOf(step, TOTAL_STEPS)}
           </p>
           <p className="tabular text-right text-sm font-medium text-ink">

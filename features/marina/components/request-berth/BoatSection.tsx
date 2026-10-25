@@ -88,7 +88,7 @@ export default function BoatSection({ ctx }: { ctx: RequestBerthCtx }) {
               </p>
             ) : null}
             {form.vesselType === "catamaran" ? (
-              <p className="mt-1 text-xs text-ink/70">
+              <p className="mt-1 text-xs text-ink-muted">
                 Catamarans may need a wider, pricier berth.
               </p>
             ) : null}
@@ -129,7 +129,7 @@ export default function BoatSection({ ctx }: { ctx: RequestBerthCtx }) {
               placeholder="e.g. I-4"
               className={inputClass}
             />
-            <p className="mt-1 text-xs text-ink/70">Auto-filled if you selected one above</p>
+            <p className="mt-1 text-xs text-ink-muted">Auto-filled if you selected one above</p>
           </label>
         </div>
       </fieldset>

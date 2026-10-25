@@ -10,7 +10,7 @@ export default function VisitSection({ ctx }: { ctx: RequestBerthCtx }) {
     <>
       <fieldset>
         <legend className="type-heading text-xl text-ink">Your visit</legend>
-        <p className="mt-4 text-sm text-ink/75">
+        <p className="mt-4 text-sm text-ink-soft">
           <span className={labelClass}>Your stay: </span>
           {form.arrival
             ? `${form.arrival} → ${form.openEnded ? "open-ended" : form.departure || "-"}`
@@ -20,7 +20,7 @@ export default function VisitSection({ ctx }: { ctx: RequestBerthCtx }) {
           {Number(form.beam) > 0 ? `, beam ${formatLength(Number(form.beam), units)}` : ""}
           {Number(form.draft) > 0 ? `, draft ${formatLength(Number(form.draft), units)}` : ""}
         </p>
-        <p className="mt-1 text-xs text-ink/70">
+        <p className="mt-1 text-xs text-ink-muted">
           Edit them in{" "}
           <a href="#plan-your-stay" className="text-ink underline underline-offset-4">
             Plan your stay
@@ -60,7 +60,7 @@ export default function VisitSection({ ctx }: { ctx: RequestBerthCtx }) {
               aria-describedby={errors.etd ? "err-etd" : undefined}
               onChange={(e) => setField("etd", e.target.value)}
               disabled={form.openEnded}
-              className={`${inputClass} disabled:bg-paper-deep disabled:text-ink/70`}
+              className={`${inputClass} disabled:bg-paper-deep disabled:text-ink-muted`}
             />
             {errors.etd ? (
               <p id="err-etd" role="alert" className={errorClass}>

@@ -88,7 +88,7 @@ export default function CountryPageContent({
   return (
     <section className="section">
       <div className="page-column">
-        <p className="text-ink/70">{countryName}</p>
+        <p className="text-ink-muted">{countryName}</p>
         <h1 className="type-title mt-2 text-ink">{t.countryPage.heading(countryName)}</h1>
 
         <div className="surface-lift mt-10 p-6 md:p-8">
@@ -154,7 +154,7 @@ export default function CountryPageContent({
               <span className={labelClass}>Facilities</span>
               <div className="mt-2 flex flex-wrap gap-3">
                 {availableFacilities.map((key) => (
-                  <label key={key} className="flex items-center gap-2 text-sm text-ink/75">
+                  <label key={key} className="flex items-center gap-2 text-sm text-ink-soft">
                     <input
                       type="checkbox"
                       checked={facilities.includes(key)}
@@ -169,7 +169,7 @@ export default function CountryPageContent({
         </div>
 
         {filtered.length === 0 ? (
-          <p className="measure mt-10 text-ink/75">
+          <p className="measure mt-10 text-ink-soft">
             No marinas match these filters. Try loosening them.
           </p>
         ) : (

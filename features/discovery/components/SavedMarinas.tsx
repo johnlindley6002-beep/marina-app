@@ -42,7 +42,7 @@ export default function SavedMarinas({ showEmpty = false, headingLevel = "h2" }:
       <Heading className="type-heading type-h3 text-ink">{t.favourites.savedHeading}</Heading>
 
       {favourites.length === 0 ? (
-        <p className="measure mt-3 text-ink/75">
+        <p className="measure mt-3 text-ink-soft">
           No saved marinas yet. Use &quot;Save marina&quot; on a marina page and it will appear
           here.
         </p>
@@ -69,7 +69,7 @@ export default function SavedMarinas({ showEmpty = false, headingLevel = "h2" }:
                 <button
                   type="button"
                   onClick={() => toggleFavourite(favourite)}
-                  className="inline-flex min-h-11 items-center text-ink/70 hover:text-error"
+                  className="inline-flex min-h-11 items-center text-ink-muted hover:text-error"
                 >
                   Remove
                   <span className="sr-only"> {favourite.marinaName}</span>

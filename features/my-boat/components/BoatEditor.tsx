@@ -165,7 +165,9 @@ export default function BoatEditor({ initial, onSave, onCancel }: Props) {
             invalid={!!errors.loa}
             describedBy={errors.loa ? "boat-err-loa" : undefined}
           />
-          <span className="mt-1 block text-xs text-ink/70">Including bowsprit, davits, dinghy</span>
+          <span className="mt-1 block text-xs text-ink-muted">
+            Including bowsprit, davits, dinghy
+          </span>
           {fieldError("loa")}
         </label>
 

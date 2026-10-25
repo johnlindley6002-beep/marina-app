@@ -2,7 +2,7 @@
 
 import { COUNTRIES } from "@/lib/countries";
 import { buildPtIdentificationSet, NAVIGATION_ZONES } from "@/features/prearrival/lib/portugal";
-import { Field } from "./WizardBits";
+import Field from "@/components/ui/Field";
 import type { BoatScope } from "./BoatScope";
 
 export default function BoatIdentityFields({ scope }: { scope: BoatScope }) {
@@ -29,7 +29,7 @@ export default function BoatIdentityFields({ scope }: { scope: BoatScope }) {
         </div>
       ) : null}
 
-      <p className="mt-6 text-sm font-medium text-ink/80">{copy.orNewBoat}</p>
+      <p className="mt-6 text-sm font-medium text-ink-soft">{copy.orNewBoat}</p>
 
       <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <Field
@@ -155,7 +155,7 @@ export default function BoatIdentityFields({ scope }: { scope: BoatScope }) {
       </div>
 
       {isPt && draft.boatIdentity.name ? (
-        <p className="tabular mt-3 text-xs text-ink/70">
+        <p className="tabular mt-3 text-xs text-ink-muted">
           {buildPtIdentificationSet(
             draft.boatIdentity.name,
             draft.boatIdentity.registrationNumber || draft.boatIdentity.name

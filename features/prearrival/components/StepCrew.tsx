@@ -138,7 +138,7 @@ export default function StepCrew({
 
       {fullCrewListMode ? (
         <p className="mt-4">
-          <span className="chip border-ink/40 text-ink/75">{copy.fullCrewListChip}</span>
+          <span className="chip border-ink/40 text-ink-soft">{copy.fullCrewListChip}</span>
         </p>
       ) : null}
 
@@ -157,7 +157,7 @@ export default function StepCrew({
         </div>
       ) : null}
 
-      <p className="mt-6 max-w-xl text-xs text-ink/65">{t.preArrival.privacyNote}</p>
+      <p className="mt-6 max-w-xl text-xs text-ink-muted">{t.preArrival.privacyNote}</p>
 
       <ul className="mt-6">
         {draft.people.map((person, index) => (

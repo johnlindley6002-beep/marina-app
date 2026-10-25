@@ -62,7 +62,7 @@ export default function PlanYourStay({ marina, plan, onPlanChange }: Props) {
   return (
     <div className="surface-lift p-6 sm:p-8 md:p-10">
       <h2 className="type-heading type-h3 text-ink">Plan your stay</h2>
-      <p className="mt-2 text-sm text-ink/75">
+      <p className="mt-2 text-sm text-ink-soft">
         Dates and boat size drive the map, estimate and enquiry below.
       </p>
 
@@ -72,7 +72,7 @@ export default function PlanYourStay({ marina, plan, onPlanChange }: Props) {
 
       {activeBoat ? (
         boatSizesDiffer ? (
-          <p className="mt-3 text-sm text-ink/75">
+          <p className="mt-3 text-sm text-ink-soft">
             These sizes differ from {activeBoat.name}&apos;s saved sizes.{" "}
             {dimsComplete ? (
               <button
@@ -92,7 +92,7 @@ export default function PlanYourStay({ marina, plan, onPlanChange }: Props) {
             ) : null}
           </p>
         ) : (
-          <p className="mt-3 text-sm text-ink/70">
+          <p className="mt-3 text-sm text-ink-muted">
             Using your saved boat, {activeBoat.name}.{" "}
             <Link href="/my-boat" className="underline underline-offset-4">
               Manage in My boat
@@ -100,7 +100,7 @@ export default function PlanYourStay({ marina, plan, onPlanChange }: Props) {
           </p>
         )
       ) : boats.length === 0 ? (
-        <p className="mt-3 text-sm text-ink/70">
+        <p className="mt-3 text-sm text-ink-muted">
           Save your boat in{" "}
           <Link href="/my-boat" className="underline underline-offset-4">
             My boat
@@ -156,7 +156,7 @@ export default function PlanYourStay({ marina, plan, onPlanChange }: Props) {
             describedBy={dimError(plan.loa) ? "err-plan-loa" : undefined}
             className={inputClass}
           />
-          <p className="mt-1 text-xs text-ink/70">Including bowsprit, davits, dinghy</p>
+          <p className="mt-1 text-xs text-ink-muted">Including bowsprit, davits, dinghy</p>
           {dimError(plan.loa) ? (
             <p id="err-plan-loa" role="alert" className={errorClass}>
               {dimError(plan.loa)}
@@ -203,7 +203,7 @@ export default function PlanYourStay({ marina, plan, onPlanChange }: Props) {
         </label>
       </div>
 
-      <label className="mt-4 flex items-center gap-2 text-sm text-ink/75">
+      <label className="mt-4 flex items-center gap-2 text-sm text-ink-soft">
         <input
           type="checkbox"
           checked={plan.openEnded}

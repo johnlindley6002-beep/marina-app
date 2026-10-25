@@ -3,7 +3,9 @@
 import type { UnitSystem } from "@/lib/units";
 import { useLanguage } from "@/components/providers/LanguageProvider";
 import { useUnits } from "@/components/providers/UnitsProvider";
+import SegmentedControl from "./SegmentedControl";
 
+// Metric or imperial, for the whole app.
 export default function UnitSegmented({
   className = "",
   tone = "dark",
@@ -20,35 +22,13 @@ export default function UnitSegmented({
   ];
 
   return (
-    <div
-      role="group"
-      aria-label={t.units.label}
-      className={`inline-flex rounded-full border p-0.5 text-sm ${
-        tone === "light" ? "border-ink/30" : "border-stone/40"
-      } ${className}`}
-    >
-      {options.map((option) => {
-        const active = units === option.value;
-        return (
-          <button
-            key={option.value}
-            type="button"
-            aria-pressed={active}
-            onClick={() => setUnits(option.value)}
-            className={`min-h-11 rounded-full px-4 transition-colors md:min-h-9 ${
-              active
-                ? tone === "light"
-                  ? "bg-ink font-medium text-paper"
-                  : "bg-paper font-medium text-ink"
-                : tone === "light"
-                  ? "text-ink/75 hover:text-ink"
-                  : "text-stone hover:text-paper"
-            }`}
-          >
-            {option.label}
-          </button>
-        );
-      })}
-    </div>
+    <SegmentedControl
+      label={t.units.label}
+      options={options}
+      value={units}
+      onChange={setUnits}
+      className={className}
+      tone={tone}
+    />
   );
 }

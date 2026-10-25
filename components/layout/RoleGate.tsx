@@ -12,7 +12,7 @@ function Message({ title, body }: { title: string; body: string }) {
     <div className="section">
       <div className="page-column page-reading">
         <h1 className="type-title text-ink">{title}</h1>
-        <p className="measure mt-4 text-lg text-ink/75">{body}</p>
+        <p className="measure mt-4 text-lg text-ink-soft">{body}</p>
         <Link href="/marinas" className="btn-quiet mt-6">
           Back to marinas
         </Link>

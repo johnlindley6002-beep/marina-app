@@ -67,13 +67,13 @@ function Row({ enquiry, staffId }: { enquiry: Enquiry; staffId: string | null })
             ) : null}
             <EuFlag enquiry={enquiry} />
           </p>
-          <p className="tabular mt-1 text-xs text-ink/70">
+          <p className="tabular mt-1 text-xs text-ink-muted">
             {formatLength(Number(enquiry.loa), units)} LOA · {enquiry.arrival} to{" "}
             {enquiry.openEnded ? "open-ended" : enquiry.departure} ·{" "}
             {enquiry.skipperName || "No name given"}
           </p>
         </div>
-        <p className="text-xs text-ink/60">Sent {formatLongDate(enquiry.createdAt)}</p>
+        <p className="text-xs text-ink-muted">Sent {formatLongDate(enquiry.createdAt)}</p>
       </button>
 
       <Collapse open={open} id={rowId}>
@@ -90,7 +90,7 @@ function Row({ enquiry, staffId }: { enquiry: Enquiry; staffId: string | null })
             <div>
               <p className="staff-label">Contact</p>
               <p className="text-ink">{enquiry.skipperName}</p>
-              <p className="text-ink/70">
+              <p className="text-ink-muted">
                 {enquiry.phone} · {enquiry.email}
               </p>
             </div>
@@ -99,7 +99,7 @@ function Row({ enquiry, staffId }: { enquiry: Enquiry; staffId: string | null })
           {isCommercialUseValue(enquiry.vesselUse) ? (
             <div className="mt-3">
               <p className="staff-label">Commercial / charter details</p>
-              <p className="text-ink/80">
+              <p className="text-ink-soft">
                 {enquiry.operatingEntity || "Operating entity not given"}
                 {enquiry.companyRegistration ? `, reg. ${enquiry.companyRegistration}` : ""}
               </p>
@@ -109,7 +109,7 @@ function Row({ enquiry, staffId }: { enquiry: Enquiry; staffId: string | null })
           {enquiry.crew.length > 0 ? (
             <div className="mt-3">
               <p className="staff-label">Crew and guests ({enquiry.crew.length})</p>
-              <ul className="text-ink/80">
+              <ul className="text-ink-soft">
                 {enquiry.crew.map((c, i) => (
                   <li key={i}>
                     {c.fullName || "Unnamed"}, {c.role || c.personType}
@@ -165,7 +165,7 @@ function Row({ enquiry, staffId }: { enquiry: Enquiry; staffId: string | null })
               </button>
             </div>
           ) : (
-            <p className="mt-4 text-ink/75">
+            <p className="mt-4 text-ink-soft">
               {enquiry.status === "approved"
                 ? `Approved, berth ${enquiry.assignedBerthId}.`
                 : `Declined${enquiry.decisionNote ? `: ${enquiry.decisionNote}` : "."}`}
@@ -202,7 +202,7 @@ export default function EnquiryInbox() {
       <div
         role="group"
         aria-label="Status"
-        className="mt-3 inline-flex rounded-[3px] border border-ink/25 p-0.5 text-xs"
+        className="mt-3 inline-flex rounded-md border border-ink/25 p-0.5 text-xs"
       >
         {STATUS_TABS.map((t) => (
           <button
@@ -210,7 +210,7 @@ export default function EnquiryInbox() {
             type="button"
             aria-pressed={tab === t.value}
             onClick={() => setTab(t.value)}
-            className={`min-h-10 rounded-[2px] px-3 ${tab === t.value ? "bg-ink text-paper" : "text-ink/70"}`}
+            className={`min-h-10 rounded-sm px-3 ${tab === t.value ? "bg-ink text-paper" : "text-ink-muted"}`}
           >
             {t.label}
             {t.value !== "all" ? ` (${counts[t.value]})` : ""}

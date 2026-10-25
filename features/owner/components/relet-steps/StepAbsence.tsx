@@ -20,7 +20,7 @@ export default function StepAbsence({ scope }: { scope: ReletScope }) {
       <h2 ref={headingRef} tabIndex={-1} className="type-heading type-h2 text-ink outline-none">
         {copy.absenceTitle}
       </h2>
-      <p className="measure mt-3 text-ink/75">{copy.absenceBody}</p>
+      <p className="measure mt-3 text-ink-soft">{copy.absenceBody}</p>
       <div className="mt-8 grid max-w-md gap-4 sm:grid-cols-2">
         <label className="block text-sm">
           <span className={labelClass}>I leave on</span>
@@ -43,7 +43,7 @@ export default function StepAbsence({ scope }: { scope: ReletScope }) {
           />
         </label>
       </div>
-      <p className="mt-3 min-h-6 text-sm text-ink/75" aria-live="polite">
+      <p className="mt-3 min-h-6 text-sm text-ink-soft" aria-live="polite">
         {nights > 0 ? `${nights} night${nights === 1 ? "" : "s"} away.` : ""}
       </p>
       <div className="mt-4">

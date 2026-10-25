@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/providers/AuthProvider";
 import type { Mode } from "@/lib/data";
+import SegmentedControl from "./SegmentedControl";
 
 const OPTIONS: { value: Mode; label: string }[] = [
   { value: "guest", label: "Guest" },
@@ -33,35 +34,13 @@ export default function ModeSwitch({
   }
 
   return (
-    <div
-      role="group"
-      aria-label="Mode"
-      className={`inline-flex rounded-full border p-0.5 text-sm ${
-        tone === "light" ? "border-ink/30" : "border-stone/40"
-      } ${className}`}
-    >
-      {OPTIONS.map((option) => {
-        const active = mode === option.value;
-        return (
-          <button
-            key={option.value}
-            type="button"
-            aria-pressed={active}
-            onClick={() => choose(option.value)}
-            className={`min-h-11 rounded-full px-4 transition-colors md:min-h-9 ${
-              active
-                ? tone === "light"
-                  ? "bg-ink font-medium text-paper"
-                  : "bg-paper font-medium text-ink"
-                : tone === "light"
-                  ? "text-ink/75 hover:text-ink"
-                  : "text-stone hover:text-paper"
-            }`}
-          >
-            {option.label}
-          </button>
-        );
-      })}
-    </div>
+    <SegmentedControl
+      label="Mode"
+      options={OPTIONS}
+      value={mode}
+      onChange={choose}
+      className={className}
+      tone={tone}
+    />
   );
 }

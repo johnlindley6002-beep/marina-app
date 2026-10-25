@@ -8,7 +8,7 @@ export default function ServicesSection({ ctx }: { ctx: RequestBerthCtx }) {
       <fieldset>
         <legend className="type-heading text-xl text-ink">Services &amp; assistance</legend>
         <div className="mt-4 grid gap-3 sm:grid-cols-2">
-          <label className="flex items-center gap-2 text-sm text-ink/75">
+          <label className="flex items-center gap-2 text-sm text-ink-soft">
             <input
               type="checkbox"
               checked={form.helpMooring}
@@ -16,7 +16,7 @@ export default function ServicesSection({ ctx }: { ctx: RequestBerthCtx }) {
             />
             Help mooring on arrival
           </label>
-          <label className="flex items-center gap-2 text-sm text-ink/75">
+          <label className="flex items-center gap-2 text-sm text-ink-soft">
             <input
               type="checkbox"
               checked={form.helpSlipping}
@@ -25,7 +25,7 @@ export default function ServicesSection({ ctx }: { ctx: RequestBerthCtx }) {
             Help slipping lines on departure
           </label>
         </div>
-        <p className="mt-4 text-xs text-ink/70">
+        <p className="mt-4 text-xs text-ink-muted">
           Extras chosen in Price estimate &amp; extras:{" "}
           {[
             form.shorePower ? `shore power${form.amperage ? ` (${form.amperage}A)` : ""}` : "",

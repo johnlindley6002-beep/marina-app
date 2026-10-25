@@ -8,7 +8,7 @@ export function InfoPanel({ title, children }: { title: string; children: ReactN
   return (
     <div className="mt-4 max-w-xl border-l-2 border-ink/30 py-1 pl-4">
       <p className="font-medium text-ink">{title}</p>
-      <p className="mt-1 text-sm text-ink/75">{children}</p>
+      <p className="mt-1 text-sm text-ink-soft">{children}</p>
     </div>
   );
 }
@@ -19,7 +19,7 @@ export function InfoPanel({ title, children }: { title: string; children: ReactN
 export function WarningPanel({ children }: { children: ReactNode }) {
   return (
     <div className="mt-3 max-w-xl border-l-2 border-error/60 py-1 pl-4">
-      <p className="text-sm text-ink/80">{children}</p>
+      <p className="text-sm text-ink-soft">{children}</p>
     </div>
   );
 }
@@ -38,38 +38,6 @@ export function StatusPill({
       ? "border-ink bg-ink text-paper"
       : status === "missing"
         ? "border-error/50 text-error"
-        : "border-ink/40 text-ink/75";
+        : "border-ink/40 text-ink-soft";
   return <span className={`chip ${cls}`}>{labels[status]}</span>;
-}
-
-// A field with a label and an error line, matching every other form in the
-// app (field / field-label / field-error), so the wizard's inputs look and
-// behave exactly like the enquiry form, the boat editor and the rest.
-export function Field({
-  label,
-  htmlFor,
-  error,
-  required,
-  children,
-}: {
-  label: string;
-  htmlFor: string;
-  error?: string;
-  required?: boolean;
-  children: ReactNode;
-}) {
-  return (
-    <label htmlFor={htmlFor} className="block text-sm">
-      <span className="field-label">
-        {label}
-        {required ? <span className="text-error"> *</span> : null}
-      </span>
-      {children}
-      {error ? (
-        <p id={`${htmlFor}-err`} role="alert" className="field-error">
-          {error}
-        </p>
-      ) : null}
-    </label>
-  );
 }

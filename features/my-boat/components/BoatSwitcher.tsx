@@ -66,7 +66,7 @@ export default function BoatSwitcher({ current, heading, onSelect }: Props) {
     boats.some((b) => b.name.trim().toLowerCase() === current.name.trim().toLowerCase());
 
   return (
-    <div className="mt-4 rounded-[3px] bg-paper-deep p-4">
+    <div className="mt-4 rounded-md bg-paper-deep p-4">
       {heading ? <p className="mb-3 text-sm font-medium text-ink">{heading}</p> : null}
       <div className="flex flex-wrap items-end gap-3">
         {boats.length > 0 ? (
@@ -112,7 +112,7 @@ export default function BoatSwitcher({ current, heading, onSelect }: Props) {
         </p>
       ) : null}
       {message ? (
-        <p role="status" className="mt-2 text-xs text-ink/70">
+        <p role="status" className="mt-2 text-xs text-ink-muted">
           {message}
         </p>
       ) : null}

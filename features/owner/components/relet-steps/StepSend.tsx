@@ -14,24 +14,24 @@ export default function StepSend({ scope }: { scope: ReletScope }) {
         {copy.submitTitle}
       </h2>
       <dl className="mt-8 grid max-w-lg gap-x-8 gap-y-4 text-ink sm:grid-cols-[auto_1fr]">
-        <dt className="text-ink/70">Berth</dt>
+        <dt className="text-ink-muted">Berth</dt>
         <dd>
           {berth.berthId}, {berth.marinaName}
         </dd>
-        <dt className="text-ink/70">Away</dt>
+        <dt className="text-ink-muted">Away</dt>
         <dd>
           {formatLongDate(startDate)} to {formatLongDate(endDate)} ({nights} nights)
         </dd>
-        <dt className="text-ink/70">Reletting</dt>
+        <dt className="text-ink-muted">Reletting</dt>
         <dd>The marina may relet it, with its approval</dd>
-        <dt className="text-ink/70">Terms</dt>
+        <dt className="text-ink-muted">Terms</dt>
         <dd>
           {creditModelHeadline(terms.creditModel)} credit, {terms.processingFeePercent}% fee,{" "}
           {terms.settlement}
         </dd>
         {estimate ? (
           <>
-            <dt className="text-ink/70">Estimate</dt>
+            <dt className="text-ink-muted">Estimate</dt>
             <dd className="tabular">
               About {eur(estimate.netEur)} if every night were relet. The marina may relet only some
               of them.
@@ -39,7 +39,7 @@ export default function StepSend({ scope }: { scope: ReletScope }) {
           </>
         ) : null}
       </dl>
-      <p className="measure mt-6 text-sm text-ink/70">
+      <p className="measure mt-6 text-sm text-ink-muted">
         Sending this asks for the marina&apos;s consent. Nothing is relet until the marina approves.
       </p>
     </>

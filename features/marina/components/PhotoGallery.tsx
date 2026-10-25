@@ -102,7 +102,7 @@ export default function PhotoGallery({ photos }: { photos: Photo[] }) {
             key={photo.src}
             type="button"
             onClick={() => open(i)}
-            className={`group relative aspect-[4/3] shrink-0 basis-[85%] snap-center overflow-hidden rounded-[3px] focus-visible:-outline-offset-4 md:aspect-auto md:basis-auto ${tileClass(count, i)}`}
+            className={`group relative aspect-[4/3] shrink-0 basis-[85%] snap-center overflow-hidden rounded-md focus-visible:-outline-offset-4 md:aspect-auto md:basis-auto ${tileClass(count, i)}`}
           >
             <Image
               src={photo.src}
@@ -116,7 +116,7 @@ export default function PhotoGallery({ photos }: { photos: Photo[] }) {
                     ? "(max-width: 1024px) 100vw, 1024px"
                     : "(max-width: 768px) 85vw, 25vw"
               }
-              className="object-cover transition-transform duration-300 group-hover:scale-[1.02] motion-reduce:transition-none"
+              className="object-cover"
             />
             <span className="sr-only">Open photo: {photo.caption}</span>
             {hiddenCount > 0 && i === count - 1 ? (

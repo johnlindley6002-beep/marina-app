@@ -47,7 +47,7 @@ export default function BerthPicker({
   if (options.length === 0) {
     return (
       <div>
-        <p className="text-xs text-ink/70">
+        <p className="text-xs text-ink-muted">
           {berthClass
             ? `No Class ${berthClass} berths are modelled in the schematic yet.`
             : "This length is outside the modelled classes."}{" "}

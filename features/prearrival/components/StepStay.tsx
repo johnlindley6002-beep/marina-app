@@ -3,7 +3,7 @@
 import type { IndicativeQuote } from "@/features/prearrival/lib/pricing";
 import { useLanguage } from "@/components/providers/LanguageProvider";
 import type { StepProps } from "./PreArrivalWizard";
-import { Field } from "./WizardBits";
+import Field from "@/components/ui/Field";
 
 type Props = StepProps & { quote: IndicativeQuote | null };
 
@@ -56,9 +56,9 @@ export default function StepStay({ draft, setDraft, errors, quote }: Props) {
           />
         </Field>
       </div>
-      <p className="mt-2 text-xs text-ink/65">{copy.billingNote}</p>
+      <p className="mt-2 text-xs text-ink-muted">{copy.billingNote}</p>
 
-      <p className="mt-8 text-sm font-medium text-ink/80">{copy.servicesHeading}</p>
+      <p className="mt-8 text-sm font-medium text-ink-soft">{copy.servicesHeading}</p>
       <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <Field label={copy.electricityLabel} htmlFor="stay-amps">
           <select
@@ -78,7 +78,7 @@ export default function StepStay({ draft, setDraft, errors, quote }: Props) {
             ))}
           </select>
         </Field>
-        <label className="flex items-center gap-2 self-end pb-2 text-sm text-ink/75">
+        <label className="flex items-center gap-2 self-end pb-2 text-sm text-ink-soft">
           <input
             type="checkbox"
             checked={draft.stay.servicesWanted.water}
@@ -86,7 +86,7 @@ export default function StepStay({ draft, setDraft, errors, quote }: Props) {
           />
           {copy.waterLabel}
         </label>
-        <label className="flex items-center gap-2 self-end pb-2 text-sm text-ink/75">
+        <label className="flex items-center gap-2 self-end pb-2 text-sm text-ink-soft">
           <input
             type="checkbox"
             checked={draft.stay.servicesWanted.pumpOut}
@@ -94,7 +94,7 @@ export default function StepStay({ draft, setDraft, errors, quote }: Props) {
           />
           {copy.pumpOutLabel}
         </label>
-        <label className="flex items-center gap-2 self-end pb-2 text-sm text-ink/75">
+        <label className="flex items-center gap-2 self-end pb-2 text-sm text-ink-soft">
           <input
             type="checkbox"
             checked={draft.stay.servicesWanted.fuelDockSlot}
@@ -102,7 +102,7 @@ export default function StepStay({ draft, setDraft, errors, quote }: Props) {
           />
           {copy.fuelDockSlotLabel}
         </label>
-        <label className="flex items-center gap-2 self-end pb-2 text-sm text-ink/75">
+        <label className="flex items-center gap-2 self-end pb-2 text-sm text-ink-soft">
           <input
             type="checkbox"
             checked={draft.stay.servicesWanted.crane}
@@ -131,7 +131,7 @@ export default function StepStay({ draft, setDraft, errors, quote }: Props) {
         {quote ? (
           <>
             {quote.lines.map((line) => (
-              <p key={line.season} className="tabular mt-2 text-sm text-ink/75">
+              <p key={line.season} className="tabular mt-2 text-sm text-ink-soft">
                 {copy.lineLabel(
                   line.nights,
                   line.season === "low" ? copy.seasonLow : copy.seasonHigh,
@@ -140,9 +140,9 @@ export default function StepStay({ draft, setDraft, errors, quote }: Props) {
               </p>
             ))}
             {quote.multihull ? (
-              <p className="mt-1 text-xs text-ink/65">{copy.multihullNote}</p>
+              <p className="mt-1 text-xs text-ink-muted">{copy.multihullNote}</p>
             ) : null}
-            <p className="tabular mt-3 text-sm text-ink/75">
+            <p className="tabular mt-3 text-sm text-ink-soft">
               {copy.subtotalLine(
                 `€${quote.subtotalExVatEur.toFixed(2)}`,
                 `€${quote.vatEur.toFixed(2)}`
@@ -153,12 +153,12 @@ export default function StepStay({ draft, setDraft, errors, quote }: Props) {
             </p>
           </>
         ) : (
-          <p className="mt-2 text-sm text-ink/70">{copy.askMarina}</p>
+          <p className="mt-2 text-sm text-ink-muted">{copy.askMarina}</p>
         )}
-        <p className="mt-3 text-xs text-ink/65">{copy.indicativeNote}</p>
+        <p className="mt-3 text-xs text-ink-muted">{copy.indicativeNote}</p>
       </div>
 
-      <label className="mt-4 flex items-start gap-3 text-sm text-ink/80">
+      <label className="mt-4 flex items-start gap-3 text-sm text-ink-soft">
         <input
           type="checkbox"
           checked={draft.stay.depositAcknowledged}

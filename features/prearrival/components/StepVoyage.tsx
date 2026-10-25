@@ -5,7 +5,8 @@ import { isEU } from "@/lib/countries";
 import { getVoyageFlags } from "@/features/prearrival/lib/schema";
 import { useLanguage } from "@/components/providers/LanguageProvider";
 import type { StepProps } from "./PreArrivalWizard";
-import { Field, InfoPanel } from "./WizardBits";
+import Field from "@/components/ui/Field";
+import { InfoPanel } from "./WizardBits";
 
 export default function StepVoyage({ draft, setDraft, errors }: StepProps) {
   const { t } = useLanguage();

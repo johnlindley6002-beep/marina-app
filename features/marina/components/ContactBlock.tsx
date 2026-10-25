@@ -1,5 +1,4 @@
 import type { Marina } from "@/data/marinas";
-import ChartDivider from "@/components/ui/ChartDivider";
 import { telHref } from "./EmergencyNumbers";
 
 const itemLink = "btn-quiet text-lg";
@@ -13,11 +12,11 @@ export default function ContactBlock({ marina }: { marina: Marina }) {
 
   return (
     <div id="contact-details" className="stack-lg scroll-mt-24">
-      <ChartDivider className="mb-10" />
+      <hr className="mb-10 border-hairline" />
       <h3 className="type-heading type-h3 text-ink">Contact the marina</h3>
       <dl className="mt-6 grid gap-x-10 gap-y-6 sm:grid-cols-2">
         <div>
-          <dt className="text-sm text-ink/70">Phone</dt>
+          <dt className="text-sm text-ink-muted">Phone</dt>
           <dd className="tabular">
             <a href={telHref(marina.phone)} className={itemLink}>
               {marina.phone}
@@ -25,13 +24,13 @@ export default function ContactBlock({ marina }: { marina: Marina }) {
           </dd>
         </div>
         <div>
-          <dt className="text-sm text-ink/70">VHF</dt>
+          <dt className="text-sm text-ink-muted">VHF</dt>
           <dd className="flex min-h-11 items-center text-lg text-ink">
             Channel {marina.vhfChannel}
           </dd>
         </div>
         <div>
-          <dt className="text-sm text-ink/70">Email</dt>
+          <dt className="text-sm text-ink-muted">Email</dt>
           <dd>
             <a href={`mailto:${marina.email}`} className={itemLink}>
               {marina.email}
@@ -39,7 +38,7 @@ export default function ContactBlock({ marina }: { marina: Marina }) {
           </dd>
         </div>
         <div>
-          <dt className="text-sm text-ink/70">Postal address</dt>
+          <dt className="text-sm text-ink-muted">Postal address</dt>
           <dd className="text-lg text-ink">
             <address className="not-italic">{marina.address}</address>
             <a

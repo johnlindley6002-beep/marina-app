@@ -24,7 +24,7 @@ export default function VesselStatusSection({ ctx }: { ctx: RequestBerthCtx }) {
           />
         </div>
         <div className="hairline-top mt-8 pt-6" />
-        <p className="text-sm text-ink/75">
+        <p className="text-sm text-ink-soft">
           Is your vessel EU-flagged AND is all crew EU/Schengen, arriving from another EU port?
           <RequiredMark />
         </p>
@@ -35,7 +35,7 @@ export default function VesselStatusSection({ ctx }: { ctx: RequestBerthCtx }) {
             className={`min-h-11 px-6 text-sm font-medium ${
               form.euStatus === "yes"
                 ? "bg-ink text-white"
-                : "border border-hairline text-ink/75 hover:border-ink/40"
+                : "border border-hairline text-ink-soft hover:border-ink/40"
             }`}
           >
             Yes
@@ -46,7 +46,7 @@ export default function VesselStatusSection({ ctx }: { ctx: RequestBerthCtx }) {
             className={`min-h-11 px-6 text-sm font-medium ${
               form.euStatus === "no"
                 ? "bg-ink text-white"
-                : "border border-hairline text-ink/75 hover:border-ink/40"
+                : "border border-hairline text-ink-soft hover:border-ink/40"
             }`}
           >
             No
@@ -59,7 +59,7 @@ export default function VesselStatusSection({ ctx }: { ctx: RequestBerthCtx }) {
         ) : null}
 
         {form.euStatus === "yes" ? (
-          <div className="mt-4 space-y-1 text-sm text-ink/70">
+          <div className="mt-4 space-y-1 text-sm text-ink-muted">
             {marina.vesselStatusNotes.euReminders.map((note) => (
               <p key={note}>{note}</p>
             ))}
@@ -117,7 +117,7 @@ export default function VesselStatusSection({ ctx }: { ctx: RequestBerthCtx }) {
               label="Border and customs notes"
               openLabel="Hide border and customs notes"
             >
-              <div className="space-y-1 pb-2 text-xs text-ink/70">
+              <div className="space-y-1 pb-2 text-xs text-ink-muted">
                 {[
                   ...marina.vesselStatusNotes.internationalNotes.slice(0, 1),
                   isCommercialUse(form.vesselUse)

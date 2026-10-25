@@ -106,7 +106,7 @@ function StayCard({ stay }: { stay: Stay }) {
             <p className="font-medium text-ink">
               {stay.draft.boatIdentity.name || copy.newBoat} · {marina.name}
             </p>
-            <p className="tabular text-sm text-ink/70">
+            <p className="tabular text-sm text-ink-muted">
               {stay.arrivalDate || copy.datesNotSet}
               {stay.kind === "submitted" && stay.checkIn
                 ? `, ${copy.referenceLabel(stay.checkIn.referenceCode)}`
@@ -128,7 +128,7 @@ function StayCard({ stay }: { stay: Stay }) {
             <li key={i}>
               <Link
                 href={item.href}
-                className="inline-flex min-h-8 items-center text-sm text-ink/80 underline underline-offset-4"
+                className="inline-flex min-h-8 items-center text-sm text-ink-soft underline underline-offset-4"
               >
                 {item.message}
               </Link>
@@ -136,7 +136,7 @@ function StayCard({ stay }: { stay: Stay }) {
           ))}
         </ul>
       ) : (
-        <p className="mt-3 text-sm text-ink/70">{copy.nothingOutstanding}</p>
+        <p className="mt-3 text-sm text-ink-muted">{copy.nothingOutstanding}</p>
       )}
 
       {stay.kind === "submitted" && stay.checkIn ? (

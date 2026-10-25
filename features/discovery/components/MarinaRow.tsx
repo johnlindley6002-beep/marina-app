@@ -36,7 +36,7 @@ export default function MarinaRow({ marina, search = "", highlighted, onHover }:
             alt={marina.coverImage.alt}
             width={160}
             height={120}
-            className="h-24 w-32 rounded-[3px] object-cover"
+            className="h-24 w-32 rounded-md object-cover"
           />
         ) : null}
 
@@ -58,24 +58,24 @@ export default function MarinaRow({ marina, search = "", highlighted, onHover }:
               />
             ) : null}
           </h2>
-          <p className="mt-1 text-ink/70">{marina.location}</p>
+          <p className="mt-1 text-ink-muted">{marina.location}</p>
           <dl className="mt-5 flex flex-wrap gap-x-8 gap-y-3">
             <div>
-              <dt className="text-sm text-ink/70">{t.keyFacts.berths}</dt>
+              <dt className="text-sm text-ink-muted">{t.keyFacts.berths}</dt>
               <dd className="tabular font-medium text-ink">{marina.berths.count}</dd>
             </div>
             <div>
-              <dt className="text-sm text-ink/70">{t.keyFacts.maxLength}</dt>
+              <dt className="text-sm text-ink-muted">{t.keyFacts.maxLength}</dt>
               <dd className="tabular font-medium text-ink">
                 {formatLength(marina.berths.maxLengthM, units)}
               </dd>
             </div>
             <div>
-              <dt className="text-sm text-ink/70">{t.results.from}</dt>
+              <dt className="text-sm text-ink-muted">{t.results.from}</dt>
               <dd className="tabular font-medium text-ink">€{cheapest.toFixed(2)}</dd>
             </div>
             <div>
-              <dt className="text-sm text-ink/70">Protection</dt>
+              <dt className="text-sm text-ink-muted">Protection</dt>
               <dd className="font-medium text-ink">
                 <ProtectionIndicator protection={marina.protection} />
               </dd>

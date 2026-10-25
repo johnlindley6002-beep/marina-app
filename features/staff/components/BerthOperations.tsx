@@ -105,11 +105,11 @@ export default function BerthOperations() {
 
         <div className="staff-panel">
           {!panel ? (
-            <p className="text-sm text-ink/70">Tap a berth on the map for its detail.</p>
+            <p className="text-sm text-ink-muted">Tap a berth on the map for its detail.</p>
           ) : (
             <div>
               <h2 className="type-heading type-h3 text-ink">Berth {panel.berthId}</h2>
-              <p className="mt-1 text-sm text-ink/70">
+              <p className="mt-1 text-sm text-ink-muted">
                 Class {panel.sizeClass} · {panel.info.detail}
               </p>
 
@@ -119,7 +119,7 @@ export default function BerthOperations() {
                   <p className="text-ink">
                     {link.ownerName}, {link.boatOnFile.name}
                   </p>
-                  <p className="text-xs text-ink/70">Linked {formatLongDate(link.linkedAt)}</p>
+                  <p className="text-xs text-ink-muted">Linked {formatLongDate(link.linkedAt)}</p>
                 </div>
               ) : null}
 
@@ -127,7 +127,7 @@ export default function BerthOperations() {
                 <div className="mt-3 text-sm">
                   <p className="staff-label">Visiting boat</p>
                   <p className="text-ink">{panel.enquiry.boatName}</p>
-                  <p className="text-ink/70">
+                  <p className="text-ink-muted">
                     {panel.enquiry.arrival} to{" "}
                     {panel.enquiry.openEnded ? "open-ended" : panel.enquiry.departure}
                   </p>
@@ -231,7 +231,7 @@ export default function BerthOperations() {
                     </button>
                   </div>
                 ) : (
-                  <p className="text-xs text-ink/70">
+                  <p className="text-xs text-ink-muted">
                     A berth in use cannot be marked out of service.
                   </p>
                 )}

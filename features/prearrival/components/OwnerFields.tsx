@@ -1,14 +1,14 @@
 "use client";
 
 import { COUNTRIES } from "@/lib/countries";
-import { Field } from "./WizardBits";
+import Field from "@/components/ui/Field";
 import type { BoatScope } from "./BoatScope";
 
 export default function OwnerFields({ scope }: { scope: BoatScope }) {
   const { draft, setDraft, errors, copy } = scope;
   return (
     <>
-      <p className="mt-8 text-sm font-medium text-ink/80">{copy.ownerHeading}</p>
+      <p className="mt-8 text-sm font-medium text-ink-soft">{copy.ownerHeading}</p>
       <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <Field
           label={copy.ownerNameLabel}
@@ -127,7 +127,7 @@ export default function OwnerFields({ scope }: { scope: BoatScope }) {
         </Field>
       </div>
 
-      <label className="mt-4 flex items-center gap-2 text-sm text-ink/75">
+      <label className="mt-4 flex items-center gap-2 text-sm text-ink-soft">
         <input
           type="checkbox"
           checked={draft.owner.isCompany}

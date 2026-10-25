@@ -84,17 +84,17 @@ export default function Navbar() {
         >
           <span className="flex w-5 flex-col gap-1.5" aria-hidden="true">
             <span
-              className={`block h-px w-full bg-paper transition-transform duration-200 ${
+              className={`block h-px w-full bg-paper transition-transform duration-(--duration-base) ${
                 menuOpen ? "translate-y-[7px] rotate-45" : ""
               }`}
             />
             <span
-              className={`block h-px w-full bg-paper transition-opacity duration-200 ${
+              className={`block h-px w-full bg-paper transition-opacity duration-(--duration-base) ${
                 menuOpen ? "opacity-0" : ""
               }`}
             />
             <span
-              className={`block h-px w-full bg-paper transition-transform duration-200 ${
+              className={`block h-px w-full bg-paper transition-transform duration-(--duration-base) ${
                 menuOpen ? "-translate-y-[7px] -rotate-45" : ""
               }`}
             />

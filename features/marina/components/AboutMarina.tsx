@@ -2,9 +2,7 @@
 
 import type { Marina } from "@/data/marinas";
 import { useLanguage } from "@/components/providers/LanguageProvider";
-import ChartDivider from "@/components/ui/ChartDivider";
 import Disclosure from "@/components/ui/Disclosure";
-import Reveal from "@/components/ui/Reveal";
 import NearbyPlaces from "./NearbyPlaces";
 import PhotoGallery from "./PhotoGallery";
 
@@ -20,19 +18,15 @@ export default function AboutMarina({ marina, description }: Props) {
   return (
     <section className="section-editorial">
       <div className="page-column">
-        <Reveal>
-          <h2 className="type-statement text-ink">About {marina.name}</h2>
-        </Reveal>
-        <Reveal delay={120}>
-          <Disclosure
-            previewLines={2}
-            label="Read more"
-            openLabel="Show less"
-            className="measure stack-md"
-          >
-            <p className="text-ink/75">{description}</p>
-          </Disclosure>
-        </Reveal>
+        <h2 className="type-statement text-ink">About {marina.name}</h2>
+        <Disclosure
+          previewLines={2}
+          label="Read more"
+          openLabel="Show less"
+          className="measure stack-md"
+        >
+          <p className="text-ink-soft">{description}</p>
+        </Disclosure>
 
         <dl className="mt-10">
           <div>
@@ -43,7 +37,7 @@ export default function AboutMarina({ marina, description }: Props) {
 
         {photos.length > 0 ? (
           <div className="stack-lg">
-            <ChartDivider className="mb-10" />
+            <hr className="mb-10 border-hairline" />
             <h3 className="type-heading type-h3 mb-6 text-ink">Photos</h3>
             <PhotoGallery photos={photos} />
           </div>

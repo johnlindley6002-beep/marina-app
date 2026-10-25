@@ -12,7 +12,7 @@ import { useUnits } from "@/components/providers/UnitsProvider";
 type Initial = { q?: string; arrival?: string; departure?: string; length?: string };
 
 const fieldClass =
-  "mt-1 w-full rounded-[3px] border border-hairline bg-paper px-4 py-3 text-base text-ink placeholder:text-ink/65 focus:border-ink";
+  "mt-1 w-full rounded-md border border-hairline bg-paper px-4 py-3 text-base text-ink placeholder:text-ink-muted focus:border-ink";
 
 export default function DestinationSearch({
   initial,
@@ -128,7 +128,7 @@ export default function DestinationSearch({
                   className={`cursor-pointer px-4 py-2.5 ${index === active ? "bg-paper" : ""}`}
                 >
                   <span className="block text-base font-medium text-ink">{suggestion.label}</span>
-                  <span className="block text-sm text-ink/70">{suggestion.detail}</span>
+                  <span className="block text-sm text-ink-muted">{suggestion.detail}</span>
                 </li>
               ))}
             </ul>
@@ -145,7 +145,7 @@ export default function DestinationSearch({
         aria-expanded={filtersOpen}
         aria-controls={`${uid}-filters`}
         onClick={() => setFiltersOpen((v) => !v)}
-        className="mt-1 inline-flex min-h-11 items-center text-sm text-ink/70 underline underline-offset-4 hover:text-ink"
+        className="mt-1 inline-flex min-h-11 items-center text-sm text-ink-muted underline underline-offset-4 hover:text-ink"
       >
         {filtersOpen
           ? t.home.hideFilters

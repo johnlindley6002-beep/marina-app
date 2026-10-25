@@ -18,11 +18,11 @@ function FuelCard({ label, entry }: { label: string; entry: Timestamped<number |
             <span className="type-heading tabular text-3xl text-ink">
               {formatFuelPrice(entry.value)}
             </span>{" "}
-            <span className="text-ink/75">per litre</span>
+            <span className="text-ink-soft">per litre</span>
             <LastUpdated date={entry.lastUpdated} className="mt-1 block" />
           </>
         ) : (
-          <span className="text-ink/75">Price at the fuel dock</span>
+          <span className="text-ink-soft">Price at the fuel dock</span>
         )}
       </dd>
     </div>
@@ -37,7 +37,7 @@ export default function FuelPrices({ marina }: { marina: Marina }) {
         <FuelCard label="Diesel" entry={marina.fuelPrices.diesel} />
         <FuelCard label="Petrol (RON 95)" entry={marina.fuelPrices.ron95} />
       </dl>
-      <p className="mt-4 text-sm text-ink/70">
+      <p className="mt-4 text-sm text-ink-muted">
         Set by the marina and changed often. Confirm at the fuel dock.
       </p>
     </div>

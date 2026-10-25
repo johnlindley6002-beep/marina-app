@@ -69,7 +69,7 @@ function OwnerBody() {
           return (
             <section key={berth.linkId} className="stack-md" aria-label={`Berth ${berth.berthId}`}>
               <h2 className="type-heading type-h2 text-ink">Berth {berth.berthId}</h2>
-              <p className="mt-1 flex flex-wrap items-center text-ink/75">
+              <p className="mt-1 flex flex-wrap items-center text-ink-soft">
                 <Link
                   href={`/marinas/${berth.countrySlug}/${berth.marinaId}`}
                   className="link inline-flex min-h-11 items-center"
@@ -83,20 +83,20 @@ function OwnerBody() {
               </p>
               <p className="tabular mt-4 text-ink">
                 <span className="font-medium">{boat.name}</span>
-                <span className="text-ink/75">
+                <span className="text-ink-soft">
                   {" "}
                   on file: {formatLength(Number(boat.loa), units)} long,{" "}
                   {formatLength(Number(boat.beam), units)} beam,{" "}
                   {formatLength(Number(boat.draft), units)} draft
                 </span>
               </p>
-              <p className="measure mt-4 text-ink/75">{copy.useRight}</p>
-              <p className="measure mt-2 text-sm text-ink/70">{copy.contractNote}</p>
+              <p className="measure mt-4 text-ink-soft">{copy.useRight}</p>
+              <p className="measure mt-2 text-sm text-ink-muted">{copy.contractNote}</p>
 
               {firstTime ? (
                 <div className="stack-sm">
                   <h3 className="type-heading type-h3 text-ink">{copy.firstTimeTitle}</h3>
-                  <p className="measure mt-2 text-ink/75">{copy.firstTimeBody}</p>
+                  <p className="measure mt-2 text-ink-soft">{copy.firstTimeBody}</p>
                 </div>
               ) : null}
 
@@ -107,7 +107,7 @@ function OwnerBody() {
                     : copy.primaryAction}
                 </Link>
                 {draft && draft.mode === "new" && draft.step > 1 ? (
-                  <span className="text-sm text-ink/70">
+                  <span className="text-sm text-ink-muted">
                     Step {draft.step} of {copy.steps.length}, saved
                   </span>
                 ) : null}
@@ -149,7 +149,7 @@ function OwnerBody() {
         ) : null}
 
         <footer className="chapter">
-          <p className="measure text-sm text-ink/70">{copy.legalFooter}</p>
+          <p className="measure text-sm text-ink-muted">{copy.legalFooter}</p>
           <Link
             href={termsHref}
             className="link mt-2 inline-flex min-h-11 items-center text-sm text-ink"

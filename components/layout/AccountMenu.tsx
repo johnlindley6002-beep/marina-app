@@ -112,7 +112,7 @@ export default function AccountMenu({
       {open ? (
         <div
           id="account-menu"
-          className="absolute top-full right-0 z-50 mt-2 w-64 rounded-[3px] border border-paper/15 bg-ink px-4 py-3 shadow-lg"
+          className="absolute top-full right-0 z-50 mt-2 w-64 rounded-md border border-paper/15 bg-ink px-4 py-3 shadow-overlay"
         >
           {/* Below lg the navbar has no room for the switch, so it lives here. */}
           <MenuBody onNavigate={() => setOpen(false)} showSwitch={canSwitchMode} />

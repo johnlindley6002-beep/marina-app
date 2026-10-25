@@ -1,5 +1,4 @@
 import type { Marina } from "@/data/marinas";
-import ChartDivider from "@/components/ui/ChartDivider";
 
 export const telHref = (number: string) => `tel:${number.replace(/[^\d+]/g, "")}`;
 
@@ -21,7 +20,7 @@ export default function EmergencyNumbers({
               key={phone.label}
               className="flex items-baseline justify-between gap-4 border-b border-hairline pb-3 text-sm"
             >
-              <span className="text-ink/75">{phone.label}</span>
+              <span className="text-ink-soft">{phone.label}</span>
               <a
                 href={telHref(phone.number)}
                 className="inline-flex min-h-11 items-center font-medium text-ink underline underline-offset-4"
@@ -37,7 +36,7 @@ export default function EmergencyNumbers({
               key={channel.channel}
               className="flex items-baseline justify-between gap-4 border-b border-hairline pb-3 text-sm"
             >
-              <span className="text-ink/75">{channel.label}</span>
+              <span className="text-ink-soft">{channel.label}</span>
               <span className="font-medium text-ink">VHF channel {channel.channel}</span>
             </li>
           ))}
@@ -49,7 +48,7 @@ export default function EmergencyNumbers({
   if (embedded) {
     return (
       <div className="stack-lg">
-        <ChartDivider className="mb-10" />
+        <hr className="mb-10 border-hairline" />
         {body}
       </div>
     );

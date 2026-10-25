@@ -5,7 +5,7 @@ import type { DocumentKey, Documents } from "@/features/prearrival/lib/schema";
 import { useBoats } from "@/components/providers/BoatProvider";
 import { useLanguage } from "@/components/providers/LanguageProvider";
 import type { StepProps } from "./PreArrivalWizard";
-import { Field } from "./WizardBits";
+import Field from "@/components/ui/Field";
 
 // What the document wallet (the saved boat's own documents) can prefill for
 // each checklist item, when a saved boat was chosen in Step 1. Not every
@@ -53,7 +53,7 @@ export default function StepDocuments({ draft, setDraft }: StepProps) {
 
   return (
     <div>
-      <p className="mt-6 max-w-xl text-sm text-ink/75">{copy.intro}</p>
+      <p className="mt-6 max-w-xl text-sm text-ink-soft">{copy.intro}</p>
 
       <ul className="mt-6">
         {requirements.map((req) => {
@@ -64,7 +64,7 @@ export default function StepDocuments({ draft, setDraft }: StepProps) {
             <li key={req.key} className="hairline-top py-6 first:border-t-0">
               <div className="flex flex-wrap items-center gap-3">
                 <p className="font-medium text-ink">{copy.items[req.key]}</p>
-                <span className={`chip ${req.required ? "border-ink/40" : "text-ink/65"}`}>
+                <span className={`chip ${req.required ? "border-ink/40" : "text-ink-muted"}`}>
                   {req.required ? copy.requiredChip : copy.optionalChip}
                 </span>
                 {showUseSaved ? (
@@ -84,13 +84,13 @@ export default function StepDocuments({ draft, setDraft }: StepProps) {
                         });
                       }
                     }}
-                    className="text-xs text-ink/65 underline underline-offset-4"
+                    className="text-xs text-ink-muted underline underline-offset-4"
                   >
                     {copy.useSaved}
                   </button>
                 ) : null}
               </div>
-              <p className="mt-1 text-xs text-ink/65">{req.reason}</p>
+              <p className="mt-1 text-xs text-ink-muted">{req.reason}</p>
 
               <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 <Field label={copy.numberLabel} htmlFor={`doc-${req.key}-number`}>
@@ -155,7 +155,7 @@ export default function StepDocuments({ draft, setDraft }: StepProps) {
                     })
                   }
                 />
-                <span className="text-sm text-ink/75">
+                <span className="text-sm text-ink-soft">
                   {copy.uploadTile}
                   {entry.uploaded && entry.fileName ? ` · ${entry.fileName}` : ""}
                 </span>
