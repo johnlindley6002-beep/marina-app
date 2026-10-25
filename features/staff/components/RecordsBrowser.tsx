@@ -3,7 +3,7 @@
 import { useCallback, useMemo, useState } from "react";
 import { getAllBerths } from "@/data/berths";
 import { getPrimaryMarina } from "@/data/marinas";
-import { todayIso } from "@/lib/formatDate";
+import { todayIso } from "@/lib/dates";
 import {
   getBerthStatuses,
   getEnquiries,

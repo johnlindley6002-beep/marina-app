@@ -4,13 +4,12 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { creditModelHeadline, marinas } from "@/data/marinas";
 import { siteConfig } from "@/data/site";
-import { eur, formatLongDate } from "@/lib/formatDate";
+import { formatLongDate, countNights, nightDates } from "@/lib/dates";
+import { eur } from "@/lib/money";
 import {
   cancelRelettingRequest,
-  countNights,
   getRelettingRequests,
   isRelettingEditable,
-  nightDates,
   requestEarlyReturn,
   RELETTING_PROGRESS,
   RELETTING_STATUS_LABELS,

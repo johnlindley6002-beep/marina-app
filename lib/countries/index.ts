@@ -1,5 +1,14 @@
-// Plain country names for select inputs, no flags/codes needed here,
-// just enough to populate a dropdown without an external dependency.
+// The one country module: the list for select inputs, and the EU, Schengen and
+// free-movement classification used by the pre-arrival rules. A country picked
+// from COUNTRIES classifies correctly with no mapping step, because the names
+// are the same strings.
+//
+// Gibraltar is listed on its own: it is a British Overseas Territory outside
+// both the EU and Schengen, and boaters arrive from it often.
+//
+// The classification is current as of writing and deliberately small and
+// readable, not a geopolitical database. Review before relying on it beyond
+// this mockup.
 export const COUNTRIES: string[] = [
   "Afghanistan",
   "Albania",
@@ -64,6 +73,7 @@ export const COUNTRIES: string[] = [
   "Gambia",
   "Georgia",
   "Germany",
+  "Gibraltar",
   "Ghana",
   "Greece",
   "Grenada",
@@ -197,3 +207,92 @@ export const COUNTRIES: string[] = [
   "Zambia",
   "Zimbabwe",
 ];
+
+export const EU_COUNTRIES = new Set<string>([
+  "Austria",
+  "Belgium",
+  "Bulgaria",
+  "Croatia",
+  "Cyprus",
+  "Czechia",
+  "Denmark",
+  "Estonia",
+  "Finland",
+  "France",
+  "Germany",
+  "Greece",
+  "Hungary",
+  "Ireland",
+  "Italy",
+  "Latvia",
+  "Lithuania",
+  "Luxembourg",
+  "Malta",
+  "Netherlands",
+  "Poland",
+  "Portugal",
+  "Romania",
+  "Slovakia",
+  "Slovenia",
+  "Spain",
+  "Sweden",
+]);
+
+// The Schengen area is not the same as the EU: Ireland and Cyprus are EU but
+// outside Schengen; Iceland, Norway, Liechtenstein and Switzerland are
+// Schengen but outside the EU.
+export const SCHENGEN_COUNTRIES = new Set<string>([
+  "Austria",
+  "Belgium",
+  "Bulgaria",
+  "Croatia",
+  "Czechia",
+  "Denmark",
+  "Estonia",
+  "Finland",
+  "France",
+  "Germany",
+  "Greece",
+  "Hungary",
+  "Iceland",
+  "Italy",
+  "Latvia",
+  "Liechtenstein",
+  "Lithuania",
+  "Luxembourg",
+  "Malta",
+  "Netherlands",
+  "Norway",
+  "Poland",
+  "Portugal",
+  "Romania",
+  "Slovakia",
+  "Slovenia",
+  "Spain",
+  "Sweden",
+  "Switzerland",
+]);
+
+// EU, EEA (EU plus Iceland, Norway, Liechtenstein) and Switzerland: nationals
+// of these move and reside freely, so temporary-admission and residence
+// warnings elsewhere are about non-EU-flagged boats and non-EU nationals
+// specifically, not this wider group.
+export const FREE_MOVEMENT_COUNTRIES = new Set<string>([
+  ...EU_COUNTRIES,
+  "Iceland",
+  "Norway",
+  "Liechtenstein",
+  "Switzerland",
+]);
+
+export function isEU(country: string): boolean {
+  return EU_COUNTRIES.has(country);
+}
+
+export function isSchengen(country: string): boolean {
+  return SCHENGEN_COUNTRIES.has(country);
+}
+
+export function isFreeMovementNational(country: string): boolean {
+  return FREE_MOVEMENT_COUNTRIES.has(country);
+}

@@ -2,14 +2,13 @@
 
 import { useState } from "react";
 import { siteConfig } from "@/data/site";
-import { eur, formatLongDate } from "@/lib/formatDate";
+import { formatLongDate, countNights, nightDates } from "@/lib/dates";
+import { eur } from "@/lib/money";
 import {
   advanceRelettingStatus,
-  countNights,
   decideReletting,
   defaultNightsBooked,
   getRelettingQueue,
-  nightDates,
   RELETTING_PROGRESS,
   RELETTING_STATUS_LABELS,
   type RelettingQueueItem,

@@ -14,9 +14,19 @@
 
 import { getAllBerths } from "@/data/berths";
 import {
+  addDaysIso,
+  countNights,
+  effectiveEnquiryDeparture,
+  formatDayMonth,
+  nightDates,
+  rangesOverlap,
+  todayIso,
+} from "@/lib/dates";
+import { fromCents, percentOfCents, toCents, type Cents } from "@/lib/money";
+import {
   CLASS_BEAM_RANGES,
   CLASS_LENGTH_RANGES,
-  getSeason,
+  getSeasonForIso,
   marinas,
   type MarinaClass,
   type RelettingTerms,
@@ -583,49 +593,17 @@ export type ReletSplit = {
   netEur: number;
 };
 
-function parseIso(value: string): Date | null {
-  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
-  if (!m) return null;
-  const d = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
-  return Number.isNaN(d.getTime()) ? null : d;
-}
-
-export function countNights(startDate: string, endDate: string): number {
-  const a = parseIso(startDate);
-  const b = parseIso(endDate);
-  if (!a || !b || b <= a) return 0;
-  return Math.round((b.getTime() - a.getTime()) / 86_400_000);
-}
-
-const cents = (n: number) => Math.round(n * 100) / 100;
-
-// Every night of an absence as ISO dates: the day the holder leaves up to, but
-// not including, the day they return.
-export function nightDates(startDate: string, endDate: string): string[] {
-  const start = parseIso(startDate);
-  const nights = countNights(startDate, endDate);
-  if (!start || nights < 1) return [];
-  const pad = (n: number) => String(n).padStart(2, "0");
-  const out: string[] = [];
-  const cursor = new Date(start);
-  for (let i = 0; i < nights; i++) {
-    out.push(`${cursor.getFullYear()}-${pad(cursor.getMonth() + 1)}-${pad(cursor.getDate())}`);
-    cursor.setDate(cursor.getDate() + 1);
-  }
-  return out;
-}
-
 // The holder's credit before the marina's fee, from the marina's credit
 // model: a percent of the tariff income, a fixed amount per night, or (for
 // display) the nominal percent an incentive-next-year model would be worth.
-function creditBeforeFee(terms: RelettingTerms, grossEur: number, nightCount: number): number {
+function creditBeforeFee(terms: RelettingTerms, grossCents: Cents, nightCount: number): Cents {
   switch (terms.creditModel.kind) {
     case "percentage":
-      return (grossEur * terms.creditModel.sharePercent) / 100;
+      return percentOfCents(grossCents, terms.creditModel.sharePercent * 100);
     case "fixed_per_night":
-      return terms.creditModel.amountEur * nightCount;
+      return toCents(terms.creditModel.amountEur) * nightCount;
     case "incentive_next_year":
-      return (grossEur * terms.creditModel.sharePercent) / 100;
+      return percentOfCents(grossCents, terms.creditModel.sharePercent * 100);
   }
 }
 
@@ -641,19 +619,18 @@ export function computeSplitForNights(
   const terms = marina?.reletting;
   const berth = getAllBerths().find((b) => b.id === berthId);
   if (!marina || !terms || !berth || nights.length === 0) return null;
-  let gross = 0;
+  let grossCents = 0;
   for (const night of nights) {
-    const date = parseIso(night);
-    if (date) gross += marina.transientRates[berth.sizeClass][getSeason(date)];
+    grossCents += toCents(marina.transientRates[berth.sizeClass][getSeasonForIso(night)]);
   }
-  const share = creditBeforeFee(terms, gross, nights.length);
-  const fee = (share * terms.processingFeePercent) / 100;
+  const shareCents = creditBeforeFee(terms, grossCents, nights.length);
+  const feeCents = percentOfCents(shareCents, terms.processingFeePercent * 100);
   return {
     nights: nights.length,
-    grossEur: cents(gross),
-    ownerShareEur: cents(share),
-    feeEur: cents(fee),
-    netEur: cents(share - fee),
+    grossEur: fromCents(grossCents),
+    ownerShareEur: fromCents(shareCents),
+    feeEur: fromCents(feeCents),
+    netEur: fromCents(shareCents - feeCents),
   };
 }
 
@@ -768,12 +745,6 @@ function saveReletStore(store: ReletStore) {
 
 function newId(prefix: string): string {
   return `${prefix}-${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
-}
-
-function todayIso(): string {
-  const d = new Date();
-  const pad = (n: number) => String(n).padStart(2, "0");
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 }
 
 const ACTIVE_STATUSES: RelettingStatus[] = ["submitted", "approved", "listed", "booked"];
@@ -929,8 +900,7 @@ function isStaffOfMarina(staffUserId: string | null, marinaId: string): boolean 
 }
 
 function dateLabel(iso: string): string {
-  const d = parseIso(iso);
-  return d ? new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "long" }).format(d) : iso;
+  return formatDayMonth(iso);
 }
 
 function formatWindow(startIso: string, endIso: string): string {
@@ -1441,25 +1411,6 @@ export function emptyMockReletting(): void {
 // backend must enforce that scoping server-side, exactly as commented for
 // reletting above; this is still a client-side mock with no real security.
 // ============================================================================
-
-function addDaysIso(iso: string, days: number): string {
-  const d = parseIso(iso);
-  if (!d) return iso;
-  d.setDate(d.getDate() + days);
-  const pad = (n: number) => String(n).padStart(2, "0");
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
-}
-
-// True while [startA,endA) and [startB,endB) share a night.
-function rangesOverlap(startA: string, endA: string, startB: string, endB: string): boolean {
-  return startA < endB && startB < endA;
-}
-
-// A blank departure means an open-ended stay; treated as one night for display
-// and conflict purposes until the boater confirms an end date.
-function effectiveEnquiryDeparture(e: { arrival: string; departure: string }): string {
-  return e.departure || addDaysIso(e.arrival, 1);
-}
 
 // ---- Enquiries ("Request a berth") ----
 

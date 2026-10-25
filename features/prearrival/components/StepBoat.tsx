@@ -1,7 +1,7 @@
 "use client";
 
 import { COUNTRIES } from "@/lib/countries";
-import { buildPtIdentificationSet, NAVIGATION_ZONES } from "@/features/prearrival/lib/countries";
+import { buildPtIdentificationSet, NAVIGATION_ZONES } from "@/features/prearrival/lib/portugal";
 import { classifyByLengthAndBeam } from "@/features/prearrival/lib/pricing";
 import {
   emptyDocuments,

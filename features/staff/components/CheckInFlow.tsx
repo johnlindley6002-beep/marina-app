@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { formatLongDate, todayIso } from "@/lib/formatDate";
+import { formatLongDate, todayIso } from "@/lib/dates";
 import {
   getEnquiries,
   markEnquiryArrived,

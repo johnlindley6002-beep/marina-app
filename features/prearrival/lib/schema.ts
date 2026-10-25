@@ -9,7 +9,8 @@
 // submission; see lib/prearrival/warnings.ts for that.
 
 import { z } from "zod";
-import { isEU, isSchengen } from "./countries";
+import { ageOn } from "@/lib/dates";
+import { isEU, isSchengen } from "@/lib/countries";
 
 export const PROPULSION = ["sail", "power", "sail_and_power"] as const;
 export type Propulsion = (typeof PROPULSION)[number];
@@ -278,16 +279,8 @@ export const EMPTY_PERSON: Person = {
 };
 
 export function isMinor(person: Person, onDate: string): boolean {
-  if (!person.dateOfBirth || !onDate) return false;
-  const birth = new Date(person.dateOfBirth);
-  const at = new Date(onDate);
-  if (Number.isNaN(birth.getTime()) || Number.isNaN(at.getTime())) return false;
-  let age = at.getFullYear() - birth.getFullYear();
-  const beforeBirthday =
-    at.getMonth() < birth.getMonth() ||
-    (at.getMonth() === birth.getMonth() && at.getDate() < birth.getDate());
-  if (beforeBirthday) age -= 1;
-  return age < 18;
+  const age = ageOn(person.dateOfBirth, onDate);
+  return age !== null && age < 18;
 }
 
 export const peopleSchema = z

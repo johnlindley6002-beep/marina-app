@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { addDaysIso, effectiveEnquiryDeparture, todayIso } from "@/lib/formatDate";
+import { addDaysIso, effectiveEnquiryDeparture, todayIso } from "@/lib/dates";
 import {
   getBerthStatuses,
   getEnquiries,

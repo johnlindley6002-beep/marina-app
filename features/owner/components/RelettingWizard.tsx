@@ -4,10 +4,10 @@ import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { creditModelCaption, creditModelHeadline, marinas } from "@/data/marinas";
 import { siteConfig } from "@/data/site";
-import { eur, formatLongDate } from "@/lib/formatDate";
+import { formatLongDate, todayIso, countNights } from "@/lib/dates";
+import { eur } from "@/lib/money";
 import {
   clearRelettingDraft,
-  countNights,
   estimateReletting,
   getOwnedBerths,
   getRelettingDraft,
@@ -29,12 +29,6 @@ const labelClass = "field-label";
 const errorClass = "field-error";
 const primaryClass = "btn-primary";
 const quietClass = "btn-quiet";
-
-function todayIso(): string {
-  const d = new Date();
-  const pad = (n: number) => String(n).padStart(2, "0");
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
-}
 
 function Check({
   checked,

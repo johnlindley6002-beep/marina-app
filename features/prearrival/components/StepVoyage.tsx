@@ -1,7 +1,7 @@
 "use client";
 
 import { COUNTRIES } from "@/lib/countries";
-import { isEU } from "@/features/prearrival/lib/countries";
+import { isEU } from "@/lib/countries";
 import { getVoyageFlags } from "@/features/prearrival/lib/schema";
 import { useLanguage } from "@/components/providers/LanguageProvider";
 import type { StepProps } from "./PreArrivalWizard";

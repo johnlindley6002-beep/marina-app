@@ -1,6 +1,6 @@
 "use client";
 
-import { formatLongDate } from "@/lib/formatDate";
+import { formatLongDate } from "@/lib/dates";
 import {
   getNotifications,
   markNotificationsRead,

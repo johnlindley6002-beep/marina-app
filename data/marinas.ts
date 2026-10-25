@@ -1,3 +1,6 @@
+import { monthOfIso, nightDates } from "@/lib/dates";
+import { fromCents, toCents } from "@/lib/money";
+
 export type MarinaClass =
   "I" | "IA" | "II" | "III" | "IV" | "V" | "VI" | "VIA" | "VII" | "VIII" | "IX";
 
@@ -117,8 +120,24 @@ export function getPriceBand(marina: Marina): PriceBand {
 // High season is April-September; low season is the rest of the year,
 // per the official tariff's own definition.
 export function getSeason(date: Date): Season {
-  const month = date.getMonth() + 1;
+  return seasonOfMonth(date.getMonth() + 1);
+}
+
+function seasonOfMonth(month: number): Season {
   return month >= 4 && month <= 9 ? "high" : "low";
+}
+
+// The season a night belongs to, from its calendar day (YYYY-MM-DD).
+export function getSeasonForIso(iso: string): Season {
+  return seasonOfMonth(monthOfIso(iso));
+}
+
+// How many of a stay's nights fall in each season. A stay that crosses 1 April
+// or 1 October is split night by night.
+export function nightsBySeason(arrival: string, departure: string): Record<Season, number> {
+  const counts: Record<Season, number> = { low: 0, high: 0 };
+  for (const night of nightDates(arrival, departure)) counts[getSeasonForIso(night)] += 1;
+  return counts;
 }
 
 // The fuel wording for the estimate: the marina's own per-litre prices when it
@@ -147,17 +166,10 @@ export function getFuelUpdated(marina: Marina): string | null {
 // busy month, otherwise null. A static indicator from data, not surge pricing.
 export function getDemandFlag(marina: Marina, arrival: string, departure: string): string | null {
   if (!marina.demand) return null;
-  const from = parseIsoDate(arrival);
-  const to = parseIsoDate(departure);
-  if (!from || !to || to <= from) return null;
-  const cursor = new Date(from);
-  while (cursor < to) {
-    if (marina.demand.busyMonths.includes(cursor.getMonth() + 1)) {
-      return marina.demand.note;
-    }
-    cursor.setDate(cursor.getDate() + 1);
-  }
-  return null;
+  const { busyMonths, note } = marina.demand;
+  return nightDates(arrival, departure).some((night) => busyMonths.includes(monthOfIso(night)))
+    ? note
+    : null;
 }
 
 export type FacilityKey =
@@ -252,12 +264,6 @@ export type Quote = {
   estimatedTotalEur: number;
 };
 
-function parseIsoDate(value: string): Date | null {
-  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
-  if (!match) return null;
-  return new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]));
-}
-
 // Prices each night by its own season, so stays that cross a season
 // boundary are split correctly. Rates are ex-VAT, per the official tariff.
 export function calculateQuote(
@@ -266,28 +272,24 @@ export function calculateQuote(
   addOns: QuoteAddOns
 ): Quote | null {
   const marinaClass = classifyBoatLength(input.loa);
-  const arrival = parseIsoDate(input.arrival);
-  const departure = parseIsoDate(input.departure);
-  if (!marinaClass || !arrival || !departure || departure <= arrival) {
-    return null;
-  }
+  const stayNights = nightsBySeason(input.arrival, input.departure);
+  const nights = stayNights.low + stayNights.high;
+  if (!marinaClass || nights < 1) return null;
 
-  const nightsBySeason: Record<Season, number> = { low: 0, high: 0 };
-  const cursor = new Date(arrival);
-  while (cursor < departure) {
-    nightsBySeason[getSeason(cursor)] += 1;
-    cursor.setDate(cursor.getDate() + 1);
-  }
-
+  // Whole cents, so the lines add up exactly to the subtotal.
   const berthLines = (["low", "high"] as Season[])
-    .filter((season) => nightsBySeason[season] > 0)
+    .filter((season) => stayNights[season] > 0)
     .map((season) => {
       const rateEur = marina.transientRates[marinaClass][season];
-      const nights = nightsBySeason[season];
-      return { season, nights, rateEur, subtotalEur: rateEur * nights };
+      const lineNights = stayNights[season];
+      return {
+        season,
+        nights: lineNights,
+        rateEur,
+        subtotalEur: fromCents(toCents(rateEur) * lineNights),
+      };
     });
-  const berthSubtotalEur = berthLines.reduce((s, l) => s + l.subtotalEur, 0);
-  const nights = nightsBySeason.low + nightsBySeason.high;
+  const berthSubtotalEur = fromCents(berthLines.reduce((s, l) => s + toCents(l.subtotalEur), 0));
 
   const fees = marina.serviceFees;
   const addOnLines: QuoteLine[] = [];
@@ -323,8 +325,9 @@ export function calculateQuote(
     });
   }
 
-  const estimatedTotalEur =
-    berthSubtotalEur + addOnLines.reduce((s, l) => s + (l.amountEur ?? 0), 0);
+  const estimatedTotalEur = fromCents(
+    toCents(berthSubtotalEur) + addOnLines.reduce((s, l) => s + toCents(l.amountEur ?? 0), 0)
+  );
 
   return {
     marinaClass,

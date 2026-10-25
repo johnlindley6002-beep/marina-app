@@ -3,19 +3,12 @@
 // for instance). Warnings never stop submission; errors do. Kept separate
 // from schema.ts's Zod pass so that distinction cannot blur by accident.
 
-import { isEU, isFreeMovementNational } from "./countries";
+import { isEU, isFreeMovementNational } from "@/lib/countries";
 import { isMinor, type PreArrivalDraft } from "./schema";
+import { daysBetween } from "@/lib/dates";
 import { getMissingRequiredDocuments } from "./documentRules";
 
 export type Flag = { message: string; path?: string };
-
-const DAY_MS = 86_400_000;
-function daysBetween(a: string, b: string): number {
-  const da = new Date(a).getTime();
-  const db = new Date(b).getTime();
-  if (Number.isNaN(da) || Number.isNaN(db)) return NaN;
-  return Math.round((db - da) / DAY_MS);
-}
 
 // ---------------------------------------------------------------------------
 // Errors beyond the Zod schema: these block Review just as much as a Zod

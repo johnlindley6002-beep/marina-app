@@ -1,10 +1,9 @@
 // Indicative pricing for the pre-arrival wizard's Step 5 (Your stay), reusing
 // the marina's real tariff (data/marinas.ts) rather than a second price list.
-// The task brief's 2026 Cascais figures are exactly what is already in
-// CLASS_LENGTH_RANGES / CLASS_BEAM_RANGES / TRANSIENT_RATES, so there is
-// nothing to duplicate; this file only adds the two rules that data does not
-// already encode: the class is the LARGER of the length class and the beam
-// class, and a multihull pays double.
+// The 2026 Cascais figures live in CLASS_LENGTH_RANGES, CLASS_BEAM_RANGES and
+// TRANSIENT_RATES; this file only adds the two rules that data does not
+// encode: the class is the LARGER of the length class and the beam class, and
+// a multihull pays double. Totals are added up in whole cents (lib/money).
 //
 // Always shown as "indicative, confirmed by the marina" (see Step 5), and
 // never used to block anything: a boat outside every class still gets an
@@ -14,11 +13,12 @@ import {
   CLASS_BEAM_RANGES,
   CLASS_LENGTH_RANGES,
   MARINA_CLASS_ORDER,
-  getSeason,
+  nightsBySeason,
   type Marina,
   type MarinaClass,
   type Season,
 } from "@/data/marinas";
+import { fromCents, toCents, vatOnCents } from "@/lib/money";
 
 function classifyByLength(lengthM: number): MarinaClass | null {
   for (const c of MARINA_CLASS_ORDER) {
@@ -62,12 +62,6 @@ export type IndicativeQuote = {
   totalIncVatEur: number;
 };
 
-function parseIsoDate(value: string): Date | null {
-  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(value);
-  if (!m) return null;
-  return new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
-}
-
 // Sums each night at its own season's rate (a stay spanning Sep/Oct is priced
 // correctly), then applies the multihull surcharge and VAT.
 export function calculateIndicativeQuote(
@@ -81,37 +75,35 @@ export function calculateIndicativeQuote(
   }
 ): IndicativeQuote | null {
   const marinaClass = classifyByLengthAndBeam(input.lengthM, input.beamM);
-  const arrival = parseIsoDate(input.arrival);
-  const departure = parseIsoDate(input.departure);
-  if (!marinaClass || !arrival || !departure || departure <= arrival) return null;
+  const stayNights = nightsBySeason(input.arrival, input.departure);
+  const nights = stayNights.low + stayNights.high;
+  if (!marinaClass || nights < 1) return null;
 
-  const nightsBySeason: Record<Season, number> = { low: 0, high: 0 };
-  const cursor = new Date(arrival);
-  while (cursor < departure) {
-    nightsBySeason[getSeason(cursor)] += 1;
-    cursor.setDate(cursor.getDate() + 1);
-  }
-
+  // Everything is added up in whole cents; VAT is rounded once, at the end.
   const multiplier = input.isMultihull ? 2 : 1;
   const lines: NightlyBreakdownLine[] = (["low", "high"] as Season[])
-    .filter((season) => nightsBySeason[season] > 0)
+    .filter((season) => stayNights[season] > 0)
     .map((season) => {
-      const rateEur = marina.transientRates[marinaClass][season] * multiplier;
-      const nights = nightsBySeason[season];
-      return { season, nights, rateEur, subtotalEur: rateEur * nights };
+      const rateCents = toCents(marina.transientRates[marinaClass][season]) * multiplier;
+      const lineNights = stayNights[season];
+      return {
+        season,
+        nights: lineNights,
+        rateEur: fromCents(rateCents),
+        subtotalEur: fromCents(rateCents * lineNights),
+      };
     });
 
-  const nights = nightsBySeason.low + nightsBySeason.high;
-  const subtotalExVatEur = lines.reduce((s, l) => s + l.subtotalEur, 0);
-  const vatEur = subtotalExVatEur * marina.vatRate;
+  const subtotalCents = lines.reduce((s, l) => s + toCents(l.subtotalEur), 0);
+  const vatCents = vatOnCents(subtotalCents, marina.vatRate);
 
   return {
     marinaClass,
     nights,
     multihull: input.isMultihull,
     lines,
-    subtotalExVatEur,
-    vatEur,
-    totalIncVatEur: subtotalExVatEur + vatEur,
+    subtotalExVatEur: fromCents(subtotalCents),
+    vatEur: fromCents(vatCents),
+    totalIncVatEur: fromCents(subtotalCents + vatCents),
   };
 }

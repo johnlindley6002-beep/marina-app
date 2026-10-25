@@ -1,3 +1,5 @@
+import { addDaysIso, isValidIsoDate } from "@/lib/dates";
+
 // The one set of trip inputs shared by the Plan panel, the berth map, the
 // price estimate and the enquiry form. Dimensions are metres, as strings.
 export type StayPlan = {
@@ -37,11 +39,7 @@ export const EMPTY_PLAN: StayPlan = {
 export const PLAN_KEYS = new Set<string>(Object.keys(EMPTY_PLAN));
 
 export function nextDayIso(iso: string): string {
-  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso);
-  if (!match) return "";
-  const next = new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]) + 1);
-  const pad = (n: number) => String(n).padStart(2, "0");
-  return `${next.getFullYear()}-${pad(next.getMonth() + 1)}-${pad(next.getDate())}`;
+  return isValidIsoDate(iso) ? addDaysIso(iso, 1) : "";
 }
 
 // Open-ended stays are priced and searched as a single night.

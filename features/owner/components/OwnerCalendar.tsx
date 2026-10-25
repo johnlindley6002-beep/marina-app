@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { formatLongDate } from "@/lib/formatDate";
+import { formatLongDate, todayIso } from "@/lib/dates";
 import { getBerthCalendar, type CalendarDay, type CalendarState } from "@/data/mock/mockData";
 import { useMock } from "@/lib/useMock";
 import { useAuth } from "@/components/providers/AuthProvider";
@@ -37,17 +37,13 @@ const LEGEND_LABEL: Record<Exclude<CalendarState, "none">, string> = {
   away: "Away",
 };
 
-function todayIso(): string {
-  const d = new Date();
-  const pad = (n: number) => String(n).padStart(2, "0");
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
-}
-
 // A month view of the holder's berth: their absences and any bookings on them.
 export default function OwnerCalendar() {
   const { user } = useAuth();
-  const now = new Date();
-  const [cursor, setCursor] = useState({ year: now.getFullYear(), month: now.getMonth() });
+  const [cursor, setCursor] = useState(() => {
+    const [year, month] = todayIso().split("-").map(Number);
+    return { year: year ?? 1970, month: (month ?? 1) - 1 };
+  });
   const userId = user?.id ?? null;
   const { value: calendar } = useMock(
     () => getBerthCalendar(userId, cursor.year, cursor.month),

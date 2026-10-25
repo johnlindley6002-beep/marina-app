@@ -2,7 +2,7 @@
 // propulsion and the voyage, rather than one fixed checklist for everyone.
 
 import type { MarinaClass } from "@/data/marinas";
-import { isEU } from "./countries";
+import { isEU } from "@/lib/countries";
 import { classifyByLengthAndBeam } from "./pricing";
 import { getVoyageFlags, type DocumentKey, type PreArrivalDraft } from "./schema";
 

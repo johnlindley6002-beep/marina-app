@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { formatLongDate } from "@/lib/formatDate";
+import { formatLongDate } from "@/lib/dates";
 import {
   decideEnquiry,
   getEnquiries,

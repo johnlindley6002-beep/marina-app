@@ -7,7 +7,7 @@ import {
   getAllPreArrivalDrafts,
   type PreArrivalCheckIn,
 } from "@/data/mock/mockData";
-import { todayIso } from "@/lib/formatDate";
+import { daysBetween, todayIso } from "@/lib/dates";
 import { getReadiness, type ReadinessItem } from "@/features/prearrival/lib/readiness";
 import type { PreArrivalDraft } from "@/features/prearrival/lib/schema";
 import { useMock } from "@/lib/useMock";
@@ -23,13 +23,9 @@ type Stay = {
   checkIn: PreArrivalCheckIn | null;
 };
 
-const DAY_MS = 86_400_000;
-
 function daysUntil(dateIso: string): number | null {
-  if (!dateIso) return null;
-  const target = new Date(dateIso).getTime();
-  if (Number.isNaN(target)) return null;
-  return Math.round((target - Date.now()) / DAY_MS);
+  const days = daysBetween(todayIso(), dateIso);
+  return Number.isNaN(days) ? null : days;
 }
 
 // A stay from today or the future is "upcoming"; one with no date yet (a

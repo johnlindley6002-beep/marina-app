@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useRef } from "react";
 import { marinas } from "@/data/marinas";
 import { siteConfig } from "@/data/site";
-import { formatLongDate } from "@/lib/formatDate";
+import { formatLongDate } from "@/lib/dates";
 import {
   getNotifications,
   getOwnedBerths,

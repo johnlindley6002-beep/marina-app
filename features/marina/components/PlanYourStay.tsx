@@ -1,6 +1,7 @@
 "use client";
 
-import { getSeason, SEASON_LABELS, type Marina, type Season } from "@/data/marinas";
+import { nightsBySeason, SEASON_LABELS, type Marina } from "@/data/marinas";
+import { isValidIsoDate } from "@/lib/dates";
 import { effectiveDeparture, type StayPlan } from "@/features/marina/lib/stayPlan";
 import Link from "next/link";
 import BoatSwitcher from "@/features/my-boat/components/BoatSwitcher";
@@ -17,11 +18,6 @@ function RequiredMark() {
   return <span className="text-error"> *</span>;
 }
 
-function parseIso(value: string): Date | null {
-  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
-  return m ? new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3])) : null;
-}
-
 type Props = {
   marina: Marina;
   plan: StayPlan;
@@ -32,21 +28,16 @@ export default function PlanYourStay({ marina, plan, onPlanChange }: Props) {
   const { label: unit } = useUnits();
   const { boats, activeBoat, saveBoat } = useBoats();
 
-  const arrivalDate = parseIso(plan.arrival);
-  const departureDate = parseIso(effectiveDeparture(plan));
-  const datesInvalid =
-    !plan.openEnded && !!arrivalDate && !!departureDate && departureDate <= arrivalDate;
-  const datesValid = !!arrivalDate && !!departureDate && !datesInvalid;
+  const departureIso = effectiveDeparture(plan);
+  const arrivalOk = isValidIsoDate(plan.arrival);
+  const departureOk = isValidIsoDate(departureIso);
+  const datesInvalid = !plan.openEnded && arrivalOk && departureOk && departureIso <= plan.arrival;
+  const datesValid = arrivalOk && departureOk && !datesInvalid;
 
-  const nightsBySeason: Record<Season, number> = { low: 0, high: 0 };
-  if (datesValid && arrivalDate && departureDate) {
-    const cursor = new Date(arrivalDate);
-    while (cursor < departureDate) {
-      nightsBySeason[getSeason(cursor)] += 1;
-      cursor.setDate(cursor.getDate() + 1);
-    }
-  }
-  const nights = nightsBySeason.low + nightsBySeason.high;
+  const seasonNights = datesValid
+    ? nightsBySeason(plan.arrival, departureIso)
+    : { low: 0, high: 0 };
+  const nights = seasonNights.low + seasonNights.high;
 
   const dim = (v: string) => Number(v);
   const dimError = (v: string) =>
@@ -61,10 +52,10 @@ export default function PlanYourStay({ marina, plan, onPlanChange }: Props) {
   const stayLine = datesValid
     ? plan.openEnded
       ? "Open-ended stay, priced and searched per night."
-      : nights > 0 && nightsBySeason.low > 0 && nightsBySeason.high > 0
-        ? `${nights} nights, spanning both seasons (${nightsBySeason.low} low, ${nightsBySeason.high} high).`
+      : nights > 0 && seasonNights.low > 0 && seasonNights.high > 0
+        ? `${nights} nights, spanning both seasons (${seasonNights.low} low, ${seasonNights.high} high).`
         : `${nights} night${nights === 1 ? "" : "s"}, ${
-            SEASON_LABELS[nightsBySeason.high > 0 ? "high" : "low"]
+            SEASON_LABELS[seasonNights.high > 0 ? "high" : "low"]
           }.`
     : "Enter your arrival and departure dates.";
 
