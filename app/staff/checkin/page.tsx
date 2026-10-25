@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import CheckInFlow from "./CheckInFlow";
+import CheckInFlow from "@/features/staff/components/CheckInFlow";
 
 export const metadata: Metadata = {
   title: "Check-in - Staff - aldock",

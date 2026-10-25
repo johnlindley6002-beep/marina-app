@@ -1,13 +1,13 @@
 import type { Metadata, Viewport } from "next";
 import { Archivo, Inter } from "next/font/google";
 import "./globals.css";
-import AppChrome from "./components/AppChrome";
-import { AuthProvider } from "./components/AuthProvider";
-import DevPersonaSwitcher from "./components/DevPersonaSwitcher";
-import { BoatProvider } from "./components/BoatProvider";
-import { LanguageProvider } from "./components/LanguageProvider";
-import ServiceWorkerRegister from "./components/ServiceWorkerRegister";
-import { UnitsProvider } from "./components/UnitsProvider";
+import AppChrome from "@/components/layout/AppChrome";
+import { AuthProvider } from "@/components/providers/AuthProvider";
+import DevPersonaSwitcher from "@/features/dev/components/DevPersonaSwitcher";
+import { BoatProvider } from "@/components/providers/BoatProvider";
+import { LanguageProvider } from "@/components/providers/LanguageProvider";
+import ServiceWorkerRegister from "@/components/layout/ServiceWorkerRegister";
+import { UnitsProvider } from "@/components/providers/UnitsProvider";
 
 // Latin covers English, Portuguese, Spanish and French, so the extended
 // subset (about 170 KB more on the wire) is not loaded.

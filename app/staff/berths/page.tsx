@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import BerthOperations from "./BerthOperations";
+import BerthOperations from "@/features/staff/components/BerthOperations";
 
 export const metadata: Metadata = {
   title: "Berth map - Staff - aldock",

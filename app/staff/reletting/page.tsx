@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import RelettingQueue from "./RelettingQueue";
+import RelettingQueue from "@/features/staff/components/RelettingQueue";
 
 export const metadata: Metadata = {
   title: "Reletting - Staff - aldock",

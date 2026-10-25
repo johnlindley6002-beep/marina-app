@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { getCountries, getMarinasByCountry } from "../../../data/marinas";
-import CountryPageContent from "./CountryPageContent";
+import CountryPageContent from "@/features/discovery/components/CountryPageContent";
 
 type Props = {
   params: Promise<{ country: string }>;

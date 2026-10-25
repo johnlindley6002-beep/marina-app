@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { maskIdNumber } from "../../lib/prearrival/mask";
+import { maskIdNumber } from "@/features/prearrival/lib/mask";
 
 describe("maskIdNumber", () => {
   it("shows only the last four characters", () => {

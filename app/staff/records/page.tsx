@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import RecordsBrowser from "./RecordsBrowser";
+import RecordsBrowser from "@/features/staff/components/RecordsBrowser";
 
 export const metadata: Metadata = {
   title: "Records - Staff - aldock",

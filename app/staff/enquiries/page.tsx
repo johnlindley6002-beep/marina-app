@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import EnquiryInbox from "./EnquiryInbox";
+import EnquiryInbox from "@/features/staff/components/EnquiryInbox";
 
 export const metadata: Metadata = {
   title: "Enquiries - Staff - aldock",

@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { MOCK_CHANGED_EVENT, MOCK_STORAGE_KEYS } from "./mockData";
+import { MOCK_CHANGED_EVENT, MOCK_STORAGE_KEYS } from "@/data/mock/mockData";
 
 // MOCK. Reads a value from the mock data layer and reads it again whenever the
 // mock data changes, here or in another tab, so an owner's screen updates when

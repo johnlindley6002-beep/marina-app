@@ -2,12 +2,12 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { savePreArrivalDraft } from "../../../lib/mockData";
+import { savePreArrivalDraft } from "@/data/mock/mockData";
 import {
   DRAFT_SCENARIOS,
   seedHolderAwayReletTenNights,
   seedHolderReturnsEarlyWhileLet,
-} from "../../../lib/prearrival/seedScenarios";
+} from "@/features/prearrival/lib/seedScenarios";
 
 // Hidden test harness, not linked from the site's own navigation: loads any
 // of the eight edge-case scenarios from the brief in one click, instead of

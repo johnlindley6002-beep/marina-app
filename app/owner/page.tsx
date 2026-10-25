@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import OwnerContent from "./OwnerContent";
+import OwnerContent from "@/features/owner/components/OwnerContent";
 
 export const metadata: Metadata = {
   title: "My berth - aldock",

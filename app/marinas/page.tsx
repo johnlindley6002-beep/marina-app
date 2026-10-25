@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import MarinasResults from "./MarinasResults";
+import MarinasResults from "@/features/discovery/components/MarinasResults";
 
 export const metadata: Metadata = {
   title: "Marinas - aldock",

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import MyBoatContent from "./MyBoatContent";
+import MyBoatContent from "@/features/my-boat/components/MyBoatContent";
 
 export const metadata: Metadata = {
   title: "My boat - aldock",

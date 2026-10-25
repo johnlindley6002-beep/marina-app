@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import HomeContent from "./components/HomeContent";
+import HomeContent from "@/features/discovery/components/HomeContent";
 
 export const metadata: Metadata = {
   title: "aldock - Marina bookings, simplified",

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import RoleGate from "../components/RoleGate";
-import StaffShell from "./StaffShell";
+import RoleGate from "@/components/layout/RoleGate";
+import StaffShell from "@/features/staff/components/StaffShell";
 
 export const metadata: Metadata = {
   title: "Staff - aldock",

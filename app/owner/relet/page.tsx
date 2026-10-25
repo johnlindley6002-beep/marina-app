@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import RelettingWizard from "./RelettingWizard";
+import RelettingWizard from "@/features/owner/components/RelettingWizard";
 
 export const metadata: Metadata = {
   title: "Make my berth available - aldock",

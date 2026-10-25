@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import ArrivalsBoard from "./ArrivalsBoard";
+import ArrivalsBoard from "@/features/staff/components/ArrivalsBoard";
 
 export const metadata: Metadata = {
   title: "Arrivals - Staff - aldock",

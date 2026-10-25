@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import AccountContent from "./AccountContent";
+import AccountContent from "@/features/account/components/AccountContent";
 
 export const metadata: Metadata = {
   title: "Account - aldock",

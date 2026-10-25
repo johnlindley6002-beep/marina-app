@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { getMarina, marinas } from "../../../../../data/marinas";
-import PreArrivalWizard from "./PreArrivalWizard";
+import PreArrivalWizard from "@/features/prearrival/components/PreArrivalWizard";
 
 type Props = {
   params: Promise<{ country: string; marina: string }>;
