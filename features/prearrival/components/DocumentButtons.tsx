@@ -6,8 +6,6 @@ import {
   buildAuthorityReportCsv,
   buildAuthorityReportJson,
 } from "@/features/prearrival/lib/documents/authorityReport";
-import { generateArrivalDeclarationPdf } from "@/features/prearrival/lib/documents/arrivalDeclaration";
-import { generateCrewListPdf } from "@/features/prearrival/lib/documents/crewList";
 import { downloadBytes, downloadText } from "@/features/prearrival/lib/documents/download";
 import type { PreArrivalCheckIn } from "@/lib/data";
 import { getVoyageFlags } from "@/features/prearrival/lib/schema";
@@ -33,6 +31,9 @@ export default function DocumentButtons({ checkIn, marina, className }: Props) {
   async function downloadDeclaration() {
     setBusy("declaration");
     try {
+      // The PDF library is large, so it is fetched when the button is pressed.
+      const { generateArrivalDeclarationPdf } =
+        await import("@/features/prearrival/lib/documents/arrivalDeclaration");
       const bytes = await generateArrivalDeclarationPdf(checkIn, marina);
       downloadBytes(bytes, `arrival-declaration-${checkIn.referenceCode}.pdf`, "application/pdf");
     } finally {
@@ -43,6 +44,7 @@ export default function DocumentButtons({ checkIn, marina, className }: Props) {
   async function downloadCrewList() {
     setBusy("crew");
     try {
+      const { generateCrewListPdf } = await import("@/features/prearrival/lib/documents/crewList");
       const bytes = await generateCrewListPdf(checkIn, marina);
       downloadBytes(bytes, `crew-list-${checkIn.referenceCode}.pdf`, "application/pdf");
     } finally {

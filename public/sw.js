@@ -6,6 +6,8 @@ const PAGES_CACHE = `${VERSION}-pages`;
 const IMAGES_CACHE = `${VERSION}-images`;
 const CORE_ASSETS = ["/images/cascais-marina-plan.webp", "/images/aldock-logo.png"];
 const NETWORK_TIMEOUT_MS = 4000;
+// Signed-in areas are never cached, so a shared device does not keep them.
+const PRIVATE_PATHS = ["/account", "/owner", "/staff", "/dev"];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
@@ -56,7 +58,9 @@ async function networkFirstPage(request) {
     const response = await (cached
       ? withTimeout(network, NETWORK_TIMEOUT_MS)
       : network);
-    if (response.ok) cache.put(request, response.clone());
+    if (response.ok && !/no-store/.test(response.headers.get("Cache-Control") || "")) {
+      cache.put(request, response.clone());
+    }
     return response;
   } catch {
     const cached = (await cache.match(request)) || (await cache.match("/"));
@@ -96,6 +100,7 @@ self.addEventListener("fetch", (event) => {
   if (url.origin !== self.location.origin) return;
 
   if (request.mode === "navigate") {
+    if (PRIVATE_PATHS.some((p) => url.pathname === p || url.pathname.startsWith(p + "/"))) return;
     event.respondWith(networkFirstPage(request));
     return;
   }

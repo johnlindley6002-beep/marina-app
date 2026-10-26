@@ -28,6 +28,10 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "aldock - Marina bookings, simplified",
   description: "Marina bookings, simplified.",
+  applicationName: "aldock",
+  appleWebApp: { capable: true, title: "aldock", statusBarStyle: "black-translucent" },
+  icons: { icon: "/icon-192.png", apple: "/icon-192.png" },
+  formatDetection: { telephone: false },
 };
 
 export const viewport: Viewport = {

@@ -53,7 +53,7 @@ ESLint is on 9.x because eslint-config-next 16 targets it; 9.x is marked depreca
 - [x] Phase 4 design system
 - [x] Phase 5 copy and i18n
 - [x] Phase 6 accessibility and mobile
-- [ ] Phase 7 performance and PWA
+- [x] Phase 7 performance and PWA
 - [ ] Phase 8 tests
 - [ ] Phase 9 documentation
 - [ ] Phase 10 verification and report
@@ -112,6 +112,24 @@ Audit written to AUDIT.md with a ranked top 20.
 - **Field** now links the error to the control (aria-invalid and aria-describedby) and keeps the error out of the label text. Dialogs: the lightbox is a native dialog; the facility dialog and contact dock already trap focus, close on Escape and return focus.
 - **One known gap, left on purpose:** on /staff/berths the map svg has role img but holds focusable berths (axe nested-interactive). The fix is one attribute inside the berth map, which is off limits; the rule is disabled for that single route in the test. Suggested change: role="group" on the svg.
 - **Not built:** dark mode (never intended). prefers-reduced-motion is honoured globally.
+
+### Phase 7
+
+First-load JavaScript, gzip over the wire, phone viewport (scripts/measure-js.mjs, production build):
+
+| Route                                 | Before | After  |
+| ------------------------------------- | ------ | ------ |
+| /                                     | 236 KB | 200 KB |
+| /marinas                              | 241 KB | 199 KB |
+| /marinas/portugal/cascais             | 263 KB | 227 KB |
+| /marinas/portugal/cascais/pre-arrival | 511 KB | 301 KB |
+| /my-boat                              | 519 KB | 297 KB |
+| /account                              | 516 KB | 203 KB |
+
+- **What changed:** the PDF library (about 176 KB gzip) loads only when a document button is pressed; the French, Spanish and Portuguese dictionaries (about 50 KB gzip together with English before) load only when that language is chosen, English ships with the page.
+- **Why not 150 KB:** the Next.js and React runtime alone is about 135 KB gzip on every route here, so 150 KB is not reachable without dropping the framework. What the app itself adds on the home page is about 65 KB. Zod (about 90 KB gzip) is the next biggest piece and only loads on the pre-arrival, My boat and owner pages; zod/mini would cut it but changes the schema API, so it is a recommendation, not done.
+- **Already in place, checked:** next/font for Archivo and Inter (self-hosted, no layout shift), next/image everywhere (no raw img), the map, enquiry form, lightbox, facilities grid and contact dock are dynamic imports, viewport-fit=cover, apple-touch icon and apple web app meta, a manifest with id and scope. Service worker review above.
+- **Not done:** per-route Lighthouse numbers (headless Edge leaks processes on this machine, see the notes in memory); run Lighthouse in CI instead.
 
 ## Deferred
 
