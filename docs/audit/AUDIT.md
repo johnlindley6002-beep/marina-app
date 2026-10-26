@@ -206,23 +206,23 @@ Strict mode is already on and `tsc` is clean. No explicit `any` (the five word m
 
 ## Top 20 fixes, ranked
 
-1. Hide the persona switcher and `/dev` in production (env gated). (I)
-2. Add ESLint, Prettier, Vitest, Playwright, CI and a `check` script. (tooling)
-3. Money in integer cents, one `lib/money.ts`, VAT rounded once. (D)
-4. Test the pricing and rule logic against the stated tariff. (tests)
-5. Restore a visible focus ring on `.field` and `.staff-field`. (E)
-6. 16 px inputs at every width; add `inputMode`, `autoComplete`, `enterKeyHint` to the wizard fields. (F)
-7. Safe-area insets, `viewport-fit=cover`, `dvh` for the fixed bottom bar and dialogs. (F)
-8. Lazy-load pdf-lib on click. (G)
-9. Merge the two country modules. (B)
-10. Split `mockData.ts` by domain behind a repository seam. (B)
-11. Split `i18n.ts` per locale and namespace, with typed keys. (B, H)
-12. Move owner, boater and reletting copy into i18n; add `check-i18n`. (H)
-13. Split `RequestBerthForm` into small components. (B)
-14. Remove `Reveal` and `useParallax`. (A)
-15. Design tokens for radius, elevation and motion; small primitives in `components/ui`. (A)
-16. Prune submitted check-ins after the stay. (I)
-17. Security headers and `metadataBase`. (I)
-18. Staff touch targets 44 px on coarse pointers. (F)
-19. Label the "berths show as available" headline as illustrative. (A)
-20. Delete create-next-app leftovers, rewrite the README. (J)
+1. Hide the persona switcher and `/dev` in production (env gated). (I): **Fixed** (Phase 3).
+2. Add ESLint, Prettier, Vitest, Playwright, CI and a `check` script. (tooling): **Fixed** (Phase 2).
+3. Money in integer cents, one `lib/money.ts`, VAT rounded once. (D): **Fixed** (Phase 3).
+4. Test the pricing and rule logic against the stated tariff. (tests): **Fixed** (Phase 8); four rule bugs found and fixed.
+5. Restore a visible focus ring on `.field` and `.staff-field`. (E): **Fixed** (Phase 6).
+6. 16 px inputs at every width; add `inputMode`, `autoComplete`, `enterKeyHint` to the wizard fields. (F): **Fixed** for 16 px and inputMode and autocomplete (Phases 6 and 10). **Deferred:** enterKeyHint.
+7. Safe-area insets, `viewport-fit=cover`, `dvh` for the fixed bottom bar and dialogs. (F): **Fixed** (Phases 4 and 7).
+8. Lazy-load pdf-lib on click. (G): **Fixed** (Phase 7).
+9. Merge the two country modules. (B): **Fixed** (Phase 3).
+10. Split `mockData.ts` by domain behind a repository seam. (B): **Fixed** (Phase 3).
+11. Split `i18n.ts` per locale and namespace, with typed keys. (B, H): **Fixed** (Phase 3).
+12. Move owner, boater and reletting copy into i18n; add `check-i18n`. (H): **Partly fixed** (Phase 5): the consumer flows and the enquiry form are in the dictionary and checked. **Deferred:** owner reletting flow (legal review first) and the staff back office.
+13. Split `RequestBerthForm` into small components. (B): **Fixed** (Phase 3).
+14. Remove `Reveal` and `useParallax`. (A): **Fixed** (Phase 4).
+15. Design tokens for radius, elevation and motion; small primitives in `components/ui`. (A): **Partly fixed** (Phase 4): radius, elevation and motion tokens and four primitives. **Won't fix:** wrapping Button, TextField, Badge in components, the CSS classes already are one source.
+16. Prune submitted check-ins after the stay. (I): **Fixed** (Phase 10).
+17. Security headers and `metadataBase`. (I): **Fixed** (Phases 7 and 10).
+18. Staff touch targets 44 px on coarse pointers. (F): **Fixed** (Phase 10), 44 px on touch screens.
+19. Label the "berths show as available" headline as illustrative. (A): **Fixed** (Phase 5).
+20. Delete create-next-app leftovers, rewrite the README. (J): **Fixed** (Phases 3 and 9).

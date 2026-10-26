@@ -26,6 +26,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
+  // Absolute URLs for social previews. Set NEXT_PUBLIC_SITE_URL in production.
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
   title: "aldock - Marina bookings, simplified",
   description: "Marina bookings, simplified.",
   applicationName: "aldock",

@@ -272,7 +272,9 @@ label:has(> input[type="checkbox"]) {
   min-height: 2.75rem;
 }
 
-@media (max-width: 639px) {
+/* 16 px on every touch screen, so iOS never zooms on focus (the staff screens
+   included). Wider pointers keep the denser size. */
+@media (max-width: 639px), (pointer: coarse) {
   #main input,
   #main select,
   #main textarea {
@@ -437,6 +439,14 @@ label:has(> input[type="checkbox"]) {
 .staff-shell textarea,
 .staff-shell button {
   font-size: 0.875rem;
+}
+
+@media (pointer: coarse) {
+  .staff-shell input,
+  .staff-shell select,
+  .staff-shell textarea {
+    font-size: 1rem;
+  }
 }
 
 .staff-topbar {
@@ -697,6 +707,15 @@ textarea.staff-field {
   font-weight: 650;
   font-size: 1.5rem;
   color: var(--ink);
+}
+
+/* Staff controls are 40 px with a mouse and 44 px on a touch screen. */
+@media (pointer: coarse) {
+  .staff-btn,
+  .staff-field,
+  .staff-nav-link {
+    min-height: 2.75rem;
+  }
 }
 
 .hairline-bottom {

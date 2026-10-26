@@ -3,6 +3,8 @@
 // the same as the enquiry form. Nothing is sent anywhere.
 
 import { type PreArrivalDraft } from "@/features/prearrival/lib/schema";
+import { pruneCheckIns } from "@/features/prearrival/lib/retention";
+import { todayIso } from "@/lib/dates";
 import {
   PREARRIVAL_DRAFT_KEY,
   PREARRIVAL_KEY,
@@ -58,8 +60,11 @@ export function clearPreArrivalDraft(marinaId: string): void {
   emitChange();
 }
 
+// Check-ins whose stay ended more than 30 days ago are not returned (see
+// features/prearrival/lib/retention.ts) and are gone from storage at the next write.
 export function loadPreArrivalStore(): PreArrivalCheckInStore {
-  return readJson<PreArrivalCheckInStore>(PREARRIVAL_KEY) ?? { checkIns: [] };
+  const stored = readJson<PreArrivalCheckInStore>(PREARRIVAL_KEY) ?? { checkIns: [] };
+  return { checkIns: pruneCheckIns(stored.checkIns, todayIso()) };
 }
 
 // "CAS-7F3K2Q" style: a marina prefix (first three letters of its id, upper

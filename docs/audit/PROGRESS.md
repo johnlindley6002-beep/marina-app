@@ -56,7 +56,7 @@ ESLint is on 9.x because eslint-config-next 16 targets it; 9.x is marked depreca
 - [x] Phase 7 performance and PWA
 - [x] Phase 8 tests
 - [x] Phase 9 documentation
-- [ ] Phase 10 verification and report
+- [x] Phase 10 verification and report
 
 ### Phase 0
 
@@ -122,7 +122,7 @@ First-load JavaScript, gzip over the wire, phone viewport (scripts/measure-js.mj
 | /                                     | 236 KB | 200 KB |
 | /marinas                              | 241 KB | 199 KB |
 | /marinas/portugal/cascais             | 263 KB | 227 KB |
-| /marinas/portugal/cascais/pre-arrival | 511 KB | 301 KB |
+| /marinas/portugal/cascais/pre-arrival | 511 KB | 308 KB |
 | /my-boat                              | 519 KB | 297 KB |
 | /account                              | 516 KB | 203 KB |
 
@@ -133,7 +133,7 @@ First-load JavaScript, gzip over the wire, phone viewport (scripts/measure-js.mj
 
 ### Phase 8
 
-- **144 tests**: 90 unit and component (Vitest, Testing Library) and 54 end-to-end (Playwright on a 390x844 phone and a 1280 desktop: axe on 17 routes, plus 10 journeys per size, one of them desktop only). Expected values were written by hand from the stated tariff and rules; where the code disagreed it was changed, not the test (the four fixes are behaviour changes 19 to 21 above).
+- **147 tests**: 93 unit and component (Vitest, Testing Library) and 53 end-to-end (Playwright on a 390x844 phone and a 1280 desktop: axe on 17 routes, plus 10 journeys per size, one of them desktop only). Expected values were written by hand from the stated tariff and rules; where the code disagreed it was changed, not the test (the four fixes are behaviour changes 19 to 21 above).
 - **Unit:** the full Cascais 2026 tariff table (class limits and day rates, boundaries 6.15 and 6.16 m and 2.40 and 2.41 m), the worked 79.34 example, beam pushing the class, a 29 March to 3 April season split, multihull, countries, voyage flags, every warning rule, insurance by zone, validation (one skipper, departure after arrival, ID expiry), masking, readiness, credit models, split rounding, the return buffer, reletAllowed none, dates (invalid days, clock change, Lisbon today), money and plurals.
 - **Component:** the crew count adds and removes person cards, the full crew list chip appears only for an external-border route, Field, SegmentedControl, Toggle, ProgressSteps, and the language provider loading Portuguese.
 - **End to end:** home to Cascais to the start of the check-in, the language switch, each of the six seed scenarios reaching the review step, the staff arrivals badges, and an owner reletting request reaching the staff queue. Scripts: npm run test, npm run test:e2e.
