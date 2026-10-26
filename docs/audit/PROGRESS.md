@@ -55,7 +55,7 @@ ESLint is on 9.x because eslint-config-next 16 targets it; 9.x is marked depreca
 - [x] Phase 6 accessibility and mobile
 - [x] Phase 7 performance and PWA
 - [x] Phase 8 tests
-- [ ] Phase 9 documentation
+- [x] Phase 9 documentation
 - [ ] Phase 10 verification and report
 
 ### Phase 0
