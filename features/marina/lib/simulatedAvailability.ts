@@ -1,5 +1,5 @@
 import { getAllBerths } from "@/data/berths";
-import { classifyBoatLength, type MarinaClass } from "@/data/marinas";
+import { classifyBoat, type MarinaClass } from "@/data/marinas";
 
 // Mirrors the pattern the berth map uses (isSimulatedAvailable in
 // BerthAvailabilityMap.tsx), so the summary and the map always agree. If the
@@ -22,8 +22,8 @@ export type SimulatedAvailability = {
 
 let cache: ReturnType<typeof getAllBerths> | null = null;
 
-export function getSimulatedAvailability(lengthM: number): SimulatedAvailability {
-  const marinaClass = classifyBoatLength(lengthM);
+export function getSimulatedAvailability(lengthM: number, beamM?: number): SimulatedAvailability {
+  const marinaClass = classifyBoat(lengthM, beamM);
   if (!marinaClass) return { marinaClass: null, total: 0, available: 0 };
   cache ??= getAllBerths();
   const matching = cache.filter((b) => b.sizeClass === marinaClass);

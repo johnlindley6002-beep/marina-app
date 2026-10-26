@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { siteConfig } from "@/data/site";
 import { formatLongDate, countNights, nightDates } from "@/lib/dates";
+import { marinas } from "@/data/marinas";
+import { nightsOfferedToVisitors } from "@/features/owner/lib/relet";
 import { eur } from "@/lib/money";
 import {
   advanceRelettingStatus,
@@ -58,7 +60,13 @@ function Item({ item, staffId }: { item: RelettingQueueItem; staffId: string }) 
   const [open, setOpen] = useState(false);
   const offered = nightDates(request.startDate, request.endDate);
   const nights = countNights(request.startDate, request.endDate);
-  const [approvedSet, setApprovedSet] = useState<Set<string>>(new Set(offered));
+  // The last nights before the holder returns start unticked (the marina's return
+  // buffer), and staff can still tick them.
+  const returnBuffer =
+    marinas.find((m) => m.id === request.marinaId)?.reletting?.returnBufferDays ?? 0;
+  const [approvedSet, setApprovedSet] = useState<Set<string>>(
+    new Set(nightsOfferedToVisitors(request.startDate, request.endDate, returnBuffer))
+  );
   const [nightsBooked, setNightsBooked] = useState(String(defaultNightsBooked(nights)));
   const [maxLengthM, setMaxLengthM] = useState("");
   const [maxBeamM, setMaxBeamM] = useState("");

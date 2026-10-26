@@ -54,7 +54,7 @@ ESLint is on 9.x because eslint-config-next 16 targets it; 9.x is marked depreca
 - [x] Phase 5 copy and i18n
 - [x] Phase 6 accessibility and mobile
 - [x] Phase 7 performance and PWA
-- [ ] Phase 8 tests
+- [x] Phase 8 tests
 - [ ] Phase 9 documentation
 - [ ] Phase 10 verification and report
 
@@ -130,6 +130,13 @@ First-load JavaScript, gzip over the wire, phone viewport (scripts/measure-js.mj
 - **Why not 150 KB:** the Next.js and React runtime alone is about 135 KB gzip on every route here, so 150 KB is not reachable without dropping the framework. What the app itself adds on the home page is about 65 KB. Zod (about 90 KB gzip) is the next biggest piece and only loads on the pre-arrival, My boat and owner pages; zod/mini would cut it but changes the schema API, so it is a recommendation, not done.
 - **Already in place, checked:** next/font for Archivo and Inter (self-hosted, no layout shift), next/image everywhere (no raw img), the map, enquiry form, lightbox, facilities grid and contact dock are dynamic imports, viewport-fit=cover, apple-touch icon and apple web app meta, a manifest with id and scope. Service worker review above.
 - **Not done:** per-route Lighthouse numbers (headless Edge leaks processes on this machine, see the notes in memory); run Lighthouse in CI instead.
+
+### Phase 8
+
+- **144 tests**: 90 unit and component (Vitest, Testing Library) and 54 end-to-end (Playwright on a 390x844 phone and a 1280 desktop: axe on 17 routes, plus 10 journeys per size, one of them desktop only). Expected values were written by hand from the stated tariff and rules; where the code disagreed it was changed, not the test (the four fixes are behaviour changes 19 to 21 above).
+- **Unit:** the full Cascais 2026 tariff table (class limits and day rates, boundaries 6.15 and 6.16 m and 2.40 and 2.41 m), the worked 79.34 example, beam pushing the class, a 29 March to 3 April season split, multihull, countries, voyage flags, every warning rule, insurance by zone, validation (one skipper, departure after arrival, ID expiry), masking, readiness, credit models, split rounding, the return buffer, reletAllowed none, dates (invalid days, clock change, Lisbon today), money and plurals.
+- **Component:** the crew count adds and removes person cards, the full crew list chip appears only for an external-border route, Field, SegmentedControl, Toggle, ProgressSteps, and the language provider loading Portuguese.
+- **End to end:** home to Cascais to the start of the check-in, the language switch, each of the six seed scenarios reaching the review step, the staff arrivals badges, and an owner reletting request reaching the staff queue. Scripts: npm run test, npm run test:e2e.
 
 ## Deferred
 

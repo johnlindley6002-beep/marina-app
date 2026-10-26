@@ -1,6 +1,6 @@
 "use client";
 
-import { classifyByLengthAndBeam } from "@/features/prearrival/lib/pricing";
+import { classifyBoat } from "@/data/marinas";
 import { applySavedBoatToDraft } from "@/features/prearrival/lib/boatMapping";
 import { useBoats } from "@/components/providers/BoatProvider";
 import { useLanguage } from "@/components/providers/LanguageProvider";
@@ -25,7 +25,7 @@ export default function StepBoat({ marina, draft, setDraft, errors }: StepProps)
 
   const lengthM = Number(draft.boatSpecs.lengthOverall) || 0;
   const beamM = Number(draft.boatSpecs.beam) || 0;
-  const marinaClass = lengthM > 0 && beamM > 0 ? classifyByLengthAndBeam(lengthM, beamM) : null;
+  const marinaClass = lengthM > 0 && beamM > 0 ? classifyBoat(lengthM, beamM) : null;
   const rate = marinaClass ? marina.transientRates[marinaClass] : null;
   const isPt = draft.boatIdentity.flagCountry === "Portugal";
 

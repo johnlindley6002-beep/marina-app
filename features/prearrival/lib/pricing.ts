@@ -10,40 +10,13 @@
 // honest "ask the marina for a quote" instead of a wrong number.
 
 import {
-  CLASS_BEAM_RANGES,
-  CLASS_LENGTH_RANGES,
-  MARINA_CLASS_ORDER,
+  classifyBoat,
   nightsBySeason,
   type Marina,
   type MarinaClass,
   type Season,
 } from "@/data/marinas";
 import { fromCents, toCents, vatOnCents } from "@/lib/money";
-
-function classifyByLength(lengthM: number): MarinaClass | null {
-  for (const c of MARINA_CLASS_ORDER) {
-    if (lengthM <= CLASS_LENGTH_RANGES[c].maxM) return c;
-  }
-  return null;
-}
-
-function classifyByBeam(beamM: number): MarinaClass | null {
-  for (const c of MARINA_CLASS_ORDER) {
-    if (beamM <= CLASS_BEAM_RANGES[c]) return c;
-  }
-  return null;
-}
-
-// The larger of the two classes applies, since a wide, short boat still needs
-// a wide berth and vice versa.
-export function classifyByLengthAndBeam(lengthM: number, beamM: number): MarinaClass | null {
-  const byLength = classifyByLength(lengthM);
-  const byBeam = classifyByBeam(beamM);
-  if (!byLength || !byBeam) return byLength ?? byBeam ?? null;
-  const li = MARINA_CLASS_ORDER.indexOf(byLength);
-  const bi = MARINA_CLASS_ORDER.indexOf(byBeam);
-  return MARINA_CLASS_ORDER[Math.max(li, bi)] ?? null;
-}
 
 export type NightlyBreakdownLine = {
   season: Season;
@@ -74,7 +47,7 @@ export function calculateIndicativeQuote(
     departure: string;
   }
 ): IndicativeQuote | null {
-  const marinaClass = classifyByLengthAndBeam(input.lengthM, input.beamM);
+  const marinaClass = classifyBoat(input.lengthM, input.beamM);
   const stayNights = nightsBySeason(input.arrival, input.departure);
   const nights = stayNights.low + stayNights.high;
   if (!marinaClass || nights < 1) return null;

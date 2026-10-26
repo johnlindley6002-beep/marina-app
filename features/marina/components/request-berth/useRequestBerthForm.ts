@@ -256,7 +256,13 @@ export function useRequestBerthForm({
     const departure = effectiveDeparture(plan);
     return calculateQuote(
       marina,
-      { loa: loaNum, arrival: form.arrival, departure },
+      {
+        loa: loaNum,
+        beam: Number(form.beam),
+        multihull: form.vesselType === "catamaran",
+        arrival: form.arrival,
+        departure,
+      },
       {
         shorePower: form.shorePower,
         water: form.water,
@@ -269,6 +275,8 @@ export function useRequestBerthForm({
     marina,
     plan,
     form.loa,
+    form.beam,
+    form.vesselType,
     form.arrival,
     form.shorePower,
     form.water,

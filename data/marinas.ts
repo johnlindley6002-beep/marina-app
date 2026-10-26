@@ -75,6 +75,29 @@ export const CLASS_BEAM_RANGES: Record<MarinaClass, number> = {
   IX: 10.0,
 };
 
+// The class a beam falls in, per the tariff's "Boca" column.
+export function classifyBoatBeam(beamM: number): MarinaClass | null {
+  for (const marinaClass of MARINA_CLASS_ORDER) {
+    if (beamM <= CLASS_BEAM_RANGES[marinaClass]) return marinaClass;
+  }
+  return null;
+}
+
+// The class a boat is berthed and priced in: the LARGER of its length class and
+// its beam class, since a wide, short boat still needs a wide berth. Without a
+// beam the length class applies.
+export function classifyBoat(lengthM: number, beamM?: number): MarinaClass | null {
+  const byLength = classifyBoatLength(lengthM);
+  // Longer than the longest class (45 m): no class, whatever the beam.
+  if (!byLength) return null;
+  if (beamM === undefined || !(beamM > 0)) return byLength;
+  const byBeam = classifyBoatBeam(beamM);
+  // Wider than the widest class (10 m): no class either.
+  if (!byBeam) return null;
+  const larger = Math.max(MARINA_CLASS_ORDER.indexOf(byLength), MARINA_CLASS_ORDER.indexOf(byBeam));
+  return MARINA_CLASS_ORDER[larger] ?? null;
+}
+
 export type BoatDimensions = { loa: number; beam: number; draft: number };
 
 export type BoatFitResult =
@@ -88,11 +111,13 @@ export function checkBoatFit(marina: Marina, dims: BoatDimensions): BoatFitResul
   if (dims.draft > marina.berths.maxDraftM) {
     return { fits: false, reason: "draft" };
   }
-  const marinaClass = classifyBoatLength(dims.loa);
-  if (!marinaClass) {
+  if (!classifyBoatLength(dims.loa)) {
     return { fits: false, reason: "length" };
   }
-  if (dims.beam > CLASS_BEAM_RANGES[marinaClass]) {
+  // A wide boat moves up to the class whose beam it fits; only a beam wider
+  // than the widest class (Class IX, 10 m) has no berth.
+  const marinaClass = classifyBoat(dims.loa, dims.beam);
+  if (!marinaClass || !classifyBoatBeam(dims.beam)) {
     return { fits: false, reason: "beam" };
   }
   return { fits: true, marinaClass };
@@ -236,10 +261,20 @@ export type Quote = {
 // boundary are split correctly. Rates are ex-VAT, per the official tariff.
 export function calculateQuote(
   marina: Marina,
-  input: { loa: number; arrival: string; departure: string },
+  input: {
+    loa: number;
+    // Optional: when given, a beam wider than the length class moves the boat up
+    // to the class whose beam it fits.
+    beam?: number;
+    // A multihull pays double the nightly rate.
+    multihull?: boolean;
+    arrival: string;
+    departure: string;
+  },
   addOns: QuoteAddOns
 ): Quote | null {
-  const marinaClass = classifyBoatLength(input.loa);
+  const marinaClass = classifyBoat(input.loa, input.beam);
+  const multiplier = input.multihull ? 2 : 1;
   const stayNights = nightsBySeason(input.arrival, input.departure);
   const nights = stayNights.low + stayNights.high;
   if (!marinaClass || nights < 1) return null;
@@ -248,7 +283,7 @@ export function calculateQuote(
   const berthLines = (["low", "high"] as Season[])
     .filter((season) => stayNights[season] > 0)
     .map((season) => {
-      const rateEur = marina.transientRates[marinaClass][season];
+      const rateEur = fromCents(toCents(marina.transientRates[marinaClass][season]) * multiplier);
       const lineNights = stayNights[season];
       return {
         season,

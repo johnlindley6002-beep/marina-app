@@ -1,9 +1,7 @@
 // Which documents Step 4 asks for, derived from the boat's flag, class,
 // propulsion and the voyage, rather than one fixed checklist for everyone.
 
-import type { MarinaClass } from "@/data/marinas";
 import { isEU } from "@/lib/countries";
-import { classifyByLengthAndBeam } from "./pricing";
 import { getVoyageFlags, type DocumentKey, type PreArrivalDraft } from "./schema";
 
 export type DocumentRequirement = {
@@ -13,24 +11,21 @@ export type DocumentRequirement = {
   reason: string;
 };
 
-const SMALL_CLASSES: MarinaClass[] = ["I", "IA", "II", "III", "IV"];
+// Third-party insurance is required for a Portuguese-flagged boat by its
+// navigation zone (DL 93/2018, art. 33): zones 1 to 4 always; zone 5 when the
+// boat is motorised (power, or sail and power), or is a sailboat over 7 m. A
+// zone 5 sailboat of 7 m or less with no engine is the one case it is not
+// required. A foreign-flagged boat, or a Portuguese one with no zone chosen
+// yet, is treated as required, because the marina asks every visitor for it.
+const ZONE_5_SAIL_LIMIT_M = 7;
 
-// Insurance is required for boat classes I to IV outright, for a motorised
-// class V boat, and for a sailboat over 7 m in class V; smaller sailboats are
-// the one case it is only requested, not required, on the marina's own side,
-// though every foreign boat is treated as required regardless of class.
 function isInsuranceRequired(draft: PreArrivalDraft): boolean {
-  const lengthM = Number(draft.boatSpecs.lengthOverall) || 0;
-  const marinaClass = classifyByLengthAndBeam(lengthM, Number(draft.boatSpecs.beam) || 0);
-  const isForeign = draft.boatIdentity.flagCountry !== "Portugal";
-  if (isForeign) return true;
-  if (!marinaClass) return true;
-  if (SMALL_CLASSES.includes(marinaClass)) return true;
-  if (marinaClass === "V") {
-    if (draft.boatSpecs.propulsion !== "sail") return true;
-    return lengthM > 7;
-  }
-  return true;
+  const zone = draft.boatIdentity.navigationZoneType;
+  const isPortuguese = draft.boatIdentity.flagCountry === "Portugal";
+  if (!isPortuguese || zone === null) return true;
+  if (zone <= 4) return true;
+  if (draft.boatSpecs.propulsion !== "sail") return true;
+  return (Number(draft.boatSpecs.lengthOverall) || 0) > ZONE_5_SAIL_LIMIT_M;
 }
 
 export function getDocumentRequirements(draft: PreArrivalDraft): DocumentRequirement[] {

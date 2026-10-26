@@ -59,14 +59,14 @@ export default function StayDecisionSummary({ marina, plan, stayLine, datesValid
 
   const fit = haveAllDims ? checkBoatFit(marina, { loa, beam, draft }) : null;
   const availability = useMemo(
-    () => (haveLoa ? getSimulatedAvailability(loa) : null),
-    [haveLoa, loa]
+    () => (haveLoa ? getSimulatedAvailability(loa, beam) : null),
+    [haveLoa, loa, beam]
   );
   const quote = useMemo(() => {
     if (!haveLoa || !datesValid) return null;
     return calculateQuote(
       marina,
-      { loa, arrival: plan.arrival, departure: effectiveDeparture(plan) },
+      { loa, beam, arrival: plan.arrival, departure: effectiveDeparture(plan) },
       {
         shorePower: plan.shorePower,
         water: plan.water,
@@ -75,7 +75,7 @@ export default function StayDecisionSummary({ marina, plan, stayLine, datesValid
         laundry: plan.laundry,
       }
     );
-  }, [marina, haveLoa, datesValid, loa, plan]);
+  }, [marina, haveLoa, datesValid, loa, beam, plan]);
 
   const doesNotFit = fit !== null && !fit.fits;
 

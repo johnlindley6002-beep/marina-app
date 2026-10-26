@@ -47,7 +47,7 @@ export default function PriceEstimate({
     if (!plan.arrival || !(loa > 0)) return null;
     return calculateQuote(
       marina,
-      { loa, arrival: plan.arrival, departure: effectiveDeparture(plan) },
+      { loa, beam: Number(plan.beam), arrival: plan.arrival, departure: effectiveDeparture(plan) },
       {
         shorePower: plan.shorePower,
         water: plan.water,
