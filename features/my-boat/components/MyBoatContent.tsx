@@ -253,6 +253,7 @@ export default function MyBoatContent() {
               <input
                 type="text"
                 value={skipper.name}
+                autoComplete="name"
                 onChange={(e) => {
                   saveSkipper({ ...skipper, name: e.target.value });
                   flash(copy.savedOnDevice);
@@ -264,6 +265,8 @@ export default function MyBoatContent() {
               <span className={labelClass}>{copy.phone}</span>
               <input
                 type="tel"
+                inputMode="tel"
+                autoComplete="tel"
                 value={skipper.phone}
                 onChange={(e) => {
                   saveSkipper({ ...skipper, phone: e.target.value });
@@ -276,6 +279,10 @@ export default function MyBoatContent() {
               <span className={labelClass}>{copy.email}</span>
               <input
                 type="email"
+                inputMode="email"
+                autoComplete="email"
+                autoCapitalize="none"
+                spellCheck={false}
                 value={skipper.email}
                 onChange={(e) => {
                   saveSkipper({ ...skipper, email: e.target.value });

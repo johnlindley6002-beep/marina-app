@@ -40,6 +40,7 @@ export default function LengthInput({
   return (
     <input
       type="number"
+      inputMode="decimal"
       min="0"
       step="0.1"
       value={text}

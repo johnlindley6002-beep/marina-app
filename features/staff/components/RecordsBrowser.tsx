@@ -129,7 +129,7 @@ export default function RecordsBrowser() {
         />
       </div>
 
-      <div className="staff-table-wrap mt-4">
+      <div className="staff-table-wrap mt-4" tabIndex={0} role="region" aria-label="Records">
         {tab === "Boats" ? (
           <table className="staff-table">
             <thead>

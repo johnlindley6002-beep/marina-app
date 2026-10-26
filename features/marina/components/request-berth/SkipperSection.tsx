@@ -21,6 +21,7 @@ export default function SkipperSection({ ctx }: { ctx: RequestBerthCtx }) {
             <input
               type="text"
               value={form.skipperName}
+              autoComplete="name"
               aria-invalid={!!errors.skipperName}
               aria-describedby={errors.skipperName ? "err-skipperName" : undefined}
               onChange={(e) => setField("skipperName", e.target.value)}
@@ -40,6 +41,8 @@ export default function SkipperSection({ ctx }: { ctx: RequestBerthCtx }) {
             </span>
             <input
               type="tel"
+              inputMode="tel"
+              autoComplete="tel"
               value={form.phone}
               aria-invalid={!!errors.phone}
               aria-describedby={errors.phone ? "err-phone" : undefined}
@@ -60,6 +63,10 @@ export default function SkipperSection({ ctx }: { ctx: RequestBerthCtx }) {
             </span>
             <input
               type="email"
+              inputMode="email"
+              autoComplete="email"
+              autoCapitalize="none"
+              spellCheck={false}
               value={form.email}
               aria-invalid={!!errors.email}
               aria-describedby={errors.email ? "err-email" : undefined}

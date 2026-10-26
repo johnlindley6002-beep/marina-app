@@ -128,7 +128,7 @@ export default function OwnerCalendar() {
                   <div
                     aria-current={day.iso === today ? "date" : undefined}
                     className={`tabular flex h-10 items-center justify-center rounded-sm text-sm md:h-12 ${
-                      day.inMonth ? "text-ink" : "text-ink/40"
+                      day.inMonth ? "text-ink" : "text-ink-muted"
                     } ${STATE_CLASS[day.state]} ${
                       day.iso === today ? "font-bold underline underline-offset-4" : ""
                     }`}

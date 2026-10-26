@@ -76,9 +76,13 @@ function ProfileForm({ user }: { user: CurrentUser }) {
           <span className={labelClass}>{copy.email}</span>
           <input
             type="email"
+            inputMode="email"
+            autoCapitalize="none"
+            spellCheck={false}
+            autoComplete="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            autoComplete="email"
+
             className={inputClass}
             {...aria("email")}
           />
@@ -92,9 +96,11 @@ function ProfileForm({ user }: { user: CurrentUser }) {
           <span className={labelClass}>{copy.phone}</span>
           <input
             type="tel"
+            inputMode="tel"
+            autoComplete="tel"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
-            autoComplete="tel"
+
             className={inputClass}
           />
         </label>

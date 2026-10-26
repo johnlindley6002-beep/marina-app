@@ -101,6 +101,7 @@ export default function PersonCard({
               <div className="flex gap-2">
                 <input
                   id={`p${index}-family`}
+                  autoComplete="family-name"
                   type="text"
                   value={person.familyName}
                   onChange={(e) => update({ familyName: e.target.value })}
@@ -120,6 +121,7 @@ export default function PersonCard({
             <Field label={copy.givenNamesLabel} htmlFor={`p${index}-given`} required>
               <input
                 id={`p${index}-given`}
+                autoComplete="given-name"
                 type="text"
                 value={person.givenNames}
                 onChange={(e) => update({ givenNames: e.target.value })}
@@ -155,6 +157,7 @@ export default function PersonCard({
             <Field label={copy.dateOfBirthLabel} htmlFor={`p${index}-dob`} required>
               <input
                 id={`p${index}-dob`}
+                autoComplete="bday"
                 type="date"
                 value={person.dateOfBirth}
                 onChange={(e) => update({ dateOfBirth: e.target.value })}
@@ -175,6 +178,9 @@ export default function PersonCard({
             <Field label={copy.idNumberLabel} htmlFor={`p${index}-idnum`} required>
               <input
                 id={`p${index}-idnum`}
+                autoCapitalize="none"
+                autoComplete="off"
+                spellCheck={false}
                 type="text"
                 value={person.idNumber}
                 onChange={(e) => update({ idNumber: e.target.value })}

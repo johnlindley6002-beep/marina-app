@@ -173,20 +173,6 @@ export type FacilityKey =
   | "dryStorage"
   | "repairs";
 
-export const FACILITY_LABELS: Record<FacilityKey, string> = {
-  fuel: "Fuel dock",
-  water: "Water",
-  power: "Shore power",
-  travelLift: "70-tonne travel lift",
-  crane: "Crane",
-  pumpOut: "Pump-out",
-  laundry: "Laundry",
-  security24h: "24-hour security",
-  wifi: "Wifi",
-  dryStorage: "Dry storage",
-  repairs: "Repairs",
-};
-
 // Maps a countryCode to its flag asset. Add an entry here whenever a
 // marina in a new country is added.
 export const COUNTRY_FLAGS: Record<string, string> = {

@@ -20,6 +20,7 @@ export default function OwnerFields({ scope }: { scope: BoatScope }) {
         >
           <input
             id="owner-name"
+            autoComplete="name"
             type="text"
             value={draft.owner.fullName}
             onChange={(e) =>
@@ -36,6 +37,9 @@ export default function OwnerFields({ scope }: { scope: BoatScope }) {
         >
           <input
             id="owner-id"
+            autoCapitalize="none"
+            autoComplete="off"
+            spellCheck={false}
             type="text"
             value={draft.owner.idDocumentNumber}
             onChange={(e) =>
@@ -52,6 +56,7 @@ export default function OwnerFields({ scope }: { scope: BoatScope }) {
         >
           <select
             id="owner-residence"
+            autoComplete="country-name"
             value={draft.owner.countryOfResidence}
             onChange={(e) =>
               setDraft((d) => ({ ...d, owner: { ...d.owner, countryOfResidence: e.target.value } }))
@@ -69,6 +74,8 @@ export default function OwnerFields({ scope }: { scope: BoatScope }) {
         <Field label={copy.ownerTaxNumberLabel} htmlFor="owner-nif">
           <input
             id="owner-nif"
+            inputMode="numeric"
+            autoComplete="off"
             type="text"
             value={draft.owner.taxNumber}
             onChange={(e) =>
@@ -86,6 +93,7 @@ export default function OwnerFields({ scope }: { scope: BoatScope }) {
           >
             <input
               id="owner-address"
+              autoComplete="street-address"
               type="text"
               value={draft.owner.address}
               onChange={(e) =>
@@ -104,6 +112,9 @@ export default function OwnerFields({ scope }: { scope: BoatScope }) {
           <input
             id="owner-email"
             type="email"
+            inputMode="email"
+            autoCapitalize="none"
+            spellCheck={false}
             value={draft.owner.email}
             onChange={(e) =>
               setDraft((d) => ({ ...d, owner: { ...d.owner, email: e.target.value } }))
@@ -120,6 +131,8 @@ export default function OwnerFields({ scope }: { scope: BoatScope }) {
           <input
             id="owner-phone"
             type="tel"
+            inputMode="tel"
+            autoComplete="tel"
             value={draft.owner.phone}
             onChange={(e) =>
               setDraft((d) => ({ ...d, owner: { ...d.owner, phone: e.target.value } }))
@@ -149,6 +162,8 @@ export default function OwnerFields({ scope }: { scope: BoatScope }) {
           >
             <input
               id="owner-nipc"
+              inputMode="numeric"
+              autoComplete="off"
               type="text"
               value={draft.owner.companyTaxId}
               onChange={(e) =>

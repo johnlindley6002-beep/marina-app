@@ -27,7 +27,7 @@ export default function EmergencyNumbers({
               <span className="text-ink-soft">{phone.label}</span>
               <a
                 href={telHref(phone.number)}
-                className="inline-flex min-h-11 items-center font-medium text-ink underline underline-offset-4"
+                className="inline-flex min-h-11 min-w-11 items-center justify-end font-medium text-ink underline underline-offset-4"
               >
                 {phone.number}
               </a>

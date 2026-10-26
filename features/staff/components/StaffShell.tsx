@@ -22,7 +22,7 @@ export default function StaffShell({ children }: { children: ReactNode }) {
   const { user, signOut } = useAuth();
 
   return (
-    <div className="staff-shell min-h-screen bg-paper-deep">
+    <div className="staff-shell min-h-dvh bg-paper-deep">
       <div className="staff-topbar flex-wrap gap-y-2 py-2">
         <div className="flex min-w-0 items-center gap-4">
           <Link href="/staff/arrivals" className="shrink-0 text-sm font-semibold text-ink">

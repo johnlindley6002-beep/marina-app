@@ -3,7 +3,6 @@ import { siteConfig } from "@/data/site";
 export const copy = siteConfig.relet;
 export const inputClass = "field";
 export const labelClass = "field-label";
-export const errorClass = "field-error";
 
 export function Check({
   checked,

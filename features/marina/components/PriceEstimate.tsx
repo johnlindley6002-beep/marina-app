@@ -243,7 +243,12 @@ export default function PriceEstimate({
 
       <Disclosure label={copy.allRates} openLabel={copy.hideRates} className="mt-8">
         <h3 className="type-heading type-h3 mt-2 text-ink">{t.rates.heading}</h3>
-        <div className="mt-4 overflow-x-auto">
+        <div
+          className="mt-4 overflow-x-auto"
+          tabIndex={0}
+          role="region"
+          aria-label={t.rates.heading}
+        >
           <table className="w-full min-w-[480px] border-collapse text-left text-sm">
             <thead>
               <tr className="type-label border-b border-hairline">

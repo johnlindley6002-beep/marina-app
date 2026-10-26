@@ -97,6 +97,9 @@ export default function BoatIdentityFields({ scope }: { scope: BoatScope }) {
         <Field label={copy.callSignLabel} htmlFor="boat-callsign">
           <input
             id="boat-callsign"
+            autoCapitalize="none"
+            autoComplete="off"
+            spellCheck={false}
             type="text"
             value={draft.boatIdentity.callSign}
             onChange={(e) =>

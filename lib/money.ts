@@ -28,11 +28,5 @@ export function vatOnCents(netCents: Cents, vatRate: number): Cents {
   return percentOfCents(netCents, toBasisPoints(vatRate));
 }
 
-export function formatEur(cents: Cents, locale = "en-GB"): string {
-  return new Intl.NumberFormat(locale, { style: "currency", currency: "EUR" }).format(
-    fromCents(cents)
-  );
-}
-
 // Plain "€12.34" for places that show an amount held as euros.
 export const eur = (amount: number) => `€${amount.toFixed(2)}`;

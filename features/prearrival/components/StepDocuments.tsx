@@ -124,6 +124,7 @@ export default function StepDocuments({ draft, setDraft }: StepProps) {
                   <Field label={copy.insurerLabel} htmlFor="doc-insurer">
                     <input
                       id="doc-insurer"
+                      autoComplete="off"
                       type="text"
                       value={draft.documents.thirdPartyInsurance.insurer}
                       onChange={(e) =>

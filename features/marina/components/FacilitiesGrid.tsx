@@ -83,7 +83,7 @@ export default function FacilitiesGrid({ facilities }: { facilities: FacilityDet
             aria-modal="true"
             aria-labelledby="facility-dialog-title"
             onClick={(e) => e.stopPropagation()}
-            className="surface-lift max-h-[85vh] w-full max-w-md overflow-y-auto p-6 md:p-8"
+            className="surface-lift max-h-[85dvh] w-full max-w-md overflow-y-auto p-6 md:p-8"
           >
             <div className="flex items-start justify-between gap-4">
               <div className="flex items-center gap-3">

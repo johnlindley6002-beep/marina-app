@@ -338,7 +338,12 @@ function Ledger({ items }: { items: RelettingQueueItem[] }) {
   if (list.length === 0) return null;
 
   return (
-    <div className="mt-8 overflow-x-auto">
+    <div
+      className="mt-8 overflow-x-auto"
+      tabIndex={0}
+      role="region"
+      aria-label="Reletting requests"
+    >
       <table className="staff-table w-full text-left text-sm">
         <thead>
           <tr>
