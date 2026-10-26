@@ -2,11 +2,12 @@
 
 import { useMemo, type ReactNode } from "react";
 import { calculateQuote, checkBoatFit, type Marina } from "@/data/marinas";
-import { siteConfig } from "@/data/site";
 import { getSimulatedAvailability } from "@/features/marina/lib/simulatedAvailability";
 import { effectiveDeparture, isPlanReady, type StayPlan } from "@/features/marina/lib/stayPlan";
 import { formatLength } from "@/lib/units";
 import { Collapse } from "@/components/ui/Disclosure";
+import { useLanguage } from "@/components/providers/LanguageProvider";
+import { useFormat } from "@/components/providers/useFormat";
 import { useUnits } from "@/components/providers/UnitsProvider";
 
 type Tone = "yes" | "no" | "wait";
@@ -17,8 +18,6 @@ type Row = {
   headline: string;
   detail: ReactNode;
 };
-
-const eur = (n: number) => `€${n.toFixed(2)}`;
 
 function StatusIcon({ tone }: { tone: Tone }) {
   const path =
@@ -49,6 +48,9 @@ type Props = {
 // estimate is the same calculation as Your estimate below.
 export default function StayDecisionSummary({ marina, plan, stayLine, datesValid }: Props) {
   const { units } = useUnits();
+  const { t } = useLanguage();
+  const { money } = useFormat();
+  const d = t.stay.decision;
   const loa = Number(plan.loa);
   const beam = Number(plan.beam);
   const draft = Number(plan.draft);
@@ -81,147 +83,138 @@ export default function StayDecisionSummary({ marina, plan, stayLine, datesValid
   let fitRow: Row;
   if (fit === null) {
     fitRow = {
-      label: "Does my boat fit?",
+      label: d.fitQuestion,
       tone: "wait",
-      headline: "Not checked yet",
-      detail: "Enter length, beam and draft.",
+      headline: d.notCheckedYet,
+      detail: d.enterDimensions,
     };
   } else if (fit.fits) {
     fitRow = {
-      label: "Does my boat fit?",
+      label: d.fitQuestion,
       tone: "yes",
-      headline: "Yes, it fits",
-      detail: `Class ${fit.marinaClass} berth for ${formatLength(loa, units)}. Beam and draft are within the marina's limits.${
-        fit.marinaClass === "IX" ? " This is the mega-yacht allocation on the outer pontoon." : ""
+      headline: d.fitYes,
+      detail: `${d.fitDetail(fit.marinaClass, formatLength(loa, units))}${
+        fit.marinaClass === "IX" ? ` ${d.fitMegaYacht}` : ""
       }`,
     };
   } else {
     const reason =
       fit.reason === "length"
-        ? "Longer than the standard berths, so contact the marina."
+        ? d.reasonLength
         : fit.reason === "beam"
-          ? `Your beam of ${formatLength(beam, units)} is wider than the standard berth for your length, so contact the marina.`
-          : `Your draft of ${formatLength(draft, units, 1)} is deeper than the marina's ${formatLength(marina.berths.maxDraftM, units, 1)} maximum, so contact the marina.`;
-    fitRow = {
-      label: "Does my boat fit?",
-      tone: "no",
-      headline: "No, not on standard berths",
-      detail: reason,
-    };
+          ? d.reasonBeam(formatLength(beam, units))
+          : d.reasonDraft(
+              formatLength(draft, units, 1),
+              formatLength(marina.berths.maxDraftM, units, 1)
+            );
+    fitRow = { label: d.fitQuestion, tone: "no", headline: d.fitNo, detail: reason };
   }
 
   // ---- Is there space? ----
   let spaceRow: Row;
   if (doesNotFit) {
     spaceRow = {
-      label: "Is there space?",
+      label: d.spaceQuestion,
       tone: "wait",
-      headline: "Not checked",
-      detail: "Standard berths do not suit your boat.",
+      headline: d.notChecked,
+      detail: d.spaceNoFit,
     };
   } else if (!haveLoa || !datesValid) {
     spaceRow = {
-      label: "Is there space?",
+      label: d.spaceQuestion,
       tone: "wait",
-      headline: "Not checked yet",
-      detail: "Enter your dates and length overall.",
+      headline: d.notCheckedYet,
+      detail: d.enterDatesAndLength,
     };
   } else if (!availability || !availability.marinaClass) {
     spaceRow = {
-      label: "Is there space?",
+      label: d.spaceQuestion,
       tone: "wait",
-      headline: "Ask the marina",
-      detail: "Your length is outside the standard berth classes.",
+      headline: d.askMarina,
+      detail: d.outsideClasses,
     };
   } else if (availability.total === 0) {
     spaceRow = {
-      label: "Is there space?",
+      label: d.spaceQuestion,
       tone: "wait",
-      headline: "Ask the marina",
-      detail: `The illustrative plan does not show Class ${availability.marinaClass} berths yet. The marina confirms availability by email.`,
+      headline: d.askMarina,
+      detail: d.noPlan(availability.marinaClass),
     };
   } else if (availability.available > 0) {
     spaceRow = {
-      label: "Is there space?",
+      label: d.spaceQuestion,
       tone: "yes",
-      headline: "Yes, berths show as available",
-      detail: siteConfig.decision.availabilityNote,
+      headline: d.spaceYes,
+      detail: d.availabilityNote,
     };
   } else {
     spaceRow = {
-      label: "Is there space?",
+      label: d.spaceQuestion,
       tone: "no",
-      headline: "None shown for your size",
-      detail: siteConfig.decision.availabilityNote,
+      headline: d.spaceNone,
+      detail: d.availabilityNote,
     };
   }
 
   // ---- What will it cost? ----
   let costRow: Row;
   if (doesNotFit) {
-    costRow = {
-      label: "What will it cost?",
-      tone: "wait",
-      headline: "Ask the marina",
-      detail: "Contact the marina for a quote.",
-    };
+    costRow = { label: d.costQuestion, tone: "wait", headline: d.askMarina, detail: d.costContact };
   } else if (quote) {
     costRow = {
-      label: "What will it cost?",
+      label: d.costQuestion,
       tone: "yes",
       headline: plan.openEnded
-        ? `About ${eur(quote.estimatedTotalEur)} for the first night`
-        : `About ${eur(quote.estimatedTotalEur)}`,
+        ? d.costAboutFirstNight(money(quote.estimatedTotalEur))
+        : d.costAbout(money(quote.estimatedTotalEur)),
       detail: (
         <>
-          {plan.openEnded
-            ? "Nightly rate"
-            : `${quote.nights} night${quote.nights === 1 ? "" : "s"}`}
-          , Class {quote.marinaClass}, excluding {Math.round(marina.vatRate * 100)}% VAT and
-          utilities.{" "}
+          {d.costDetail(
+            plan.openEnded ? d.nightlyRate : d.nightsCount(quote.nights),
+            quote.marinaClass,
+            Math.round(marina.vatRate * 100)
+          )}{" "}
           <a
             href="#price-estimate"
             className="inline-flex min-h-11 items-center text-ink underline underline-offset-4"
           >
-            See the breakdown
+            {d.seeBreakdown}
           </a>
         </>
       ),
     };
   } else if (haveLoa && !availability?.marinaClass) {
     costRow = {
-      label: "What will it cost?",
+      label: d.costQuestion,
       tone: "wait",
-      headline: "Ask the marina",
-      detail: "Your length is outside the standard classes, so contact the marina for a quote.",
+      headline: d.askMarina,
+      detail: d.costOutsideClasses,
     };
   } else {
     costRow = {
-      label: "What will it cost?",
+      label: d.costQuestion,
       tone: "wait",
-      headline: "Not estimated yet",
-      detail: "Enter your dates and length overall.",
+      headline: d.notEstimatedYet,
+      detail: d.enterDatesAndLength,
     };
   }
 
   const rows = [fitRow, spaceRow, costRow];
 
   const ready = isPlanReady(plan);
-  const missing =
+  const prompt =
     !plan.arrival || !(plan.openEnded || plan.departure)
       ? haveLoa
-        ? "your dates"
-        : "your dates and length overall"
-      : "your length overall";
+        ? d.promptDates
+        : d.promptDatesAndLength
+      : d.promptLength;
 
   return (
     <div className="mt-6 border-t border-hairline pt-6" aria-live="polite">
-      {!ready ? (
-        <p className="text-sm text-ink-soft">Add {missing} to see fit, space and price.</p>
-      ) : null}
+      {!ready ? <p className="text-sm text-ink-soft">{prompt}</p> : null}
       <Collapse open={ready}>
         <p className="text-sm text-ink-soft">
-          <span className="field-label">Stay: </span>
+          <span className="field-label">{t.stay.plan.stayLabel}</span>
           {stayLine}
         </p>
         <ul className="mt-4 grid gap-x-8 gap-y-5 md:grid-cols-3">

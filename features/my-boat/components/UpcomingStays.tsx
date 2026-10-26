@@ -42,13 +42,20 @@ function Ring({ complete, total }: { complete: number; total: number }) {
   const fraction = total > 0 ? complete / total : 0;
   return (
     <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} aria-hidden="true">
-      <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="#B9C2C0" strokeWidth={stroke} />
       <circle
         cx={size / 2}
         cy={size / 2}
         r={r}
         fill="none"
-        stroke="#0A1A2F"
+        stroke="var(--stone)"
+        strokeWidth={stroke}
+      />
+      <circle
+        cx={size / 2}
+        cy={size / 2}
+        r={r}
+        fill="none"
+        stroke="var(--ink)"
         strokeWidth={stroke}
         strokeDasharray={c}
         strokeDashoffset={c * (1 - fraction)}

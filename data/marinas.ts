@@ -136,16 +136,10 @@ export function nightsBySeason(arrival: string, departure: string): Record<Seaso
   return counts;
 }
 
-// The fuel wording for the estimate: the marina's own per-litre prices when it
-// has supplied them, otherwise the general note.
-export function getFuelNote(marina: Marina): string {
-  const { diesel, ron95 } = marina.fuelPrices;
-  const parts: string[] = [];
-  if (diesel.value !== null) parts.push(`Diesel €${diesel.value.toFixed(3)}/L`);
-  if (ron95.value !== null) parts.push(`RON 95 €${ron95.value.toFixed(3)}/L`);
-  return parts.length > 0
-    ? `${parts.join(", ")}, billed at the fuel dock`
-    : marina.serviceFees.fuelNote;
+// The per-litre fuel prices the marina has supplied, or null for a fuel it has
+// not. The wording around them lives in the dictionary.
+export function getFuelPrices(marina: Marina): { diesel: number | null; ron95: number | null } {
+  return { diesel: marina.fuelPrices.diesel.value, ron95: marina.fuelPrices.ron95.value };
 }
 
 // The oldest confirmation date among the fuel prices on file, so the "Updated"
@@ -158,14 +152,12 @@ export function getFuelUpdated(marina: Marina): string | null {
   return dates[0] ?? null;
 }
 
-// Returns the marina's busy-period note when any night of the stay falls in a
-// busy month, otherwise null. A static indicator from data, not surge pricing.
-export function getDemandFlag(marina: Marina, arrival: string, departure: string): string | null {
-  if (!marina.demand) return null;
-  const { busyMonths, note } = marina.demand;
-  return nightDates(arrival, departure).some((night) => busyMonths.includes(monthOfIso(night)))
-    ? note
-    : null;
+// Whether any night of the stay falls in one of the marina's busy months. A
+// static indicator from data, not surge pricing.
+export function isBusyPeriod(marina: Marina, arrival: string, departure: string): boolean {
+  if (!marina.demand) return false;
+  const { busyMonths } = marina.demand;
+  return nightDates(arrival, departure).some((night) => busyMonths.includes(monthOfIso(night)));
 }
 
 export type FacilityKey =
@@ -224,12 +216,6 @@ export type ServiceFees = {
   wasteDisposalEur: { min: number; max: number };
   maxAmperage: number;
   amperageOptions: number[];
-  fuelNote: string;
-};
-
-export const SEASON_LABELS: Record<Season, string> = {
-  low: "Low season (Jan–Mar, Oct–Dec)",
-  high: "High season (Apr–Sep)",
 };
 
 export type QuoteAddOns = {
@@ -240,10 +226,10 @@ export type QuoteAddOns = {
   laundry: boolean;
 };
 
+// An extra on the estimate. Its wording comes from the dictionary, by kind.
 export type QuoteLine = {
-  label: string;
+  kind: "shorePower" | "water" | "pumpOut" | "fuel" | "laundry";
   amountEur: number | null;
-  note?: string;
 };
 
 export type Quote = {
@@ -289,37 +275,11 @@ export function calculateQuote(
 
   const fees = marina.serviceFees;
   const addOnLines: QuoteLine[] = [];
-  if (addOns.shorePower) {
-    addOnLines.push({
-      label: "Shore power",
-      amountEur: null,
-      note: `Metered, billed on consumption (up to ${fees.maxAmperage} A)`,
-    });
-  }
-  if (addOns.water) {
-    addOnLines.push({
-      label: "Water",
-      amountEur: null,
-      note: "Metered, billed on consumption",
-    });
-  }
-  if (addOns.pumpOut) {
-    addOnLines.push({
-      label: "Pump-out",
-      amountEur: fees.pumpOutEur,
-      note: "Per operation",
-    });
-  }
-  if (addOns.fuel) {
-    addOnLines.push({ label: "Fuel", amountEur: null, note: getFuelNote(marina) });
-  }
-  if (addOns.laundry) {
-    addOnLines.push({
-      label: "Laundry",
-      amountEur: null,
-      note: `Wash €${fees.laundryWashEur.toFixed(2)} / dry €${fees.laundryDryEur.toFixed(2)} per load, tokens from reception`,
-    });
-  }
+  if (addOns.shorePower) addOnLines.push({ kind: "shorePower", amountEur: null });
+  if (addOns.water) addOnLines.push({ kind: "water", amountEur: null });
+  if (addOns.pumpOut) addOnLines.push({ kind: "pumpOut", amountEur: fees.pumpOutEur });
+  if (addOns.fuel) addOnLines.push({ kind: "fuel", amountEur: null });
+  if (addOns.laundry) addOnLines.push({ kind: "laundry", amountEur: null });
 
   const estimatedTotalEur = fromCents(
     toCents(berthSubtotalEur) + addOnLines.reduce((s, l) => s + toCents(l.amountEur ?? 0), 0)
@@ -362,7 +322,7 @@ export type FuelPrices = {
 
 // Static busy-period flag for display only. It never changes a price.
 // busyMonths uses 1 (January) to 12 (December).
-export type DemandInfo = { busyMonths: number[]; note: string };
+export type DemandInfo = { busyMonths: number[] };
 
 // How a marina lets a holder's berth work while they are away, per its own
 // regulation. "none": reletting is not offered at all (e.g. Marina do Freixo).
@@ -542,7 +502,6 @@ const CASCAIS_SERVICE_FEES: ServiceFees = {
   maxAmperage: CASCAIS_MAX_AMPERAGE,
   amperageOptions: [16, 32],
   // Shown when no per-litre price has been supplied (see fuelPrices).
-  fuelNote: "Diesel / petrol, price at the fuel dock",
 };
 
 // TODO (owner to supply): mapPoint for wifi, security, waste and extras;
@@ -898,7 +857,6 @@ export const marinas: Marina[] = [
     // TODO (owner): confirm the busy months and wording with the marina.
     demand: {
       busyMonths: [7, 8],
-      note: "Busy period: peak summer, so availability may be tighter.",
     },
     // TODO (legal and marina): every value below is a placeholder. Set the real
     // share, fee and settlement with the marina, and have the tax note and the

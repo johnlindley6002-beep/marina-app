@@ -2,12 +2,7 @@
 
 export type VesselUse = "private" | "bareboat" | "crewed" | "commercial" | "";
 
-export const VESSEL_USE_LABELS: Record<Exclude<VesselUse, "">, string> = {
-  private: "Private pleasure",
-  bareboat: "Bareboat charter",
-  crewed: "Crewed charter",
-  commercial: "Commercial or company-owned",
-};
+import { useLanguage } from "@/components/providers/LanguageProvider";
 
 export type VesselUseValues = {
   vesselUse: VesselUse;
@@ -60,6 +55,8 @@ export default function VesselUseFields({
   disclaimer,
   onChange,
 }: Props) {
+  const { t } = useLanguage();
+  const copy = t.enquiry.use;
   const use = values.vesselUse;
   const commercial = isCommercialUse(use);
 
@@ -67,7 +64,7 @@ export default function VesselUseFields({
     <div>
       <label className="block text-sm">
         <span className={labelClass}>
-          Vessel use
+          {copy.label}
           <Required />
         </span>
         <select
@@ -77,27 +74,27 @@ export default function VesselUseFields({
           onChange={(e) => onChange("vesselUse", e.target.value as VesselUse)}
           className={`${inputClass} max-w-md`}
         >
-          {use === "" ? <option value="">Select…</option> : null}
-          {(Object.keys(VESSEL_USE_LABELS) as Exclude<VesselUse, "">[]).map((key) => (
+          {use === "" ? <option value="">{t.enquiry.select}</option> : null}
+          {(Object.keys(copy.types) as Exclude<VesselUse, "">[]).map((key) => (
             <option key={key} value={key}>
-              {VESSEL_USE_LABELS[key]}
+              {copy.types[key]}
             </option>
           ))}
         </select>
         <FieldError id="err-vesselUse" message={errors.vesselUse} />
       </label>
       <p id="vessel-use-help" className="mt-2 text-xs text-ink-muted">
-        Most visiting boats are private pleasure craft. Other choices ask for a few company details.
+        {copy.help}
       </p>
 
       {commercial ? (
         <div className="hairline-top mt-6 pt-6">
-          <h3 className="type-heading type-h3 text-ink">Commercial / charter details</h3>
+          <h3 className="type-heading type-h3 text-ink">{copy.commercialHeading}</h3>
 
           <div className="mt-4 grid gap-4 sm:grid-cols-2">
             <label className="block text-sm">
               <span className={labelClass}>
-                Operating entity
+                {copy.operatingEntity}
                 <Required />
               </span>
               <input
@@ -108,15 +105,13 @@ export default function VesselUseFields({
                 onChange={(e) => onChange("operatingEntity", e.target.value)}
                 className={inputClass}
               />
-              <span className="mt-1 block text-xs text-ink-muted">
-                The charter operator or owning company name.
-              </span>
+              <span className="mt-1 block text-xs text-ink-muted">{copy.operatingEntityHint}</span>
               <FieldError id="err-operatingEntity" message={errors.operatingEntity} />
             </label>
 
             <label className="block text-sm">
               <span className={labelClass}>
-                Company registration / VAT (NIF) number
+                {copy.companyRegistration}
                 <Required />
               </span>
               <input
@@ -135,15 +130,15 @@ export default function VesselUseFields({
 
           {use === "bareboat" ? (
             <p className="mt-4 text-sm text-ink-soft">
-              <span className={labelClass}>Responsible contracting party: </span>
-              the bareboat charterer, who is the skipper
-              {skipperName.trim() ? ` (${skipperName.trim()})` : " named in Skipper & contact"}.
+              <span className={labelClass}>{copy.contractingParty}</span>
+              {copy.bareboatParty}
+              {skipperName.trim() ? ` (${skipperName.trim()})` : copy.namedIn}.
             </p>
           ) : (
             <div className="mt-4 grid gap-4 sm:grid-cols-2">
               <label className="block text-sm">
                 <span className={labelClass}>
-                  Responsible contracting party, name
+                  {copy.contractName}
                   <Required />
                 </span>
                 <input
@@ -158,13 +153,13 @@ export default function VesselUseFields({
               </label>
               <label className="block text-sm">
                 <span className={labelClass}>
-                  Their role
+                  {copy.contractRole}
                   <Required />
                 </span>
                 <input
                   type="text"
                   value={values.contractRole}
-                  placeholder="For example operator or company representative"
+                  placeholder={copy.contractRolePlaceholder}
                   aria-invalid={!!errors.contractRole}
                   aria-describedby={errors.contractRole ? "err-contractRole" : undefined}
                   onChange={(e) => onChange("contractRole", e.target.value)}
@@ -179,7 +174,7 @@ export default function VesselUseFields({
             <div className="mt-4 grid gap-4 sm:grid-cols-2">
               <label className="block text-sm">
                 <span className={labelClass}>
-                  Professional crew on board
+                  {copy.professionalCrew}
                   <Required />
                 </span>
                 <input
@@ -198,7 +193,7 @@ export default function VesselUseFields({
               </label>
               <label className="block text-sm">
                 <span className={labelClass}>
-                  Guests / passengers on board
+                  {copy.guests}
                   <Required />
                 </span>
                 <input
@@ -227,7 +222,7 @@ export default function VesselUseFields({
                 className="mt-1"
               />
               <span>
-                Commercial third-party liability insurance is in place
+                {copy.insurance}
                 <Required />
               </span>
             </label>

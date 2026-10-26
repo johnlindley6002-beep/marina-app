@@ -203,10 +203,8 @@ export default function CascaisPageContent({
 
           {!formMounted ? (
             <div id="request-berth" className="hairline-top scroll-mt-24 pt-6">
-              <h2 className="type-heading type-h3 text-ink">Request a berth</h2>
-              <p className="mt-2 text-ink-soft">
-                Add your dates and length overall above to request a berth.
-              </p>
+              <h2 className="type-heading type-h3 text-ink">{t.marinaPage.page.requestBerth}</h2>
+              <p className="mt-2 text-ink-soft">{t.marinaPage.page.requestPrompt}</p>
             </div>
           ) : (
             <Collapse open={formOpen}>
@@ -228,7 +226,7 @@ export default function CascaisPageContent({
                 href="#contact-details"
                 className="inline-flex min-h-11 items-center text-ink underline underline-offset-4 hover:text-ink-2"
               >
-                General question? See the contact details
+                {t.marinaPage.page.generalQuestion}
               </a>
             </div>
           </div>
@@ -260,9 +258,9 @@ export default function CascaisPageContent({
       <section className="pb-10 md:pb-14">
         <div className="page-column">
           <div className="hairline-top flex flex-col gap-4 pt-8 sm:flex-row sm:items-center sm:justify-between">
-            <p className="type-heading type-h3 text-ink">Ready to plan your visit?</p>
+            <p className="type-heading type-h3 text-ink">{t.marinaPage.page.ready}</p>
             <a href="#plan-your-stay" className="btn-quiet">
-              Request a berth
+              {t.marinaPage.page.requestBerth}
             </a>
           </div>
         </div>

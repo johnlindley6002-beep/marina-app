@@ -1,4 +1,10 @@
 import type { FacilityKey } from "@/data/marinas";
+import type { enquiry } from "./locales/en/enquiry";
+import type { account } from "./locales/en/account";
+import type { myBoat } from "./locales/en/myBoat";
+import type { chrome } from "./locales/en/chrome";
+import type { marinaPage } from "./locales/en/marinaPage";
+import type { stay } from "./locales/en/stay";
 
 export type Locale = "en" | "pt" | "es" | "fr";
 
@@ -360,4 +366,10 @@ export type Dictionary = {
       authorityCsvBtn: string;
     };
   };
+  stay: typeof stay;
+  marinaPage: typeof marinaPage;
+  chrome: typeof chrome;
+  myBoat: typeof myBoat;
+  account: typeof account;
+  enquiry: typeof enquiry;
 };

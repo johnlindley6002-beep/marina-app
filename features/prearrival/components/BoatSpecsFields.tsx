@@ -5,13 +5,16 @@ import {
   type Propulsion,
   type VesselUseValue,
 } from "@/features/prearrival/lib/schema";
-import { VESSEL_USE_LABELS } from "@/features/marina/components/VesselUseFields";
 import LengthInput from "@/components/ui/LengthInput";
 import Field from "@/components/ui/Field";
+import { useLanguage } from "@/components/providers/LanguageProvider";
+import { useFormat } from "@/components/providers/useFormat";
 import type { BoatScope } from "./BoatScope";
 
 export default function BoatSpecsFields({ scope }: { scope: BoatScope }) {
   const { draft, setDraft, errors, copy, unit, marinaClass, rate } = scope;
+  const { t } = useLanguage();
+  const { money } = useFormat();
   return (
     <>
       <p className="mt-8 text-sm font-medium text-ink-soft">{copy.specificationsHeading}</p>
@@ -91,9 +94,7 @@ export default function BoatSpecsFields({ scope }: { scope: BoatScope }) {
       {marinaClass && rate ? (
         <p className="tabular mt-4 text-ink">
           <span className="chip mr-2">{copy.classLabel(marinaClass)}</span>
-          {copy.indicativeNightly(
-            `€${(rate.low * (draft.boatSpecs.isMultihull ? 2 : 1)).toFixed(2)}`
-          )}
+          {copy.indicativeNightly(money(rate.low * (draft.boatSpecs.isMultihull ? 2 : 1)))}
         </p>
       ) : null}
 
@@ -109,7 +110,7 @@ export default function BoatSpecsFields({ scope }: { scope: BoatScope }) {
           >
             {VESSEL_USES.map((use) => (
               <option key={use} value={use}>
-                {VESSEL_USE_LABELS[use]}
+                {t.enquiry.use.types[use]}
               </option>
             ))}
           </select>

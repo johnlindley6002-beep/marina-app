@@ -18,7 +18,7 @@ export default function Navbar() {
   // Owner mode has its own navigation, the way a host mode does elsewhere.
   const ownerMode = !!user && mode === "owner";
   const links = ownerMode
-    ? [{ href: "/owner", label: "My berth" }]
+    ? [{ href: "/owner", label: t.chrome.nav.ownerHome }]
     : [
         { href: "/marinas", label: t.nav.marinas },
         { href: "/my-boat", label: t.nav.myBoat },
@@ -54,7 +54,7 @@ export default function Navbar() {
           />
         </Link>
 
-        <nav className="hidden items-center gap-8 md:flex" aria-label="Main">
+        <nav className="hidden items-center gap-8 md:flex" aria-label={t.chrome.nav.main}>
           {links.map((link) => (
             <Link
               key={link.href}
@@ -105,7 +105,7 @@ export default function Navbar() {
       {menuOpen ? (
         <div className="border-t border-paper/10 md:hidden">
           <div className="page-column py-8">
-            <nav className="flex flex-col gap-6" aria-label="Main">
+            <nav className="flex flex-col gap-6" aria-label={t.chrome.nav.main}>
               {links.map((link) => (
                 <Link
                   key={link.href}

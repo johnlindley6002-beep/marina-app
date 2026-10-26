@@ -1,5 +1,6 @@
 "use client";
 
+import { useLanguage } from "@/components/providers/LanguageProvider";
 import { useRequestBerthForm, type RequestBerthProps } from "./useRequestBerthForm";
 import VisitSection from "./VisitSection";
 import BoatSection from "./BoatSection";
@@ -12,13 +13,12 @@ import SummaryPanel from "./SummaryPanel";
 
 export default function RequestBerthForm(props: RequestBerthProps) {
   const ctx = useRequestBerthForm(props);
+  const { t } = useLanguage();
   const { marina, formElRef, handleSubmit } = ctx;
   return (
     <div id="request-berth" className="surface-lift scroll-mt-24 p-6 sm:p-8 md:p-10">
-      <h2 className="type-heading type-h3 text-ink">Request a berth</h2>
-      <p className="mt-2 text-sm text-ink-muted">
-        Opens a pre-filled email to {marina.name}. Nothing is submitted to a server.
-      </p>
+      <h2 className="type-heading type-h3 text-ink">{t.enquiry.heading}</h2>
+      <p className="mt-2 text-sm text-ink-muted">{t.enquiry.intro(marina.name)}</p>
 
       <form ref={formElRef} onSubmit={handleSubmit} noValidate className="mt-8 space-y-12">
         <VisitSection ctx={ctx} />

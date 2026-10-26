@@ -7,6 +7,7 @@ import ChartLinework from "@/components/ui/ChartLinework";
 import FavouriteButton from "@/features/discovery/components/FavouriteButton";
 import FlagIcon from "@/components/ui/FlagIcon";
 import ShareButton from "@/components/ui/ShareButton";
+import { useLanguage } from "@/components/providers/LanguageProvider";
 import { useGallery } from "./PhotoGallery";
 
 const chipClass = "chip-dark";
@@ -16,6 +17,8 @@ const chipClass = "chip-dark";
 // adding the photo later moves nothing.
 export default function MarinaHero({ marina }: { marina: Marina }) {
   const { count, open } = useGallery();
+  const { t } = useLanguage();
+  const copy = t.marinaPage.hero;
   const photo = marina.heroImage;
   const { lat, lng } = marina.coordinates;
 
@@ -85,7 +88,7 @@ export default function MarinaHero({ marina }: { marina: Marina }) {
 
           <div className="mt-8 flex flex-wrap items-center gap-3">
             <a href="#plan-your-stay" className="btn-primary">
-              Request a berth
+              {copy.requestBerth}
             </a>
             <ShareButton title={marina.name} className={chipClass} />
             <a
@@ -109,21 +112,21 @@ export default function MarinaHero({ marina }: { marina: Marina }) {
                 <circle cx="10" cy="8" r="2" />
               </svg>
               <span className="leading-tight">
-                Show on the map
+                {copy.showOnMap}
                 <span className="tabular block text-xs text-white/80">
                   {formatCoordinates(lat, lng)}
                 </span>
-                <span className="sr-only"> (opens in a new tab)</span>
+                <span className="sr-only"> {copy.opensInNewTab}</span>
               </span>
             </a>
             {count > 0 ? (
               <button type="button" onClick={() => open(0)} className={chipClass}>
-                View gallery ({count})
+                {copy.viewGallery(count)}
               </button>
             ) : null}
           </div>
 
-          {!photo ? <p className="mt-6 text-xs text-white/70">Marina photo coming soon</p> : null}
+          {!photo ? <p className="mt-6 text-xs text-white/70">{copy.photoSoon}</p> : null}
         </div>
       </div>
     </section>

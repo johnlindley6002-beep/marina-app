@@ -1,4 +1,7 @@
+"use client";
+
 import type { Marina } from "@/data/marinas";
+import { useLanguage } from "@/components/providers/LanguageProvider";
 
 export const telHref = (number: string) => `tel:${number.replace(/[^\d+]/g, "")}`;
 
@@ -9,10 +12,11 @@ export default function EmergencyNumbers({
   marina: Marina;
   embedded?: boolean;
 }) {
+  const { t } = useLanguage();
   const { phones, vhf } = marina.emergency;
   const body = (
     <>
-      <h3 className="type-heading type-h3 text-ink">Emergency &amp; key numbers</h3>
+      <h3 className="type-heading type-h3 text-ink">{t.marinaPage.emergency.heading}</h3>
       <div className="mt-6 grid gap-8 sm:grid-cols-2">
         <ul className="space-y-3">
           {phones.map((phone) => (
@@ -37,7 +41,9 @@ export default function EmergencyNumbers({
               className="flex items-baseline justify-between gap-4 border-b border-hairline pb-3 text-sm"
             >
               <span className="text-ink-soft">{channel.label}</span>
-              <span className="font-medium text-ink">VHF channel {channel.channel}</span>
+              <span className="font-medium text-ink">
+                {t.marinaPage.emergency.vhfChannel(channel.channel)}
+              </span>
             </li>
           ))}
         </ul>

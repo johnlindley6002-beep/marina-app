@@ -1,1 +1,13 @@
-["Marinas", "Email", "Contact", "Documents", "Propulsion"]
+[
+  "Marinas",
+  "Email",
+  "Contact",
+  "Documents",
+  "Propulsion",
+  "Extras",
+  "Photos",
+  "Mode",
+  "Motor",
+  "Type",
+  "Catamaran"
+]

@@ -1,6 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import { useLanguage } from "@/components/providers/LanguageProvider";
 import Image from "next/image";
 import {
   createContext,
@@ -83,6 +84,8 @@ function gridClass(count: number): string {
 
 export default function PhotoGallery({ photos }: { photos: Photo[] }) {
   const { open } = useGallery();
+  const { t } = useLanguage();
+  const copy = t.marinaPage.gallery;
 
   if (photos.length === 0) return null;
 
@@ -94,7 +97,7 @@ export default function PhotoGallery({ photos }: { photos: Photo[] }) {
     <div>
       <div
         role="group"
-        aria-label="Photos"
+        aria-label={copy.photos}
         className={`flex snap-x snap-mandatory gap-3 overflow-x-auto md:grid md:h-[28rem] md:snap-none md:overflow-visible ${gridClass(count)}`}
       >
         {tiles.map((photo, i) => (
@@ -118,7 +121,7 @@ export default function PhotoGallery({ photos }: { photos: Photo[] }) {
               }
               className="object-cover"
             />
-            <span className="sr-only">Open photo: {photo.caption}</span>
+            <span className="sr-only">{copy.openPhoto(photo.caption)}</span>
             {hiddenCount > 0 && i === count - 1 ? (
               <span
                 aria-hidden="true"
@@ -132,7 +135,7 @@ export default function PhotoGallery({ photos }: { photos: Photo[] }) {
       </div>
 
       <button type="button" onClick={() => open(0)} className="btn-quiet mt-3">
-        {photos.length === 1 ? "View photo" : `View all ${photos.length} photos`}
+        {photos.length === 1 ? copy.viewPhoto : copy.viewAll(photos.length)}
       </button>
     </div>
   );

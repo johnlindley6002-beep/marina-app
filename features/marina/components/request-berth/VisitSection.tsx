@@ -1,36 +1,39 @@
 "use client";
 
 import { formatLength } from "@/lib/units";
+import { useLanguage } from "@/components/providers/LanguageProvider";
 import { inputClass, labelClass, errorClass, RequiredMark } from "./shared";
 import type { RequestBerthCtx } from "./useRequestBerthForm";
 
 export default function VisitSection({ ctx }: { ctx: RequestBerthCtx }) {
   const { errors, form, nights, setField, units } = ctx;
+  const { t } = useLanguage();
+  const copy = t.enquiry.visit;
   return (
     <>
       <fieldset>
-        <legend className="type-heading text-xl text-ink">Your visit</legend>
+        <legend className="type-heading text-xl text-ink">{copy.legend}</legend>
         <p className="mt-4 text-sm text-ink-soft">
-          <span className={labelClass}>Your stay: </span>
+          <span className={labelClass}>{copy.stay}</span>
           {form.arrival
-            ? `${form.arrival} → ${form.openEnded ? "open-ended" : form.departure || "-"}`
-            : "not set yet"}
-          {nights ? ` · ${nights} night${nights === 1 ? "" : "s"}` : ""}
-          {Number(form.loa) > 0 ? ` · length ${formatLength(Number(form.loa), units)}` : ""}
-          {Number(form.beam) > 0 ? `, beam ${formatLength(Number(form.beam), units)}` : ""}
-          {Number(form.draft) > 0 ? `, draft ${formatLength(Number(form.draft), units)}` : ""}
+            ? `${form.arrival} → ${form.openEnded ? copy.openEnded : form.departure || "-"}`
+            : copy.notSet}
+          {nights ? ` · ${copy.nights(nights)}` : ""}
+          {Number(form.loa) > 0 ? ` · ${copy.length(formatLength(Number(form.loa), units))}` : ""}
+          {Number(form.beam) > 0 ? `, ${copy.beam(formatLength(Number(form.beam), units))}` : ""}
+          {Number(form.draft) > 0 ? `, ${copy.draft(formatLength(Number(form.draft), units))}` : ""}
         </p>
         <p className="mt-1 text-xs text-ink-muted">
-          Edit them in{" "}
+          {copy.editIn}{" "}
           <a href="#plan-your-stay" className="text-ink underline underline-offset-4">
-            Plan your stay
+            {copy.planYourStay}
           </a>
           .
         </p>
         <div className="mt-4 grid max-w-md gap-4 sm:grid-cols-2">
           <label className="block text-sm">
             <span className={labelClass}>
-              ETA
+              {copy.eta}
               <RequiredMark />
             </span>
             <input
@@ -50,7 +53,7 @@ export default function VisitSection({ ctx }: { ctx: RequestBerthCtx }) {
 
           <label className="block text-sm">
             <span className={labelClass}>
-              ETD
+              {copy.etd}
               {!form.openEnded ? <RequiredMark /> : null}
             </span>
             <input

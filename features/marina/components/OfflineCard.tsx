@@ -9,6 +9,7 @@ import {
   type LastEnquiry,
 } from "@/features/marina/lib/tripStore";
 import { formatLength } from "@/lib/units";
+import { useLanguage } from "@/components/providers/LanguageProvider";
 import { useUnits } from "@/components/providers/UnitsProvider";
 import { telHref } from "./EmergencyNumbers";
 
@@ -20,6 +21,8 @@ export default function OfflineCard({
   embedded?: boolean;
 }) {
   const { units } = useUnits();
+  const { t } = useLanguage();
+  const copy = t.marinaPage.offline;
   const [enquiry, setEnquiry] = useState<LastEnquiry | null>(null);
   const [online, setOnline] = useState(true);
 
@@ -51,22 +54,20 @@ export default function OfflineCard({
       <div className={embedded ? "" : "page-column"}>
         <div className="flex flex-wrap items-baseline justify-between gap-3">
           <Heading className={`type-heading text-ink ${embedded ? "type-h3" : "type-h2"}`}>
-            Offline essentials
+            {copy.heading}
           </Heading>
           <p
             role="status"
             className={`text-xs font-medium ${online ? "text-ink-muted" : "text-ink"}`}
           >
-            {online ? "Online" : "You're offline, showing saved details"}
+            {online ? copy.online : copy.offline}
           </p>
         </div>
-        <p className="mt-2 max-w-2xl text-sm text-ink-soft">
-          Kept on this device, so they work without a signal.
-        </p>
+        <p className="mt-2 max-w-2xl text-sm text-ink-soft">{copy.kept}</p>
 
         <div className="mt-6 grid gap-6 md:grid-cols-2">
           <div className="hairline-top pt-6">
-            <h3 className="type-heading type-h3 text-ink">Contact &amp; VHF</h3>
+            <h3 className="type-heading type-h3 text-ink">{copy.contactVhf}</h3>
             <ul className="mt-3 space-y-2 text-sm text-ink-soft">
               <li>
                 <a
@@ -84,7 +85,7 @@ export default function OfflineCard({
                   {marina.email}
                 </a>
               </li>
-              <li>Hail on VHF channel {marina.vhfChannel}</li>
+              <li>{copy.hail(marina.vhfChannel)}</li>
               <li>
                 <a
                   href={marina.planImage.src}
@@ -92,46 +93,43 @@ export default function OfflineCard({
                   rel="noopener noreferrer"
                   className="inline-flex min-h-11 items-center text-ink underline underline-offset-4"
                 >
-                  Open the marina plan (image)
+                  {copy.planImage}
                 </a>
               </li>
             </ul>
           </div>
 
           <div className="hairline-top pt-6">
-            <h3 className="type-heading type-h3 text-ink">Your saved enquiry</h3>
+            <h3 className="type-heading type-h3 text-ink">{copy.savedEnquiry}</h3>
             {enquiry ? (
               <>
                 <ul className="mt-3 space-y-1 text-sm text-ink-soft">
+                  <li>{copy.arrival(enquiry.arrival, enquiry.eta)}</li>
                   <li>
-                    Arrival: {enquiry.arrival}
-                    {enquiry.eta ? ` (ETA ${enquiry.eta})` : ""}
+                    {copy.departure(
+                      enquiry.openEnded
+                        ? copy.openEnded
+                        : copy.departureTimes(enquiry.departure, enquiry.etd)
+                    )}
                   </li>
                   <li>
-                    Departure:{" "}
-                    {enquiry.openEnded
-                      ? "open-ended"
-                      : `${enquiry.departure}${enquiry.etd ? ` (ETD ${enquiry.etd})` : ""}`}
+                    {copy.boat(
+                      enquiry.boatName || "-",
+                      Number(enquiry.loa) > 0 ? formatLength(Number(enquiry.loa), units) : ""
+                    )}
                   </li>
-                  <li>
-                    Boat: {enquiry.boatName || "-"}
-                    {Number(enquiry.loa) > 0 ? `, ${formatLength(Number(enquiry.loa), units)}` : ""}
-                  </li>
-                  <li>Berth: {enquiry.berthId || "not selected"}</li>
+                  <li>{copy.berth(enquiry.berthId || copy.notSelected)}</li>
                 </ul>
                 <button
                   type="button"
                   onClick={clearLastEnquiry}
                   className="mt-2 inline-flex min-h-11 items-center text-sm text-ink-muted underline underline-offset-4 hover:text-error"
                 >
-                  Clear saved enquiry
+                  {copy.clear}
                 </button>
               </>
             ) : (
-              <p className="mt-3 text-sm text-ink-soft">
-                Nothing saved yet. When you send an enquiry, its dates, boat and berth are kept here
-                for offline use.
-              </p>
+              <p className="mt-3 text-sm text-ink-soft">{copy.nothing}</p>
             )}
           </div>
         </div>

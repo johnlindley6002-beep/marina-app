@@ -1,13 +1,17 @@
+"use client";
+
 import type { Marina } from "@/data/marinas";
+import { useLanguage } from "@/components/providers/LanguageProvider";
 import Disclosure from "@/components/ui/Disclosure";
 
 // A compact list of place names. Each opens to its one-line description.
 export default function NearbyPlaces({ marina }: { marina: Marina }) {
+  const { t } = useLanguage();
   if (marina.nearby.length === 0) return null;
   return (
     <div className="stack-lg">
       <hr className="mb-10 border-hairline" />
-      <h3 className="type-heading type-h3 text-ink">What&apos;s nearby</h3>
+      <h3 className="type-heading type-h3 text-ink">{t.marinaPage.about.nearby}</h3>
       <ul className="mt-4 max-w-2xl">
         {marina.nearby.map((place) => (
           <li key={place.name}>

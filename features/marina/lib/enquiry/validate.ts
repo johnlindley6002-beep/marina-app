@@ -1,93 +1,84 @@
 import { isCommercialUse } from "@/features/marina/components/VesselUseFields";
+import type { Dictionary } from "@/lib/i18n";
 import type { FormData } from "./types";
 
 export type Errors = Partial<Record<keyof FormData, string>> & { crew?: string };
 
-export function validate(form: FormData): Errors {
+export function validate(form: FormData, text: Dictionary["enquiry"]["errors"]): Errors {
   const errors: Errors = {};
 
-  if (!form.arrival) errors.arrival = "Choose your arrival date in Plan your stay.";
-  if (!form.eta) errors.eta = "Enter your expected arrival time, for example 15:30.";
+  if (!form.arrival) errors.arrival = text.arrival;
+  if (!form.eta) errors.eta = text.eta;
 
   if (!form.openEnded) {
-    if (!form.departure)
-      errors.departure = "Choose your departure date in Plan your stay, or tick open-ended stay.";
-    if (!form.etd) errors.etd = "Enter your expected departure time, for example 10:00.";
+    if (!form.departure) errors.departure = text.departure;
+    if (!form.etd) errors.etd = text.etd;
     if (form.arrival && form.departure && form.departure <= form.arrival) {
-      errors.departure =
-        "Departure must be after arrival. Choose a later departure date in Plan your stay.";
+      errors.departure = text.departureBefore;
     }
   }
 
-  if (!form.boatName.trim()) errors.boatName = "Enter your boat's name.";
-  if (!form.vesselType)
-    errors.vesselType = "Choose a vessel type: sail, motor, catamaran or other.";
-  if (!form.loa || Number(form.loa) <= 0)
-    errors.loa = "Enter your boat's length overall, for example 12.5.";
-  if (!form.beam || Number(form.beam) <= 0)
-    errors.beam = "Enter your boat's beam, for example 4.2.";
-  if (!form.draft || Number(form.draft) <= 0)
-    errors.draft = "Enter your boat's draft, for example 1.8.";
-  if (!form.flagCountry) errors.flagCountry = "Choose the country your boat is registered in.";
+  if (!form.boatName.trim()) errors.boatName = text.boatName;
+  if (!form.vesselType) errors.vesselType = text.vesselType;
+  if (!form.loa || Number(form.loa) <= 0) errors.loa = text.loa;
+  if (!form.beam || Number(form.beam) <= 0) errors.beam = text.beam;
+  if (!form.draft || Number(form.draft) <= 0) errors.draft = text.draft;
+  if (!form.flagCountry) errors.flagCountry = text.flagCountry;
 
-  if (!form.skipperName.trim()) errors.skipperName = "Enter the skipper's full name.";
-  if (!form.phone.trim())
-    errors.phone = "Enter a phone number the marina can reach you on, including the country code.";
+  if (!form.skipperName.trim()) errors.skipperName = text.skipperName;
+  if (!form.phone.trim()) errors.phone = text.phone;
   if (!form.email.trim()) {
-    errors.email = "Enter your email address so the marina can reply.";
+    errors.email = text.emailMissing;
   } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
-    errors.email = "Enter an email address like name@example.com.";
+    errors.email = text.emailInvalid;
   }
   if (!form.peopleOnBoard || Number(form.peopleOnBoard) <= 0) {
-    errors.peopleOnBoard = "Enter how many people will be on board (1 or more).";
+    errors.peopleOnBoard = text.peopleOnBoard;
   }
 
   if (form.shorePower && !form.amperage) {
-    errors.amperage = "Choose a shore power amperage in Price estimate & extras.";
+    errors.amperage = text.amperage;
   }
 
   if (!form.vesselUse) {
-    errors.vesselUse =
-      "Choose how the vessel will be used: private pleasure, charter or commercial.";
+    errors.vesselUse = text.vesselUse;
   } else if (isCommercialUse(form.vesselUse)) {
     if (!form.operatingEntity.trim()) {
-      errors.operatingEntity = "Enter the charter operator or owning company name.";
+      errors.operatingEntity = text.operatingEntity;
     }
     if (!form.companyRegistration.trim()) {
-      errors.companyRegistration = "Enter the company registration or VAT (NIF) number.";
+      errors.companyRegistration = text.companyRegistration;
     }
     if (form.vesselUse !== "bareboat") {
       if (!form.contractName.trim()) {
-        errors.contractName = "Enter the name of the responsible contracting party.";
+        errors.contractName = text.contractName;
       }
       if (!form.contractRole.trim()) {
-        errors.contractRole = "Enter their role, for example operator or company representative.";
+        errors.contractRole = text.contractRole;
       }
     }
     if (!form.insuranceConfirmed) {
-      errors.insuranceConfirmed =
-        "Tick to confirm commercial third-party liability insurance is in place.";
+      errors.insuranceConfirmed = text.insuranceConfirmed;
     }
     if (form.vesselUse === "crewed") {
       if (!(Number(form.professionalCrewCount) >= 1)) {
-        errors.professionalCrewCount = "Enter how many professional crew are on board (1 or more).";
+        errors.professionalCrewCount = text.professionalCrewCount;
       }
       if (!(Number(form.guestCount) >= 1)) {
-        errors.guestCount = "Enter how many guests or passengers are on board (1 or more).";
+        errors.guestCount = text.guestCount;
       }
     }
   }
 
-  if (!form.euStatus)
-    errors.euStatus = "Answer Yes or No so the marina knows which paperwork applies.";
+  if (!form.euStatus) errors.euStatus = text.euStatus;
   if (form.euStatus === "no") {
-    if (!form.lastPort.trim()) errors.lastPort = "Enter the port you are arriving from.";
-    if (!form.nextPort.trim()) errors.nextPort = "Enter the port you are heading to next.";
+    if (!form.lastPort.trim()) errors.lastPort = text.lastPort;
+    if (!form.nextPort.trim()) errors.nextPort = text.nextPort;
     const hasCompleteCrewRow = form.crew.some(
       (c) => c.fullName.trim() && c.nationality && c.role.trim()
     );
     if (!hasCompleteCrewRow) {
-      errors.crew = "Add at least one crew member with a name, nationality and role.";
+      errors.crew = text.crew;
     }
   }
 

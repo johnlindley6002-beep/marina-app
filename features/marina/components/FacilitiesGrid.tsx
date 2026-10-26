@@ -9,7 +9,7 @@ import { useUnits } from "@/components/providers/UnitsProvider";
 import FacilityIcon from "./facility-icons";
 
 export default function FacilitiesGrid({ facilities }: { facilities: FacilityDetail[] }) {
-  const { locale } = useLanguage();
+  const { locale, t } = useLanguage();
   const cl = contentLocale(locale);
   const { units } = useUnits();
   const dialogRef = useRef<HTMLDivElement>(null);
@@ -96,7 +96,7 @@ export default function FacilitiesGrid({ facilities }: { facilities: FacilityDet
                 ref={closeRef}
                 type="button"
                 onClick={() => setOpenId(null)}
-                aria-label="Close"
+                aria-label={t.marinaPage.facilitiesClose}
                 className="-mt-1 -mr-2 px-2 py-1 text-2xl leading-none text-ink-muted hover:text-ink"
               >
                 ×

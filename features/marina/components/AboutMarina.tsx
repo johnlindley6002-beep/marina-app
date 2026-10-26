@@ -18,11 +18,11 @@ export default function AboutMarina({ marina, description }: Props) {
   return (
     <section className="section-editorial">
       <div className="page-column">
-        <h2 className="type-statement text-ink">About {marina.name}</h2>
+        <h2 className="type-statement text-ink">{t.marinaPage.about.heading(marina.name)}</h2>
         <Disclosure
           previewLines={2}
-          label="Read more"
-          openLabel="Show less"
+          label={t.marinaPage.about.readMore}
+          openLabel={t.marinaPage.about.showLess}
           className="measure stack-md"
         >
           <p className="text-ink-soft">{description}</p>
@@ -38,7 +38,7 @@ export default function AboutMarina({ marina, description }: Props) {
         {photos.length > 0 ? (
           <div className="stack-lg">
             <hr className="mb-10 border-hairline" />
-            <h3 className="type-heading type-h3 mb-6 text-ink">Photos</h3>
+            <h3 className="type-heading type-h3 mb-6 text-ink">{t.marinaPage.about.photos}</h3>
             <PhotoGallery photos={photos} />
           </div>
         ) : null}

@@ -1,12 +1,16 @@
 "use client";
+
+import { useLanguage } from "@/components/providers/LanguageProvider";
 import type { RequestBerthCtx } from "./useRequestBerthForm";
 
 export default function ServicesSection({ ctx }: { ctx: RequestBerthCtx }) {
   const { form, setField } = ctx;
+  const { t } = useLanguage();
+  const copy = t.enquiry.services;
   return (
     <>
       <fieldset>
-        <legend className="type-heading text-xl text-ink">Services &amp; assistance</legend>
+        <legend className="type-heading text-xl text-ink">{copy.legend}</legend>
         <div className="mt-4 grid gap-3 sm:grid-cols-2">
           <label className="flex items-center gap-2 text-sm text-ink-soft">
             <input
@@ -14,7 +18,7 @@ export default function ServicesSection({ ctx }: { ctx: RequestBerthCtx }) {
               checked={form.helpMooring}
               onChange={(e) => setField("helpMooring", e.target.checked)}
             />
-            Help mooring on arrival
+            {copy.helpMooring}
           </label>
           <label className="flex items-center gap-2 text-sm text-ink-soft">
             <input
@@ -22,20 +26,20 @@ export default function ServicesSection({ ctx }: { ctx: RequestBerthCtx }) {
               checked={form.helpSlipping}
               onChange={(e) => setField("helpSlipping", e.target.checked)}
             />
-            Help slipping lines on departure
+            {copy.helpSlipping}
           </label>
         </div>
         <p className="mt-4 text-xs text-ink-muted">
-          Extras chosen in Price estimate &amp; extras:{" "}
+          {copy.extras}
           {[
-            form.shorePower ? `shore power${form.amperage ? ` (${form.amperage}A)` : ""}` : "",
-            form.water ? "water" : "",
-            form.pumpOut ? "pump-out" : "",
-            form.fuel ? "fuel" : "",
-            form.laundry ? "laundry" : "",
+            form.shorePower ? copy.shorePower(form.amperage) : "",
+            form.water ? copy.water : "",
+            form.pumpOut ? copy.pumpOut : "",
+            form.fuel ? copy.fuel : "",
+            form.laundry ? copy.laundry : "",
           ]
             .filter(Boolean)
-            .join(", ") || "none"}
+            .join(", ") || copy.none}
           .
         </p>
       </fieldset>

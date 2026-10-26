@@ -21,15 +21,15 @@ export default function KeyFactsStrip({ marina }: { marina: Marina }) {
       value: formatLength(marina.berths.maxDraftM, units),
     },
     {
-      label: "Min depth",
+      label: t.marinaPage.facts.minDepth,
       value: formatLength(marina.berths.minDepthM, units, 1),
     },
-    { label: "VHF", value: `Ch ${marina.vhfChannel}` },
+    { label: t.marinaPage.facts.vhf, value: t.marinaPage.facts.channelShort(marina.vhfChannel) },
     {
-      label: "Protection",
+      label: t.marinaPage.facts.protection,
       value: <ProtectionIndicator protection={marina.protection} />,
     },
-    { label: "Location", value: marina.location },
+    { label: t.marinaPage.facts.location, value: marina.location },
   ];
 
   return (
@@ -40,12 +40,16 @@ export default function KeyFactsStrip({ marina }: { marina: Marina }) {
           {facts.map((fact) => (
             <div
               key={fact.label}
-              className={fact.label === "Location" ? "col-span-2 sm:col-span-3 lg:col-span-1" : ""}
+              className={
+                fact.label === t.marinaPage.facts.location
+                  ? "col-span-2 sm:col-span-3 lg:col-span-1"
+                  : ""
+              }
             >
               <dt className="field-label">{fact.label}</dt>
               <dd
                 className={`tabular mt-1 font-medium text-ink ${
-                  fact.label === "Location" ? "text-base" : "text-lg"
+                  fact.label === t.marinaPage.facts.location ? "text-base" : "text-lg"
                 }`}
               >
                 {fact.value}

@@ -4,7 +4,6 @@ import { useEffect, useMemo, useState } from "react";
 import {
   boatFitsMarina,
   getPriceBand,
-  FACILITY_LABELS,
   type FacilityKey,
   type Marina,
   type PriceBand,
@@ -14,7 +13,7 @@ import BoatSwitcher from "@/features/my-boat/components/BoatSwitcher";
 import MarinaRow from "./MarinaRow";
 import LengthInput from "@/components/ui/LengthInput";
 import { useUnits } from "@/components/providers/UnitsProvider";
-import { withUnit } from "@/lib/units";
+
 import { useLanguage } from "@/components/providers/LanguageProvider";
 
 const inputClass = "field";
@@ -28,7 +27,7 @@ export default function CountryPageContent({
   countryName: string;
 }) {
   const { t } = useLanguage();
-  const { units } = useUnits();
+  const { label: unit } = useUnits();
 
   const [region, setRegion] = useState("");
   const [priceBand, setPriceBand] = useState<PriceBand | "">("");
@@ -101,13 +100,13 @@ export default function CountryPageContent({
           />
           <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <label className="block text-sm">
-              <span className={labelClass}>Region</span>
+              <span className={labelClass}>{t.chrome.discovery.region}</span>
               <select
                 value={region}
                 onChange={(e) => setRegion(e.target.value)}
                 className={inputClass}
               >
-                <option value="">Any</option>
+                <option value="">{t.chrome.discovery.any}</option>
                 {regions.map((r) => (
                   <option key={r} value={r}>
                     {r}
@@ -117,13 +116,13 @@ export default function CountryPageContent({
             </label>
 
             <label className="block text-sm">
-              <span className={labelClass}>Price band</span>
+              <span className={labelClass}>{t.chrome.discovery.priceBand}</span>
               <select
                 value={priceBand}
                 onChange={(e) => setPriceBand(e.target.value as PriceBand | "")}
                 className={inputClass}
               >
-                <option value="">Any</option>
+                <option value="">{t.chrome.discovery.any}</option>
                 {priceBands.map((band) => (
                   <option key={band} value={band}>
                     {band}
@@ -133,17 +132,17 @@ export default function CountryPageContent({
             </label>
 
             <label className="block text-sm">
-              <span className={labelClass}>{withUnit("Boat length (m)", units)}</span>
+              <span className={labelClass}>{t.chrome.discovery.boatLength(unit)}</span>
               <LengthInput valueM={loa} onChangeM={setLoa} className={inputClass} />
             </label>
 
             <div className="grid grid-cols-2 gap-2">
               <label className="block text-sm">
-                <span className={labelClass}>{withUnit("Beam (m)", units)}</span>
+                <span className={labelClass}>{t.stay.plan.beam(unit)}</span>
                 <LengthInput valueM={beam} onChangeM={setBeam} className={inputClass} />
               </label>
               <label className="block text-sm">
-                <span className={labelClass}>{withUnit("Draft (m)", units)}</span>
+                <span className={labelClass}>{t.stay.plan.draft(unit)}</span>
                 <LengthInput valueM={draft} onChangeM={setDraft} className={inputClass} />
               </label>
             </div>
@@ -151,7 +150,7 @@ export default function CountryPageContent({
 
           {availableFacilities.length > 0 ? (
             <div className="mt-4">
-              <span className={labelClass}>Facilities</span>
+              <span className={labelClass}>{t.chrome.discovery.facilities}</span>
               <div className="mt-2 flex flex-wrap gap-3">
                 {availableFacilities.map((key) => (
                   <label key={key} className="flex items-center gap-2 text-sm text-ink-soft">
@@ -160,7 +159,7 @@ export default function CountryPageContent({
                       checked={facilities.includes(key)}
                       onChange={() => toggleFacility(key)}
                     />
-                    {FACILITY_LABELS[key]}
+                    {t.facilities[key]}
                   </label>
                 ))}
               </div>
@@ -169,9 +168,7 @@ export default function CountryPageContent({
         </div>
 
         {filtered.length === 0 ? (
-          <p className="measure mt-10 text-ink-soft">
-            No marinas match these filters. Try loosening them.
-          </p>
+          <p className="measure mt-10 text-ink-soft">{t.chrome.discovery.noMatch}</p>
         ) : (
           <ul className="mt-10 max-w-3xl">
             {filtered.map((marina) => (

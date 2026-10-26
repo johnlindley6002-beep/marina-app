@@ -2,6 +2,7 @@
 
 import type { IndicativeQuote } from "@/features/prearrival/lib/pricing";
 import { useLanguage } from "@/components/providers/LanguageProvider";
+import { useFormat } from "@/components/providers/useFormat";
 import type { StepProps } from "./PreArrivalWizard";
 import Field from "@/components/ui/Field";
 
@@ -11,6 +12,7 @@ const AMP_OPTIONS = [0, 16, 32, 63] as const;
 
 export default function StepStay({ draft, setDraft, errors, quote }: Props) {
   const { t } = useLanguage();
+  const { money } = useFormat();
   const copy = t.preArrival.stay;
 
   function setServices(patch: Partial<typeof draft.stay.servicesWanted>) {
@@ -135,7 +137,7 @@ export default function StepStay({ draft, setDraft, errors, quote }: Props) {
                 {copy.lineLabel(
                   line.nights,
                   line.season === "low" ? copy.seasonLow : copy.seasonHigh,
-                  `€${line.rateEur.toFixed(2)}`
+                  money(line.rateEur)
                 )}
               </p>
             ))}
@@ -143,13 +145,10 @@ export default function StepStay({ draft, setDraft, errors, quote }: Props) {
               <p className="mt-1 text-xs text-ink-muted">{copy.multihullNote}</p>
             ) : null}
             <p className="tabular mt-3 text-sm text-ink-soft">
-              {copy.subtotalLine(
-                `€${quote.subtotalExVatEur.toFixed(2)}`,
-                `€${quote.vatEur.toFixed(2)}`
-              )}
+              {copy.subtotalLine(money(quote.subtotalExVatEur), money(quote.vatEur))}
             </p>
             <p className="tabular mt-1 text-2xl font-medium text-ink">
-              €{quote.totalIncVatEur.toFixed(2)}
+              {money(quote.totalIncVatEur)}
             </p>
           </>
         ) : (

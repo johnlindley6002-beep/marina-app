@@ -1,7 +1,6 @@
 "use client";
 
 import type { Marina } from "@/data/marinas";
-import { siteConfig } from "@/data/site";
 import { formatCoordinates } from "@/lib/geo";
 import { formatLength } from "@/lib/units";
 import { useLanguage } from "@/components/providers/LanguageProvider";
@@ -24,12 +23,13 @@ const valueClass = "mt-2 text-ink-soft";
 
 export default function ApproachInfo({ marina, arrivalInstructions, gettingThere }: Props) {
   const { t } = useLanguage();
+  const copy = t.marinaPage.approach;
   const { units } = useUnits();
 
   return (
     <section id="practical-info" className="section-editorial scroll-mt-20">
       <div className="page-column">
-        <h2 className="type-statement text-ink">Approach &amp; practical info</h2>
+        <h2 className="type-statement text-ink">{copy.heading}</h2>
 
         {/* The four essentials */}
         <div className="stack-md grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
@@ -46,11 +46,11 @@ export default function ApproachInfo({ marina, arrivalInstructions, gettingThere
             </p>
           </div>
           <div>
-            <p className={labelClass}>Minimum depth</p>
+            <p className={labelClass}>{copy.minDepth}</p>
             <p className={valueClass}>{formatLength(marina.berths.minDepthM, units, 1)}</p>
           </div>
           <div>
-            <p className={labelClass}>Protection</p>
+            <p className={labelClass}>{copy.protection}</p>
             <p className={valueClass}>
               <ProtectionIndicator protection={marina.protection} />
             </p>
@@ -61,7 +61,7 @@ export default function ApproachInfo({ marina, arrivalInstructions, gettingThere
         </div>
 
         <div className="mt-10 space-y-1">
-          <Disclosure label="More arrival details" openLabel="Fewer arrival details">
+          <Disclosure label={copy.moreArrival} openLabel={copy.fewerArrival}>
             <div className="pt-2 pb-4">
               <p className="measure text-ink-soft">{marina.entryNote}</p>
               <p className={`${labelClass} mt-6`}>{t.visiting.onArrival}</p>
@@ -85,7 +85,7 @@ export default function ApproachInfo({ marina, arrivalInstructions, gettingThere
             </div>
           </Disclosure>
 
-          <Disclosure label="Getting there" openLabel="Hide getting there">
+          <Disclosure label={copy.gettingThere} openLabel={copy.hideGettingThere}>
             <div className="grid gap-8 pt-2 pb-4 sm:grid-cols-2 lg:grid-cols-4">
               <div>
                 <p className={labelClass}>{t.visiting.byCar}</p>
@@ -114,15 +114,15 @@ export default function ApproachInfo({ marina, arrivalInstructions, gettingThere
 
         <div id="cancellation" className="stack-lg scroll-mt-24">
           <hr className="mb-10 border-hairline" />
-          <h3 className="type-heading type-h3 text-ink">Cancellation policy</h3>
+          <h3 className="type-heading type-h3 text-ink">{copy.cancellation}</h3>
           <p className="measure mt-3 text-ink-soft">{marina.cancellationPolicy}</p>
           <Disclosure
             hashId="privacy"
-            label="How your data is handled"
-            openLabel="Hide how your data is handled"
+            label={copy.dataHandled}
+            openLabel={copy.hideDataHandled}
             className="mt-4"
           >
-            <p className="measure pt-2 pb-2 text-ink-soft">{siteConfig.privacyNote}</p>
+            <p className="measure pt-2 pb-2 text-ink-soft">{t.chrome.privacyNote}</p>
           </Disclosure>
         </div>
 

@@ -37,7 +37,12 @@ ESLint is on 9.x because eslint-config-next 16 targets it; 9.x is marked depreca
 6. **"Copied!" is now "Copied"** on the enquiry summary.
 7. **Decoration removed (Phase 4).** No scroll reveal, no hero image drift on scroll (parallax), no hero load animation or image zoom, no photo zoom on hover, no chart-scale dividers between sections (now a plain hairline), no gradients on navy plates, and the chart linework survives only in the two heroes. The empty navy "resting band" shown when no photo is supplied is no longer rendered (it was a 30 rem blank block); with a photo it is unchanged.
 8. **Contact email on the home page was invisible** (navy text on a navy section). It is now paper-coloured.
-9. **Secondary text is slightly darker** where it used 60 or 65 percent ink (now the 70 percent floor that passes 4.5:1 on paper).
+9. **Emails to the marina are written in English or Portuguese** (Portuguese when the interface is Portuguese; Spanish and French visitors send English). Before, every email was English. All email wording now lives in lib/i18n/mail.ts.
+10. **Amounts, dates and plurals follow the language.** 12,50 € in Portuguese, Spanish and French, €12.50 in English. French counts 0 nights as singular, as French does.
+11. **Copy changes (Phase 5).** Examples: Send pre-arrival, Plus 23% VAT and utilities. Indicative price, confirmed by the marina., Does not fit your boat, Wi-Fi. The home About text no longer promises a calm morning on the water and now says what the product does. The simulated-availability notes now say Demo data. Sign out (mock) is Sign out; the dev-only banner still marks mock mode.
+12. **Portuguese terms.** Berth is posto de amarração, pre-arrival is registo prévio de chegada (not pre-check-in), the greeting in the email is Exmos. Senhores.
+13. **Spanish and French are now complete** (before, about a third of the pre-arrival form fell back to English). Spanish uses usted throughout, as Portuguese and French use the formal form.
+14. **Secondary text is slightly darker** where it used 60 or 65 percent ink (now the 70 percent floor that passes 4.5:1 on paper).
 
 ## Phases
 
@@ -46,7 +51,7 @@ ESLint is on 9.x because eslint-config-next 16 targets it; 9.x is marked depreca
 - [x] Phase 2 tooling
 - [x] Phase 3 architecture
 - [x] Phase 4 design system
-- [ ] Phase 5 copy and i18n
+- [x] Phase 5 copy and i18n
 - [ ] Phase 6 accessibility and mobile
 - [ ] Phase 7 performance and PWA
 - [ ] Phase 8 tests
@@ -92,7 +97,16 @@ Audit written to AUDIT.md with a ranked top 20.
 - **Safe area.** viewport-fit=cover, and the contact dock, the pre-arrival sticky bar, the footer and the dev switcher clear the home indicator.
 - **Before and after screenshots** of 17 routes at 375, 768 and 1280 are in docs/audit/screens (scripts/screens.mjs). No horizontal overflow at any size.
 
+### Phase 5
+
+- **Dictionaries.** 4 languages, 1,000+ keys, one folder per language and one file per area. All four are complete and typed; scripts/check-i18n.mjs (in npm run check) fails on a missing or extra key, an unused key and a Portuguese, Spanish or French value identical to English, except the shared words in scripts/i18n-same-as-english.json.
+- **New areas moved into the dictionary:** stay planning, estimate, recap, document wallet and arrival actions; marina page blocks (hero, practical info, contact, emergency, fuel, offline, reviews, gallery); app shell (menus, gate, share, filters); My boat; account; the whole enquiry form with its validation messages. Quote lines no longer carry English text (kind only); the busy-period note is a generic dictionary line.
+- **Formatting.** lib/i18n/format.ts (pt-PT, es-ES, fr-FR, en-GB tags, plural rules through Intl.PluralRules, 24-hour times, euro formatting) and the useFormat hook.
+- **Real data only.** The Google reviews block already renders nothing below 15 reviews or with no rating; it is unchanged. Simulated availability and the sample account notes are labelled demo.
+
 ## Deferred
+
+- **Phase 5, not done.** (a) The owner reletting wizard, ledger and calendar and the copy in data/site.ts (siteConfig.relet), about 90 strings: the file itself says the wording needs legal review, so translating it first would translate text that may change. (b) The staff back office (about 130 strings): English only, a marina staff tool; say if you want it in Portuguese. (c) Marina-supplied prose outside description, arrival and getting-there (location, entry note, protection reason, cancellation policy, checklist, emergency labels, nearby places) is English only; the data model has no pt, es or fr slot for it and the marina should supply it. (d) Country names in selects stay in English (the stored value is the English name the rules use; showing a translated name needs a name to ISO table). (e) Page titles and meta descriptions are English (no per-language routes). (f) Three labels inside BerthAvailabilityMap (Owner away, Out of service, the map aria-label), because its internals are off limits. (g) Dev tools.
 
 - **Phase 4, not done, on purpose.** Button, TextField, Select, Badge and EmptyState as React components: the app already has one CSS source for each (the btn, field, staff-btn, staff-badge and staff-empty classes) used 20 to 120 times, and wrapping them would add no behaviour for a large diff. Sheet, Dialog, Toast, Skeleton, IconButton, Card and ListRow were not built because no screen needs them yet (an unused primitive is dead code). Titillium Web and the accent #1e3a5f were not adopted (see Decisions). Status colours (success, warning, info) were not added: the product conveys status with words, ink, brass and one error red, and nothing would use them. Dark mode was never intended (no dark styles existed), so it was not added. Staff pages keep their own denser heading style on purpose. The berth map keeps its own greys and navy classes because its internals are off limits.
 

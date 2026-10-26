@@ -134,7 +134,7 @@ export default function PersonCard({
                   onChange={(e) => update({ nationality: e.target.value })}
                   className="field"
                 >
-                  <option value="">Select…</option>
+                  <option value="">{t.enquiry.select}</option>
                   {COUNTRIES.map((c) => (
                     <option key={c} value={c}>
                       {c}
@@ -227,7 +227,7 @@ export default function PersonCard({
                     onChange={(e) => update({ idIssuingState: e.target.value })}
                     className="field"
                   >
-                    <option value="">Select…</option>
+                    <option value="">{t.enquiry.select}</option>
                     {COUNTRIES.map((c) => (
                       <option key={c} value={c}>
                         {c}

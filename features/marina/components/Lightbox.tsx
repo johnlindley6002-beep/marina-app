@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useRef, type KeyboardEvent, type PointerEvent } from "react";
+import { useLanguage } from "@/components/providers/LanguageProvider";
 import type { Photo } from "./PhotoGallery";
 
 type Props = {
@@ -19,6 +20,8 @@ const controlClass =
 // A full-screen viewer on the native dialog element: it traps focus, closes
 // on Escape and makes the page behind it inert without any library.
 export default function Lightbox({ photos, index, onIndexChange, onClose }: Props) {
+  const { t } = useLanguage();
+  const copy = t.marinaPage.gallery;
   const dialogRef = useRef<HTMLDialogElement>(null);
   const swipeStart = useRef<number | null>(null);
   const count = photos.length;
@@ -88,14 +91,14 @@ export default function Lightbox({ photos, index, onIndexChange, onClose }: Prop
   return (
     <dialog
       ref={dialogRef}
-      aria-label="Photo gallery"
+      aria-label={copy.dialog}
       onKeyDown={onKeyDown}
       className="on-ink fixed inset-0 m-0 h-full max-h-none w-full max-w-none border-0 bg-ink p-0 text-white backdrop:bg-ink"
     >
       <div className="flex h-full flex-col">
         <div className="flex items-center justify-between gap-4 px-4 py-3 sm:px-6">
           <p className="tabular text-sm text-white/80" aria-live="polite">
-            Photo {index + 1} of {count}
+            {copy.position(index + 1, count)}
           </p>
           <button type="button" onClick={onClose} className={controlClass}>
             <svg
@@ -108,7 +111,7 @@ export default function Lightbox({ photos, index, onIndexChange, onClose }: Prop
             >
               <path d="M4 4l12 12M16 4L4 16" strokeLinecap="round" />
             </svg>
-            <span className="sr-only">Close photo gallery</span>
+            <span className="sr-only">{copy.close}</span>
           </button>
         </div>
 
@@ -146,7 +149,7 @@ export default function Lightbox({ photos, index, onIndexChange, onClose }: Prop
                 >
                   <path d="M12.5 4l-6 6 6 6" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
-                <span className="sr-only">Previous photo</span>
+                <span className="sr-only">{copy.previous}</span>
               </button>
               <button
                 type="button"
@@ -163,7 +166,7 @@ export default function Lightbox({ photos, index, onIndexChange, onClose }: Prop
                 >
                   <path d="M7.5 4l6 6-6 6" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
-                <span className="sr-only">Next photo</span>
+                <span className="sr-only">{copy.next}</span>
               </button>
             </>
           ) : null}

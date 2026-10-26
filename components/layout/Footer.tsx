@@ -30,7 +30,7 @@ export default function Footer() {
           <p className="mt-5 max-w-xs text-sm leading-relaxed text-stone">{t.footer.tagline}</p>
         </div>
 
-        <nav aria-label="Footer">
+        <nav aria-label={t.chrome.nav.footer}>
           <p className="text-sm font-medium text-paper">{t.footer.product}</p>
           <ul className="mt-4 space-y-3">
             {links.map((link) => (

@@ -17,6 +17,12 @@ import { units } from "./units";
 import { dock } from "./dock";
 import { favourites } from "./favourites";
 import { preArrival } from "./preArrival";
+import { stay } from "./stay";
+import { marinaPage } from "./marinaPage";
+import { chrome } from "./chrome";
+import { myBoat } from "./myBoat";
+import { account } from "./account";
+import { enquiry } from "./enquiry";
 
 export const es: Dictionary = {
   nav,
@@ -37,4 +43,10 @@ export const es: Dictionary = {
   dock,
   favourites,
   preArrival,
+  stay,
+  marinaPage,
+  chrome,
+  myBoat,
+  account,
+  enquiry,
 };

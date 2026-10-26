@@ -3,25 +3,28 @@
 import { EMPTY_DOCUMENTS } from "@/features/my-boat/lib/boatProfile";
 import BoatSwitcher from "@/features/my-boat/components/BoatSwitcher";
 import DocumentWallet from "@/features/marina/components/DocumentWallet";
-import { formatEurShort } from "@/features/marina/lib/enquiry/summary";
+import { useFormat } from "@/components/providers/useFormat";
+import { useLanguage } from "@/components/providers/LanguageProvider";
 import type { RequestBerthCtx } from "./useRequestBerthForm";
 
 export default function DocumentsSection({ ctx }: { ctx: RequestBerthCtx }) {
   const { docs, form, includeDocs, marina, setDocs, setForm, setIncludeDocs } = ctx;
+  const { t } = useLanguage();
+  const { moneyCompact } = useFormat();
   return (
     <>
       <fieldset>
-        <legend className="type-heading text-xl text-ink">Document wallet</legend>
+        <legend className="type-heading text-xl text-ink">{t.enquiry.documents.legend}</legend>
         <DocumentWallet
           documents={docs}
           onChange={setDocs}
-          insuranceMinimumLabel={formatEurShort(marina.insuranceMinimumEur)}
+          insuranceMinimumLabel={moneyCompact(marina.insuranceMinimumEur)}
           arrival={form.arrival}
           includeInEnquiry={includeDocs}
           onIncludeChange={setIncludeDocs}
         />
         <BoatSwitcher
-          heading="Boats & documents: save this boat or switch to another"
+          heading={t.enquiry.documents.switcherHeading}
           current={{
             name: form.boatName,
             type: form.vesselType,

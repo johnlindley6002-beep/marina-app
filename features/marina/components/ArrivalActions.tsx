@@ -5,6 +5,8 @@ import type { Marina } from "@/data/marinas";
 import { useBoats } from "@/components/providers/BoatProvider";
 import { useLanguage } from "@/components/providers/LanguageProvider";
 import type { StayPlan } from "@/features/marina/lib/stayPlan";
+import { mailText } from "@/lib/i18n/mail";
+import { useFormat } from "@/components/providers/useFormat";
 
 type Props = {
   marina: Marina;
@@ -15,7 +17,10 @@ type Props = {
 const dash = (value: string) => (value.trim() ? value : "-");
 
 export default function ArrivalActions({ marina, plan, selectedBerthId }: Props) {
-  const { t } = useLanguage();
+  const { t, locale } = useLanguage();
+  const { time } = useFormat();
+  const m = mailText(locale);
+  const copy = t.stay.arrival;
   const { activeBoat } = useBoats();
   const boatName = activeBoat?.name ?? "";
   const boatType = activeBoat?.type ?? "";
@@ -30,64 +35,60 @@ export default function ArrivalActions({ marina, plan, selectedBerthId }: Props)
 
   function boatLines(): string[] {
     return [
-      `Boat: ${dash(boatName)}${boatType ? ` (${boatType})` : ""}`,
-      `Length overall: ${dash(plan.loa)} m`,
-      `Beam: ${dash(plan.beam)} m`,
-      `Draft: ${dash(plan.draft)} m`,
-      `Flag: ${dash(flag)}`,
-      `Home port: ${dash(homePort)}`,
-      `Berth: ${selectedBerthId ?? "not yet assigned"}`,
+      m.boat.boat(dash(boatName), boatType),
+      m.boat.length(dash(plan.loa)),
+      m.boat.beam(dash(plan.beam)),
+      m.boat.draft(dash(plan.draft)),
+      m.boat.flag(dash(flag)),
+      m.boat.homePort(dash(homePort)),
+      m.boat.berth(selectedBerthId ?? m.boat.berthNotAssigned),
     ];
   }
 
   function arrivingNow() {
-    const now = new Date().toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-    openMail(`Arriving now - ${boatName.trim() || "visiting vessel"}`, [
-      `ARRIVING NOW - ${marina.name.toUpperCase()}`,
+    const a = m.arrivingNow;
+    openMail(a.subject(boatName.trim() || a.visitingVessel), [
+      a.title(marina.name.toUpperCase()),
       "",
-      `ETA: now (sent at ${now} local time)`,
+      a.eta(time(new Date())),
       ...boatLines(),
-      "Skipper phone: (please add)",
+      a.skipperPhone,
       "",
       marina.outsideHoursInstructions,
     ]);
   }
 
   function digitalCheckIn() {
-    openMail(`Digital check-in - ${boatName.trim() || "visiting vessel"}`, [
-      `DIGITAL CHECK-IN - ${marina.name.toUpperCase()}`,
+    const c = m.digitalCheckIn;
+    openMail(c.subject(boatName.trim() || m.arrivingNow.visitingVessel), [
+      c.title(marina.name.toUpperCase()),
       "",
-      `Arrival: ${plan.arrival || "(to confirm)"}`,
-      `ETA: ${plan.eta || "(to confirm)"}`,
+      c.arrival(plan.arrival || c.toConfirm),
+      c.eta(plan.eta || c.toConfirm),
       ...boatLines(),
       "",
-      "SKIPPER",
-      "Full name: (please add)",
-      "Phone: (please add)",
-      "People on board: (please add)",
+      c.skipper,
+      c.fullName,
+      c.phone,
+      c.people,
       "",
-      "CREW LIST (one per line)",
-      "1. Full name, date of birth, nationality, passport number, role",
+      c.crewList,
+      c.crewListFormat,
       "",
-      "I will bring boat registration, third-party insurance certificate and the skipper's certificate of competence.",
+      c.bring,
     ]);
   }
 
   return (
     <div className="mt-10 border-t border-hairline pt-8">
-      <h3 className="type-heading type-h3 text-ink">Arriving today?</h3>
-      <p className="mt-2 text-sm text-ink-soft">
-        Each opens a pre-filled email to {marina.name}. Nothing is sent until you press send.
-      </p>
+      <h3 className="type-heading type-h3 text-ink">{copy.heading}</h3>
+      <p className="mt-2 text-sm text-ink-soft">{copy.intro(marina.name)}</p>
       <div className="mt-4 flex flex-wrap items-center gap-4">
         <button type="button" onClick={arrivingNow} className="btn-secondary">
-          I&apos;m arriving now
+          {copy.arrivingNow}
         </button>
         <button type="button" onClick={digitalCheckIn} className="btn-secondary">
-          Digital check-in
+          {copy.digitalCheckIn}
         </button>
         <Link
           href={`/marinas/${marina.countrySlug}/${marina.id}/pre-arrival`}

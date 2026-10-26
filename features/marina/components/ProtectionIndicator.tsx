@@ -1,5 +1,8 @@
+"use client";
+
 import type { Marina } from "@/data/marinas";
-import { PROTECTION_LEVELS, PROTECTION_SEGMENTS } from "@/features/marina/lib/protection";
+import { useLanguage } from "@/components/providers/LanguageProvider";
+import { PROTECTION_FILLED, PROTECTION_SEGMENTS } from "@/features/marina/lib/protection";
 
 type Props = {
   protection: Marina["protection"];
@@ -20,8 +23,10 @@ function Scale({ filled }: { filled: number }) {
 
 // The label and scale: for cards, the quick facts and the practical info.
 export default function ProtectionIndicator({ protection }: Props) {
-  const { label, filled } = PROTECTION_LEVELS[protection.level];
-  const spoken = `${label}, ${filled} out of ${PROTECTION_SEGMENTS}`;
+  const { t } = useLanguage();
+  const label = t.marinaPage.facts.levels[protection.level];
+  const filled = PROTECTION_FILLED[protection.level];
+  const spoken = t.marinaPage.approach.protectionSpoken(label, filled, PROTECTION_SEGMENTS);
 
   return (
     <span className="inline-flex items-center gap-2">
@@ -35,10 +40,11 @@ export default function ProtectionIndicator({ protection }: Props) {
 // The one-line reason behind the rating. It stays visible wherever the rating
 // is shown in full, because it is the safety point.
 export function ProtectionWhy({ protection }: Props) {
+  const { t } = useLanguage();
   return (
     <p className="measure text-ink-soft">
       {protection.description}{" "}
-      <span className="text-sm text-ink-muted">General guide, not a forecast.</span>
+      <span className="text-sm text-ink-muted">{t.marinaPage.approach.protectionNote}</span>
     </p>
   );
 }

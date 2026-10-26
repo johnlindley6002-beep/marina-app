@@ -4,6 +4,7 @@ import { getDocumentRequirements } from "@/features/prearrival/lib/documentRules
 import type { IndicativeQuote } from "@/features/prearrival/lib/pricing";
 import type { Flag } from "@/features/prearrival/lib/warnings";
 import { useLanguage } from "@/components/providers/LanguageProvider";
+import { useFormat } from "@/components/providers/useFormat";
 import type { StepProps } from "./PreArrivalWizard";
 import { WarningPanel } from "./WizardBits";
 
@@ -47,6 +48,7 @@ export default function StepReview({
   onSubmit,
 }: Props) {
   const { t } = useLanguage();
+  const { money } = useFormat();
   const copy = t.preArrival.review;
   const steps = t.preArrival.steps;
   const documentItems = t.preArrival.documents.items;
@@ -114,7 +116,7 @@ export default function StepReview({
           {draft.stay.requestedArrival || "-"} → {draft.stay.requestedDeparture || "-"}
         </p>
         {quote ? (
-          <p className="tabular mt-1 text-sm text-ink-soft">€{quote.totalIncVatEur.toFixed(2)}</p>
+          <p className="tabular mt-1 text-sm text-ink-soft">{money(quote.totalIncVatEur)}</p>
         ) : null}
       </div>
 

@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Archivo, Inter } from "next/font/google";
 import "./globals.css";
 import AppChrome from "@/components/layout/AppChrome";
+import SkipLink from "@/components/layout/SkipLink";
 import { AuthProvider } from "@/components/providers/AuthProvider";
 import DevPersonaSwitcher from "@/features/dev/components/DevPersonaSwitcher";
 import { BoatProvider } from "@/components/providers/BoatProvider";
@@ -44,13 +45,8 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${archivo.variable} ${inter.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col font-sans">
-        <a
-          href="#main"
-          className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[100] focus:bg-paper focus:px-4 focus:py-2 focus:text-ink"
-        >
-          Skip to content
-        </a>
         <LanguageProvider>
+          <SkipLink />
           <UnitsProvider>
             <BoatProvider>
               <AuthProvider>

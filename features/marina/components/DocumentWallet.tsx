@@ -1,6 +1,7 @@
 "use client";
 
 import Disclosure from "@/components/ui/Disclosure";
+import { useLanguage } from "@/components/providers/LanguageProvider";
 import type { BoatDocuments } from "@/features/my-boat/lib/boatProfile";
 
 const inputClass = "field";
@@ -24,6 +25,9 @@ export default function DocumentWallet({
   includeInEnquiry = false,
   onIncludeChange,
 }: Props) {
+  const { t } = useLanguage();
+  const copy = t.stay.wallet;
+
   function set<K extends keyof BoatDocuments>(key: K, value: string) {
     onChange({ ...documents, [key]: value });
   }
@@ -33,24 +37,15 @@ export default function DocumentWallet({
 
   return (
     <div>
-      <p className="mt-4 text-sm leading-relaxed text-ink-soft">
-        All optional. The documents themselves must be shown on arrival.
-      </p>
-      <Disclosure label="More about saving these details" openLabel="Hide">
-        <p className="pb-2 text-sm leading-relaxed text-ink-soft">
-          Save these details with your boat to reuse them next time, or leave any blank and give
-          them to the marina staff in person. Only the text is stored here, in this browser.
-        </p>
+      <p className="mt-4 text-sm leading-relaxed text-ink-soft">{copy.optional}</p>
+      <Disclosure label={copy.moreAbout} openLabel={copy.hide}>
+        <p className="pb-2 text-sm leading-relaxed text-ink-soft">{copy.moreAboutBody}</p>
       </Disclosure>
-      <p className="mt-2 text-xs text-ink-muted">
-        Bring: boat registration (Portugal requires originals, not laminated copies), proof of
-        third-party insurance (min {insuranceMinimumLabel}, certificate in Portuguese if possible),
-        and the skipper&apos;s certificate of competence.
-      </p>
+      <p className="mt-2 text-xs text-ink-muted">{copy.bring(insuranceMinimumLabel)}</p>
 
       <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <label className="block text-sm">
-          <span className={labelClass}>Registration number</span>
+          <span className={labelClass}>{copy.registrationNumber}</span>
           <input
             type="text"
             value={documents.registrationNumber}
@@ -59,7 +54,7 @@ export default function DocumentWallet({
           />
         </label>
         <label className="block text-sm">
-          <span className={labelClass}>Insurance provider</span>
+          <span className={labelClass}>{copy.insuranceProvider}</span>
           <input
             type="text"
             value={documents.insuranceProvider}
@@ -68,7 +63,7 @@ export default function DocumentWallet({
           />
         </label>
         <label className="block text-sm">
-          <span className={labelClass}>Insurance policy number</span>
+          <span className={labelClass}>{copy.insurancePolicy}</span>
           <input
             type="text"
             value={documents.insurancePolicy}
@@ -77,19 +72,17 @@ export default function DocumentWallet({
           />
         </label>
         <label className="block text-sm">
-          <span className={labelClass}>Insurance expiry</span>
+          <span className={labelClass}>{copy.insuranceExpiry}</span>
           <input
             type="date"
             value={documents.insuranceExpiry}
             onChange={(e) => set("insuranceExpiry", e.target.value)}
             className={inputClass}
           />
-          {expiresBeforeArrival ? (
-            <p className="field-error">This expires before your arrival date.</p>
-          ) : null}
+          {expiresBeforeArrival ? <p className="field-error">{copy.expiresBefore}</p> : null}
         </label>
         <label className="block text-sm">
-          <span className={labelClass}>Skipper&apos;s competence certificate</span>
+          <span className={labelClass}>{copy.competence}</span>
           <input
             type="text"
             value={documents.competenceCertificate}
@@ -98,7 +91,7 @@ export default function DocumentWallet({
           />
         </label>
         <label className="block text-sm">
-          <span className={labelClass}>VHF licence</span>
+          <span className={labelClass}>{copy.vhfLicence}</span>
           <input
             type="text"
             value={documents.vhfLicence}
@@ -115,7 +108,7 @@ export default function DocumentWallet({
             checked={includeInEnquiry}
             onChange={(e) => onIncludeChange(e.target.checked)}
           />
-          Include these details in my enquiry email
+          {copy.includeInEnquiry}
         </label>
       ) : null}
     </div>

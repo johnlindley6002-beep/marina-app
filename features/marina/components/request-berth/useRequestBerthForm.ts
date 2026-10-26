@@ -7,6 +7,7 @@ import {
   type BoatDocuments,
 } from "@/features/my-boat/lib/boatProfile";
 import { useBoats } from "@/components/providers/BoatProvider";
+import { useLanguage } from "@/components/providers/LanguageProvider";
 import { useUnits } from "@/components/providers/UnitsProvider";
 import { loadLastEnquiry, saveLastEnquiry } from "@/features/marina/lib/tripStore";
 import { submitEnquiry } from "@/lib/data";
@@ -36,6 +37,7 @@ export function useRequestBerthForm({
   rebookToken = 0,
 }: RequestBerthProps) {
   const { units } = useUnits();
+  const { locale, t } = useLanguage();
   const [localForm, setLocalForm] = useState<FormData>({
     arrival: "",
     eta: "",
@@ -226,8 +228,8 @@ export function useRequestBerthForm({
   }, [rebookToken, marina.id, setForm]);
 
   useEffect(() => {
-    if (submitted) setErrors(validate(form));
-  }, [form, submitted]);
+    if (submitted) setErrors(validate(form, t.enquiry.errors));
+  }, [form, submitted, t]);
 
   // After a failed submit, move focus to the first field that needs fixing,
   // or to the note that points at the Plan panel.
@@ -281,9 +283,8 @@ export function useRequestBerthForm({
   ).length;
 
   const planErrorLabels: string[] = [];
-  if (errors.arrival || errors.departure) planErrorLabels.push("dates");
-  if (errors.loa || errors.beam || errors.draft)
-    planErrorLabels.push("boat length, beam and draft");
+  if (errors.arrival || errors.departure) planErrorLabels.push(t.enquiry.planLabels.dates);
+  if (errors.loa || errors.beam || errors.draft) planErrorLabels.push(t.enquiry.planLabels.size);
 
   function setField<K extends keyof FormData>(key: K, value: FormData[K]) {
     setForm((f) => ({ ...f, [key]: value }));
@@ -310,14 +311,14 @@ export function useRequestBerthForm({
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setSubmitted(true);
-    const validationErrors = validate(form);
+    const validationErrors = validate(form, t.enquiry.errors);
     setErrors(validationErrors);
     if (Object.keys(validationErrors).length > 0) {
       setSubmitTick((n) => n + 1);
       return;
     }
 
-    const text = buildSummary(form, marina, nights, quote, includeDocs ? docs : null);
+    const text = buildSummary(form, marina, nights, quote, includeDocs ? docs : null, locale);
     if (rememberSkipper) {
       saveSkipper({
         name: form.skipperName.trim(),

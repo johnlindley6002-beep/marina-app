@@ -2,6 +2,7 @@
 
 import Disclosure from "@/components/ui/Disclosure";
 import VesselUseFields, { isCommercialUse } from "@/features/marina/components/VesselUseFields";
+import { useLanguage } from "@/components/providers/LanguageProvider";
 import { inputClass, labelClass, errorClass, RequiredMark } from "./shared";
 
 import type { RequestBerthCtx } from "./useRequestBerthForm";
@@ -9,10 +10,12 @@ import CrewList from "./CrewList";
 
 export default function VesselStatusSection({ ctx }: { ctx: RequestBerthCtx }) {
   const { errors, form, marina, setField, setForm } = ctx;
+  const { t } = useLanguage();
+  const copy = t.enquiry.status;
   return (
     <>
       <fieldset>
-        <legend className="type-heading text-xl text-ink">Vessel use and status</legend>
+        <legend className="type-heading text-xl text-ink">{copy.legend}</legend>
         <div className="mt-4">
           <VesselUseFields
             values={form}
@@ -25,7 +28,7 @@ export default function VesselStatusSection({ ctx }: { ctx: RequestBerthCtx }) {
         </div>
         <div className="hairline-top mt-8 pt-6" />
         <p className="text-sm text-ink-soft">
-          Is your vessel EU-flagged AND is all crew EU/Schengen, arriving from another EU port?
+          {copy.euQuestion}
           <RequiredMark />
         </p>
         <div className="mt-3 flex gap-3">
@@ -38,7 +41,7 @@ export default function VesselStatusSection({ ctx }: { ctx: RequestBerthCtx }) {
                 : "border border-hairline text-ink-soft hover:border-ink/40"
             }`}
           >
-            Yes
+            {copy.yes}
           </button>
           <button
             type="button"
@@ -49,7 +52,7 @@ export default function VesselStatusSection({ ctx }: { ctx: RequestBerthCtx }) {
                 : "border border-hairline text-ink-soft hover:border-ink/40"
             }`}
           >
-            No
+            {copy.no}
           </button>
         </div>
         {errors.euStatus ? (
@@ -71,7 +74,7 @@ export default function VesselStatusSection({ ctx }: { ctx: RequestBerthCtx }) {
             <div className="grid gap-4 sm:grid-cols-2">
               <label className="block text-sm">
                 <span className={labelClass}>
-                  Last port
+                  {copy.lastPort}
                   <RequiredMark />
                 </span>
                 <input
@@ -91,7 +94,7 @@ export default function VesselStatusSection({ ctx }: { ctx: RequestBerthCtx }) {
 
               <label className="block text-sm">
                 <span className={labelClass}>
-                  Next port
+                  {copy.nextPort}
                   <RequiredMark />
                 </span>
                 <input
@@ -114,8 +117,8 @@ export default function VesselStatusSection({ ctx }: { ctx: RequestBerthCtx }) {
 
             <Disclosure
               className="mt-4"
-              label="Border and customs notes"
-              openLabel="Hide border and customs notes"
+              label={copy.customsNotes}
+              openLabel={copy.hideCustomsNotes}
             >
               <div className="space-y-1 pb-2 text-xs text-ink-muted">
                 {[

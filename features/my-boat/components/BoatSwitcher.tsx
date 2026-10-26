@@ -5,6 +5,7 @@ import { useState } from "react";
 import type { SavedBoat } from "@/features/my-boat/lib/boatProfile";
 import { formatLength } from "@/lib/units";
 import { useBoats } from "@/components/providers/BoatProvider";
+import { useLanguage } from "@/components/providers/LanguageProvider";
 import { useUnits } from "@/components/providers/UnitsProvider";
 
 type Props = {
@@ -22,6 +23,8 @@ const labelClass = "field-label";
 export default function BoatSwitcher({ current, heading, onSelect }: Props) {
   const { boats, activeBoat, setActiveId, saveBoat } = useBoats();
   const { units } = useUnits();
+  const { t } = useLanguage();
+  const copy = t.myBoat.switcher;
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
 
@@ -43,20 +46,18 @@ export default function BoatSwitcher({ current, heading, onSelect }: Props) {
     const name = current.name.trim();
     if (!name) {
       setMessage(null);
-      setError("Give the boat a name to save it.");
+      setError(copy.errName);
       return;
     }
     if (!(Number(current.loa) > 0 && Number(current.beam) > 0 && Number(current.draft) > 0)) {
       setMessage(null);
-      setError("Enter the boat's length, beam and draft above, then save.");
+      setError(copy.errSizes);
       return;
     }
     const existing = boats.find((b) => b.name.trim().toLowerCase() === name.toLowerCase());
     saveBoat({ ...current, name, id: existing?.id });
     setError(null);
-    setMessage(
-      existing ? "Boat and documents updated." : "Boat and documents saved on this device."
-    );
+    setMessage(existing ? copy.updated : copy.savedMsg);
   }
 
   if (boats.length === 0 && !current) return null;
@@ -71,13 +72,13 @@ export default function BoatSwitcher({ current, heading, onSelect }: Props) {
       <div className="flex flex-wrap items-end gap-3">
         {boats.length > 0 ? (
           <label className="block min-w-[200px] flex-1 text-sm">
-            <span className={labelClass}>Saved boats</span>
+            <span className={labelClass}>{copy.savedBoats}</span>
             <select
               value={activeBoat?.id ?? ""}
               onChange={(e) => handleChange(e.target.value)}
               className={inputClass}
             >
-              <option value="">Choose a saved boat…</option>
+              <option value="">{copy.choose}</option>
               {boats.map((boat) => (
                 <option key={boat.id} value={boat.id}>
                   {boat.name}
@@ -90,11 +91,7 @@ export default function BoatSwitcher({ current, heading, onSelect }: Props) {
 
         {current ? (
           <button type="button" onClick={handleSave} className="btn-secondary">
-            {matchesSaved
-              ? "Update saved boat"
-              : boats.length > 0
-                ? "Save as new boat"
-                : "Save this boat"}
+            {matchesSaved ? copy.updateSaved : boats.length > 0 ? copy.saveAsNew : copy.saveThis}
           </button>
         ) : null}
 
@@ -102,7 +99,7 @@ export default function BoatSwitcher({ current, heading, onSelect }: Props) {
           href="/my-boat"
           className="inline-flex min-h-11 items-center px-2 text-sm font-medium text-ink underline underline-offset-4 hover:text-ink-2"
         >
-          Manage boats
+          {copy.manage}
         </Link>
       </div>
 

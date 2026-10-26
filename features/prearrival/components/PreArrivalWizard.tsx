@@ -22,6 +22,7 @@ import { getMissingRequiredDocuments } from "@/features/prearrival/lib/documentR
 import { getExtraErrors, getWarnings } from "@/features/prearrival/lib/warnings";
 import { calculateIndicativeQuote } from "@/features/prearrival/lib/pricing";
 import { useLanguage } from "@/components/providers/LanguageProvider";
+import { useFormat } from "@/components/providers/useFormat";
 import Confirmation from "./Confirmation";
 import StepBoat from "./StepBoat";
 import StepCrew from "./StepCrew";
@@ -42,6 +43,7 @@ export type StepProps = {
 
 export default function PreArrivalWizard({ marina }: { marina: Marina }) {
   const { t } = useLanguage();
+  const { money } = useFormat();
   const copy = t.preArrival;
   const searchParams = useSearchParams();
 
@@ -249,7 +251,7 @@ export default function PreArrivalWizard({ marina }: { marina: Marina }) {
                     {copy.page.nightsCount(quote.nights)}
                   </p>
                   <p className="tabular mt-1 text-2xl font-medium text-ink">
-                    €{quote.totalIncVatEur.toFixed(2)}
+                    {money(quote.totalIncVatEur)}
                   </p>
                   <p className="mt-1 text-xs text-ink-muted">{copy.stay.indicativeNote}</p>
                 </>
@@ -272,7 +274,7 @@ export default function PreArrivalWizard({ marina }: { marina: Marina }) {
             {copy.page.stepOf(step, TOTAL_STEPS)}
           </p>
           <p className="tabular text-right text-sm font-medium text-ink">
-            {quote ? `€${quote.totalIncVatEur.toFixed(2)}` : copy.stay.askMarina}
+            {quote ? money(quote.totalIncVatEur) : copy.stay.askMarina}
           </p>
         </div>
       </div>

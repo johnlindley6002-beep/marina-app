@@ -3,12 +3,8 @@
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/providers/AuthProvider";
 import type { Mode } from "@/lib/data";
+import { useLanguage } from "@/components/providers/LanguageProvider";
 import SegmentedControl from "./SegmentedControl";
-
-const OPTIONS: { value: Mode; label: string }[] = [
-  { value: "guest", label: "Guest" },
-  { value: "owner", label: "Owner" },
-];
 
 // The Guest / Owner switch. It renders only for a user who holds the owner
 // role, so a plain voyager never sees it.
@@ -23,6 +19,11 @@ export default function ModeSwitch({
 }) {
   const { canSwitchMode, mode, setMode } = useAuth();
   const router = useRouter();
+  const { t } = useLanguage();
+  const options: { value: Mode; label: string }[] = [
+    { value: "guest", label: t.chrome.mode.guest },
+    { value: "owner", label: t.chrome.mode.owner },
+  ];
 
   if (!canSwitchMode) return null;
 
@@ -35,8 +36,8 @@ export default function ModeSwitch({
 
   return (
     <SegmentedControl
-      label="Mode"
-      options={OPTIONS}
+      label={t.chrome.mode.label}
+      options={options}
       value={mode}
       onChange={choose}
       className={className}

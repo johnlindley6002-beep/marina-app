@@ -4,11 +4,13 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useAuth } from "@/components/providers/AuthProvider";
 import ModeSwitch from "@/components/ui/ModeSwitch";
+import { useLanguage } from "@/components/providers/LanguageProvider";
 
 const itemClass = "flex min-h-11 items-center text-paper transition-colors hover:text-stone";
 
 function MenuBody({ onNavigate, showSwitch }: { onNavigate: () => void; showSwitch: boolean }) {
   const { user, signOut } = useAuth();
+  const { t } = useLanguage();
   if (!user) return null;
   const isStaff = user.roles.includes("staff");
 
@@ -26,13 +28,13 @@ function MenuBody({ onNavigate, showSwitch }: { onNavigate: () => void; showSwit
       <ul className="py-1">
         <li>
           <Link href="/account" onClick={onNavigate} className={itemClass}>
-            Account
+            {t.chrome.account.account}
           </Link>
         </li>
         {isStaff ? (
           <li>
             <Link href="/staff" onClick={onNavigate} className={itemClass}>
-              Staff area
+              {t.chrome.account.staffArea}
             </Link>
           </li>
         ) : null}
@@ -45,7 +47,7 @@ function MenuBody({ onNavigate, showSwitch }: { onNavigate: () => void; showSwit
             }}
             className={`${itemClass} w-full text-left`}
           >
-            Sign out (mock)
+            {t.chrome.account.signOut}
           </button>
         </li>
       </ul>
@@ -63,6 +65,7 @@ export default function AccountMenu({
   onNavigate?: () => void;
 }) {
   const { ready, user, canSwitchMode } = useAuth();
+  const { t } = useLanguage();
   const [open, setOpen] = useState(false);
   const wrapRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
@@ -107,7 +110,7 @@ export default function AccountMenu({
         className="flex h-11 w-11 items-center justify-center rounded-full border border-stone/40 text-sm font-medium text-paper transition-colors hover:border-paper"
       >
         <span aria-hidden="true">{user.initials}</span>
-        <span className="sr-only">Account menu for {user.name}</span>
+        <span className="sr-only">{t.chrome.account.menuFor(user.name)}</span>
       </button>
       {open ? (
         <div

@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { useLanguage } from "@/components/providers/LanguageProvider";
 
 type Props = {
   title: string;
@@ -10,6 +11,7 @@ type Props = {
 // Native share on devices that have it, otherwise copies the page link.
 // The shared link is the page itself, without any dates or sizes typed in.
 export default function ShareButton({ title, className = "" }: Props) {
+  const { t } = useLanguage();
   const [status, setStatus] = useState("");
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -32,9 +34,9 @@ export default function ShareButton({ title, className = "" }: Props) {
     }
     try {
       await navigator.clipboard.writeText(url);
-      announce("Link copied");
+      announce(t.chrome.share.copied);
     } catch {
-      announce("Could not copy. Copy the address from your browser bar.");
+      announce(t.chrome.share.failed);
     }
   }
 
@@ -55,7 +57,9 @@ export default function ShareButton({ title, className = "" }: Props) {
             strokeLinejoin="round"
           />
         </svg>
-        <span>{status === "Link copied" ? "Link copied" : "Share"}</span>
+        <span>
+          {status === t.chrome.share.copied ? t.chrome.share.copied : t.chrome.share.share}
+        </span>
       </button>
       <span role="status" className="sr-only">
         {status}

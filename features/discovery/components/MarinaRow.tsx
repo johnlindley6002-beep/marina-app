@@ -6,6 +6,7 @@ import { MARINA_CLASS_ORDER, type Marina } from "@/data/marinas";
 import { formatLength } from "@/lib/units";
 import FavouriteButton from "./FavouriteButton";
 import { useLanguage } from "@/components/providers/LanguageProvider";
+import { useFormat } from "@/components/providers/useFormat";
 import ProtectionIndicator from "@/features/marina/components/ProtectionIndicator";
 import { useUnits } from "@/components/providers/UnitsProvider";
 
@@ -19,6 +20,7 @@ type Props = {
 
 export default function MarinaRow({ marina, search = "", highlighted, onHover }: Props) {
   const { t } = useLanguage();
+  const { money } = useFormat();
   const { units } = useUnits();
 
   const cheapest = Math.min(...MARINA_CLASS_ORDER.map((c) => marina.transientRates[c].low));
@@ -72,10 +74,10 @@ export default function MarinaRow({ marina, search = "", highlighted, onHover }:
             </div>
             <div>
               <dt className="text-sm text-ink-muted">{t.results.from}</dt>
-              <dd className="tabular font-medium text-ink">€{cheapest.toFixed(2)}</dd>
+              <dd className="tabular font-medium text-ink">{money(cheapest)}</dd>
             </div>
             <div>
-              <dt className="text-sm text-ink-muted">Protection</dt>
+              <dt className="text-sm text-ink-muted">{t.chrome.discovery.protection}</dt>
               <dd className="font-medium text-ink">
                 <ProtectionIndicator protection={marina.protection} />
               </dd>

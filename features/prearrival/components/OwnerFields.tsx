@@ -2,10 +2,12 @@
 
 import { COUNTRIES } from "@/lib/countries";
 import Field from "@/components/ui/Field";
+import { useLanguage } from "@/components/providers/LanguageProvider";
 import type { BoatScope } from "./BoatScope";
 
 export default function OwnerFields({ scope }: { scope: BoatScope }) {
   const { draft, setDraft, errors, copy } = scope;
+  const { t } = useLanguage();
   return (
     <>
       <p className="mt-8 text-sm font-medium text-ink-soft">{copy.ownerHeading}</p>
@@ -56,7 +58,7 @@ export default function OwnerFields({ scope }: { scope: BoatScope }) {
             }
             className="field"
           >
-            <option value="">Select…</option>
+            <option value="">{t.enquiry.select}</option>
             {COUNTRIES.map((c) => (
               <option key={c} value={c}>
                 {c}

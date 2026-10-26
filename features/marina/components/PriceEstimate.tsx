@@ -5,24 +5,22 @@ import {
   calculateQuote,
   classifyBoatLength,
   CLASS_LENGTH_RANGES,
-  getDemandFlag,
-  getFuelNote,
-  getFuelUpdated,
+  isBusyPeriod,
   MARINA_CLASS_ORDER,
-  SEASON_LABELS,
+  getFuelUpdated,
   type Marina,
 } from "@/data/marinas";
-import { siteConfig } from "@/data/site";
+import { addOnText, fuelText } from "@/features/marina/lib/addOnText";
 import { effectiveDeparture, isPlanReady, type StayPlan } from "@/features/marina/lib/stayPlan";
 import { toDisplay } from "@/lib/units";
 import { useLanguage } from "@/components/providers/LanguageProvider";
+import { useFormat } from "@/components/providers/useFormat";
 import Disclosure, { Collapse } from "@/components/ui/Disclosure";
 import LastUpdated from "@/components/ui/LastUpdated";
 import { useUnits } from "@/components/providers/UnitsProvider";
 
 const inputClass = "field max-w-[160px]";
 const labelClass = "field-label";
-const eur = (n: number) => `€${n.toFixed(2)}`;
 
 type Props = {
   marina: Marina;
@@ -40,7 +38,9 @@ export default function PriceEstimate({
   amperageError,
 }: Props) {
   const { t } = useLanguage();
+  const { money, moneyPrecise } = useFormat();
   const { units, label: unit } = useUnits();
+  const copy = t.stay.estimate;
 
   const loa = Number(plan.loa);
   const quote = useMemo(() => {
@@ -67,7 +67,7 @@ export default function PriceEstimate({
   const ready = isPlanReady(plan);
   const cheapestNightly = Math.min(...MARINA_CLASS_ORDER.map((c) => marina.transientRates[c].low));
   const fees = marina.serviceFees;
-  const demandNote = quote ? getDemandFlag(marina, plan.arrival, effectiveDeparture(plan)) : null;
+  const busy = quote ? isBusyPeriod(marina, plan.arrival, effectiveDeparture(plan)) : false;
 
   // One modular row per extra: a real checkbox, its price hint, and the fee
   // folds into the breakdown below as soon as it is ticked.
@@ -96,63 +96,56 @@ export default function PriceEstimate({
 
   return (
     <div>
-      <h2 className="type-heading type-h2 text-ink">Your estimate</h2>
+      <h2 className="type-heading type-h2 text-ink">{copy.heading}</h2>
 
       {!ready ? (
-        <p className="measure mt-3 text-ink-soft">
-          From {eur(cheapestNightly)} per night, depending on boat length and season. Add your dates
-          and length overall for your own estimate.
-        </p>
+        <p className="measure mt-3 text-ink-soft">{copy.fromLine(money(cheapestNightly))}</p>
       ) : null}
 
       <Collapse open={ready}>
         <fieldset className="mt-6">
-          <legend className={labelClass}>Extras</legend>
-          <p className="mt-1 text-xs text-ink-muted">
-            Pick what you need. Each one is added to the breakdown below.
-          </p>
+          <legend className={labelClass}>{copy.extras}</legend>
+          <p className="mt-1 text-xs text-ink-muted">{copy.extrasHint}</p>
           <div className="mt-3 grid gap-x-8 gap-y-3 sm:grid-cols-2">
             {extraRow(
               "shorePower",
-              "Shore power",
-              `Metered, billed on consumption (up to ${fees.maxAmperage} A)`,
+              copy.shorePower,
+              copy.shorePowerHint(fees.maxAmperage),
               plan.shorePower ? (
                 <div className="mt-2 ml-7">
                   <select
                     value={plan.amperage}
-                    aria-label="Shore power amperage"
+                    aria-label={copy.amperageLabel}
                     onChange={(e) => onPlanChange({ amperage: e.target.value })}
                     className={`${inputClass} mt-0`}
                   >
-                    <option value="">Amperage…</option>
+                    <option value="">{copy.amperagePlaceholder}</option>
                     {fees.amperageOptions.map((amps) => (
                       <option key={amps} value={String(amps)}>
-                        {amps}A
+                        {amps} A
                       </option>
                     ))}
                   </select>
                   {amperageError && !plan.amperage ? (
-                    <p className="field-error">
-                      Choose a shore power amperage, for example 16A or 32A.
-                    </p>
+                    <p className="field-error">{copy.amperageError}</p>
                   ) : null}
                 </div>
               ) : null
             )}
-            {extraRow("water", "Water", "Metered, billed on consumption")}
-            {extraRow("pumpOut", "Pump-out", `${eur(fees.pumpOutEur)} per operation`)}
+            {extraRow("water", copy.water, copy.waterHint)}
+            {extraRow("pumpOut", copy.pumpOut, copy.pumpOutHint(money(fees.pumpOutEur)))}
             {extraRow(
               "fuel",
-              "Fuel on arrival",
+              copy.fuel,
               <>
-                {getFuelNote(marina)}
+                {fuelText(copy, marina, moneyPrecise)}
                 <LastUpdated date={getFuelUpdated(marina)} className="mt-0.5 block" />
               </>
             )}
             {extraRow(
               "laundry",
-              "Laundry",
-              `Wash ${eur(fees.laundryWashEur)}, dry ${eur(fees.laundryDryEur)} per load, tokens from reception`
+              copy.laundry,
+              copy.laundryHint(money(fees.laundryWashEur), money(fees.laundryDryEur))
             )}
           </div>
         </fieldset>
@@ -161,21 +154,24 @@ export default function PriceEstimate({
           {quote ? (
             <>
               <p className="text-sm text-ink-soft">
-                Class {quote.marinaClass} berth ·{" "}
-                {plan.openEnded
-                  ? "nightly rate (open-ended stay)"
-                  : `${quote.nights} night${quote.nights === 1 ? "" : "s"}`}{" "}
-                ·{" "}
-                {quote.berthLines.length > 1
-                  ? "both seasons"
-                  : quote.berthLines[0]
-                    ? SEASON_LABELS[quote.berthLines[0].season]
-                    : ""}
-                {selectedBerthId ? ` · Berth ${selectedBerthId}` : ""}
+                {[
+                  copy.classBerth(quote.marinaClass),
+                  plan.openEnded
+                    ? copy.nightlyOpenEnded
+                    : t.stay.decision.nightsCount(quote.nights),
+                  quote.berthLines.length > 1
+                    ? t.stay.season.both
+                    : quote.berthLines[0]
+                      ? t.stay.season[quote.berthLines[0].season]
+                      : "",
+                  selectedBerthId ? copy.berthId(selectedBerthId) : "",
+                ]
+                  .filter(Boolean)
+                  .join(" · ")}
               </p>
-              {demandNote ? (
+              {busy ? (
                 <p className="mt-2 max-w-xl border-l-2 border-ink/40 pl-3 text-sm text-ink-soft">
-                  {demandNote}
+                  {copy.busyPeriod}
                 </p>
               ) : null}
               <table className="mt-3 w-full max-w-xl border-collapse text-left text-sm">
@@ -183,70 +179,69 @@ export default function PriceEstimate({
                   {quote.berthLines.map((line) => (
                     <tr key={line.season} className="border-b border-hairline text-ink-soft">
                       <td className="py-2 pr-4">
-                        {line.nights} night{line.nights === 1 ? "" : "s"} at {eur(line.rateEur)} per
-                        night
+                        {copy.nightsAtRate(line.nights, money(line.rateEur))}
                         <span className="block text-xs text-ink-muted">
-                          {SEASON_LABELS[line.season]}
+                          {t.stay.season[line.season]}
                         </span>
                       </td>
                       <td className="py-2 text-right font-medium text-ink">
-                        {eur(line.subtotalEur)}
+                        {money(line.subtotalEur)}
                       </td>
                     </tr>
                   ))}
                   {quote.berthLines.length > 1 || quote.addOnLines.length > 0 ? (
                     <tr className="border-b border-hairline text-ink-soft">
-                      <td className="py-2 pr-4">Berth subtotal</td>
+                      <td className="py-2 pr-4">{copy.berthSubtotal}</td>
                       <td className="py-2 text-right font-medium text-ink">
-                        {eur(quote.berthSubtotalEur)}
+                        {money(quote.berthSubtotalEur)}
                       </td>
                     </tr>
                   ) : null}
-                  {quote.addOnLines.map((line) => (
-                    <tr key={line.label} className="border-b border-hairline text-ink-soft">
-                      <td className="py-2 pr-4">
-                        {line.label}
-                        {line.note ? (
-                          <span className="block text-xs text-ink-muted">{line.note}</span>
-                        ) : null}
-                      </td>
-                      <td className="py-2 text-right font-medium text-ink">
-                        {line.amountEur !== null ? eur(line.amountEur) : "-"}
-                      </td>
-                    </tr>
-                  ))}
+                  {quote.addOnLines.map((line) => {
+                    const text = addOnText(copy, line.kind, marina, money, moneyPrecise);
+                    return (
+                      <tr key={line.kind} className="border-b border-hairline text-ink-soft">
+                        <td className="py-2 pr-4">
+                          {text.label}
+                          <span className="block text-xs text-ink-muted">{text.note}</span>
+                        </td>
+                        <td className="py-2 text-right font-medium text-ink">
+                          {line.amountEur !== null ? money(line.amountEur) : "-"}
+                        </td>
+                      </tr>
+                    );
+                  })}
                   <tr>
                     <td className="pt-3 pr-4 font-medium text-ink">
-                      {plan.openEnded ? "Estimated first night" : "Estimated total"}
+                      {plan.openEnded ? copy.totalFirstNight : copy.total}
                     </td>
                     <td className="pt-3 text-right text-base font-medium text-ink">
-                      {eur(quote.estimatedTotalEur)}
+                      {money(quote.estimatedTotalEur)}
                     </td>
                   </tr>
                 </tbody>
               </table>
               <p className="mt-3 text-xs text-ink-muted">
-                Excl. {Math.round(marina.vatRate * 100)}% VAT and utilities, estimate, confirm with
-                the marina.
+                {copy.vatNote(Math.round(marina.vatRate * 100))}
               </p>
               <div className="mt-6">
                 <a href="#request-berth" className="btn-primary">
-                  Request a berth
+                  {copy.requestBerth}
                 </a>
-                <p className="mt-2 text-sm text-ink-soft">{siteConfig.decision.requestNote}</p>
+                <p className="mt-2 text-sm text-ink-soft">{copy.requestNote}</p>
               </div>
             </>
           ) : (
             <p className="text-sm text-ink-soft">
               {loa > 0 && classifyBoatLength(loa) === null
-                ? "Your length is outside the standard berth classes, so contact the marina for a quote."
-                : "Enter your dates and boat length above to see a price estimate."}
+                ? copy.outsideClasses
+                : copy.enterDatesAndLength}
             </p>
           )}
         </div>
       </Collapse>
 
-      <Disclosure label="All berth rates" openLabel="Hide berth rates" className="mt-8">
+      <Disclosure label={copy.allRates} openLabel={copy.hideRates} className="mt-8">
         <h3 className="type-heading type-h3 mt-2 text-ink">{t.rates.heading}</h3>
         <div className="mt-4 overflow-x-auto">
           <table className="w-full min-w-[480px] border-collapse text-left text-sm">
@@ -266,8 +261,8 @@ export default function PriceEstimate({
                   <tr key={marinaClass} className="border-b border-hairline text-ink-soft">
                     <td className="py-3 pr-4 font-medium text-ink">{marinaClass}</td>
                     <td className="py-3 pr-4">{formatLengthRange(range.minM, range.maxM)}</td>
-                    <td className="py-3 pr-4">€{rate.low.toFixed(2)}</td>
-                    <td className="py-3">€{rate.high.toFixed(2)}</td>
+                    <td className="py-3 pr-4">{money(rate.low)}</td>
+                    <td className="py-3">{money(rate.high)}</td>
                   </tr>
                 );
               })}

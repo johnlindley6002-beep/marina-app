@@ -3,10 +3,12 @@
 import { COUNTRIES } from "@/lib/countries";
 import { buildPtIdentificationSet, NAVIGATION_ZONES } from "@/features/prearrival/lib/portugal";
 import Field from "@/components/ui/Field";
+import { useLanguage } from "@/components/providers/LanguageProvider";
 import type { BoatScope } from "./BoatScope";
 
 export default function BoatIdentityFields({ scope }: { scope: BoatScope }) {
   const { draft, setDraft, errors, copy, boats, chooseSaved, isPt } = scope;
+  const { t } = useLanguage();
   return (
     <>
       {boats.length > 0 ? (
@@ -84,7 +86,7 @@ export default function BoatIdentityFields({ scope }: { scope: BoatScope }) {
             }
             className="field"
           >
-            <option value="">Select…</option>
+            <option value="">{t.enquiry.select}</option>
             {COUNTRIES.map((c) => (
               <option key={c} value={c}>
                 {c}
@@ -143,7 +145,7 @@ export default function BoatIdentityFields({ scope }: { scope: BoatScope }) {
               }
               className="field"
             >
-              <option value="">Select…</option>
+              <option value="">{t.enquiry.select}</option>
               {NAVIGATION_ZONES.map((z) => (
                 <option key={z.value} value={z.value}>
                   {z.label}

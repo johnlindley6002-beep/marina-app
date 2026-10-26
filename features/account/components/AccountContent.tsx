@@ -2,9 +2,9 @@
 
 import Link from "next/link";
 import { useRef, useState, type FormEvent } from "react";
-import { siteConfig } from "@/data/site";
 import type { CurrentUser } from "@/lib/data";
 import { useAuth } from "@/components/providers/AuthProvider";
+import { useLanguage } from "@/components/providers/LanguageProvider";
 import PageHeader from "@/components/layout/PageHeader";
 import RoleGate from "@/components/layout/RoleGate";
 
@@ -16,6 +16,8 @@ type Errors = Partial<Record<"name" | "email", string>>;
 
 function ProfileForm({ user }: { user: CurrentUser }) {
   const { updateProfile } = useAuth();
+  const { t } = useLanguage();
+  const copy = t.account;
   const [name, setName] = useState(user.name);
   const [email, setEmail] = useState(user.email);
   const [phone, setPhone] = useState(user.phone);
@@ -26,9 +28,9 @@ function ProfileForm({ user }: { user: CurrentUser }) {
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const next: Errors = {};
-    if (!name.trim()) next.name = "Enter your name.";
+    if (!name.trim()) next.name = copy.errName;
     if (!/^\S+@\S+\.\S+$/.test(email.trim())) {
-      next.email = "Enter an email address like name@example.com.";
+      next.email = copy.errEmail;
     }
     setErrors(next);
     if (Object.keys(next).length > 0) {
@@ -43,7 +45,7 @@ function ProfileForm({ user }: { user: CurrentUser }) {
       email: email.trim(),
       phone: phone.trim(),
     });
-    setStatus(ok ? "Saved on this device." : "Could not save. Your browser is blocking storage.");
+    setStatus(ok ? copy.saved : copy.saveFailed);
   }
 
   const aria = (key: keyof Errors) => ({
@@ -55,7 +57,7 @@ function ProfileForm({ user }: { user: CurrentUser }) {
     <form ref={formRef} onSubmit={handleSubmit} noValidate>
       <div className="grid gap-4 sm:grid-cols-3">
         <label className="block text-sm">
-          <span className={labelClass}>Name</span>
+          <span className={labelClass}>{copy.name}</span>
           <input
             type="text"
             value={name}
@@ -71,7 +73,7 @@ function ProfileForm({ user }: { user: CurrentUser }) {
           ) : null}
         </label>
         <label className="block text-sm">
-          <span className={labelClass}>Email</span>
+          <span className={labelClass}>{copy.email}</span>
           <input
             type="email"
             value={email}
@@ -87,7 +89,7 @@ function ProfileForm({ user }: { user: CurrentUser }) {
           ) : null}
         </label>
         <label className="block text-sm">
-          <span className={labelClass}>Phone</span>
+          <span className={labelClass}>{copy.phone}</span>
           <input
             type="tel"
             value={phone}
@@ -99,7 +101,7 @@ function ProfileForm({ user }: { user: CurrentUser }) {
       </div>
       <div className="mt-6 flex flex-wrap items-center gap-4">
         <button type="submit" className="btn-primary">
-          Save changes
+          {copy.save}
         </button>
         <p role="status" className="min-h-6 text-sm font-medium text-ink">
           {status}
@@ -111,28 +113,29 @@ function ProfileForm({ user }: { user: CurrentUser }) {
 
 function AccountBody() {
   const { user, canSwitchMode } = useAuth();
+  const { t } = useLanguage();
   if (!user) return null;
-  const copy = siteConfig.accounts.roleCopy;
+  const copy = t.account;
 
   return (
     <div className="section">
       <div className="page-column page-reading">
-        <PageHeader title="Account" mock>
-          Signed in as {user.name}.
+        <PageHeader title={copy.title} mock>
+          {copy.signedInAs(user.name)}
         </PageHeader>
 
         <section className="stack-md" aria-labelledby="profile-heading">
           <h2 id="profile-heading" className="type-heading type-h2 text-ink">
-            Profile
+            {copy.profile}
           </h2>
           <div className="mt-6">
             {/* Keyed so switching account resets the form to that person. */}
             <ProfileForm key={user.id} user={user} />
           </div>
           <p className="measure mt-6 text-sm text-ink-muted">
-            The skipper details used to fill your enquiries are kept separately in{" "}
+            {copy.skipperNote}{" "}
             <Link href="/my-boat" className="underline underline-offset-4">
-              My boat
+              {t.nav.myBoat}
             </Link>
             .
           </p>
@@ -140,20 +143,20 @@ function AccountBody() {
 
         <section className="chapter" aria-labelledby="roles-heading">
           <h2 id="roles-heading" className="type-heading type-h2 text-ink">
-            Your roles
+            {copy.roles}
           </h2>
           <ul className="mt-4">
             {user.roles.map((role) => (
               <li key={role} className="hairline-top py-4 first:border-t-0">
-                <p className="type-heading type-h3 text-ink">{copy[role].title}</p>
-                <p className="measure mt-1 text-ink-soft">{copy[role].how}</p>
+                <p className="type-heading type-h3 text-ink">{copy.roleCopy[role].title}</p>
+                <p className="measure mt-1 text-ink-soft">{copy.roleCopy[role].how}</p>
               </li>
             ))}
           </ul>
 
-          <p className="type-label mt-6">How roles work</p>
+          <p className="type-label mt-6">{copy.howRolesWork}</p>
           <ul className="mt-2 space-y-1 text-sm text-ink-soft">
-            {siteConfig.accounts.rules.map((rule) => (
+            {copy.rules.map((rule) => (
               <li key={rule}>{rule}</li>
             ))}
           </ul>
@@ -161,13 +164,10 @@ function AccountBody() {
 
         {canSwitchMode ? (
           <section className="chapter">
-            <h2 className="type-heading type-h2 text-ink">Owner mode</h2>
-            <p className="measure mt-2 text-ink-soft">
-              Use the Guest and Owner switch in the top bar to move between booking as a guest and
-              managing the berth you hold.
-            </p>
+            <h2 className="type-heading type-h2 text-ink">{copy.ownerMode}</h2>
+            <p className="measure mt-2 text-ink-soft">{copy.ownerModeBody}</p>
             <Link href="/owner" className="btn-quiet mt-4">
-              Go to My berth
+              {copy.goToMyBerth}
             </Link>
           </section>
         ) : null}

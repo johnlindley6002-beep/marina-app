@@ -1,152 +1,149 @@
-import { SEASON_LABELS, type Marina, type Quote } from "@/data/marinas";
+import type { Marina, Quote } from "@/data/marinas";
 import { type BoatDocuments } from "@/features/my-boat/lib/boatProfile";
-import { isCommercialUse, VESSEL_USE_LABELS } from "@/features/marina/components/VesselUseFields";
-import { type FormData, type CrewMember, type PersonType, VESSEL_TYPE_LABELS } from "./types";
+import { isCommercialUse } from "@/features/marina/components/VesselUseFields";
+import { formatEuros } from "@/lib/i18n/format";
+import { mailText } from "@/lib/i18n/mail";
+import type { Locale } from "@/lib/i18n/types";
+import { type FormData, type CrewMember, type PersonType } from "./types";
 
-export function formatEurShort(amount: number): string {
-  if (amount >= 1_000_000) return `€${(amount / 1_000_000).toFixed(1)}M`;
-  if (amount >= 1_000) return `€${(amount / 1_000).toFixed(0)}K`;
-  return `€${amount}`;
-}
-
-export function formatEur(amount: number): string {
-  return `€${amount.toFixed(2)}`;
-}
-
+// The plain-text enquiry that opens in the visitor's email app, addressed to
+// the marina. It is written in English or Portuguese (see lib/i18n/mail.ts).
 export function buildSummary(
   form: FormData,
   marina: Marina,
   nights: number | null,
   quote: Quote | null,
-  docs: BoatDocuments | null
+  docs: BoatDocuments | null,
+  locale: Locale
 ): string {
+  const m = mailText(locale);
+  const e = m.enquiry;
+  const money = (amount: number) => formatEuros(amount, locale === "pt" ? "pt" : "en");
   const lines: string[] = [];
 
-  lines.push(`BERTH ENQUIRY - ${marina.name.toUpperCase()}`);
+  lines.push(e.title(marina.name.toUpperCase()));
   lines.push("");
 
-  lines.push("YOUR VISIT");
-  lines.push(`Arrival: ${form.arrival} (ETA ${form.eta})`);
+  lines.push(e.visit);
+  lines.push(e.arrival(form.arrival, form.eta));
   if (form.openEnded) {
-    lines.push("Departure: open-ended stay");
+    lines.push(e.departureOpen);
   } else {
-    lines.push(`Departure: ${form.departure} (ETD ${form.etd})`);
-    if (nights) lines.push(`Nights: ${nights}`);
+    lines.push(e.departure(form.departure, form.etd));
+    if (nights) lines.push(e.nights(nights));
   }
   lines.push("");
 
-  lines.push("YOUR BOAT");
-  lines.push(`Boat name: ${form.boatName}`);
-  lines.push(`Vessel type: ${form.vesselType ? VESSEL_TYPE_LABELS[form.vesselType] : ""}`);
-  lines.push(`Length overall: ${form.loa} m`);
-  lines.push(`Beam: ${form.beam} m`);
-  lines.push(`Draft: ${form.draft} m`);
-  lines.push(`Flag: ${form.flagCountry}`);
-  if (form.berthId.trim()) lines.push(`Selected berth: ${form.berthId}`);
+  lines.push(e.yourBoat);
+  lines.push(e.boatName(form.boatName));
+  lines.push(e.vesselType(form.vesselType ? m.vesselType[form.vesselType] : ""));
+  lines.push(m.boat.length(form.loa));
+  lines.push(m.boat.beam(form.beam));
+  lines.push(m.boat.draft(form.draft));
+  lines.push(m.boat.flag(form.flagCountry));
+  if (form.berthId.trim()) lines.push(e.selectedBerth(form.berthId));
   lines.push("");
 
-  lines.push("SKIPPER & CONTACT");
-  lines.push(`Skipper: ${form.skipperName}`);
-  lines.push(`Phone: ${form.phone}`);
-  lines.push(`Email: ${form.email}`);
-  if (form.homePort.trim()) lines.push(`Home port: ${form.homePort}`);
-  lines.push(`People on board: ${form.peopleOnBoard}`);
+  lines.push(e.skipperAndContact);
+  lines.push(e.skipper(form.skipperName));
+  lines.push(e.phone(form.phone));
+  lines.push(e.email(form.email));
+  if (form.homePort.trim()) lines.push(m.boat.homePort(form.homePort));
+  lines.push(e.people(form.peopleOnBoard));
   lines.push("");
 
   const services: string[] = [];
-  if (form.shorePower) services.push(`Shore power (${form.amperage}A)`);
-  if (form.water) services.push("Water");
-  if (form.helpMooring) services.push("Help mooring on arrival");
-  if (form.helpSlipping) services.push("Help slipping lines on departure");
-  if (form.pumpOut) services.push("Pump-out");
-  if (form.fuel) services.push("Fuel on arrival");
-  if (form.laundry) services.push("Laundry");
+  if (form.shorePower) services.push(e.shorePower(form.amperage));
+  if (form.water) services.push(e.water);
+  if (form.helpMooring) services.push(e.helpMooring);
+  if (form.helpSlipping) services.push(e.helpSlipping);
+  if (form.pumpOut) services.push(e.pumpOut);
+  if (form.fuel) services.push(e.fuel);
+  if (form.laundry) services.push(e.laundry);
   if (services.length > 0) {
-    lines.push("SERVICES NEEDED");
+    lines.push(e.servicesNeeded);
     lines.push(...services);
     lines.push("");
   }
 
   if (quote) {
-    lines.push("ESTIMATE (excl. VAT and utilities, to be confirmed by the marina)");
-    lines.push(`Berth class: ${quote.marinaClass}`);
+    const addOnNames = {
+      shorePower: e.shorePower(form.amperage),
+      water: e.water,
+      pumpOut: e.pumpOut,
+      fuel: e.fuel,
+      laundry: e.laundry,
+    };
+    lines.push(e.estimate);
+    lines.push(e.berthClass(quote.marinaClass));
     quote.berthLines.forEach((l) =>
-      lines.push(
-        `${l.nights} night(s) × ${formatEur(l.rateEur)} (${SEASON_LABELS[l.season]}) = ${formatEur(l.subtotalEur)}`
-      )
+      lines.push(e.berthLine(l.nights, money(l.rateEur), m.season[l.season], money(l.subtotalEur)))
     );
     quote.addOnLines.forEach((l) => {
-      const parts = [l.amountEur !== null ? formatEur(l.amountEur) : "", l.note ?? ""];
-      lines.push(`${l.label}: ${parts.filter(Boolean).join(" - ")}`);
+      lines.push(`${addOnNames[l.kind]}${l.amountEur !== null ? `: ${money(l.amountEur)}` : ""}`);
     });
-    lines.push(`Estimated total: ${formatEur(quote.estimatedTotalEur)}`);
+    lines.push(e.estimatedTotal(money(quote.estimatedTotalEur)));
     lines.push("");
   }
 
   if (docs) {
     const docLines = [
-      docs.registrationNumber && `Registration number: ${docs.registrationNumber}`,
-      docs.insuranceProvider && `Insurance provider: ${docs.insuranceProvider}`,
-      docs.insurancePolicy && `Insurance policy: ${docs.insurancePolicy}`,
-      docs.insuranceExpiry && `Insurance expiry: ${docs.insuranceExpiry}`,
-      docs.competenceCertificate && `Competence certificate: ${docs.competenceCertificate}`,
-      docs.vhfLicence && `VHF licence: ${docs.vhfLicence}`,
+      docs.registrationNumber && e.registrationNumber(docs.registrationNumber),
+      docs.insuranceProvider && e.insuranceProvider(docs.insuranceProvider),
+      docs.insurancePolicy && e.insurancePolicy(docs.insurancePolicy),
+      docs.insuranceExpiry && e.insuranceExpiry(docs.insuranceExpiry),
+      docs.competenceCertificate && e.competence(docs.competenceCertificate),
+      docs.vhfLicence && e.vhfLicence(docs.vhfLicence),
     ].filter(Boolean) as string[];
     if (docLines.length > 0) {
-      lines.push("DOCUMENTS (originals to be shown on arrival)");
+      lines.push(e.documents);
       lines.push(...docLines);
       lines.push("");
     }
   }
 
-  lines.push("VESSEL USE");
-  lines.push(`Use: ${form.vesselUse ? VESSEL_USE_LABELS[form.vesselUse] : ""}`);
+  lines.push(e.vesselUse);
+  lines.push(e.use(form.vesselUse ? m.vesselUse[form.vesselUse] : ""));
   lines.push("");
   if (isCommercialUse(form.vesselUse)) {
-    lines.push("COMMERCIAL / CHARTER DETAILS");
-    lines.push(`Operating entity: ${form.operatingEntity.trim()}`);
-    lines.push(`Company registration / VAT (NIF): ${form.companyRegistration.trim()}`);
+    lines.push(e.commercial);
+    lines.push(e.operatingEntity(form.operatingEntity.trim()));
+    lines.push(e.companyRegistration(form.companyRegistration.trim()));
     lines.push(
-      `Responsible contracting party: ${
-        form.vesselUse === "bareboat"
-          ? `${form.skipperName.trim()} (bareboat charterer, skipper)`
-          : `${form.contractName.trim()} (${form.contractRole.trim()})`
-      }`
+      form.vesselUse === "bareboat"
+        ? e.bareboatParty(form.skipperName.trim())
+        : e.otherParty(form.contractName.trim(), form.contractRole.trim())
     );
-    lines.push("Commercial third-party liability insurance: confirmed");
+    lines.push(e.insuranceConfirmed);
     if (form.vesselUse === "crewed") {
-      lines.push(`Professional crew on board: ${form.professionalCrewCount}`);
-      lines.push(`Guests / passengers on board: ${form.guestCount}`);
+      lines.push(e.professionalCrew(form.professionalCrewCount));
+      lines.push(e.guests(form.guestCount));
     }
     lines.push("");
   }
 
-  lines.push("VESSEL STATUS");
-  lines.push(
-    `EU-flagged & EU/Schengen crew, arriving from another EU port: ${
-      form.euStatus === "yes" ? "Yes" : "No"
-    }`
-  );
+  lines.push(e.vesselStatus);
+  lines.push(e.euStatus(form.euStatus === "yes"));
   if (form.euStatus === "no") {
-    lines.push(`Last port: ${form.lastPort}`);
-    lines.push(`Next port: ${form.nextPort}`);
+    lines.push(e.lastPort(form.lastPort));
+    lines.push(e.nextPort(form.nextPort));
     const completeCrew = form.crew.filter((c) => c.fullName.trim());
     const crewLine = (c: CrewMember, i: number) => {
       const parts = [
         c.fullName,
-        c.dateOfBirth && `DOB ${c.dateOfBirth}`,
+        c.dateOfBirth && e.crewDob(c.dateOfBirth),
         c.nationality,
-        c.passportNumber.trim() && `Passport ${c.passportNumber.trim()}`,
+        c.passportNumber.trim() && e.crewPassport(c.passportNumber.trim()),
         c.role.trim(),
-        c.joinDate && `Joined ${c.joinDate}`,
+        c.joinDate && e.crewJoined(c.joinDate),
       ].filter(Boolean);
       return `${i + 1}. ${parts.join(" - ")}`;
     };
     if (form.vesselUse === "crewed") {
       // Crew and guests are listed separately: immigration treats them differently.
       const groups: [string, PersonType][] = [
-        ["PROFESSIONAL CREW", "crew"],
-        ["GUESTS / PASSENGERS", "guest"],
+        [e.professionalCrewTitle, "crew"],
+        [e.guestsTitle, "guest"],
       ];
       groups.forEach(([title, type]) => {
         const list = completeCrew.filter((c) => c.personType === type);
@@ -158,7 +155,7 @@ export function buildSummary(
       });
     } else if (completeCrew.length > 0) {
       lines.push("");
-      lines.push("CREW LIST");
+      lines.push(e.crewListTitle);
       completeCrew.forEach((c, i) => lines.push(crewLine(c, i)));
     }
   }

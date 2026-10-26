@@ -49,7 +49,7 @@ export default function StepVoyage({ draft, setDraft, errors }: StepProps) {
             }
             className="field"
           >
-            <option value="">Select…</option>
+            <option value="">{t.enquiry.select}</option>
             {COUNTRIES.map((c) => (
               <option key={c} value={c}>
                 {c}
@@ -87,7 +87,7 @@ export default function StepVoyage({ draft, setDraft, errors }: StepProps) {
             }
             className="field"
           >
-            <option value="">Select…</option>
+            <option value="">{t.enquiry.select}</option>
             {COUNTRIES.map((c) => (
               <option key={c} value={c}>
                 {c}

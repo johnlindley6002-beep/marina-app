@@ -1,12 +1,13 @@
 "use client";
 
-import { nightsBySeason, SEASON_LABELS, type Marina } from "@/data/marinas";
+import { nightsBySeason, type Marina } from "@/data/marinas";
 import { isValidIsoDate } from "@/lib/dates";
 import { effectiveDeparture, type StayPlan } from "@/features/marina/lib/stayPlan";
 import Link from "next/link";
 import BoatSwitcher from "@/features/my-boat/components/BoatSwitcher";
 import { useBoats } from "@/components/providers/BoatProvider";
 import LengthInput from "@/components/ui/LengthInput";
+import { useLanguage } from "@/components/providers/LanguageProvider";
 import { useUnits } from "@/components/providers/UnitsProvider";
 import StayDecisionSummary from "./StayDecisionSummary";
 
@@ -26,6 +27,8 @@ type Props = {
 
 export default function PlanYourStay({ marina, plan, onPlanChange }: Props) {
   const { label: unit } = useUnits();
+  const { t } = useLanguage();
+  const copy = t.stay.plan;
   const { boats, activeBoat, saveBoat } = useBoats();
 
   const departureIso = effectiveDeparture(plan);
@@ -40,8 +43,7 @@ export default function PlanYourStay({ marina, plan, onPlanChange }: Props) {
   const nights = seasonNights.low + seasonNights.high;
 
   const dim = (v: string) => Number(v);
-  const dimError = (v: string) =>
-    v !== "" && !(dim(v) > 0) ? "Enter a number greater than 0, for example 12.5." : null;
+  const dimError = (v: string) => (v !== "" && !(dim(v) > 0) ? copy.dimensionError : null);
   const dimsComplete = dim(plan.loa) > 0 && dim(plan.beam) > 0 && dim(plan.draft) > 0;
   const boatSizesDiffer =
     !!activeBoat &&
@@ -51,20 +53,16 @@ export default function PlanYourStay({ marina, plan, onPlanChange }: Props) {
       Number(plan.draft) !== Number(activeBoat.draft));
   const stayLine = datesValid
     ? plan.openEnded
-      ? "Open-ended stay, priced and searched per night."
+      ? copy.stayOpenEnded
       : nights > 0 && seasonNights.low > 0 && seasonNights.high > 0
-        ? `${nights} nights, spanning both seasons (${seasonNights.low} low, ${seasonNights.high} high).`
-        : `${nights} night${nights === 1 ? "" : "s"}, ${
-            SEASON_LABELS[seasonNights.high > 0 ? "high" : "low"]
-          }.`
-    : "Enter your arrival and departure dates.";
+        ? copy.stayBothSeasons(nights, seasonNights.low, seasonNights.high)
+        : copy.staySingleSeason(nights, t.stay.season[seasonNights.high > 0 ? "high" : "low"])
+    : copy.stayEnterDates;
 
   return (
     <div className="surface-lift p-6 sm:p-8 md:p-10">
-      <h2 className="type-heading type-h3 text-ink">Plan your stay</h2>
-      <p className="mt-2 text-sm text-ink-soft">
-        Dates and boat size drive the map, estimate and enquiry below.
-      </p>
+      <h2 className="type-heading type-h3 text-ink">{copy.heading}</h2>
+      <p className="mt-2 text-sm text-ink-soft">{copy.intro}</p>
 
       <BoatSwitcher
         onSelect={(boat) => onPlanChange({ loa: boat.loa, beam: boat.beam, draft: boat.draft })}
@@ -73,7 +71,7 @@ export default function PlanYourStay({ marina, plan, onPlanChange }: Props) {
       {activeBoat ? (
         boatSizesDiffer ? (
           <p className="mt-3 text-sm text-ink-soft">
-            These sizes differ from {activeBoat.name}&apos;s saved sizes.{" "}
+            {copy.sizesDiffer(activeBoat.name)}{" "}
             {dimsComplete ? (
               <button
                 type="button"
@@ -87,32 +85,32 @@ export default function PlanYourStay({ marina, plan, onPlanChange }: Props) {
                 }
                 className="inline-flex min-h-11 items-center font-medium text-ink underline underline-offset-4"
               >
-                Update saved boat
+                {copy.updateSavedBoat}
               </button>
             ) : null}
           </p>
         ) : (
           <p className="mt-3 text-sm text-ink-muted">
-            Using your saved boat, {activeBoat.name}.{" "}
+            {copy.usingSaved(activeBoat.name)}{" "}
             <Link href="/my-boat" className="underline underline-offset-4">
-              Manage in My boat
+              {copy.manageBoat}
             </Link>
           </p>
         )
       ) : boats.length === 0 ? (
         <p className="mt-3 text-sm text-ink-muted">
-          Save your boat in{" "}
+          {copy.saveLead}{" "}
           <Link href="/my-boat" className="underline underline-offset-4">
-            My boat
+            {copy.saveLink}
           </Link>{" "}
-          and these sizes fill in next time.
+          {copy.saveTail}
         </p>
       ) : null}
 
       <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
         <label className="block text-sm">
           <span className={labelClass}>
-            Arrival date
+            {copy.arrivalDate}
             <RequiredMark />
           </span>
           <input
@@ -125,7 +123,7 @@ export default function PlanYourStay({ marina, plan, onPlanChange }: Props) {
 
         <label className="block text-sm">
           <span className={labelClass}>
-            Departure date
+            {copy.departureDate}
             {!plan.openEnded ? <RequiredMark /> : null}
           </span>
           <input
@@ -139,14 +137,14 @@ export default function PlanYourStay({ marina, plan, onPlanChange }: Props) {
           />
           {datesInvalid ? (
             <p id="err-plan-departure" role="alert" className={errorClass}>
-              Departure must be after arrival. Choose a later departure date.
+              {copy.departureAfterArrival}
             </p>
           ) : null}
         </label>
 
         <label className="block text-sm">
           <span className={labelClass}>
-            Length overall ({unit})
+            {copy.lengthOverall(unit)}
             <RequiredMark />
           </span>
           <LengthInput
@@ -156,7 +154,7 @@ export default function PlanYourStay({ marina, plan, onPlanChange }: Props) {
             describedBy={dimError(plan.loa) ? "err-plan-loa" : undefined}
             className={inputClass}
           />
-          <p className="mt-1 text-xs text-ink-muted">Including bowsprit, davits, dinghy</p>
+          <p className="mt-1 text-xs text-ink-muted">{copy.lengthHint}</p>
           {dimError(plan.loa) ? (
             <p id="err-plan-loa" role="alert" className={errorClass}>
               {dimError(plan.loa)}
@@ -166,7 +164,7 @@ export default function PlanYourStay({ marina, plan, onPlanChange }: Props) {
 
         <label className="block text-sm">
           <span className={labelClass}>
-            Beam ({unit})
+            {copy.beam(unit)}
             <RequiredMark />
           </span>
           <LengthInput
@@ -185,7 +183,7 @@ export default function PlanYourStay({ marina, plan, onPlanChange }: Props) {
 
         <label className="block text-sm">
           <span className={labelClass}>
-            Draft ({unit})
+            {copy.draft(unit)}
             <RequiredMark />
           </span>
           <LengthInput
@@ -209,7 +207,7 @@ export default function PlanYourStay({ marina, plan, onPlanChange }: Props) {
           checked={plan.openEnded}
           onChange={(e) => onPlanChange({ openEnded: e.target.checked })}
         />
-        Open-ended stay (no departure date yet)
+        {copy.openEnded}
       </label>
 
       <StayDecisionSummary

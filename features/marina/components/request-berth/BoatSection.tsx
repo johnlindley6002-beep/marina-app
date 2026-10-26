@@ -3,18 +3,20 @@
 import { EMPTY_DOCUMENTS } from "@/features/my-boat/lib/boatProfile";
 import { COUNTRIES } from "@/lib/countries";
 import BoatSwitcher from "@/features/my-boat/components/BoatSwitcher";
+import { useLanguage } from "@/components/providers/LanguageProvider";
 import { inputClass, labelClass, errorClass, RequiredMark } from "./shared";
-import { VESSEL_TYPE_LABELS } from "@/features/marina/lib/enquiry/types";
 import type { VesselType } from "@/features/marina/lib/enquiry/types";
 
 import type { RequestBerthCtx } from "./useRequestBerthForm";
 
 export default function BoatSection({ ctx }: { ctx: RequestBerthCtx }) {
   const { docs, errors, form, setDocs, setField, setForm } = ctx;
+  const { t } = useLanguage();
+  const copy = t.enquiry.boat;
   return (
     <>
       <fieldset>
-        <legend className="type-heading text-xl text-ink">Your boat</legend>
+        <legend className="type-heading text-xl text-ink">{copy.legend}</legend>
         <BoatSwitcher
           current={{
             name: form.boatName,
@@ -45,7 +47,7 @@ export default function BoatSection({ ctx }: { ctx: RequestBerthCtx }) {
         <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <label className="block text-sm">
             <span className={labelClass}>
-              Boat name
+              {copy.name}
               <RequiredMark />
             </span>
             <input
@@ -65,7 +67,7 @@ export default function BoatSection({ ctx }: { ctx: RequestBerthCtx }) {
 
           <label className="block text-sm">
             <span className={labelClass}>
-              Vessel type
+              {copy.vesselType}
               <RequiredMark />
             </span>
             <select
@@ -75,10 +77,10 @@ export default function BoatSection({ ctx }: { ctx: RequestBerthCtx }) {
               onChange={(e) => setField("vesselType", e.target.value as VesselType | "")}
               className={inputClass}
             >
-              <option value="">Select…</option>
-              {(Object.keys(VESSEL_TYPE_LABELS) as VesselType[]).map((key) => (
+              <option value="">{t.enquiry.select}</option>
+              {(Object.keys(copy.types) as VesselType[]).map((key) => (
                 <option key={key} value={key}>
-                  {VESSEL_TYPE_LABELS[key]}
+                  {copy.types[key]}
                 </option>
               ))}
             </select>
@@ -88,15 +90,13 @@ export default function BoatSection({ ctx }: { ctx: RequestBerthCtx }) {
               </p>
             ) : null}
             {form.vesselType === "catamaran" ? (
-              <p className="mt-1 text-xs text-ink-muted">
-                Catamarans may need a wider, pricier berth.
-              </p>
+              <p className="mt-1 text-xs text-ink-muted">{copy.catamaranNote}</p>
             ) : null}
           </label>
 
           <label className="block text-sm">
             <span className={labelClass}>
-              Flag / country of registration
+              {copy.flag}
               <RequiredMark />
             </span>
             <select
@@ -106,7 +106,7 @@ export default function BoatSection({ ctx }: { ctx: RequestBerthCtx }) {
               onChange={(e) => setField("flagCountry", e.target.value)}
               className={inputClass}
             >
-              <option value="">Select…</option>
+              <option value="">{t.enquiry.select}</option>
               {COUNTRIES.map((country) => (
                 <option key={country} value={country}>
                   {country}
@@ -121,15 +121,15 @@ export default function BoatSection({ ctx }: { ctx: RequestBerthCtx }) {
           </label>
 
           <label className="block text-sm">
-            <span className={labelClass}>Selected berth</span>
+            <span className={labelClass}>{copy.selectedBerth}</span>
             <input
               type="text"
               value={form.berthId}
               onChange={(e) => setField("berthId", e.target.value)}
-              placeholder="e.g. I-4"
+              placeholder={copy.berthPlaceholder}
               className={inputClass}
             />
-            <p className="mt-1 text-xs text-ink-muted">Auto-filled if you selected one above</p>
+            <p className="mt-1 text-xs text-ink-muted">{copy.berthHint}</p>
           </label>
         </div>
       </fieldset>

@@ -1,18 +1,21 @@
 "use client";
 
+import { useLanguage } from "@/components/providers/LanguageProvider";
 import { inputClass, labelClass, errorClass, RequiredMark } from "./shared";
 import type { RequestBerthCtx } from "./useRequestBerthForm";
 
 export default function SkipperSection({ ctx }: { ctx: RequestBerthCtx }) {
   const { errors, form, rememberSkipper, setField, setRememberSkipper } = ctx;
+  const { t } = useLanguage();
+  const copy = t.enquiry.skipper;
   return (
     <>
       <fieldset>
-        <legend className="type-heading text-xl text-ink">Skipper &amp; contact</legend>
+        <legend className="type-heading text-xl text-ink">{copy.legend}</legend>
         <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <label className="block text-sm">
             <span className={labelClass}>
-              Skipper full name
+              {copy.name}
               <RequiredMark />
             </span>
             <input
@@ -32,7 +35,7 @@ export default function SkipperSection({ ctx }: { ctx: RequestBerthCtx }) {
 
           <label className="block text-sm">
             <span className={labelClass}>
-              Phone
+              {copy.phone}
               <RequiredMark />
             </span>
             <input
@@ -52,7 +55,7 @@ export default function SkipperSection({ ctx }: { ctx: RequestBerthCtx }) {
 
           <label className="block text-sm">
             <span className={labelClass}>
-              Email
+              {copy.email}
               <RequiredMark />
             </span>
             <input
@@ -71,7 +74,7 @@ export default function SkipperSection({ ctx }: { ctx: RequestBerthCtx }) {
           </label>
 
           <label className="block text-sm">
-            <span className={labelClass}>Home port</span>
+            <span className={labelClass}>{copy.homePort}</span>
             <input
               type="text"
               value={form.homePort}
@@ -82,7 +85,7 @@ export default function SkipperSection({ ctx }: { ctx: RequestBerthCtx }) {
 
           <label className="block text-sm">
             <span className={labelClass}>
-              People on board
+              {copy.people}
               <RequiredMark />
             </span>
             <input
@@ -109,10 +112,7 @@ export default function SkipperSection({ ctx }: { ctx: RequestBerthCtx }) {
             onChange={(e) => setRememberSkipper(e.target.checked)}
             className="mt-1"
           />
-          <span>
-            Remember my name, phone and email on this device for next time. You can change or remove
-            them in My boat.
-          </span>
+          <span>{copy.remember}</span>
         </label>
       </fieldset>
     </>

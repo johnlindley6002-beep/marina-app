@@ -61,10 +61,3 @@ export type FormData = {
   nextPort: string;
   crew: CrewMember[];
 } & VesselUseValues;
-
-export const VESSEL_TYPE_LABELS: Record<VesselType, string> = {
-  sail: "Sail",
-  motor: "Motor",
-  catamaran: "Catamaran",
-  other: "Other",
-};

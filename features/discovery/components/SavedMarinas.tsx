@@ -64,14 +64,14 @@ export default function SavedMarinas({ showEmpty = false, headingLevel = "h2" }:
                   href={`/marinas/${favourite.countrySlug}/${favourite.marinaId}#request-berth`}
                   className="btn-quiet"
                 >
-                  Start an enquiry
+                  {t.chrome.discovery.startEnquiry}
                 </Link>
                 <button
                   type="button"
                   onClick={() => toggleFavourite(favourite)}
                   className="inline-flex min-h-11 items-center text-ink-muted hover:text-error"
                 >
-                  Remove
+                  {t.chrome.discovery.remove}
                   <span className="sr-only"> {favourite.marinaName}</span>
                 </button>
               </span>
