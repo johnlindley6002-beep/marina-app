@@ -3,7 +3,7 @@
 import { useEffect, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import RoleGate from "@/components/layout/RoleGate";
-import { useLanguage } from "@/components/providers/LanguageProvider";
+import { useStaffText } from "./StaffLanguageProvider";
 import { signOutStaff, STAFF_DATA_SOURCE } from "@/lib/data";
 import { useStaffSession } from "./StaffSessionProvider";
 
@@ -14,8 +14,8 @@ import { useStaffSession } from "./StaffSessionProvider";
 export default function StaffGate({ children }: { children: ReactNode }) {
   const { ready, session, signedIn, email } = useStaffSession();
   const router = useRouter();
-  const { t } = useLanguage();
-  const copy = t.staffLogin;
+  const { s } = useStaffText();
+  const copy = s.login;
   const supabase = STAFF_DATA_SOURCE === "supabase";
 
   useEffect(() => {
@@ -41,7 +41,7 @@ export default function StaffGate({ children }: { children: ReactNode }) {
           }}
           className="btn-quiet mt-6"
         >
-          {copy.signOut}
+          {s.shell.signOut}
         </button>
       </div>
     );

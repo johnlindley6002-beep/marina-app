@@ -13,6 +13,7 @@ import { getVoyageFlags, isMinor } from "@/features/prearrival/lib/schema";
 import { getExtraErrors, getWarnings } from "@/features/prearrival/lib/warnings";
 import { getMissingRequiredDocuments } from "@/features/prearrival/lib/documentRules";
 import { useStaffSession } from "./StaffSessionProvider";
+import { useStaffText } from "./StaffLanguageProvider";
 import { Collapse } from "@/components/ui/Disclosure";
 import DocumentButtons from "@/features/prearrival/components/DocumentButtons";
 
@@ -29,12 +30,6 @@ function statusFor(checkIn: PreArrivalCheckIn): PreArrivalStatus {
   return "ready";
 }
 
-const STATUS_LABEL: Record<PreArrivalStatus, string> = {
-  ready: "Ready",
-  missing: "Missing info",
-  border: "Needs border check",
-};
-
 const STATUS_CLASS: Record<PreArrivalStatus, string> = {
   ready: "staff-badge-ink",
   missing: "staff-badge-warn",
@@ -43,6 +38,8 @@ const STATUS_CLASS: Record<PreArrivalStatus, string> = {
 
 function Row({ checkIn }: { checkIn: PreArrivalCheckIn }) {
   const { draft } = checkIn;
+  const { s } = useStaffText();
+  const pa = s.prearrival;
   const [open, setOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const marina = marinas.find((m) => m.id === checkIn.marinaId);
@@ -71,24 +68,22 @@ function Row({ checkIn }: { checkIn: PreArrivalCheckIn }) {
       >
         <div className="min-w-0">
           <p className="flex flex-wrap items-center gap-2 font-medium text-ink">
-            {draft.boatIdentity.name || "Unnamed boat"}
-            <span className={`staff-badge ${STATUS_CLASS[status]}`}>{STATUS_LABEL[status]}</span>
+            {draft.boatIdentity.name || s.common.unnamedBoat}
+            <span className={`staff-badge ${STATUS_CLASS[status]}`}>{pa[status]}</span>
             <span className="staff-badge staff-badge-outline">
-              {flags.fromOrToNonEU ? "Non-EU route" : "EU route"}
+              {flags.fromOrToNonEU ? pa.nonEuRoute : pa.euRoute}
             </span>
             {nonEUFlagged ? (
-              <span className="staff-badge staff-badge-warn">Non-EU flag</span>
+              <span className="staff-badge staff-badge-warn">{pa.nonEuFlag}</span>
             ) : null}
-            {minorOnBoard ? (
-              <span className="staff-badge staff-badge-warn">Minor on board</span>
-            ) : null}
+            {minorOnBoard ? <span className="staff-badge staff-badge-warn">{pa.minor}</span> : null}
             {insuranceExpired ? (
-              <span className="staff-badge staff-badge-warn">Insurance expired</span>
+              <span className="staff-badge staff-badge-warn">{pa.insuranceExpired}</span>
             ) : null}
           </p>
           <p className="tabular mt-1 text-xs text-ink-muted">
-            {draft.stay.requestedArrival || draft.voyage.arrivalDateTime} · {draft.people.length} on
-            board · ref. {checkIn.referenceCode}
+            {draft.stay.requestedArrival || draft.voyage.arrivalDateTime} ·{" "}
+            {s.common.onBoard(draft.people.length)} · {pa.reference(checkIn.referenceCode)}
           </p>
         </div>
       </button>
@@ -97,13 +92,13 @@ function Row({ checkIn }: { checkIn: PreArrivalCheckIn }) {
         <div className="mt-3 border-t border-hairline pt-3 text-sm">
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <p className="staff-label">Skipper / owner</p>
-              <p className="text-ink">{draft.owner.fullName || "Not given"}</p>
+              <p className="staff-label">{pa.skipperOwner}</p>
+              <p className="text-ink">{draft.owner.fullName || s.common.notGiven}</p>
               <p className="text-ink-muted">{draft.owner.phone}</p>
               <p className="text-ink-muted">{draft.owner.email}</p>
             </div>
             <div>
-              <p className="staff-label">Voyage</p>
+              <p className="staff-label">{pa.voyage}</p>
               <p className="text-ink">
                 {draft.voyage.lastPortName}, {draft.voyage.lastPortCountry} &rarr;{" "}
                 {draft.voyage.nextPortName}, {draft.voyage.nextPortCountry}
@@ -113,12 +108,13 @@ function Row({ checkIn }: { checkIn: PreArrivalCheckIn }) {
 
           {draft.people.length > 0 ? (
             <div className="mt-3">
-              <p className="staff-label">Crew and guests ({draft.people.length})</p>
+              <p className="staff-label">{s.arrivals.crew(draft.people.length)}</p>
               <ul className="text-ink-soft">
                 {draft.people.map((p, i) => (
                   <li key={i}>
-                    {[p.givenNames, p.familyName].filter(Boolean).join(" ") || "Unnamed"}, {p.role},{" "}
-                    {p.nationality || "nationality not given"}, ID {maskIdNumber(p.idNumber)}
+                    {[p.givenNames, p.familyName].filter(Boolean).join(" ") || s.common.unnamed},{" "}
+                    {p.role}, {p.nationality || pa.noNationality},{" "}
+                    {pa.idNumber(maskIdNumber(p.idNumber))}
                   </li>
                 ))}
               </ul>
@@ -127,7 +123,7 @@ function Row({ checkIn }: { checkIn: PreArrivalCheckIn }) {
 
           {warnings.length > 0 ? (
             <div className="mt-3">
-              <p className="staff-label">Flags</p>
+              <p className="staff-label">{pa.flags}</p>
               <ul className="text-ink-soft">
                 {warnings.map((w, i) => (
                   <li key={i}>{w.message}</li>
@@ -140,7 +136,7 @@ function Row({ checkIn }: { checkIn: PreArrivalCheckIn }) {
 
           <div className="mt-3 flex flex-wrap items-center gap-2">
             {checkIn.checkedInAt ? (
-              <span className="staff-badge staff-badge-ink">Berthed</span>
+              <span className="staff-badge staff-badge-ink">{pa.berthed}</span>
             ) : (
               <button
                 type="button"
@@ -150,7 +146,7 @@ function Row({ checkIn }: { checkIn: PreArrivalCheckIn }) {
                 }}
                 className="staff-btn staff-btn-primary"
               >
-                Mark checked in
+                {pa.markCheckedIn}
               </button>
             )}
           </div>
@@ -176,6 +172,8 @@ export default function PreArrivalArrivals() {
     marinaIds.join(",")
   );
   const [needsAuthorityOnly, setNeedsAuthorityOnly] = useState(false);
+  const { s } = useStaffText();
+  const pa = s.prearrival;
   const [hideBerthed, setHideBerthed] = useState(true);
 
   const filtered = useMemo(() => {
@@ -187,7 +185,7 @@ export default function PreArrivalArrivals() {
   return (
     <div className="mt-8">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h2 className="type-heading type-h3 text-ink">Pre-arrival check-ins</h2>
+        <h2 className="type-heading type-h3 text-ink">{pa.title}</h2>
         <div className="flex flex-wrap gap-2">
           <button
             type="button"
@@ -195,7 +193,7 @@ export default function PreArrivalArrivals() {
             onClick={() => setNeedsAuthorityOnly((v) => !v)}
             className={`staff-btn ${needsAuthorityOnly ? "staff-btn-primary" : ""}`}
           >
-            Needs authority report
+            {pa.needsAuthority}
           </button>
           <button
             type="button"
@@ -203,7 +201,7 @@ export default function PreArrivalArrivals() {
             onClick={() => setHideBerthed((v) => !v)}
             className={`staff-btn ${hideBerthed ? "staff-btn-primary" : ""}`}
           >
-            Hide berthed
+            {pa.hideBerthed}
           </button>
         </div>
       </div>
@@ -214,9 +212,7 @@ export default function PreArrivalArrivals() {
         ))}
       </ul>
 
-      {ready && filtered.length === 0 ? (
-        <p className="staff-empty mt-4">No pre-arrival check-ins to show.</p>
-      ) : null}
+      {ready && filtered.length === 0 ? <p className="staff-empty mt-4">{pa.empty}</p> : null}
     </div>
   );
 }

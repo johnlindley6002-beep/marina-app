@@ -15,6 +15,7 @@ import { useStaffId } from "./StaffSessionProvider";
 import { Collapse } from "@/components/ui/Disclosure";
 import { useUnits } from "@/components/providers/UnitsProvider";
 import BerthPicker from "./BerthPicker";
+import { useStaffText } from "./StaffLanguageProvider";
 
 const NONE: Enquiry[] = [];
 
@@ -22,24 +23,22 @@ function isCommercialUseValue(vesselUse: string): boolean {
   return vesselUse !== "" && vesselUse !== "private";
 }
 
-const STATUS_TABS: { value: EnquiryStatus | "all"; label: string }[] = [
-  { value: "new", label: "New" },
-  { value: "approved", label: "Approved" },
-  { value: "declined", label: "Declined" },
-  { value: "all", label: "All" },
-];
+const STATUS_TABS: (EnquiryStatus | "all")[] = ["new", "approved", "declined", "all"];
 
 function EuFlag({ enquiry }: { enquiry: Enquiry }) {
+  const { s } = useStaffText();
   if (!enquiry.euStatus) return null;
   return (
     <span className="staff-chip">
-      {enquiry.euStatus === "yes" ? "EU-flagged, EU crew" : "Non-EU"}
+      {enquiry.euStatus === "yes" ? s.enquiries.euFlagged : s.enquiries.nonEu}
     </span>
   );
 }
 
 function Row({ enquiry, staffId }: { enquiry: Enquiry; staffId: string | null }) {
   const { units } = useUnits();
+  const { s, dateLocale } = useStaffText();
+  const q = s.enquiries;
   const [open, setOpen] = useState(false);
   const [berthId, setBerthId] = useState(enquiry.assignedBerthId ?? "");
   const [reason, setReason] = useState("");
@@ -57,7 +56,7 @@ function Row({ enquiry, staffId }: { enquiry: Enquiry; staffId: string | null })
       >
         <div className="min-w-0">
           <p className="flex flex-wrap items-center gap-2 font-medium text-ink">
-            {enquiry.boatName || "Unnamed boat"}
+            {enquiry.boatName || s.common.unnamedBoat}
             <span
               className={`staff-badge ${
                 enquiry.status === "new"
@@ -67,7 +66,7 @@ function Row({ enquiry, staffId }: { enquiry: Enquiry; staffId: string | null })
                     : "staff-badge-warn"
               }`}
             >
-              {enquiry.status}
+              {q.tabs[enquiry.status]}
             </span>
             {isCommercialUseValue(enquiry.vesselUse) ? (
               <span className="staff-chip">{enquiry.vesselUse}</span>
@@ -75,27 +74,32 @@ function Row({ enquiry, staffId }: { enquiry: Enquiry; staffId: string | null })
             <EuFlag enquiry={enquiry} />
           </p>
           <p className="tabular mt-1 text-xs text-ink-muted">
-            {formatLength(Number(enquiry.loa), units)} LOA · {enquiry.arrival} to{" "}
-            {enquiry.openEnded ? "open-ended" : enquiry.departure} ·{" "}
-            {enquiry.skipperName || "No name given"}
+            {formatLength(Number(enquiry.loa), units)} {s.common.loa} ·{" "}
+            {s.common.range(
+              enquiry.arrival,
+              enquiry.openEnded ? s.common.openEnded : enquiry.departure
+            )}{" "}
+            · {enquiry.skipperName || q.noName}
           </p>
         </div>
-        <p className="text-xs text-ink-muted">Sent {formatLongDate(enquiry.createdAt)}</p>
+        <p className="text-xs text-ink-muted">
+          {q.sent(formatLongDate(enquiry.createdAt, dateLocale))}
+        </p>
       </button>
 
       <Collapse open={open} id={rowId}>
         <div className="mt-3 border-t border-hairline pt-3 text-sm">
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <p className="staff-label">Boat</p>
+              <p className="staff-label">{q.boat}</p>
               <p className="text-ink">
-                {enquiry.vesselType}, {formatLength(Number(enquiry.loa), units)} LOA,{" "}
-                {formatLength(Number(enquiry.beam), units)} beam,{" "}
-                {formatLength(Number(enquiry.draft), units)} draft, {enquiry.flagCountry}
+                {enquiry.vesselType}, {formatLength(Number(enquiry.loa), units)} {s.common.loa},{" "}
+                {formatLength(Number(enquiry.beam), units)} {s.common.beam},{" "}
+                {formatLength(Number(enquiry.draft), units)} {s.common.draft}, {enquiry.flagCountry}
               </p>
             </div>
             <div>
-              <p className="staff-label">Contact</p>
+              <p className="staff-label">{q.contact}</p>
               <p className="text-ink">{enquiry.skipperName}</p>
               <p className="text-ink-muted">
                 {enquiry.phone} · {enquiry.email}
@@ -105,21 +109,21 @@ function Row({ enquiry, staffId }: { enquiry: Enquiry; staffId: string | null })
 
           {isCommercialUseValue(enquiry.vesselUse) ? (
             <div className="mt-3">
-              <p className="staff-label">Commercial / charter details</p>
+              <p className="staff-label">{q.commercial}</p>
               <p className="text-ink-soft">
-                {enquiry.operatingEntity || "Operating entity not given"}
-                {enquiry.companyRegistration ? `, reg. ${enquiry.companyRegistration}` : ""}
+                {enquiry.operatingEntity || q.noEntity}
+                {enquiry.companyRegistration ? q.registration(enquiry.companyRegistration) : ""}
               </p>
             </div>
           ) : null}
 
           {enquiry.crew.length > 0 ? (
             <div className="mt-3">
-              <p className="staff-label">Crew and guests ({enquiry.crew.length})</p>
+              <p className="staff-label">{s.arrivals.crew(enquiry.crew.length)}</p>
               <ul className="text-ink-soft">
                 {enquiry.crew.map((c, i) => (
                   <li key={i}>
-                    {c.fullName || "Unnamed"}, {c.role || c.personType}
+                    {c.fullName || s.common.unnamed}, {c.role || c.personType}
                   </li>
                 ))}
               </ul>
@@ -130,7 +134,7 @@ function Row({ enquiry, staffId }: { enquiry: Enquiry; staffId: string | null })
             <div className="mt-4 flex flex-wrap items-end gap-3">
               <label className="block text-sm">
                 <span className="staff-label" id={`${rowId}-berth`}>
-                  Assign berth
+                  {q.assignBerth}
                 </span>
                 <BerthPicker
                   id={`${rowId}-berth`}
@@ -149,10 +153,10 @@ function Row({ enquiry, staffId }: { enquiry: Enquiry; staffId: string | null })
                 }
                 className="staff-btn staff-btn-primary"
               >
-                Approve
+                {q.approve}
               </button>
               <label className="block flex-1 text-sm">
-                <span className="staff-label">Reason to decline (optional)</span>
+                <span className="staff-label">{q.declineReason}</span>
                 <input
                   type="text"
                   value={reason}
@@ -168,14 +172,14 @@ function Row({ enquiry, staffId }: { enquiry: Enquiry; staffId: string | null })
                 }
                 className="staff-btn staff-btn-danger"
               >
-                Decline
+                {q.decline}
               </button>
             </div>
           ) : (
             <p className="mt-4 text-ink-soft">
               {enquiry.status === "approved"
-                ? `Approved, berth ${enquiry.assignedBerthId}.`
-                : `Declined${enquiry.decisionNote ? `: ${enquiry.decisionNote}` : "."}`}
+                ? q.approvedOn(enquiry.assignedBerthId ?? "")
+                : q.declinedWith(enquiry.decisionNote)}
             </p>
           )}
           {error ? (
@@ -197,6 +201,8 @@ export default function EnquiryInbox() {
     staffId ?? ""
   );
   const [tab, setTab] = useState<EnquiryStatus | "all">("new");
+  const { s } = useStaffText();
+  const q = s.enquiries;
 
   const filtered = tab === "all" ? enquiries : enquiries.filter((e) => e.status === tab);
   const counts = {
@@ -207,23 +213,23 @@ export default function EnquiryInbox() {
 
   return (
     <div>
-      <h1 className="type-heading type-h2 text-ink">Enquiries</h1>
+      <h1 className="type-heading type-h2 text-ink">{q.title}</h1>
 
       <div
         role="group"
-        aria-label="Status"
+        aria-label={q.statusGroup}
         className="mt-3 inline-flex rounded-md border border-ink/25 p-0.5 text-xs"
       >
-        {STATUS_TABS.map((t) => (
+        {STATUS_TABS.map((value) => (
           <button
-            key={t.value}
+            key={value}
             type="button"
-            aria-pressed={tab === t.value}
-            onClick={() => setTab(t.value)}
-            className={`min-h-10 rounded-sm px-3 ${tab === t.value ? "bg-ink text-paper" : "text-ink-muted"}`}
+            aria-pressed={tab === value}
+            onClick={() => setTab(value)}
+            className={`min-h-10 rounded-sm px-3 ${tab === value ? "bg-ink text-paper" : "text-ink-muted"}`}
           >
-            {t.label}
-            {t.value !== "all" ? ` (${counts[t.value]})` : ""}
+            {q.tabs[value]}
+            {value !== "all" ? ` (${counts[value]})` : ""}
           </button>
         ))}
       </div>
@@ -235,9 +241,7 @@ export default function EnquiryInbox() {
       </ul>
 
       {ready && filtered.length === 0 ? (
-        <p className="staff-empty mt-4">
-          {tab === "new" ? "No enquiries waiting for a decision." : "Nothing here yet."}
-        </p>
+        <p className="staff-empty mt-4">{tab === "new" ? q.emptyNew : q.emptyOther}</p>
       ) : null}
     </div>
   );

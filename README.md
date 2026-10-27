@@ -1,6 +1,6 @@
 # aldock
 
-aldock helps boaters find a berth at a marina in Portugal, tell the marina about their boat and crew before they arrive, and keep their details in one place. It starts with Marina de Cascais. Berth holders can offer their berth for reletting while they are away, and marina staff handle arrivals, enquiries and relet approvals. The staff back office (arrivals, the berth map, relet approvals) runs on Supabase with an email sign-in link. Everything else is still a front-end mock: the data lives in the browser, and an enquiry is sent by the visitor's own email app.
+aldock helps boaters find a berth at a marina in Portugal, tell the marina about their boat and crew before they arrive, and keep their details in one place. It starts with Marina de Cascais. Berth holders can offer their berth for reletting while they are away, and marina staff handle arrivals, enquiries and relet approvals. The staff back office (arrivals, reception, the berth planner and map, enquiries, relet approvals, customers, dock tasks and the radio log) runs on Supabase with an email sign-in link, in English and Portuguese. Everything else is still a front-end mock: the data lives in the browser, and an enquiry is sent by the visitor's own email app.
 
 ## Stack
 
@@ -62,6 +62,7 @@ Everything the UI reads or writes goes through `lib/data/index.ts`. Nothing outs
 
 - **Guest and berth holder screens** still use `data/mock/*`. The mock bodies read and write `localStorage` (always inside try and catch) and fire an `aldock-mock-changed` event so screens stay in step.
 - **The staff back office** uses `lib/data/staff.ts`, where every function returns a Promise and screens read through `useStaffData`. Each call loads the staff member's marina data from Supabase, runs the same rule as the mock (`data/mock/snapshot.ts` points the mock stores at the loaded rows for the length of one call), and saves only the rows that changed (`data/supabase/staff.ts`). The rules are written once, so the mock and Supabase cannot disagree. `NEXT_PUBLIC_STAFF_DATA=mock` switches the back office back to the mock; the end-to-end tests do this.
+- **Reception, the berth planner, customers, dock tasks and the radio log** read and write Supabase directly (`data/supabase/backoffice.ts`) and have no mock. On the mock they show a short note instead. Their rules (the document checklist, berth fit, the planner grid, expiry, task and log checks) are in `features/staff/lib` with unit tests.
 
 Until the guest and berth holder screens move over, their new enquiries and relet offers stay in the browser and do not reach the staff database, and staff decisions do not reach the berth holder's screen.
 
@@ -87,7 +88,7 @@ All tokens live in `app/globals.css`.
 
 ## Language rules
 
-The site is in English, Portuguese (European), Spanish and French, and only those. Every user-facing string, including `aria-label` and `alt` text, comes from `lib/i18n`. English is the source: `lib/i18n/locales/en/<area>.ts` defines the shape, and the other languages must match it key for key. `npm run check:i18n` fails on a missing or extra key, an unused key, or a value left identical to English (shared words go in `scripts/i18n-same-as-english.json`). Dates, times, money and plurals go through `useFormat` and `lib/i18n/format.ts`, never by hand. Emails to the marina are written in English or Portuguese (`lib/i18n/mail.ts`). The staff back office, the owner reletting flow and the dev tools are English only for now (see `docs/audit/PROGRESS.md`, Deferred).
+The site is in English, Portuguese (European), Spanish and French, and only those. Every user-facing string, including `aria-label` and `alt` text, comes from `lib/i18n`. English is the source: `lib/i18n/locales/en/<area>.ts` defines the shape, and the other languages must match it key for key. `npm run check:i18n` fails on a missing or extra key, an unused key, or a value left identical to English (shared words go in `scripts/i18n-same-as-english.json`). Dates, times, money and plurals go through `useFormat` and `lib/i18n/format.ts`, never by hand. Emails to the marina are written in English or Portuguese (`lib/i18n/mail.ts`). The staff back office is in English and European Portuguese only, from its own dictionary in `lib/i18n/staff`, with an EN | PT switch in the staff top bar; `npm run check:i18n` checks it too. Messages from the shared rules in `data/mock` and the berth map's own labels are still English. The owner reletting flow and the dev tools are English only for now (see `docs/audit/PROGRESS.md`, Deferred).
 
 ## No em dashes
 

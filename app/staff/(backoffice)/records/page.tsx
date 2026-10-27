@@ -1,11 +1,6 @@
-import type { Metadata } from "next";
-import RecordsBrowser from "@/features/staff/components/RecordsBrowser";
+import { redirect } from "next/navigation";
 
-export const metadata: Metadata = {
-  title: "Records - Staff - aldock",
-  description: "Boats, berths and customers, tied together.",
-};
-
+// Records moved to Customers.
 export default function RecordsPage() {
-  return <RecordsBrowser />;
+  redirect("/staff/customers");
 }

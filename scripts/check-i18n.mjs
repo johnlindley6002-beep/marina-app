@@ -60,6 +60,9 @@ const en = (await load("lib/i18n/locales/en/index.js")).en;
 const pt = (await load("lib/i18n/locales/pt/index.js")).pt;
 const es = (await load("lib/i18n/locales/es/index.js")).es;
 const fr = (await load("lib/i18n/locales/fr/index.js")).fr;
+// The staff back office has its own dictionary in English and Portuguese only.
+const staffEn = (await load("lib/i18n/staff/en.js")).staffEn;
+const staffPt = (await load("lib/i18n/staff/pt.js")).staffPt;
 rmSync(out, { recursive: true, force: true });
 
 function flatten(value, prefix = "", into = new Map()) {
@@ -72,11 +75,18 @@ function flatten(value, prefix = "", into = new Map()) {
 }
 
 const base = flatten(en);
+const staffBase = flatten(staffEn);
 const locales = { pt: flatten(pt), es: flatten(es), fr: flatten(fr) };
 const allow = JSON.parse(readFileSync(join(root, "scripts/i18n-same-as-english.json"), "utf8"));
 const problems = [];
 
-for (const [name, map] of Object.entries(locales)) {
+// Each translation against its English base: [name, base, translation].
+const pairs = [
+  ...Object.entries(locales).map(([name, map]) => [name, base, map]),
+  ["staff pt", staffBase, flatten(staffPt)],
+];
+
+for (const [name, base, map] of pairs) {
   for (const key of base.keys()) {
     if (!map.has(key)) problems.push(`${name}: missing ${key}`);
   }
@@ -100,9 +110,17 @@ const sources = SOURCE_DIRS.flatMap((d) =>
 )
   .map((f) => readFileSync(f, "utf8"))
   .join("\n");
-for (const key of base.keys()) {
-  const last = key.split(".").pop();
-  if (!new RegExp(String.raw`\b${last}\b`).test(sources)) problems.push(`unused key ${key}`);
+for (const [prefix, keys] of [
+  ["", base],
+  ["staff ", staffBase],
+]) {
+  for (const key of keys.keys()) {
+    const last = key.split(".").pop();
+    // Keys such as "owner-away" are read by a computed index, so match them
+    // as written in quotes too.
+    const used = new RegExp(String.raw`\b${last}\b`).test(sources) || sources.includes(`"${last}"`);
+    if (!used) problems.push(`unused ${prefix}key ${key}`);
+  }
 }
 
 if (problems.length) {
@@ -113,4 +131,6 @@ if (problems.length) {
     console.error(`  ... and ${problems.length - limit} more (I18N_LIMIT=999 to see all)`);
   process.exit(1);
 }
-console.log(`check-i18n: ${base.size} keys, 4 locales, all in step`);
+console.log(
+  `check-i18n: ${base.size} keys in 4 locales and ${staffBase.size} staff keys in 2, all in step`
+);

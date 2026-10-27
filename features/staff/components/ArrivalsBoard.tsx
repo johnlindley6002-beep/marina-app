@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo, useState } from "react";
 import { addDaysIso, effectiveEnquiryDeparture, todayIso } from "@/lib/dates";
 import {
@@ -18,7 +19,9 @@ import { useStaffAction } from "../lib/useStaffAction";
 import { useStaffId } from "./StaffSessionProvider";
 import { Collapse } from "@/components/ui/Disclosure";
 import { useUnits } from "@/components/providers/UnitsProvider";
+import { serviceList } from "../lib/services";
 import BerthPicker from "./BerthPicker";
+import { useStaffText } from "./StaffLanguageProvider";
 import PreArrivalArrivals from "./PreArrivalArrivals";
 
 const NONE: Enquiry[] = [];
@@ -27,19 +30,6 @@ const WINDOW_DAYS = 6;
 
 type EventKind = "arrival" | "departure";
 type BoardEvent = { enquiry: Enquiry; kind: EventKind; date: string; time: string };
-
-function serviceList(e: Enquiry): string[] {
-  const s = e.services;
-  const out: string[] = [];
-  if (s.shorePower) out.push(`Shore power${s.amperage ? ` (${s.amperage}A)` : ""}`);
-  if (s.water) out.push("Water");
-  if (s.pumpOut) out.push("Pump-out");
-  if (s.fuel) out.push("Fuel");
-  if (s.laundry) out.push("Laundry");
-  if (s.helpMooring) out.push("Help mooring");
-  if (s.helpSlipping) out.push("Help slipping");
-  return out;
-}
 
 function EventRow({
   event,
@@ -52,6 +42,8 @@ function EventRow({
 }) {
   const { enquiry, kind } = event;
   const { units } = useUnits();
+  const { s } = useStaffText();
+  const a = s.arrivals;
   const [open, setOpen] = useState(false);
   const { busy, error, run } = useStaffAction();
   const [flagDraft, setFlagDraft] = useState(enquiry.flagNote);
@@ -69,33 +61,33 @@ function EventRow({
       >
         <div className="min-w-0">
           <p className="flex flex-wrap items-center gap-2 font-medium text-ink">
-            {enquiry.boatName || "Unnamed boat"}
+            {enquiry.boatName || s.common.unnamedBoat}
             <span className="staff-badge staff-badge-outline">
-              {kind === "arrival" ? "Arriving" : "Departing"}
+              {kind === "arrival" ? a.arriving : a.departing}
             </span>
             {enquiry.services.helpMooring && kind === "arrival" ? (
-              <span className="staff-badge staff-badge-accent">Needs mooring help</span>
+              <span className="staff-badge staff-badge-accent">{a.needsMooringHelp}</span>
             ) : null}
             {enquiry.flagNote ? (
-              <span className="staff-badge staff-badge-warn">Flagged</span>
+              <span className="staff-badge staff-badge-warn">{a.flagged}</span>
             ) : null}
             {enquiry.arrivalStatus === "arrived" ? (
-              <span className="staff-badge staff-badge-ink">On site</span>
+              <span className="staff-badge staff-badge-ink">{a.onSite}</span>
             ) : null}
             {releasedBerth ? (
-              <span className="staff-badge staff-badge-accent">Released by berth holder</span>
+              <span className="staff-badge staff-badge-accent">{a.releasedBerth}</span>
             ) : null}
           </p>
           <p className="tabular mt-1 text-xs text-ink-muted">
-            {formatLength(Number(enquiry.loa), units)} LOA ·{" "}
-            {formatLength(Number(enquiry.beam), units)} beam ·{" "}
-            {formatLength(Number(enquiry.draft), units)} draft · Berth{" "}
-            {enquiry.assignedBerthId ?? "unassigned"}
+            {formatLength(Number(enquiry.loa), units)} {s.common.loa} ·{" "}
+            {formatLength(Number(enquiry.beam), units)} {s.common.beam} ·{" "}
+            {formatLength(Number(enquiry.draft), units)} {s.common.draft} ·{" "}
+            {s.common.berthCode(enquiry.assignedBerthId ?? a.berthUnassigned)}
           </p>
         </div>
         <div className="tabular text-right text-sm text-ink">
           <p className="font-medium">
-            {kind === "arrival" ? enquiry.eta || "ETA n/a" : enquiry.etd || "ETD n/a"}
+            {kind === "arrival" ? enquiry.eta || a.etaMissing : enquiry.etd || a.etdMissing}
           </p>
           <p className="text-xs text-ink-muted">{event.date}</p>
         </div>
@@ -105,34 +97,37 @@ function EventRow({
         <div className="mt-3 border-t border-hairline pt-3 text-sm">
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <p className="staff-label">Skipper</p>
-              <p className="text-ink">{enquiry.skipperName || "Not given"}</p>
+              <p className="staff-label">{a.skipper}</p>
+              <p className="text-ink">{enquiry.skipperName || s.common.notGiven}</p>
               <p className="text-ink-muted">{enquiry.phone}</p>
               <p className="text-ink-muted">{enquiry.email}</p>
             </div>
             <div>
-              <p className="staff-label">Stay</p>
+              <p className="staff-label">{a.stay}</p>
               <p className="text-ink">
-                {enquiry.arrival} to {enquiry.openEnded ? "open-ended" : enquiry.departure}
+                {s.common.range(
+                  enquiry.arrival,
+                  enquiry.openEnded ? s.common.openEnded : enquiry.departure
+                )}
               </p>
-              <p className="text-ink-muted">{enquiry.peopleOnBoard} on board</p>
+              <p className="text-ink-muted">{s.common.onBoard(enquiry.peopleOnBoard)}</p>
             </div>
           </div>
 
-          {serviceList(enquiry).length > 0 ? (
+          {serviceList(enquiry, s).length > 0 ? (
             <div className="mt-3">
-              <p className="staff-label">Services requested</p>
-              <p className="text-ink-soft">{serviceList(enquiry).join(", ")}</p>
+              <p className="staff-label">{a.servicesRequested}</p>
+              <p className="text-ink-soft">{serviceList(enquiry, s).join(", ")}</p>
             </div>
           ) : null}
 
           {enquiry.crew.length > 0 ? (
             <div className="mt-3">
-              <p className="staff-label">Crew and guests ({enquiry.crew.length})</p>
+              <p className="staff-label">{a.crew(enquiry.crew.length)}</p>
               <ul className="text-ink-soft">
                 {enquiry.crew.map((c, i) => (
                   <li key={i}>
-                    {c.fullName || "Unnamed"}, {c.role || c.personType}
+                    {c.fullName || s.common.unnamed}, {c.role || c.personType}
                     {c.nationality ? `, ${c.nationality}` : ""}
                   </li>
                 ))}
@@ -143,7 +138,7 @@ function EventRow({
           <div className="mt-3 flex flex-wrap items-end gap-3">
             <label className="block text-sm">
               <span className="staff-label" id={`${rowId}-berth`}>
-                Assigned berth
+                {a.assignedBerth}
               </span>
               <BerthPicker
                 id={`${rowId}-berth`}
@@ -163,7 +158,7 @@ function EventRow({
                 onClick={() => void run(() => markEnquiryArrived(staffId, enquiry.id))}
                 className="staff-btn staff-btn-primary"
               >
-                Mark arrived
+                {a.markArrived}
               </button>
             ) : null}
             {kind === "departure" && enquiry.arrivalStatus === "arrived" ? (
@@ -173,20 +168,23 @@ function EventRow({
                 onClick={() => void run(() => markEnquiryDeparted(staffId, enquiry.id))}
                 className="staff-btn staff-btn-primary"
               >
-                Mark departed
+                {a.markDeparted}
               </button>
             ) : null}
             {!editingFlag ? (
               <button type="button" onClick={() => setEditingFlag(true)} className="staff-btn">
-                {enquiry.flagNote ? "Edit flag" : "Flag an issue"}
+                {enquiry.flagNote ? a.editFlag : a.flagIssue}
               </button>
             ) : null}
+            <Link href={`/staff/reception/${enquiry.id}`} className="staff-btn">
+              {a.openCheckIn}
+            </Link>
           </div>
 
           {editingFlag ? (
             <div className="mt-3 max-w-md">
               <label className="block text-sm">
-                <span className="staff-label">Staff-only note</span>
+                <span className="staff-label">{a.staffNote}</span>
                 <textarea
                   value={flagDraft}
                   onChange={(e) => setFlagDraft(e.target.value)}
@@ -205,14 +203,14 @@ function EventRow({
                   }}
                   className="staff-btn staff-btn-primary"
                 >
-                  Save
+                  {s.common.save}
                 </button>
                 <button
                   type="button"
                   onClick={() => setEditingFlag(false)}
                   className="staff-btn staff-btn-ghost"
                 >
-                  Cancel
+                  {s.common.cancel}
                 </button>
               </div>
             </div>
@@ -233,6 +231,8 @@ function EventRow({
 
 export default function ArrivalsBoard() {
   const staffId = useStaffId();
+  const { s } = useStaffText();
+  const a = s.arrivals;
   const { value: enquiries, ready } = useStaffData(
     () => getEnquiries(staffId),
     NONE,
@@ -281,13 +281,13 @@ export default function ArrivalsBoard() {
   return (
     <div>
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="type-heading type-h2 text-ink">Arrivals</h1>
+        <h1 className="type-heading type-h2 text-ink">{a.title}</h1>
       </div>
 
       <div className="mt-3 flex flex-wrap gap-4">
         <div
           role="group"
-          aria-label="When"
+          aria-label={a.when}
           className="inline-flex rounded-md border border-ink/25 p-0.5 text-xs"
         >
           {(["today", "upcoming"] as const).map((v) => (
@@ -298,13 +298,13 @@ export default function ArrivalsBoard() {
               onClick={() => setWhen(v)}
               className={`min-h-10 rounded-sm px-3 ${when === v ? "bg-ink text-paper" : "text-ink-muted"}`}
             >
-              {v === "today" ? "Today" : `Next ${WINDOW_DAYS} days`}
+              {v === "today" ? a.today : a.nextDays(WINDOW_DAYS)}
             </button>
           ))}
         </div>
         <div
           role="group"
-          aria-label="Type"
+          aria-label={a.type}
           className="inline-flex rounded-md border border-ink/25 p-0.5 text-xs"
         >
           {(["all", "arrival", "departure"] as const).map((v) => (
@@ -315,7 +315,7 @@ export default function ArrivalsBoard() {
               onClick={() => setType(v)}
               className={`min-h-10 rounded-sm px-3 ${type === v ? "bg-ink text-paper" : "text-ink-muted"}`}
             >
-              {v === "all" ? "All" : v === "arrival" ? "Arrivals" : "Departures"}
+              {v === "all" ? a.all : v === "arrival" ? a.arrivalsFilter : a.departuresFilter}
             </button>
           ))}
         </div>
@@ -338,8 +338,7 @@ export default function ArrivalsBoard() {
 
       {ready && events.length === 0 ? (
         <p className="staff-empty mt-4">
-          Nothing scheduled for {when === "today" ? "today" : `the next ${WINDOW_DAYS} days`}
-          {type !== "all" ? ` (${type}s)` : ""}.
+          {when === "today" ? a.emptyToday : a.emptyNext(WINDOW_DAYS)}
         </p>
       ) : null}
 

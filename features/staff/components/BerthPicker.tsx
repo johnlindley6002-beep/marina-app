@@ -4,7 +4,7 @@ import { useMemo } from "react";
 import { getAllBerths } from "@/data/berths";
 import { classifyBoatLength } from "@/data/marinas";
 import { getBerthStatuses, useStaffData, type BerthOperationalInfo } from "@/lib/data";
-import { STAFF_STATUS_LABEL } from "@/features/marina/components/BerthAvailabilityMap";
+import { useStaffText } from "./StaffLanguageProvider";
 
 // Lists the berths modelled for the boat's class, each showing its status on
 // the given date so staff do not pick an obviously bad one; the mock layer's
@@ -28,6 +28,7 @@ export default function BerthPicker({
   onChange: (berthId: string) => void;
   id?: string;
 }) {
+  const { s } = useStaffText();
   const berthClass = classifyBoatLength(Number(loa) || 0);
   const { value: statuses } = useStaffData(
     () => getBerthStatuses(marinaId, dateIso),
@@ -54,17 +55,15 @@ export default function BerthPicker({
     return (
       <div>
         <p className="text-xs text-ink-muted">
-          {berthClass
-            ? `No Class ${berthClass} berths are modelled in the schematic yet.`
-            : "This length is outside the modelled classes."}{" "}
-          Enter the berth to assign it manually.
+          {berthClass ? s.picker.noClassBerths(berthClass) : s.picker.outsideClasses}{" "}
+          {s.picker.manual}
         </p>
         <input
           id={id}
           type="text"
           value={value}
           onChange={(event) => onChange(event.target.value.toUpperCase())}
-          placeholder="e.g. Q-12"
+          placeholder={s.picker.manualPlaceholder}
           className="staff-field mt-1 max-w-[10rem]"
         />
       </div>
@@ -78,7 +77,7 @@ export default function BerthPicker({
       onChange={(event) => onChange(event.target.value)}
       className="staff-field max-w-[13rem]"
     >
-      <option value="">Choose a berth</option>
+      <option value="">{s.picker.choose}</option>
       {options.map((option) => (
         <option
           key={option.id}
@@ -86,7 +85,7 @@ export default function BerthPicker({
           disabled={option.status !== "free" && option.id !== value}
         >
           {option.id}
-          {option.status !== "free" ? ` (${STAFF_STATUS_LABEL[option.status]})` : ""}
+          {option.status !== "free" ? ` (${s.status[option.status]})` : ""}
         </option>
       ))}
     </select>

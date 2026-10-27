@@ -1,11 +1,6 @@
-import type { Metadata } from "next";
-import CheckInFlow from "@/features/staff/components/CheckInFlow";
+import { redirect } from "next/navigation";
 
-export const metadata: Metadata = {
-  title: "Check-in - Staff - aldock",
-  description: "Arriving, on site and departing today.",
-};
-
+// Check-in moved to Reception.
 export default function CheckInPage() {
-  return <CheckInFlow />;
+  redirect("/staff/reception");
 }

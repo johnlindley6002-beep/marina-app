@@ -25,7 +25,7 @@ Run `npm run check`. It runs the type check, ESLint, the copy and i18n checks, t
 
 ## Words
 
-- Every user-facing string comes from `lib/i18n`, in all four languages (English, European Portuguese, Spanish, French), including `aria-label` and `alt`. Add the English key first, then the other three. `npm run check:i18n` must pass.
+- Every user-facing string comes from `lib/i18n`, in all four languages (English, European Portuguese, Spanish, French), including `aria-label` and `alt`. Add the English key first, then the other three. The staff area is the exception: it is in English and European Portuguese only, from `lib/i18n/staff/en.ts` and `pt.ts`, read with `useStaffText`. `npm run check:i18n` must pass.
 - Use the words in `docs/glossary.md`: guest, berth holder, right of use, relet (the button says Offer my berth), and boat, never vessel.
 - Format dates, times, money and plurals with `useFormat` and `lib/i18n/format.ts`.
 - No em dashes anywhere (strings, comments, docs, commit messages), no exclamation marks, no filler words. Sentence case. Verbs on buttons. Numbers with units.
@@ -41,4 +41,4 @@ A change to pricing, rules, validation, dates, money or the reletting logic need
 
 ## Local data
 
-The staff back office (arrivals, berth map, relet approvals) uses Supabase through `lib/data/staff.ts`; schema changes go in a new file in `supabase/migrations`, and only the publishable key is ever used in the app. Everything else has no backend: storage is `localStorage` inside try and catch. Enquiries go out by `mailto:`. Keep `public/images/boatyard.svg` and `public/images/pier.svg` out of commits unless told otherwise. Do not push, merge or force anything.
+The staff back office uses Supabase through `lib/data/staff.ts`. Reception, the berth planner, customers, dock tasks and the radio log run on Supabase only (`data/supabase/backoffice.ts`), and every new table gets row level security limiting staff to their own marina; schema changes go in a new file in `supabase/migrations`, and only the publishable key is ever used in the app. Everything else has no backend: storage is `localStorage` inside try and catch. Enquiries go out by `mailto:`. Keep `public/images/boatyard.svg` and `public/images/pier.svg` out of commits unless told otherwise. Do not push, merge or force anything.

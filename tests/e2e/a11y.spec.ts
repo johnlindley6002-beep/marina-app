@@ -18,9 +18,12 @@ const routes: { path: string; user?: string }[] = [
   { path: "/staff", user: "u-staff" },
   { path: "/staff/arrivals", user: "u-staff" },
   { path: "/staff/berths", user: "u-staff" },
-  { path: "/staff/checkin", user: "u-staff" },
+  { path: "/staff/reception", user: "u-staff" },
+  { path: "/staff/planner", user: "u-staff" },
   { path: "/staff/enquiries", user: "u-staff" },
-  { path: "/staff/records", user: "u-staff" },
+  { path: "/staff/customers", user: "u-staff" },
+  { path: "/staff/tasks", user: "u-staff" },
+  { path: "/staff/radio", user: "u-staff" },
   { path: "/staff/reletting", user: "u-staff" },
 ];
 

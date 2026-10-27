@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import StaffShell from "@/features/staff/components/StaffShell";
+import { StaffLanguageProvider } from "@/features/staff/components/StaffLanguageProvider";
 import { StaffSessionProvider } from "@/features/staff/components/StaffSessionProvider";
 
 export const metadata: Metadata = {
@@ -14,8 +15,10 @@ export const metadata: Metadata = {
 // and skip-link target, signed in or not.
 export default function StaffLayout({ children }: { children: React.ReactNode }) {
   return (
-    <StaffSessionProvider>
-      <StaffShell>{children}</StaffShell>
-    </StaffSessionProvider>
+    <StaffLanguageProvider>
+      <StaffSessionProvider>
+        <StaffShell>{children}</StaffShell>
+      </StaffSessionProvider>
+    </StaffLanguageProvider>
   );
 }

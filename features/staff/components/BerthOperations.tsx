@@ -24,6 +24,7 @@ import BerthAvailabilityMap, {
   type StaffBerthInfo,
 } from "@/features/marina/components/BerthAvailabilityMap";
 import BerthPicker from "./BerthPicker";
+import { useStaffText } from "./StaffLanguageProvider";
 
 const MARINA = getPrimaryMarina();
 const NONE: Enquiry[] = [];
@@ -39,6 +40,8 @@ type PanelData = {
 
 export default function BerthOperations() {
   const staffId = useStaffId();
+  const { s, dateLocale } = useStaffText();
+  const b = s.berthMap;
   const [dateIso, setDateIso] = useState(todayIso());
   const [selectedBerthId, setSelectedBerthId] = useState<string | null>(null);
   const [oosReason, setOosReason] = useState("");
@@ -103,9 +106,9 @@ export default function BerthOperations() {
   return (
     <div>
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="type-heading type-h2 text-ink">Berth map</h1>
+        <h1 className="type-heading type-h2 text-ink">{b.title}</h1>
         <label className="flex items-center gap-2 text-sm">
-          <span className="staff-label mb-0">Date</span>
+          <span className="staff-label mb-0">{b.date}</span>
           <input
             type="date"
             value={dateIso}
@@ -135,45 +138,50 @@ export default function BerthOperations() {
 
         <div className="staff-panel">
           {!panel ? (
-            <p className="text-sm text-ink-muted">Tap a berth on the map for its detail.</p>
+            <p className="text-sm text-ink-muted">{b.tapBerth}</p>
           ) : (
             <div>
-              <h2 className="type-heading type-h3 text-ink">Berth {panel.berthId}</h2>
+              <h2 className="type-heading type-h3 text-ink">{s.common.berthCode(panel.berthId)}</h2>
               <p className="mt-1 text-sm text-ink-muted">
-                Class {panel.sizeClass} · {panel.info.detail}
+                {s.common.classLabel(panel.sizeClass)} · {s.status[panel.info.status]}
+                {panel.info.detail ? ` · ${panel.info.detail}` : ""}
               </p>
 
               {link ? (
                 <div className="mt-3 text-sm">
-                  <p className="staff-label">Held by</p>
+                  <p className="staff-label">{b.heldBy}</p>
                   <p className="text-ink">
                     {link.ownerName}, {link.boatOnFile.name}
                   </p>
-                  <p className="text-xs text-ink-muted">Linked {formatLongDate(link.linkedAt)}</p>
+                  <p className="text-xs text-ink-muted">
+                    {b.linked(formatLongDate(link.linkedAt, dateLocale))}
+                  </p>
                 </div>
               ) : null}
 
               {panel.enquiry ? (
                 <div className="mt-3 text-sm">
-                  <p className="staff-label">Guest boat</p>
+                  <p className="staff-label">{b.guestBoat}</p>
                   <p className="text-ink">{panel.enquiry.boatName}</p>
                   <p className="text-ink-muted">
-                    {panel.enquiry.arrival} to{" "}
-                    {panel.enquiry.openEnded ? "open-ended" : panel.enquiry.departure}
+                    {s.common.range(
+                      panel.enquiry.arrival,
+                      panel.enquiry.openEnded ? s.common.openEnded : panel.enquiry.departure
+                    )}
                   </p>
                   {suggestions.length > 0 ? (
                     <div className="mt-2">
-                      <p className="staff-label">Suggested released berths</p>
+                      <p className="staff-label">{b.suggested}</p>
                       <ul className="flex flex-wrap gap-1.5">
-                        {suggestions.map((s) => (
-                          <li key={s.berthId}>
+                        {suggestions.map((sug) => (
+                          <li key={sug.berthId}>
                             <button
                               type="button"
                               disabled={busy}
-                              onClick={() => void reassign(panel.enquiry!.id, s.berthId)}
+                              onClick={() => void reassign(panel.enquiry!.id, sug.berthId)}
                               className="staff-btn text-xs"
                             >
-                              {s.berthId} (Class {s.sizeClass}, {s.ownerName})
+                              {b.suggestion(sug.berthId, sug.sizeClass, sug.ownerName)}
                             </button>
                           </li>
                         ))}
@@ -181,7 +189,7 @@ export default function BerthOperations() {
                     </div>
                   ) : null}
                   <div className="mt-2">
-                    <p className="staff-label">Reassign to</p>
+                    <p className="staff-label">{b.reassignTo}</p>
                     <BerthPicker
                       marinaId={MARINA.id}
                       loa={panel.enquiry.loa}
@@ -203,19 +211,19 @@ export default function BerthOperations() {
                     }
                     className="staff-btn staff-btn-primary"
                   >
-                    Return to service
+                    {b.returnToService}
                   </button>
                 ) : panel.info.status === "free" ||
                   panel.info.status === "owner-away" ||
                   panel.info.status === "released" ? (
                   <div>
                     <label className="block text-sm">
-                      <span className="staff-label">Reason</span>
+                      <span className="staff-label">{b.reason}</span>
                       <input
                         type="text"
                         value={oosReason}
                         onChange={(e) => setOosReason(e.target.value)}
-                        placeholder="e.g. pontoon repair"
+                        placeholder={b.reasonPlaceholder}
                         className="staff-field"
                       />
                     </label>
@@ -229,13 +237,11 @@ export default function BerthOperations() {
                       }
                       className="staff-btn staff-btn-danger mt-2"
                     >
-                      Mark out of service
+                      {b.markOutOfService}
                     </button>
                   </div>
                 ) : (
-                  <p className="text-xs text-ink-muted">
-                    A berth in use cannot be marked out of service.
-                  </p>
+                  <p className="text-xs text-ink-muted">{b.inUse}</p>
                 )}
                 {error ? (
                   <p role="alert" className="field-error mt-2">

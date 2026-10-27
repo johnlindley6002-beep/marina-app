@@ -8,3 +8,6 @@ public
 docs/audit/screens
 next-env.d.ts
 *.tsbuildinfo
+
+# Supabase CLI working files (linked project, versions)
+supabase/.temp

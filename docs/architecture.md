@@ -27,6 +27,8 @@ Dates are `YYYY-MM-DD` strings and all day maths is done on whole UTC days (`lib
 
 Staff access: `/staff/login` sends an email sign-in link (`shouldCreateUser: false`, sign-ups off), `app/auth/callback` swaps the link's code for a session cookie, and `proxy.ts` refreshes that cookie on staff routes. The gate in `app/staff/(backoffice)/layout.tsx` only hides screens; row level security on every table is what refuses the data.
 
+Staff screens on Supabase only: Reception (`/staff/reception`, replacing Check-in) records the documents seen and the authority formalities on the arrival; the document list is longer for a non-EU boat (`features/staff/lib/reception.ts`). The berth planner shows 14 days of the same berth statuses the berth map uses (`timeline.ts`) and warns when a boat's length, beam or draft is over the berth's limits (`berthFit.ts`). Customers (replacing Records) flags documents and rights of use that run out within 30 Lisbon days (`expiry.ts`). Dock tasks and the radio log are simple marina-scoped tables; turning a log entry into an arrival is one database function, `radio_entry_to_arrival`, so both writes succeed or neither does.
+
 Server and client: pages in `app/` are server components that render a feature component. Anything that reads `localStorage`, the language or the session is a client component. The map, the enquiry form, the lightbox, the dictionaries other than English and the PDF library are loaded on demand.
 
 ## Rules the code encodes, and where they come from

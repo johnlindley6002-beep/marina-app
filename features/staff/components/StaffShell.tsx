@@ -6,16 +6,24 @@ import type { ReactNode } from "react";
 import { siteConfig } from "@/data/site";
 import { signOutStaff, STAFF_DATA_SOURCE } from "@/lib/data";
 import { useAuth } from "@/components/providers/AuthProvider";
-import { useLanguage } from "@/components/providers/LanguageProvider";
 import { useStaffSession } from "./StaffSessionProvider";
+import { useStaffText, type StaffLang } from "./StaffLanguageProvider";
 
 const NAV = [
-  { href: "/staff/arrivals", label: "Arrivals" },
-  { href: "/staff/berths", label: "Berth map" },
-  { href: "/staff/enquiries", label: "Enquiries" },
-  { href: "/staff/reletting", label: "Reletting" },
-  { href: "/staff/checkin", label: "Check-in" },
-  { href: "/staff/records", label: "Records" },
+  { href: "/staff/arrivals", key: "arrivals" },
+  { href: "/staff/reception", key: "reception" },
+  { href: "/staff/planner", key: "planner" },
+  { href: "/staff/berths", key: "berths" },
+  { href: "/staff/enquiries", key: "enquiries" },
+  { href: "/staff/reletting", key: "reletting" },
+  { href: "/staff/customers", key: "customers" },
+  { href: "/staff/tasks", key: "tasks" },
+  { href: "/staff/radio", key: "radio" },
+] as const;
+
+const LANGS: { value: StaffLang; label: string; name: string }[] = [
+  { value: "en", label: "EN", name: "English" },
+  { value: "pt", label: "PT", name: "Português" },
 ];
 
 // A compact top bar with the nav, replacing the consumer navbar and footer for
@@ -25,7 +33,7 @@ export default function StaffShell({ children }: { children: ReactNode }) {
   const router = useRouter();
   const { user } = useAuth();
   const { signedIn, email } = useStaffSession();
-  const { t } = useLanguage();
+  const { s, lang, setLang } = useStaffText();
   const onSignIn = pathname === "/staff/login";
   const mock = STAFF_DATA_SOURCE === "mock";
   // On the mock the dev persona's name shows; on Supabase, the email.
@@ -37,14 +45,14 @@ export default function StaffShell({ children }: { children: ReactNode }) {
   }
 
   return (
-    <div className="staff-shell min-h-dvh bg-paper-deep">
+    <div className="staff-shell min-h-dvh bg-paper-deep" lang={lang}>
       <div className="staff-topbar flex-wrap gap-y-2 py-2">
         <div className="flex min-w-0 items-center gap-4">
           <Link href="/staff/arrivals" className="shrink-0 text-sm font-semibold text-ink">
-            aldock <span className="font-normal text-ink-soft">staff</span>
+            aldock <span className="font-normal text-ink-soft">{s.shell.brand}</span>
           </Link>
           {onSignIn ? null : (
-            <nav className="staff-nav overflow-x-auto" aria-label="Staff">
+            <nav className="staff-nav overflow-x-auto" aria-label={s.shell.navLabel}>
               {NAV.map((item) => {
                 const active = pathname?.startsWith(item.href);
                 return (
@@ -54,7 +62,7 @@ export default function StaffShell({ children }: { children: ReactNode }) {
                     aria-current={active ? "page" : undefined}
                     className={`staff-nav-link ${active ? "is-active" : ""}`}
                   >
-                    {item.label}
+                    {s.shell.nav[item.key]}
                   </Link>
                 );
               })}
@@ -62,26 +70,45 @@ export default function StaffShell({ children }: { children: ReactNode }) {
           )}
         </div>
         <div className="flex shrink-0 items-center gap-3">
-          {who ? (
-            <span className="text-xs text-ink-muted">{t.staffLogin.signedInAs(who)}</span>
-          ) : null}
+          <div
+            role="group"
+            aria-label={s.shell.language}
+            className="inline-flex rounded-md border border-ink/25 p-0.5 text-xs"
+          >
+            {LANGS.map((option) => (
+              <button
+                key={option.value}
+                type="button"
+                lang={option.value}
+                aria-label={option.name}
+                aria-pressed={lang === option.value}
+                onClick={() => setLang(option.value)}
+                className={`min-h-10 min-w-10 rounded-sm px-2 ${
+                  lang === option.value ? "bg-ink text-paper" : "text-ink-muted"
+                }`}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
+          {who ? <span className="text-xs text-ink-muted">{s.shell.signedInAs(who)}</span> : null}
           {who && !onSignIn ? (
             <button
               type="button"
               onClick={() => void handleSignOut()}
               className="staff-btn staff-btn-ghost"
             >
-              {t.staffLogin.signOut}
+              {s.shell.signOut}
             </button>
           ) : null}
           <Link href="/" className="staff-btn staff-btn-ghost">
-            Exit
+            {s.shell.exit}
           </Link>
         </div>
       </div>
       {siteConfig.mockMode && mock ? (
         <p className="border-b border-hairline bg-paper px-4 py-1.5 text-xs text-ink-muted">
-          {siteConfig.accounts.mockNote}
+          {s.shell.mockNote}
         </p>
       ) : null}
       <main id="main" className="staff-page">

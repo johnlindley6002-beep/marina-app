@@ -36,6 +36,32 @@ import {
 } from "@/data/supabase/staff";
 
 export type { SignInLinkResult, StaffSession };
+export { SAVE_FAILED } from "@/data/supabase/staff";
+
+// Reception, the berth planner, customers, dock tasks and the radio log run
+// on Supabase only; in mock mode their screens show a note instead.
+export {
+  addRadioEntry,
+  addTask,
+  getCustomer,
+  getPlannerBerths,
+  getRadioLog,
+  getReceptionRecord,
+  getTaskBoard,
+  listCustomers,
+  radioEntryToArrival,
+  saveReceptionDetails,
+  setAuthorityFormalities,
+  setDocumentsChecked,
+  setMyDisplayName,
+  setTaskStatus,
+  type Customer,
+  type PlannerBerth,
+  type RadioEntry,
+  type ReceptionRecord,
+  type StaffMemberOption,
+  type TaskBoard,
+} from "@/data/supabase/backoffice";
 
 export const STAFF_DATA_SOURCE: "supabase" | "mock" =
   process.env.NEXT_PUBLIC_STAFF_DATA === "mock" ? "mock" : "supabase";

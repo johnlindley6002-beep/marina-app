@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { siteConfig } from "@/data/site";
 import { formatLongDate, countNights, nightDates } from "@/lib/dates";
 import { marinas } from "@/data/marinas";
 import { nightsOfferedToVisitors } from "@/features/owner/lib/relet";
@@ -12,13 +11,13 @@ import {
   defaultNightsBooked,
   getRelettingQueue,
   RELETTING_PROGRESS,
-  RELETTING_STATUS_LABELS,
   type RelettingQueueItem,
   useStaffData,
 } from "@/lib/data";
 import { useStaffAction } from "../lib/useStaffAction";
 import { useStaffId } from "./StaffSessionProvider";
 import { Collapse } from "@/components/ui/Disclosure";
+import { useStaffText } from "./StaffLanguageProvider";
 
 const NONE: RelettingQueueItem[] = [];
 
@@ -31,8 +30,9 @@ function NightChips({
   selected: Set<string>;
   onToggle: (night: string) => void;
 }) {
+  const { s, dateLocale } = useStaffText();
   return (
-    <ul className="flex flex-wrap gap-1.5" aria-label="Nights to clear for reletting">
+    <ul className="flex flex-wrap gap-1.5" aria-label={s.reletting.nightsToClear}>
       {nights.map((night) => {
         const on = selected.has(night);
         return (
@@ -45,7 +45,7 @@ function NightChips({
                 on ? "border-ink bg-ink text-paper" : "border-ink/30 text-ink-muted"
               }`}
             >
-              {formatLongDate(night).replace(/\s\d{4}$/, "")}
+              {formatLongDate(night, dateLocale).replace(/\s(de\s)?\d{4}$/, "")}
             </button>
           </li>
         );
@@ -56,6 +56,9 @@ function NightChips({
 
 function Item({ item, staffId }: { item: RelettingQueueItem; staffId: string | null }) {
   const { request, ownerName, boatName, berthClass, estimate } = item;
+  const { s, dateLocale } = useStaffText();
+  const r = s.reletting;
+  const day = (iso: string) => formatLongDate(iso, dateLocale);
   const [note, setNote] = useState("");
   const { busy, error, run } = useStaffAction();
   const [open, setOpen] = useState(false);
@@ -81,7 +84,7 @@ function Item({ item, staffId }: { item: RelettingQueueItem; staffId: string | n
     index >= 1 &&
     index < RELETTING_PROGRESS.length - 1;
   const nextStatus = canAdvance ? RELETTING_PROGRESS[index + 1] : undefined;
-  const nextLabel = nextStatus ? RELETTING_STATUS_LABELS[nextStatus] : "";
+  const nextLabel = nextStatus ? r.statuses[nextStatus] : "";
   const rowId = `relet-${request.id}`;
 
   function decide(decision: "approve" | "decline") {
@@ -115,17 +118,16 @@ function Item({ item, staffId }: { item: RelettingQueueItem; staffId: string | n
       >
         <div>
           <p className="font-medium text-ink">
-            {ownerName}, berth {request.berthId}
-            {berthClass ? ` (Class ${berthClass})` : ""}
+            {r.holderBerth(ownerName, request.berthId)}
+            {berthClass ? ` (${s.common.classLabel(berthClass)})` : ""}
           </p>
           <p className="tabular text-xs text-ink-muted">
-            {formatLongDate(request.startDate)} to {formatLongDate(request.endDate)}, {nights}{" "}
-            nights{boatName ? `, ${boatName}` : ""}
+            {s.common.range(day(request.startDate), day(request.endDate))},{" "}
+            {s.common.nights(nights)}
+            {boatName ? `, ${boatName}` : ""}
           </p>
         </div>
-        <span className="staff-badge staff-badge-outline">
-          {RELETTING_STATUS_LABELS[request.status]}
-        </span>
+        <span className="staff-badge staff-badge-outline">{r.statuses[request.status]}</span>
       </button>
 
       <Collapse open={open} id={rowId}>
@@ -135,29 +137,32 @@ function Item({ item, staffId }: { item: RelettingQueueItem; staffId: string | n
           ) : null}
           {request.bookedNights.length > 0 ? (
             <p className="tabular text-ink">
-              {request.bookedNights.length} of {(request.approvedNights ?? offered).length} approved
-              nights booked
+              {r.bookedOf(request.bookedNights.length, (request.approvedNights ?? offered).length)}
             </p>
           ) : null}
           {request.status === "cancelled" ? (
-            <p className="text-ink-soft">Cancelled by the berth holder.</p>
+            <p className="text-ink-soft">{r.cancelledByHolder}</p>
           ) : null}
 
           <ul className="mt-2 space-y-0.5 text-ink-soft">
-            <li>Boat removal confirmed: {request.boatRemovalConfirmed ? "yes" : "no"}</li>
-            <li>Terms accepted: {formatLongDate(request.termsAcceptedAt)}</li>
+            <li>{r.boatRemoval(request.boatRemovalConfirmed ? s.common.yes : s.common.no)}</li>
+            <li>{r.termsAccepted(day(request.termsAcceptedAt))}</li>
           </ul>
 
           {estimate ? (
             <p className="tabular mt-2 text-ink-muted">
-              If every night were relet: income {eur(estimate.grossEur)}, berth holder share{" "}
-              {eur(estimate.ownerShareEur)}, fee {eur(estimate.feeEur)}, net {eur(estimate.netEur)}.
+              {r.estimate(
+                eur(estimate.grossEur),
+                eur(estimate.ownerShareEur),
+                eur(estimate.feeEur),
+                eur(estimate.netEur)
+              )}
             </p>
           ) : null}
 
           {request.status === "submitted" ? (
             <div className="mt-4">
-              <p className="staff-label">Nights to clear for reletting</p>
+              <p className="staff-label">{r.nightsToClear}</p>
               <NightChips
                 nights={offered}
                 selected={approvedSet}
@@ -171,14 +176,13 @@ function Item({ item, staffId }: { item: RelettingQueueItem; staffId: string | n
                 }
               />
               <p className="mt-1 text-xs text-ink-muted">
-                {approvedSet.size} of {offered.length} nights selected. Fewer than all is a partial
-                approval.
+                {r.selected(approvedSet.size, offered.length)}
               </p>
 
-              <p className="staff-label mt-3">Conditions for a released berth (optional)</p>
+              <p className="staff-label mt-3">{r.conditionsTitle}</p>
               <div className="mt-1 grid max-w-lg grid-cols-2 gap-2 sm:grid-cols-4">
                 <label className="text-sm">
-                  <span className="staff-label">Max length (m)</span>
+                  <span className="staff-label">{r.maxLength}</span>
                   <input
                     type="number"
                     min={0}
@@ -188,7 +192,7 @@ function Item({ item, staffId }: { item: RelettingQueueItem; staffId: string | n
                   />
                 </label>
                 <label className="text-sm">
-                  <span className="staff-label">Max beam (m)</span>
+                  <span className="staff-label">{r.maxBeam}</span>
                   <input
                     type="number"
                     min={0}
@@ -198,7 +202,7 @@ function Item({ item, staffId }: { item: RelettingQueueItem; staffId: string | n
                   />
                 </label>
                 <label className="text-sm">
-                  <span className="staff-label">Earliest relet date</span>
+                  <span className="staff-label">{r.earliest}</span>
                   <input
                     type="date"
                     value={earliestReletDate}
@@ -207,7 +211,7 @@ function Item({ item, staffId }: { item: RelettingQueueItem; staffId: string | n
                   />
                 </label>
                 <label className="text-sm">
-                  <span className="staff-label">Buffer before return (days)</span>
+                  <span className="staff-label">{r.buffer}</span>
                   <input
                     type="number"
                     min={0}
@@ -219,7 +223,7 @@ function Item({ item, staffId }: { item: RelettingQueueItem; staffId: string | n
               </div>
 
               <label className="mt-3 block max-w-md text-sm">
-                <span className="staff-label">Note to the berth holder (optional)</span>
+                <span className="staff-label">{r.noteToHolder}</span>
                 <input
                   type="text"
                   value={note}
@@ -234,7 +238,9 @@ function Item({ item, staffId }: { item: RelettingQueueItem; staffId: string | n
                   disabled={busy || approvedSet.size === 0}
                   className="staff-btn staff-btn-primary"
                 >
-                  Approve{approvedSet.size < offered.length ? ` (${approvedSet.size} nights)` : ""}
+                  {approvedSet.size < offered.length
+                    ? r.approvePartial(approvedSet.size)
+                    : r.approve}
                 </button>
                 <button
                   type="button"
@@ -242,7 +248,7 @@ function Item({ item, staffId }: { item: RelettingQueueItem; staffId: string | n
                   onClick={() => void decide("decline")}
                   className="staff-btn staff-btn-danger"
                 >
-                  Not approved
+                  {r.notApproved}
                 </button>
               </div>
             </div>
@@ -254,18 +260,16 @@ function Item({ item, staffId }: { item: RelettingQueueItem; staffId: string | n
             request.conditions.earliestReletDate ||
             request.conditions.bufferDays) ? (
             <p className="tabular mt-2 text-ink-muted">
-              Conditions:{" "}
+              {r.conditions}{" "}
               {[
                 request.conditions.maxLengthM
-                  ? `max ${request.conditions.maxLengthM} m length`
+                  ? r.condMaxLength(request.conditions.maxLengthM)
                   : null,
-                request.conditions.maxBeamM ? `max ${request.conditions.maxBeamM} m beam` : null,
+                request.conditions.maxBeamM ? r.condMaxBeam(request.conditions.maxBeamM) : null,
                 request.conditions.earliestReletDate
-                  ? `not before ${formatLongDate(request.conditions.earliestReletDate)}`
+                  ? r.condNotBefore(day(request.conditions.earliestReletDate))
                   : null,
-                request.conditions.bufferDays
-                  ? `${request.conditions.bufferDays} day buffer before return`
-                  : null,
+                request.conditions.bufferDays ? r.condBuffer(request.conditions.bufferDays) : null,
               ]
                 .filter(Boolean)
                 .join(", ")}
@@ -273,14 +277,14 @@ function Item({ item, staffId }: { item: RelettingQueueItem; staffId: string | n
           ) : null}
 
           {request.earlyReturnRequestedAt ? (
-            <p className="mt-2 font-medium text-ink">The berth holder asked to return early.</p>
+            <p className="mt-2 font-medium text-ink">{r.earlyReturn}</p>
           ) : null}
 
           {canAdvance ? (
             <div className="mt-4">
-              {nextLabel === "Booked" ? (
+              {nextStatus === "booked" ? (
                 <label className="mb-2 block max-w-[10rem] text-sm">
-                  <span className="staff-label">Nights booked (mock)</span>
+                  <span className="staff-label">{r.nightsBooked}</span>
                   <input
                     type="number"
                     min={1}
@@ -303,16 +307,14 @@ function Item({ item, staffId }: { item: RelettingQueueItem; staffId: string | n
                 }
                 className="staff-btn"
               >
-                Mock: mark as {nextLabel}
+                {r.advance(nextLabel)}
               </button>
-              <p className="mt-1 text-xs text-ink-muted">
-                Preview only. In the real product this comes from real guest bookings.
-              </p>
+              <p className="mt-1 text-xs text-ink-muted">{r.previewOnly}</p>
             </div>
           ) : null}
 
           {request.decisionNote ? (
-            <p className="mt-2 text-ink-soft">Note sent: {request.decisionNote}</p>
+            <p className="mt-2 text-ink-soft">{r.noteSent(request.decisionNote)}</p>
           ) : null}
           {error ? (
             <p role="alert" className="field-error mt-2">
@@ -348,23 +350,20 @@ function Ledger({ items }: { items: RelettingQueueItem[] }) {
     rows.set(request.userId, row);
   }
   const list = Array.from(rows.values());
+  const { s } = useStaffText();
+  const r = s.reletting;
   if (list.length === 0) return null;
 
   return (
-    <div
-      className="mt-8 overflow-x-auto"
-      tabIndex={0}
-      role="region"
-      aria-label="Reletting requests"
-    >
+    <div className="mt-8 overflow-x-auto" tabIndex={0} role="region" aria-label={r.ledgerRegion}>
       <table className="staff-table w-full text-left text-sm">
         <thead>
           <tr>
-            <th scope="col">Berth holder</th>
-            <th scope="col">Nights let</th>
-            <th scope="col">Guest revenue</th>
-            <th scope="col">Berth holder credit</th>
-            <th scope="col">Marina share</th>
+            <th scope="col">{r.ledgerHolder}</th>
+            <th scope="col">{r.ledgerNights}</th>
+            <th scope="col">{r.ledgerRevenue}</th>
+            <th scope="col">{r.ledgerCredit}</th>
+            <th scope="col">{r.ledgerMarina}</th>
           </tr>
         </thead>
         <tbody>
@@ -387,6 +386,8 @@ function Ledger({ items }: { items: RelettingQueueItem[] }) {
 // lands here as "submitted" and nothing is relet until staff decide it.
 export default function RelettingQueue() {
   const staffId = useStaffId();
+  const { s } = useStaffText();
+  const r = s.reletting;
   const { value: items, ready } = useStaffData(
     () => getRelettingQueue(staffId),
     NONE,
@@ -401,14 +402,12 @@ export default function RelettingQueue() {
 
   return (
     <div>
-      <h1 className="type-heading type-h2 text-ink">Reletting approvals</h1>
-      <p className="mt-1 max-w-2xl text-sm text-ink-muted">{siteConfig.relet.queueIntro}</p>
+      <h1 className="type-heading type-h2 text-ink">{r.title}</h1>
+      <p className="mt-1 max-w-2xl text-sm text-ink-muted">{r.intro}</p>
 
-      <h2 className="type-heading type-h3 mt-6 text-ink">
-        Waiting for your decision ({pending.length})
-      </h2>
+      <h2 className="type-heading type-h3 mt-6 text-ink">{r.waiting(pending.length)}</h2>
       {ready && pending.length === 0 ? (
-        <p className="staff-empty mt-2">Nothing is waiting.</p>
+        <p className="staff-empty mt-2">{r.nothingWaiting}</p>
       ) : (
         <ul className="mt-2 space-y-2">
           {pending.map((item) => (
@@ -419,7 +418,7 @@ export default function RelettingQueue() {
 
       {active.length > 0 ? (
         <>
-          <h2 className="type-heading type-h3 mt-6 text-ink">In progress</h2>
+          <h2 className="type-heading type-h3 mt-6 text-ink">{r.inProgress}</h2>
           <ul className="mt-2 space-y-2">
             {active.map((item) => (
               <Item key={item.request.id} item={item} staffId={staffId} />
@@ -430,7 +429,7 @@ export default function RelettingQueue() {
 
       {closed.length > 0 ? (
         <>
-          <h2 className="type-heading type-h3 mt-6 text-ink">Closed ({closed.length})</h2>
+          <h2 className="type-heading type-h3 mt-6 text-ink">{r.closed(closed.length)}</h2>
           <ul className="mt-2 space-y-2">
             {closed.map((item) => (
               <Item key={item.request.id} item={item} staffId={staffId} />
@@ -439,7 +438,7 @@ export default function RelettingQueue() {
         </>
       ) : null}
 
-      <h2 className="type-heading type-h3 mt-8 text-ink">Ledger</h2>
+      <h2 className="type-heading type-h3 mt-8 text-ink">{r.ledger}</h2>
       <Ledger items={items} />
     </div>
   );
