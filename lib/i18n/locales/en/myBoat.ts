@@ -68,7 +68,7 @@ export const myBoat = {
     saveBoat: "Save boat",
     cancel: "Cancel",
     errName: "Enter a name for this boat.",
-    errType: "Choose a vessel type: sail, motor, catamaran or other.",
+    errType: "Choose a boat type: sail, motor, catamaran or other.",
     errLoa: "Enter the length overall, for example 12.5.",
     errBeam: "Enter the beam, for example 4.2.",
     errDraft: "Enter the draft, for example 1.8.",

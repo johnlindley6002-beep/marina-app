@@ -4,7 +4,7 @@ import PageHeader from "@/components/layout/PageHeader";
 
 export const metadata: Metadata = {
   title: "Reletting terms - aldock",
-  description: "The terms for reletting a berth while its holder is away.",
+  description: "The terms for reletting a berth while its berth holder is away.",
 };
 
 // PLACEHOLDER. TODO (legal): replace this page with the real terms, supplied by

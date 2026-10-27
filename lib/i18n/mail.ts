@@ -7,7 +7,7 @@ import { contentLocale, type Locale } from "./types";
 const en = {
   arrivingNow: {
     subject: (boat: string) => `Arriving now - ${boat}`,
-    visitingVessel: "visiting vessel",
+    visitingVessel: "guest boat",
     title: (marina: string) => `ARRIVING NOW - ${marina}`,
     eta: (time: string) => `ETA: now (sent at ${time} local time)`,
     skipperPhone: "Skipper phone: (please add)",
@@ -39,7 +39,7 @@ const en = {
   },
   departure: {
     subject: (boat: string) => `Departure notice - ${boat}`,
-    visitingVessel: "visiting vessel",
+    visitingVessel: "guest boat",
     title: (marina: string) => `DEPARTURE NOTICE - ${marina}`,
     boat: (v: string) => `Boat: ${v}`,
     berth: (v: string) => `Berth: ${v}`,
@@ -65,7 +65,7 @@ const en = {
     nights: (n: number) => `Nights: ${n}`,
     yourBoat: "YOUR BOAT",
     boatName: (v: string) => `Boat name: ${v}`,
-    vesselType: (v: string) => `Vessel type: ${v}`,
+    vesselType: (v: string) => `Boat type: ${v}`,
     selectedBerth: (v: string) => `Selected berth: ${v}`,
     skipperAndContact: "SKIPPER AND CONTACT",
     skipper: (v: string) => `Skipper: ${v}`,
@@ -122,7 +122,7 @@ export type MailText = typeof en;
 const pt: MailText = {
   arrivingNow: {
     subject: (boat) => `Chegada imediata - ${boat}`,
-    visitingVessel: "embarcação em visita",
+    visitingVessel: "embarcação de visitante",
     title: (marina) => `CHEGADA IMEDIATA - ${marina}`,
     eta: (time) => `ETA: agora (enviado às ${time}, hora local)`,
     skipperPhone: "Telefone do comandante: (por favor acrescente)",
@@ -155,7 +155,7 @@ const pt: MailText = {
   },
   departure: {
     subject: (boat) => `Aviso de partida - ${boat}`,
-    visitingVessel: "embarcação em visita",
+    visitingVessel: "embarcação de visitante",
     title: (marina) => `AVISO DE PARTIDA - ${marina}`,
     boat: (v) => `Embarcação: ${v}`,
     berth: (v) => `Posto: ${v}`,

@@ -6,17 +6,10 @@ import type { Mode } from "@/lib/data";
 import { useLanguage } from "@/components/providers/LanguageProvider";
 import SegmentedControl from "./SegmentedControl";
 
-// The Guest / Owner switch. It renders only for a user who holds the owner
-// role, so a plain voyager never sees it.
-export default function ModeSwitch({
-  className = "",
-  tone = "dark",
-  onSwitched,
-}: {
-  className?: string;
-  tone?: "dark" | "light";
-  onSwitched?: () => void;
-}) {
+// The Guest / Berth holder switch, drawn as a pill. It renders only for a
+// signed-in user who has at least one linked berth (the berth holder role), so
+// a plain guest never sees it. It lives in the floating dock, not the header.
+export default function ModeSwitch() {
   const { canSwitchMode, mode, setMode } = useAuth();
   const router = useRouter();
   const { t } = useLanguage();
@@ -31,7 +24,6 @@ export default function ModeSwitch({
     if (next === mode) return;
     if (!setMode(next)) return;
     router.push(next === "owner" ? "/owner" : "/");
-    onSwitched?.();
   }
 
   return (
@@ -40,8 +32,7 @@ export default function ModeSwitch({
       options={options}
       value={mode}
       onChange={choose}
-      className={className}
-      tone={tone}
+      tone="pill"
     />
   );
 }

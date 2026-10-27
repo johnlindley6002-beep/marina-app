@@ -16,7 +16,7 @@ export const chrome: Dictionary["chrome"] = {
     signOut: "Terminar sessão",
     menuFor: (name) => `Menu da conta de ${name}`,
   },
-  mode: { label: "Modo", guest: "Visitante", owner: "Titular" },
+  mode: { label: "Modo", guest: "Visitante", owner: "Titular do posto" },
   gate: {
     back: "Voltar às marinas",
     signInTitle: "Inicie sessão para continuar",
@@ -24,9 +24,9 @@ export const chrome: Dictionary["chrome"] = {
       "Não tem sessão iniciada. Isto é uma demonstração: use o seletor no canto inferior esquerdo para entrar com uma conta de exemplo.",
     notAvailable:
       "Não tem sessão iniciada. O início de sessão não está disponível nesta pré-visualização.",
-    ownerTitle: "O modo titular não está disponível",
+    ownerTitle: "O modo titular do posto não está disponível",
     ownerLocked:
-      "O modo titular fica disponível quando a marina associa o seu posto de amarração à sua conta. Não o pode adicionar sozinho.",
+      "O modo titular do posto fica disponível quando a marina associa o seu posto de amarração à sua conta. Não o pode adicionar sozinho.",
     staffTitle: "Área da equipa",
     staffLocked:
       "A área da equipa é para o pessoal da marina que aceitou o convite da respetiva marina.",

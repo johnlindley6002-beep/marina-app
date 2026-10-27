@@ -503,7 +503,7 @@ export function checkBerthAvailability(
     if (alreadyBooked) {
       return {
         ok: false,
-        error: `Berth ${berthId} already has a visitor booked on part of these dates.`,
+        error: `Berth ${berthId} already has a guest booked on part of these dates.`,
       };
     }
   }

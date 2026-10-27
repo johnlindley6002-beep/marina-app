@@ -17,11 +17,11 @@ export const account: Dictionary["account"] = {
   roles: "As suas funções",
   roleCopy: {
     voyager: {
-      title: "Viajante",
-      how: "Registou-se como viajante. É a função de todos por predefinição.",
+      title: "Visitante",
+      how: "Registou-se como visitante. É a função de todos por predefinição.",
     },
     owner: {
-      title: "Titular",
+      title: "Titular do posto de amarração",
       how: "Atribuída porque uma marina associou um posto de amarração a si. Não pode ser acrescentada nem retirada aqui.",
     },
     staff: {
@@ -31,12 +31,12 @@ export const account: Dictionary["account"] = {
   },
   howRolesWork: "Como funcionam as funções",
   rules: [
-    "Qualquer pessoa se pode registar como viajante.",
-    "A função de titular só é atribuída quando uma marina associa um posto de amarração a si.",
+    "Qualquer pessoa se pode registar como visitante.",
+    "A função de titular do posto de amarração só é atribuída quando uma marina associa um posto a si.",
     "A função de equipa só é atribuída quando uma marina o convida e aceita.",
   ],
-  ownerMode: "Modo titular",
+  ownerMode: "Modo titular do posto",
   ownerModeBody:
-    "Use o seletor Visitante e Titular na barra superior para alternar entre reservar como visitante e gerir o posto de amarração de que é titular.",
+    "Use o seletor Visitante e Titular do posto no canto inferior esquerdo para alternar entre reservar como visitante e gerir o seu posto de amarração.",
   goToMyBerth: "Ir para O meu posto",
 };

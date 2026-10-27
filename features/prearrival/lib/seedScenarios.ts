@@ -228,7 +228,7 @@ export function scenarioMultihullSeasonBoundary(): PreArrivalDraft {
 }
 
 export const DRAFT_SCENARIOS = [
-  { key: "solo-sailor", label: "1. Solo sailor", build: scenarioSoloSailor },
+  { key: "solo-sailor", label: "1. Solo guest", build: scenarioSoloSailor },
   { key: "twelve-people", label: "2. Twelve people", build: scenarioTwelvePeople },
   { key: "minor-on-board", label: "3. Minor on board", build: scenarioMinorOnBoard },
   {

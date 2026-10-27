@@ -138,7 +138,7 @@ function Item({ item, staffId }: { item: RelettingQueueItem; staffId: string }) 
             </p>
           ) : null}
           {request.status === "cancelled" ? (
-            <p className="text-ink-soft">Cancelled by the holder.</p>
+            <p className="text-ink-soft">Cancelled by the berth holder.</p>
           ) : null}
 
           <ul className="mt-2 space-y-0.5 text-ink-soft">
@@ -148,7 +148,7 @@ function Item({ item, staffId }: { item: RelettingQueueItem; staffId: string }) 
 
           {estimate ? (
             <p className="tabular mt-2 text-ink-muted">
-              If every night were relet: income {eur(estimate.grossEur)}, holder share{" "}
+              If every night were relet: income {eur(estimate.grossEur)}, berth holder share{" "}
               {eur(estimate.ownerShareEur)}, fee {eur(estimate.feeEur)}, net {eur(estimate.netEur)}.
             </p>
           ) : null}
@@ -217,7 +217,7 @@ function Item({ item, staffId }: { item: RelettingQueueItem; staffId: string }) 
               </div>
 
               <label className="mt-3 block max-w-md text-sm">
-                <span className="staff-label">Note to the holder (optional)</span>
+                <span className="staff-label">Note to the berth holder (optional)</span>
                 <input
                   type="text"
                   value={note}
@@ -270,7 +270,7 @@ function Item({ item, staffId }: { item: RelettingQueueItem; staffId: string }) 
           ) : null}
 
           {request.earlyReturnRequestedAt ? (
-            <p className="mt-2 font-medium text-ink">The holder asked to return early.</p>
+            <p className="mt-2 font-medium text-ink">The berth holder asked to return early.</p>
           ) : null}
 
           {canAdvance ? (
@@ -301,7 +301,7 @@ function Item({ item, staffId }: { item: RelettingQueueItem; staffId: string }) 
                 Mock: mark as {nextLabel}
               </button>
               <p className="mt-1 text-xs text-ink-muted">
-                Preview only. In the real product this comes from real visitor bookings.
+                Preview only. In the real product this comes from real guest bookings.
               </p>
             </div>
           ) : null}
@@ -355,10 +355,10 @@ function Ledger({ items }: { items: RelettingQueueItem[] }) {
       <table className="staff-table w-full text-left text-sm">
         <thead>
           <tr>
-            <th scope="col">Holder</th>
+            <th scope="col">Berth holder</th>
             <th scope="col">Nights let</th>
-            <th scope="col">Visitor revenue</th>
-            <th scope="col">Holder credit</th>
+            <th scope="col">Guest revenue</th>
+            <th scope="col">Berth holder credit</th>
             <th scope="col">Marina share</th>
           </tr>
         </thead>

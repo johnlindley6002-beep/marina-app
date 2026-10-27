@@ -38,7 +38,7 @@ export default function ScenarioLoader() {
       <div className="page-column page-reading">
         <h1 className="type-title text-ink">Pre-arrival test scenarios</h1>
         <p className="measure mt-4 text-ink-soft">
-          Dev only. Loads a scenario into the mock data layer, the same as if a boater or berth
+          Dev only. Loads a scenario into the mock data layer, the same as if a guest or berth
           holder had entered it by hand.
         </p>
 
@@ -61,8 +61,8 @@ export default function ScenarioLoader() {
         <section className="chapter">
           <h2 className="type-heading type-h2 text-ink">Reletting scenarios</h2>
           <p className="mt-1 text-sm text-ink-muted">
-            Creates and, where relevant, approves a reletting request for the seed owner&apos;s
-            berth (G-14).
+            Creates and, where relevant, approves a reletting request for the seed berth
+            holder&apos;s berth (G-14).
           </p>
           <ul className="mt-4 space-y-2">
             <li>
@@ -71,7 +71,7 @@ export default function ScenarioLoader() {
                 onClick={() => runReletScenario("away-relet")}
                 className="btn-secondary"
               >
-                7. Holder away 3 weeks in August, relet 10 nights
+                7. Berth holder away 3 weeks in August, relet 10 nights
               </button>
             </li>
             <li>
@@ -80,7 +80,7 @@ export default function ScenarioLoader() {
                 onClick={() => runReletScenario("early-return")}
                 className="btn-secondary"
               >
-                8. Holder returns early while berth is let
+                8. Berth holder returns early while berth is let
               </button>
             </li>
           </ul>

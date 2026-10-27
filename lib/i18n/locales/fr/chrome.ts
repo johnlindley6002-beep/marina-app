@@ -16,7 +16,7 @@ export const chrome: Dictionary["chrome"] = {
     signOut: "Se déconnecter",
     menuFor: (name) => `Menu du compte de ${name}`,
   },
-  mode: { label: "Mode", guest: "Visiteur", owner: "Titulaire" },
+  mode: { label: "Mode", guest: "Visiteur", owner: "Titulaire de la place" },
   gate: {
     back: "Retour aux marinas",
     signInTitle: "Connectez-vous pour continuer",

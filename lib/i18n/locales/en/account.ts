@@ -16,11 +16,11 @@ export const account = {
   roles: "Your roles",
   roleCopy: {
     voyager: {
-      title: "Voyager",
-      how: "You signed up as a voyager. This is the default for everyone.",
+      title: "Guest",
+      how: "You signed up as a guest. This is the default for everyone.",
     },
     owner: {
-      title: "Owner",
+      title: "Berth holder",
       how: "Granted because a marina linked a berth to you. It cannot be added or removed from here.",
     },
     staff: {
@@ -30,12 +30,12 @@ export const account = {
   },
   howRolesWork: "How roles work",
   rules: [
-    "Anyone can sign up as a voyager.",
-    "Owner is granted only when a marina links a berth to you.",
+    "Anyone can sign up as a guest.",
+    "Berth holder is granted only when a marina links a berth to you.",
     "Staff is granted only when a marina invites you and you accept.",
   ],
-  ownerMode: "Owner mode",
+  ownerMode: "Berth holder mode",
   ownerModeBody:
-    "Use the Guest and Owner switch in the top bar to move between booking as a guest and managing the berth you hold.",
+    "Use the Guest and Berth holder switch at the bottom left to move between booking as a guest and managing your berth.",
   goToMyBerth: "Go to My berth",
 };

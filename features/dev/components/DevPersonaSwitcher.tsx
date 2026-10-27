@@ -25,12 +25,12 @@ export default function DevPersonaSwitcher() {
   const active = personas.find((p) => p.id === activePersonaId);
 
   return (
-    <div className="on-ink fixed bottom-[max(0.75rem,env(safe-area-inset-bottom))] left-3 z-[60] max-w-[calc(100vw-1.5rem)] text-sm">
+    <div className="relative">
       {open ? (
         <div
           role="group"
           aria-label="Mock sign in, dev only"
-          className="mb-2 w-72 max-w-full rounded-md border border-paper/20 bg-ink p-3 text-paper shadow-overlay"
+          className="absolute bottom-full left-0 mb-2 w-72 max-w-[calc(100vw-1.5rem)] rounded-md border border-paper/20 bg-ink p-3 text-paper shadow-overlay"
         >
           <p className="font-medium">Mock / dev only</p>
           <p className="mt-1 text-xs text-stone">
@@ -70,7 +70,7 @@ export default function DevPersonaSwitcher() {
             onClick={emptyMockReletting}
             className="flex min-h-11 w-full items-center rounded-md px-3 text-left text-xs text-stone hover:bg-paper/10"
           >
-            Show first-time owner view
+            Show first-time berth holder view
           </button>
           <button
             type="button"

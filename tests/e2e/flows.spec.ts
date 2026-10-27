@@ -58,7 +58,7 @@ test("the language switch changes the page and survives a reload", async ({ page
 });
 
 const SCENARIOS = [
-  { label: "1. Solo sailor", people: 1 },
+  { label: "1. Solo guest", people: 1 },
   { label: "2. Twelve people", people: 12 },
   { label: "3. Minor on board", people: 2 },
   { label: "4. Non-EU flagged boat, EU crew", people: null },
@@ -138,4 +138,32 @@ test("an owner's reletting request reaches the staff queue", async ({ page }) =>
   await page.goto("/staff/reletting");
   await expect(page.getByRole("heading", { level: 1, name: "Reletting approvals" })).toBeVisible();
   await expect(page.getByText("Berth G-14").first()).toBeVisible();
+});
+
+test("the Guest and Berth holder switch is a floating pill, only for someone with a linked berth", async ({
+  page,
+}) => {
+  await signInAs(page, "u-owner");
+  await page.goto("/");
+  const pill = page.getByRole("group", { name: "Mode" });
+  await expect(pill).toBeVisible();
+  await expect(pill.getByRole("button", { name: "Guest" })).toHaveAttribute("aria-pressed", "true");
+  // bottom-left, and not in the header
+  const box = (await pill.boundingBox())!;
+  const viewport = page.viewportSize()!;
+  expect(box.x).toBeLessThan(viewport.width / 2);
+  expect(box.y).toBeGreaterThan(viewport.height / 2);
+  await expect(page.locator("header").getByRole("group", { name: "Mode" })).toHaveCount(0);
+  // 44 px tall, like the Mock pill
+  expect(Math.round(box.height)).toBe(44);
+
+  await pill.getByRole("button", { name: "Berth holder" }).click();
+  await expect(page).toHaveURL(/\/owner$/);
+  await expect(page.getByRole("link", { name: "Offer my berth" }).first()).toBeVisible();
+});
+
+test("a guest without a linked berth gets no switch", async ({ page }) => {
+  await signInAs(page, "u-voyager");
+  await page.goto("/");
+  await expect(page.getByRole("group", { name: "Mode" })).toHaveCount(0);
 });

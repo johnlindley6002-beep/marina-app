@@ -75,7 +75,7 @@ function EventRow({ event, staffId }: { event: BoardEvent; staffId: string | nul
               <span className="staff-badge staff-badge-ink">On site</span>
             ) : null}
             {releasedBerth ? (
-              <span className="staff-badge staff-badge-accent">Released holder berth</span>
+              <span className="staff-badge staff-badge-accent">Released by berth holder</span>
             ) : null}
           </p>
           <p className="tabular mt-1 text-xs text-ink-muted">

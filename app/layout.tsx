@@ -4,7 +4,7 @@ import "./globals.css";
 import AppChrome from "@/components/layout/AppChrome";
 import SkipLink from "@/components/layout/SkipLink";
 import { AuthProvider } from "@/components/providers/AuthProvider";
-import DevPersonaSwitcher from "@/features/dev/components/DevPersonaSwitcher";
+import FloatingDock from "@/components/layout/FloatingDock";
 import { BoatProvider } from "@/components/providers/BoatProvider";
 import { LanguageProvider } from "@/components/providers/LanguageProvider";
 import ServiceWorkerRegister from "@/components/layout/ServiceWorkerRegister";
@@ -58,7 +58,7 @@ export default function RootLayout({
               <AuthProvider>
                 <AppChrome>{children}</AppChrome>
                 <ServiceWorkerRegister />
-                <DevPersonaSwitcher />
+                <FloatingDock />
               </AuthProvider>
             </BoatProvider>
           </UnitsProvider>

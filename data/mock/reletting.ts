@@ -65,7 +65,7 @@ export const RELETTING_STATUS_LABELS: Record<RelettingStatus, string> = {
 export type RelettingEvent = {
   status: RelettingStatus;
   at: string;
-  // A short plain-language note, for example "Dates changed by the holder".
+  // A short plain-language note, for example "Dates changed by the berth holder".
   note?: string;
 };
 
@@ -256,7 +256,7 @@ export function buildSeedRelettingStore(): ReletStore {
         kind: "booked",
         requestId: request.id,
         title: "Your berth was booked",
-        body: "A visitor booked your berth for part of your absence.",
+        body: "A guest booked your berth for part of your absence.",
         at: "2026-06-20T14:15:00.000Z",
         read: true,
       },
@@ -335,7 +335,7 @@ export function submitRelettingRequest(
 ): SubmitRelettingResult {
   const berth = getOwnedBerths(userId).find((b) => b.berthId === input.berthId);
   if (!userId || !berth) {
-    return { ok: false, error: "Only the holder of this berth can make it available." };
+    return { ok: false, error: "Only the berth holder can offer this berth." };
   }
   const terms = marinas.find((m) => m.id === berth.marinaId)?.reletting;
   if (!terms) {
@@ -615,7 +615,7 @@ export function advanceRelettingStatus(
         next,
         "booked",
         "Your berth was booked",
-        `A visitor booked ${next.bookedNights.length} of your ${all.length} nights.`
+        `A guest booked ${next.bookedNights.length} of your ${all.length} nights.`
       )
     );
   }
@@ -682,10 +682,10 @@ export function updateRelettingRequest(
   dates: { startDate: string; endDate: string }
 ): ChangeRelettingResult {
   const found = ownedRequest(userId, requestId);
-  if (!found) return { ok: false, error: "Only the holder can change this request." };
+  if (!found) return { ok: false, error: "Only the berth holder can change this request." };
   const { store, request } = found;
   if (!isRelettingEditable(request)) {
-    return { ok: false, error: "A visitor has booked this, so it can no longer be changed here." };
+    return { ok: false, error: "A guest has booked this, so it can no longer be changed here." };
   }
   if (countNights(dates.startDate, dates.endDate) < 1) {
     return { ok: false, error: "Choose a return date after the day you leave." };
@@ -718,8 +718,8 @@ export function updateRelettingRequest(
         status: "submitted",
         at: now,
         note: needsConsent
-          ? "Dates changed by the holder, so the marina's consent is needed again"
-          : "Dates changed by the holder",
+          ? "Dates changed by the berth holder, so the marina's consent is needed again"
+          : "Dates changed by the berth holder",
       },
     ],
   };
@@ -735,12 +735,12 @@ export function cancelRelettingRequest(
   requestId: string
 ): ChangeRelettingResult {
   const found = ownedRequest(userId, requestId);
-  if (!found) return { ok: false, error: "Only the holder can cancel this request." };
+  if (!found) return { ok: false, error: "Only the berth holder can cancel this request." };
   const { store, request } = found;
   if (!isRelettingEditable(request)) {
     return {
       ok: false,
-      error: "A visitor has booked this, so it cannot be cancelled here. Contact the marina.",
+      error: "A guest has booked this, so it cannot be cancelled here. Contact the marina.",
     };
   }
   const next: RelettingRequest = {
@@ -748,7 +748,7 @@ export function cancelRelettingRequest(
     status: "cancelled",
     history: [
       ...request.history,
-      { status: "cancelled", at: new Date().toISOString(), note: "Cancelled by the holder" },
+      { status: "cancelled", at: new Date().toISOString(), note: "Cancelled by the berth holder" },
     ],
   };
   saveReletStore({
@@ -766,7 +766,7 @@ export function requestEarlyReturn(
   requestId: string
 ): ChangeRelettingResult {
   const found = ownedRequest(userId, requestId);
-  if (!found) return { ok: false, error: "Only the holder can do this." };
+  if (!found) return { ok: false, error: "Only the berth holder can do this." };
   const { store, request } = found;
   if (!["approved", "listed", "booked"].includes(request.status)) {
     return { ok: false, error: "This request is not currently active." };
@@ -782,7 +782,7 @@ export function requestEarlyReturn(
       {
         status: request.status,
         at: new Date().toISOString(),
-        note: "Holder asked to return early",
+        note: "Berth holder asked to return early",
       },
     ],
   };

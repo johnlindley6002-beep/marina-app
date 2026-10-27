@@ -19,11 +19,11 @@ export const account: Dictionary["account"] = {
   roles: "Vos rôles",
   roleCopy: {
     voyager: {
-      title: "Plaisancier",
-      how: "Vous vous êtes inscrit comme plaisancier. C'est le rôle par défaut de tout le monde.",
+      title: "Visiteur",
+      how: "Vous vous êtes inscrit comme visiteur. C'est le rôle par défaut de tout le monde.",
     },
     owner: {
-      title: "Titulaire",
+      title: "Titulaire de la place",
       how: "Attribué parce qu'une marina a associé une place à votre compte. Il ne peut être ni ajouté ni retiré ici.",
     },
     staff: {
@@ -33,12 +33,12 @@ export const account: Dictionary["account"] = {
   },
   howRolesWork: "Comment fonctionnent les rôles",
   rules: [
-    "Tout le monde peut s'inscrire comme plaisancier.",
-    "Le rôle de titulaire n'est attribué que lorsqu'une marina associe une place à votre compte.",
+    "Tout le monde peut s'inscrire comme visiteur.",
+    "Le rôle de titulaire de la place n'est attribué que lorsqu'une marina associe une place à votre compte.",
     "Le rôle de personnel n'est attribué que lorsqu'une marina vous invite et que vous acceptez.",
   ],
-  ownerMode: "Mode titulaire",
+  ownerMode: "Mode titulaire de la place",
   ownerModeBody:
-    "Utilisez le sélecteur Visiteur et Titulaire de la barre du haut pour passer de la réservation en tant que visiteur à la gestion de la place que vous détenez.",
+    "Utilisez le sélecteur Visiteur et Titulaire de la place en bas à gauche pour passer de la réservation en tant que visiteur à la gestion de votre place.",
   goToMyBerth: "Aller à Ma place",
 };

@@ -26,6 +26,7 @@ Run `npm run check`. It runs the type check, ESLint, the copy and i18n checks, t
 ## Words
 
 - Every user-facing string comes from `lib/i18n`, in all four languages (English, European Portuguese, Spanish, French), including `aria-label` and `alt`. Add the English key first, then the other three. `npm run check:i18n` must pass.
+- Use the words in `docs/glossary.md`: guest, berth holder, right of use, relet (the button says Offer my berth), and boat, never vessel.
 - Format dates, times, money and plurals with `useFormat` and `lib/i18n/format.ts`.
 - No em dashes anywhere (strings, comments, docs, commit messages), no exclamation marks, no filler words. Sentence case. Verbs on buttons. Numbers with units.
 - Never show a fake trust signal: no invented rating, review count, "only 2 left" or urgency message. Anything simulated is labelled as a demo or indicative. The Google reviews block shows only with real data above the minimum count.

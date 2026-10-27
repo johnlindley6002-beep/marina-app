@@ -65,7 +65,7 @@ export const preArrival: Dictionary["preArrival"] = {
     multihullLabel: "Multihull",
     classLabel: (cls) => `Berth class ${cls}`,
     indicativeNightly: (amount) => `About ${amount} a night, indicative`,
-    vesselUseLabel: "Vessel use",
+    vesselUseLabel: "Boat use",
     ownerHeading: "About you",
     ownerNameLabel: "Full name",
     ownerIdLabel: "ID or passport number",

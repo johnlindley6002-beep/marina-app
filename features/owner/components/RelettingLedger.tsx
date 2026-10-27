@@ -100,7 +100,7 @@ function EarlyReturn({ request }: { request: RelettingRequest }) {
       <p className="mt-3 text-sm text-ink-muted">
         You told the marina you are returning early.
         {request.status === "booked"
-          ? " Since a visitor is aboard, the marina will offer you a temporary berth or ask you to coordinate a handover."
+          ? " Since a guest is aboard, the marina will offer you a temporary berth or ask you to coordinate a handover."
           : ""}
       </p>
     );

@@ -668,7 +668,7 @@ const CASCAIS_FACILITY_DETAILS: FacilityDetail[] = [
     details: [
       { en: "Certified maintenance", pt: "Manutenção certificada" },
       // {{m:N}} is rendered in the visitor's chosen length unit.
-      { en: "Vessels up to {{m:25}}", pt: "Embarcações até {{m:25}}" },
+      { en: "Boats up to {{m:25}}", pt: "Embarcações até {{m:25}}" },
     ],
     mapPoint: { x: 275, y: 600 },
   },
@@ -714,8 +714,8 @@ const CASCAIS_FACILITY_DETAILS: FacilityDetail[] = [
     name: { en: "Waste & recycling", pt: "Resíduos e reciclagem" },
     icon: "waste",
     description: {
-      en: "Recycling points and waste disposal for visiting boats.",
-      pt: "Pontos de reciclagem e recolha de resíduos para embarcações visitantes.",
+      en: "Recycling points and waste disposal for guests.",
+      pt: "Pontos de reciclagem e recolha de resíduos para visitantes.",
     },
     details: [
       { en: "Recycling points", pt: "Ecopontos" },
@@ -761,7 +761,7 @@ export const marinas: Marina[] = [
     vhfChannel: CASCAIS_VHF_CHANNEL,
     officeHours: CASCAIS_OFFICE_HOURS,
     description:
-      "Marina de Cascais is a full-service marina on the Bay of Cascais, just five minutes from the town centre and the largest on the Portuguese Riviera. With around 650 berths for vessels up to 36 metres, it pairs sheltered, modern moorings with a complete range of nautical services alongside the restaurants and shops of the waterfront.",
+      "Marina de Cascais is a full-service marina on the Bay of Cascais, just five minutes from the town centre and the largest on the Portuguese Riviera. With around 650 berths for boats up to 36 metres, it pairs sheltered, modern moorings with a complete range of nautical services alongside the restaurants and shops of the waterfront.",
     facilities: [
       "fuel",
       "water",
@@ -844,12 +844,12 @@ export const marinas: Marina[] = [
       temporaryAdmission: {
         private: "Non-EU-flagged boats get 18 months Temporary Admission (customs).",
         commercial:
-          "Temporary Admission (18 months) is for private use only and does not apply to chartered or commercial vessels.",
+          "Temporary Admission (18 months) is for private use only and does not apply to chartered or commercial boats.",
       },
       commercialUseNotes: [
         `Commercial charter is subject to VAT on the charter fee (Portugal ${Math.round(CASCAIS_VAT_RATE * 100)}%), not the 18-month Temporary Admission private scheme.`,
-        "A chartered non-EU-flagged vessel cannot use Temporary Admission; Portuguese customs may request proof of Union goods status (VAT-paid evidence and possibly a T2L document).",
-        "Bring the operating entity's commercial insurance and the vessel's registration and licence.",
+        "A chartered non-EU-flagged boat cannot use Temporary Admission; Portuguese customs may request proof of Union goods status (VAT-paid evidence and possibly a T2L document).",
+        "Bring the operating entity's commercial insurance and the boat's registration and licence.",
       ],
       commercialUseDisclaimer:
         "General guidance only, not legal advice. Confirm the rules with Portuguese customs or the marina.",

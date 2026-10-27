@@ -6,7 +6,6 @@ import Link from "next/link";
 import AccountMenu from "./AccountMenu";
 import { useAuth } from "@/components/providers/AuthProvider";
 import LanguageSelect from "./LanguageSelect";
-import ModeSwitch from "@/components/ui/ModeSwitch";
 import { useLanguage } from "@/components/providers/LanguageProvider";
 import UnitSegmented from "@/components/ui/UnitSegmented";
 
@@ -67,9 +66,6 @@ export default function Navbar() {
         </nav>
 
         <div className="ml-auto hidden items-center gap-3 md:flex">
-          <div className="hidden lg:block">
-            <ModeSwitch />
-          </div>
           <UnitSegmented />
           <LanguageSelect />
           <AccountMenu />

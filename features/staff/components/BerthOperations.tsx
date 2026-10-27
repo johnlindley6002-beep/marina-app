@@ -125,7 +125,7 @@ export default function BerthOperations() {
 
               {panel.enquiry ? (
                 <div className="mt-3 text-sm">
-                  <p className="staff-label">Visiting boat</p>
+                  <p className="staff-label">Guest boat</p>
                   <p className="text-ink">{panel.enquiry.boatName}</p>
                   <p className="text-ink-muted">
                     {panel.enquiry.arrival} to{" "}

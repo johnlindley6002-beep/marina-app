@@ -83,7 +83,7 @@ function BoatCard({
             {enquiry.phone} · {enquiry.email}
           </p>
 
-          <p className="staff-label mt-3">Documents (as entered by the boater, read only)</p>
+          <p className="staff-label mt-3">Documents (as entered by the guest, read only)</p>
           {hasDocs ? (
             <div className="mt-1 space-y-0.5">
               <DocRow label="Registration" value={enquiry.documents.registrationNumber} />

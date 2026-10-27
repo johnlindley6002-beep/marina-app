@@ -3,12 +3,11 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useAuth } from "@/components/providers/AuthProvider";
-import ModeSwitch from "@/components/ui/ModeSwitch";
 import { useLanguage } from "@/components/providers/LanguageProvider";
 
 const itemClass = "flex min-h-11 items-center text-paper transition-colors hover:text-stone";
 
-function MenuBody({ onNavigate, showSwitch }: { onNavigate: () => void; showSwitch: boolean }) {
+function MenuBody({ onNavigate }: { onNavigate: () => void }) {
   const { user, signOut } = useAuth();
   const { t } = useLanguage();
   if (!user) return null;
@@ -20,11 +19,6 @@ function MenuBody({ onNavigate, showSwitch }: { onNavigate: () => void; showSwit
         <p className="font-medium text-paper">{user.name}</p>
         <p className="text-sm text-stone">{user.email}</p>
       </div>
-      {showSwitch ? (
-        <div className="border-b border-paper/10 py-3 lg:hidden">
-          <ModeSwitch onSwitched={onNavigate} />
-        </div>
-      ) : null}
       <ul className="py-1">
         <li>
           <Link href="/account" onClick={onNavigate} className={itemClass}>
@@ -64,7 +58,7 @@ export default function AccountMenu({
   variant?: "dropdown" | "inline";
   onNavigate?: () => void;
 }) {
-  const { ready, user, canSwitchMode } = useAuth();
+  const { ready, user } = useAuth();
   const { t } = useLanguage();
   const [open, setOpen] = useState(false);
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -94,7 +88,7 @@ export default function AccountMenu({
   if (variant === "inline") {
     return (
       <div className="mt-10 border-t border-paper/10 pt-6">
-        <MenuBody onNavigate={onNavigate ?? (() => {})} showSwitch={canSwitchMode} />
+        <MenuBody onNavigate={onNavigate ?? (() => {})} />
       </div>
     );
   }
@@ -118,7 +112,7 @@ export default function AccountMenu({
           className="absolute top-full right-0 z-50 mt-2 w-64 rounded-md border border-paper/15 bg-ink px-4 py-3 shadow-overlay"
         >
           {/* Below lg the navbar has no room for the switch, so it lives here. */}
-          <MenuBody onNavigate={() => setOpen(false)} showSwitch={canSwitchMode} />
+          <MenuBody onNavigate={() => setOpen(false)} />
         </div>
       ) : null}
     </div>

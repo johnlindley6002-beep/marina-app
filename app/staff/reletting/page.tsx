@@ -3,7 +3,7 @@ import RelettingQueue from "@/features/staff/components/RelettingQueue";
 
 export const metadata: Metadata = {
   title: "Reletting - Staff - aldock",
-  description: "Owner absence requests waiting for the marina's consent.",
+  description: "Berth holder absence requests waiting for the marina's consent.",
 };
 
 export default function RelettingPage() {

@@ -56,26 +56,26 @@ export function getBerthStatuses(
         if (request.bookedNights.includes(dateIso)) {
           out[berth.id] = {
             status: "occupied",
-            detail: "A visitor is aboard for these dates.",
+            detail: "A guest is aboard for these dates.",
             relettingId: request.id,
           };
         } else if ((request.approvedNights ?? []).includes(dateIso)) {
           out[berth.id] = {
             status: "released",
-            detail: `Released by the holder, ${formatWindow(request.startDate, request.endDate)}.`,
+            detail: `Released by the berth holder, ${formatWindow(request.startDate, request.endDate)}.`,
             relettingId: request.id,
           };
         } else {
           out[berth.id] = {
             status: "owner-away",
-            detail: "The holder is away; not cleared for reletting on this date.",
+            detail: "The berth holder is away; not cleared for reletting on this date.",
             relettingId: request.id,
           };
         }
       } else {
         out[berth.id] = {
           status: "occupied",
-          detail: `${link.boatOnFile.name}, the holder's own boat.`,
+          detail: `${link.boatOnFile.name}, the berth holder's own boat.`,
         };
       }
       continue;
@@ -99,12 +99,12 @@ export function getBerthStatuses(
         enquiry.arrivalStatus === "arrived"
           ? {
               status: "occupied",
-              detail: `${enquiry.boatName || "A visiting boat"}, on site.`,
+              detail: `${enquiry.boatName || "A guest boat"}, on site.`,
               enquiryId: enquiry.id,
             }
           : {
               status: "reserved",
-              detail: `${enquiry.boatName || "A visiting boat"}, arriving ${enquiry.eta || "soon"}.`,
+              detail: `${enquiry.boatName || "A guest boat"}, arriving ${enquiry.eta || "soon"}.`,
               enquiryId: enquiry.id,
             };
     } else {

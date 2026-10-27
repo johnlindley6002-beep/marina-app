@@ -718,6 +718,26 @@ textarea.staff-field {
   }
 }
 
+/* While the floating pills show, the page ends with room for them. */
+html[data-dock] footer {
+  padding-bottom: calc(4.5rem + env(safe-area-inset-bottom));
+}
+
+html[data-dock] .staff-shell {
+  padding-bottom: 4.5rem;
+}
+
+/* On a narrow phone the two pills stack, so they need two rows of room. */
+@media (max-width: 479px) {
+  html[data-dock="both"] footer {
+    padding-bottom: calc(7.5rem + env(safe-area-inset-bottom));
+  }
+
+  html[data-dock="both"] .staff-shell {
+    padding-bottom: 7.5rem;
+  }
+}
+
 .hairline-bottom {
   border-bottom: 1px solid var(--hairline);
 }

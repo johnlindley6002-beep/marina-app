@@ -1,8 +1,9 @@
 "use client";
 
-// One choice out of a few, shown as a pill group (units, guest or owner mode).
-// "dark" sits on the ink navbar, "light" on paper. Each option is a toggle
-// button with aria-pressed, 44 px tall on touch.
+// One choice out of a few, shown as a pill group (units, guest or berth holder
+// mode). "dark" sits on the ink navbar, "light" on paper, and "pill" is the
+// floating pill: ink with a paper outline, 44 px tall like the dev pill. Each
+// option is a toggle button with aria-pressed.
 export default function SegmentedControl<T extends string>({
   label,
   options,
@@ -16,14 +17,17 @@ export default function SegmentedControl<T extends string>({
   value: T;
   onChange: (value: T) => void;
   className?: string;
-  tone?: "dark" | "light";
+  tone?: "dark" | "light" | "pill";
 }) {
+  const pill = tone === "pill";
   return (
     <div
       role="group"
       aria-label={label}
-      className={`inline-flex rounded-full border p-0.5 text-sm ${
-        tone === "light" ? "border-ink/30" : "border-stone/40"
+      className={`inline-flex rounded-full text-sm ${
+        pill
+          ? "h-11 items-stretch bg-ink shadow-overlay ring-1 ring-paper/30"
+          : `border p-0.5 ${tone === "light" ? "border-ink/30" : "border-stone/40"}`
       } ${className}`}
     >
       {options.map((option) => {
@@ -34,7 +38,9 @@ export default function SegmentedControl<T extends string>({
             type="button"
             aria-pressed={active}
             onClick={() => onChange(option.value)}
-            className={`min-h-11 rounded-full px-4 transition-colors md:min-h-9 ${
+            className={`rounded-full px-4 transition-colors ${
+              pill ? "h-full" : "min-h-11 md:min-h-9"
+            } ${
               active
                 ? tone === "light"
                   ? "bg-ink font-medium text-paper"

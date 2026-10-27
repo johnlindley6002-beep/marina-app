@@ -17,11 +17,11 @@ export const account: Dictionary["account"] = {
   roles: "Sus funciones",
   roleCopy: {
     voyager: {
-      title: "Navegante",
-      how: "Se registró como navegante. Es la función por defecto de todos.",
+      title: "Visitante",
+      how: "Se registró como visitante. Es la función por defecto de todos.",
     },
     owner: {
-      title: "Titular",
+      title: "Titular del amarre",
       how: "Se concede porque una marina vinculó un amarre a usted. No se puede añadir ni quitar desde aquí.",
     },
     staff: {
@@ -31,12 +31,12 @@ export const account: Dictionary["account"] = {
   },
   howRolesWork: "Cómo funcionan las funciones",
   rules: [
-    "Cualquiera puede registrarse como navegante.",
-    "La función de titular solo se concede cuando una marina vincula un amarre a usted.",
+    "Cualquiera puede registrarse como visitante.",
+    "La función de titular del amarre solo se concede cuando una marina vincula un amarre a usted.",
     "La función de personal solo se concede cuando una marina le invita y usted acepta.",
   ],
-  ownerMode: "Modo titular",
+  ownerMode: "Modo titular del amarre",
   ownerModeBody:
-    "Use el selector Visitante y Titular de la barra superior para pasar de reservar como visitante a gestionar el amarre que usted tiene.",
+    "Use el selector Visitante y Titular del amarre de la esquina inferior izquierda para pasar de reservar como visitante a gestionar su amarre.",
   goToMyBerth: "Ir a Mi amarre",
 };

@@ -16,16 +16,16 @@ export const chrome = {
     signOut: "Sign out",
     menuFor: (name: string) => `Account menu for ${name}`,
   },
-  mode: { label: "Mode", guest: "Guest", owner: "Owner" },
+  mode: { label: "Mode", guest: "Guest", owner: "Berth holder" },
   gate: {
     back: "Back to marinas",
     signInTitle: "Sign in to continue",
     signedOutDemo:
       "You are not signed in. This is a demo, so use the switcher at the bottom left to sign in as a sample account.",
     notAvailable: "You are not signed in. Sign-in is not available in this preview.",
-    ownerTitle: "Owner mode is not available",
+    ownerTitle: "Berth holder mode is not available",
     ownerLocked:
-      "Owner mode is available when a marina links your berth to your account. You cannot add it yourself.",
+      "Berth holder mode is available when a marina links your berth to your account. You cannot add it yourself.",
     staffTitle: "Staff area",
     staffLocked:
       "The staff area is for marina staff who have accepted an invitation from their marina.",

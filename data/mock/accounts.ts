@@ -372,14 +372,14 @@ export function listDevPersonas(): DevPersona[] {
     {
       id: "voyager",
       userId: "u-voyager",
-      label: "Plain voyager",
+      label: "Guest",
       description: "Guest experience only",
     },
     {
       id: "owner",
       userId: "u-owner",
-      label: "Voyager and owner",
-      description: "Holds berth G-14, sees the mode switch",
+      label: "Guest and berth holder",
+      description: "Has a linked berth (G-14), sees the mode switch",
     },
     {
       id: "staff",
