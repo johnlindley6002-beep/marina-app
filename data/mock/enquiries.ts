@@ -18,6 +18,7 @@ import {
   type StaffActionResult,
 } from "./accounts";
 import { loadReletStore } from "./reletting";
+import { activeSnapshot } from "./snapshot";
 
 // ============================================================================
 // STAFF BACK OFFICE
@@ -391,11 +392,18 @@ export function buildSeedEnquiryStore(): EnquiryStore {
 }
 
 export function loadEnquiryStore(): EnquiryStore {
+  const snapshot = activeSnapshot();
+  if (snapshot) return snapshot.enquiries;
   const stored = readJson<EnquiryStore>(ENQUIRY_KEY);
   return stored ?? buildSeedEnquiryStore();
 }
 
 export function saveEnquiryStore(store: EnquiryStore) {
+  const snapshot = activeSnapshot();
+  if (snapshot) {
+    snapshot.enquiries = store;
+    return;
+  }
   writeJson(ENQUIRY_KEY, store);
   emitChange();
 }
@@ -670,10 +678,17 @@ export type OutOfServiceMark = {
 export type OosStore = { marks: OutOfServiceMark[] };
 
 export function loadOosStore(): OosStore {
+  const snapshot = activeSnapshot();
+  if (snapshot) return snapshot.oos;
   return readJson<OosStore>(OOS_KEY) ?? { marks: [] };
 }
 
 export function saveOosStore(store: OosStore) {
+  const snapshot = activeSnapshot();
+  if (snapshot) {
+    snapshot.oos = store;
+    return;
+  }
   writeJson(OOS_KEY, store);
   emitChange();
 }

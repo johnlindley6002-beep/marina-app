@@ -2,9 +2,16 @@
 
 import { useState } from "react";
 import { formatLongDate } from "@/lib/dates";
-import { decideEnquiry, getEnquiries, type Enquiry, type EnquiryStatus, useMock } from "@/lib/data";
+import {
+  decideEnquiry,
+  getEnquiries,
+  type Enquiry,
+  type EnquiryStatus,
+  useStaffData,
+} from "@/lib/data";
 import { formatLength } from "@/lib/units";
-import { useAuth } from "@/components/providers/AuthProvider";
+import { useStaffAction } from "../lib/useStaffAction";
+import { useStaffId } from "./StaffSessionProvider";
 import { Collapse } from "@/components/ui/Disclosure";
 import { useUnits } from "@/components/providers/UnitsProvider";
 import BerthPicker from "./BerthPicker";
@@ -36,7 +43,7 @@ function Row({ enquiry, staffId }: { enquiry: Enquiry; staffId: string | null })
   const [open, setOpen] = useState(false);
   const [berthId, setBerthId] = useState(enquiry.assignedBerthId ?? "");
   const [reason, setReason] = useState("");
-  const [error, setError] = useState<string | null>(null);
+  const { busy, error, run } = useStaffAction();
   const rowId = `enquiry-${enquiry.id}`;
 
   return (
@@ -136,10 +143,10 @@ function Row({ enquiry, staffId }: { enquiry: Enquiry; staffId: string | null })
               </label>
               <button
                 type="button"
-                onClick={() => {
-                  const result = decideEnquiry(staffId, enquiry.id, "approve", { berthId });
-                  setError(result.ok ? null : result.error);
-                }}
+                disabled={busy}
+                onClick={() =>
+                  void run(() => decideEnquiry(staffId, enquiry.id, "approve", { berthId }))
+                }
                 className="staff-btn staff-btn-primary"
               >
                 Approve
@@ -155,10 +162,10 @@ function Row({ enquiry, staffId }: { enquiry: Enquiry; staffId: string | null })
               </label>
               <button
                 type="button"
-                onClick={() => {
-                  const result = decideEnquiry(staffId, enquiry.id, "decline", { reason });
-                  setError(result.ok ? null : result.error);
-                }}
+                disabled={busy}
+                onClick={() =>
+                  void run(() => decideEnquiry(staffId, enquiry.id, "decline", { reason }))
+                }
                 className="staff-btn staff-btn-danger"
               >
                 Decline
@@ -183,9 +190,12 @@ function Row({ enquiry, staffId }: { enquiry: Enquiry; staffId: string | null })
 }
 
 export default function EnquiryInbox() {
-  const { user } = useAuth();
-  const staffId = user?.id ?? null;
-  const { value: enquiries, ready } = useMock(() => getEnquiries(staffId), NONE, staffId ?? "");
+  const staffId = useStaffId();
+  const { value: enquiries, ready } = useStaffData(
+    () => getEnquiries(staffId),
+    NONE,
+    staffId ?? ""
+  );
   const [tab, setTab] = useState<EnquiryStatus | "all">("new");
 
   const filtered = tab === "all" ? enquiries : enquiries.filter((e) => e.status === tab);

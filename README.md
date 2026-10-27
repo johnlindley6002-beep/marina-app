@@ -1,6 +1,6 @@
 # aldock
 
-aldock helps boaters find a berth at a marina in Portugal, tell the marina about their boat and crew before they arrive, and keep their details in one place. It starts with Marina de Cascais. Berth holders can offer their berth for reletting while they are away, and marina staff handle arrivals, enquiries and relet approvals. Everything is a front-end mock: there is no server, the data lives in the browser, and an enquiry is sent by the visitor's own email app.
+aldock helps boaters find a berth at a marina in Portugal, tell the marina about their boat and crew before they arrive, and keep their details in one place. It starts with Marina de Cascais. Berth holders can offer their berth for reletting while they are away, and marina staff handle arrivals, enquiries and relet approvals. The staff back office (arrivals, the berth map, relet approvals) runs on Supabase with an email sign-in link. Everything else is still a front-end mock: the data lives in the browser, and an enquiry is sent by the visitor's own email app.
 
 ## Stack
 
@@ -15,21 +15,24 @@ npm install
 npm run dev        # http://localhost:3000
 ```
 
-Sign-in is mocked. In development a small switcher at the bottom left lets you sign in as a sample voyager, owner or staff member. A production build hides it and the `/dev` pages unless `NEXT_PUBLIC_ENABLE_DEV_TOOLS=1` is set at build time (set it to demo the owner and staff areas on a hosted preview).
+Copy `.env.local.example` to `.env.local` and fill in the Supabase project URL and publishable key. The staff area signs in at `/staff/login` with a link sent by email; see "Supabase" below for setting up the database and the first admin.
+
+Guest and berth holder sign-in is mocked. In development a small switcher at the bottom left lets you sign in as a sample voyager, owner or staff member. A production build hides it and the `/dev` pages unless `NEXT_PUBLIC_ENABLE_DEV_TOOLS=1` is set at build time (set it to demo the owner and staff areas on a hosted preview).
 
 ## Scripts
 
-| Script               | What it does                                                           |
-| -------------------- | ---------------------------------------------------------------------- |
-| `npm run check`      | The gate: types, lint, copy and i18n checks, formatting, tests, build  |
-| `npm run typecheck`  | `tsc --noEmit`                                                         |
-| `npm run lint`       | ESLint                                                                 |
-| `npm run format`     | Prettier (write)                                                       |
-| `npm run check:copy` | Fails on em dashes, filler words and exclamation marks                 |
-| `npm run check:i18n` | Fails when the four languages are out of step                          |
-| `npm run test`       | Unit and component tests                                               |
-| `npm run test:e2e`   | Playwright journeys and axe on every route (builds and serves on 3100) |
-| `npm run knip`       | Finds unused files, exports and dependencies                           |
+| Script                  | What it does                                                           |
+| ----------------------- | ---------------------------------------------------------------------- |
+| `npm run check`         | The gate: types, lint, copy and i18n checks, formatting, tests, build  |
+| `npm run typecheck`     | `tsc --noEmit`                                                         |
+| `npm run lint`          | ESLint                                                                 |
+| `npm run format`        | Prettier (write)                                                       |
+| `npm run check:copy`    | Fails on em dashes, filler words and exclamation marks                 |
+| `npm run check:i18n`    | Fails when the four languages are out of step                          |
+| `npm run test`          | Unit and component tests                                               |
+| `npm run test:e2e`      | Playwright journeys and axe on every route (builds and serves on 3100) |
+| `npm run knip`          | Finds unused files, exports and dependencies                           |
+| `npm run db:seed:build` | Writes `supabase/seed.sql` from the app's berths and sample data       |
 
 Other scripts: `node scripts/screens.mjs <label>` takes screenshots of every route at 375, 768 and 1280 px into `docs/audit/screens`, and `node scripts/measure-js.mjs` reports first-load JavaScript per route against a running production server.
 
@@ -55,7 +58,20 @@ docs/                 architecture.md and the quality audit in docs/audit
 
 ## Where the mocks live, and how Supabase replaces them
 
-Everything the UI reads or writes goes through `lib/data/index.ts`, which re-exports a fixed list of functions from `data/mock/*`. The mock bodies read and write `localStorage` (always inside try and catch) and fire an `aldock-mock-changed` event so screens stay in step. To move to Supabase, keep the exported names and types and replace the bodies behind them with calls to the backend. Nothing outside `data/mock` and `lib/data` should know where the data comes from. Row-level security has to enforce what the mock only hides: only the holder of a berth may relet it, and only staff of a marina may decide on a request.
+Everything the UI reads or writes goes through `lib/data/index.ts`. Nothing outside `data/` and `lib/data` should know where the data comes from.
+
+- **Guest and berth holder screens** still use `data/mock/*`. The mock bodies read and write `localStorage` (always inside try and catch) and fire an `aldock-mock-changed` event so screens stay in step.
+- **The staff back office** uses `lib/data/staff.ts`, where every function returns a Promise and screens read through `useStaffData`. Each call loads the staff member's marina data from Supabase, runs the same rule as the mock (`data/mock/snapshot.ts` points the mock stores at the loaded rows for the length of one call), and saves only the rows that changed (`data/supabase/staff.ts`). The rules are written once, so the mock and Supabase cannot disagree. `NEXT_PUBLIC_STAFF_DATA=mock` switches the back office back to the mock; the end-to-end tests do this.
+
+Until the guest and berth holder screens move over, their new enquiries and relet offers stay in the browser and do not reach the staff database, and staff decisions do not reach the berth holder's screen.
+
+## Supabase
+
+The schema is in `supabase/migrations` and the sample data in `supabase/seed.sql` (generated, do not edit by hand). Every table has row level security: a signed-in user reads and writes only the marinas they are in `staff_members` for, an admin of a marina manages its staff, and the anon role has no access at all. The browser only ever holds the publishable key.
+
+Staff accounts are invite only. Sign-ups are off, and the sign-in form never creates an account. To add someone, invite their email in Supabase (Authentication, Users, Invite user), then add a `staff_members` row for their user id and marina.
+
+Known gap: the berth conflict check runs in the browser, not in one database transaction, so two staff members approving the same berth at the same moment could both succeed. Move it into a database function before the guest side goes live.
 
 ## Design tokens
 

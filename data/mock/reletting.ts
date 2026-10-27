@@ -23,6 +23,7 @@ import {
   isStaffOfMarina,
   type StaffActionResult,
 } from "./accounts";
+import { activeSnapshot } from "./snapshot";
 
 // ---------------------------------------------------------------------------
 // Reletting a held berth while its holder is away
@@ -275,6 +276,8 @@ export function buildSeedRelettingStore(): ReletStore {
 }
 
 export function loadReletStore(): ReletStore {
+  const snapshot = activeSnapshot();
+  if (snapshot) return snapshot.relet;
   const stored = readJson<ReletStore>(RELETTING_KEY);
   if (!stored) return buildSeedRelettingStore();
   // Older stored requests lack the newer fields.
@@ -293,6 +296,11 @@ export function loadReletStore(): ReletStore {
 }
 
 export function saveReletStore(store: ReletStore) {
+  const snapshot = activeSnapshot();
+  if (snapshot) {
+    snapshot.relet = store;
+    return;
+  }
   writeJson(RELETTING_KEY, store);
   emitChange();
 }

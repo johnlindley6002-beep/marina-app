@@ -15,9 +15,11 @@ import {
   suggestReleasedBerths,
   type BerthOperationalInfo,
   type Enquiry,
-  useMock,
+  type OutOfServiceMark,
+  useStaffData,
 } from "@/lib/data";
-import { useAuth } from "@/components/providers/AuthProvider";
+import { useStaffAction } from "../lib/useStaffAction";
+import { useStaffId } from "./StaffSessionProvider";
 import BerthAvailabilityMap, {
   type StaffBerthInfo,
 } from "@/features/marina/components/BerthAvailabilityMap";
@@ -25,6 +27,8 @@ import BerthPicker from "./BerthPicker";
 
 const MARINA = getPrimaryMarina();
 const NONE: Enquiry[] = [];
+const NO_MARKS: OutOfServiceMark[] = [];
+const NO_STATUSES: Record<string, BerthOperationalInfo> = {};
 
 type PanelData = {
   berthId: string;
@@ -34,17 +38,20 @@ type PanelData = {
 };
 
 export default function BerthOperations() {
-  const { user } = useAuth();
-  const staffId = user?.id ?? null;
+  const staffId = useStaffId();
   const [dateIso, setDateIso] = useState(todayIso());
   const [selectedBerthId, setSelectedBerthId] = useState<string | null>(null);
   const [oosReason, setOosReason] = useState("");
-  const [error, setError] = useState<string | null>(null);
+  const { busy, error, setError, run } = useStaffAction();
   const [reassignTo, setReassignTo] = useState("");
 
-  const { value: statuses } = useMock(() => getBerthStatuses(MARINA.id, dateIso), {}, dateIso);
-  const { value: enquiries } = useMock(() => getEnquiries(staffId), NONE, staffId ?? "");
-  const { value: oosMarks } = useMock(() => getOutOfServiceBerths(MARINA.id), [], "");
+  const { value: statuses } = useStaffData(
+    () => getBerthStatuses(MARINA.id, dateIso),
+    NO_STATUSES,
+    dateIso
+  );
+  const { value: enquiries } = useStaffData(() => getEnquiries(staffId), NONE, staffId ?? "");
+  const { value: oosMarks } = useStaffData(() => getOutOfServiceBerths(MARINA.id), NO_MARKS);
 
   const allBerths = useMemo(() => getAllBerths(), []);
   const berthLinks = useMemo(() => getMarinaBerthLinks(MARINA.id), []);
@@ -61,6 +68,29 @@ export default function BerthOperations() {
 
   const link = panel ? berthLinks.find((l) => l.berthId === panel.berthId) : undefined;
   const isOos = panel ? oosMarks.some((m) => m.berthId === panel.berthId) : false;
+
+  // Released holder berths that would take the selected guest boat.
+  const guest = panel?.enquiry ?? null;
+  const { value: suggestions } = useStaffData(
+    () =>
+      guest
+        ? suggestReleasedBerths(
+            MARINA.id,
+            { loa: Number(guest.loa) || 0, beam: 0 },
+            {
+              arrival: guest.arrival,
+              departure: guest.openEnded ? guest.arrival : guest.departure,
+            }
+          )
+        : Promise.resolve([]),
+    [],
+    guest ? `${guest.id}|${guest.arrival}|${guest.departure}` : ""
+  );
+
+  async function reassign(enquiryId: string, berthId: string) {
+    setReassignTo(berthId);
+    if (await run(() => reassignEnquiryBerth(staffId, enquiryId, berthId))) selectBerth(berthId);
+  }
 
   function selectBerth(berthId: string) {
     setSelectedBerthId(berthId);
@@ -131,45 +161,25 @@ export default function BerthOperations() {
                     {panel.enquiry.arrival} to{" "}
                     {panel.enquiry.openEnded ? "open-ended" : panel.enquiry.departure}
                   </p>
-                  {(() => {
-                    const suggestions = suggestReleasedBerths(
-                      MARINA.id,
-                      { loa: Number(panel.enquiry.loa) || 0, beam: 0 },
-                      {
-                        arrival: panel.enquiry.arrival,
-                        departure: panel.enquiry.openEnded
-                          ? panel.enquiry.arrival
-                          : panel.enquiry.departure,
-                      }
-                    );
-                    return suggestions.length > 0 ? (
-                      <div className="mt-2">
-                        <p className="staff-label">Suggested released berths</p>
-                        <ul className="flex flex-wrap gap-1.5">
-                          {suggestions.map((s) => (
-                            <li key={s.berthId}>
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  setReassignTo(s.berthId);
-                                  const result = reassignEnquiryBerth(
-                                    staffId,
-                                    panel.enquiry!.id,
-                                    s.berthId
-                                  );
-                                  if (result.ok) selectBerth(s.berthId);
-                                  setError(result.ok ? null : result.error);
-                                }}
-                                className="staff-btn text-xs"
-                              >
-                                {s.berthId} (Class {s.sizeClass}, {s.ownerName})
-                              </button>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    ) : null;
-                  })()}
+                  {suggestions.length > 0 ? (
+                    <div className="mt-2">
+                      <p className="staff-label">Suggested released berths</p>
+                      <ul className="flex flex-wrap gap-1.5">
+                        {suggestions.map((s) => (
+                          <li key={s.berthId}>
+                            <button
+                              type="button"
+                              disabled={busy}
+                              onClick={() => void reassign(panel.enquiry!.id, s.berthId)}
+                              className="staff-btn text-xs"
+                            >
+                              {s.berthId} (Class {s.sizeClass}, {s.ownerName})
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ) : null}
                   <div className="mt-2">
                     <p className="staff-label">Reassign to</p>
                     <BerthPicker
@@ -177,12 +187,7 @@ export default function BerthOperations() {
                       loa={panel.enquiry.loa}
                       dateIso={panel.enquiry.arrival}
                       value={reassignTo}
-                      onChange={(id) => {
-                        setReassignTo(id);
-                        const result = reassignEnquiryBerth(staffId, panel.enquiry!.id, id);
-                        if (result.ok) selectBerth(id);
-                        setError(result.ok ? null : result.error);
-                      }}
+                      onChange={(id) => void reassign(panel.enquiry!.id, id)}
                     />
                   </div>
                 </div>
@@ -192,10 +197,10 @@ export default function BerthOperations() {
                 {isOos ? (
                   <button
                     type="button"
-                    onClick={() => {
-                      const result = clearBerthOutOfService(staffId, MARINA.id, panel.berthId);
-                      setError(result.ok ? null : result.error);
-                    }}
+                    disabled={busy}
+                    onClick={() =>
+                      void run(() => clearBerthOutOfService(staffId, MARINA.id, panel.berthId))
+                    }
                     className="staff-btn staff-btn-primary"
                   >
                     Return to service
@@ -216,15 +221,12 @@ export default function BerthOperations() {
                     </label>
                     <button
                       type="button"
-                      onClick={() => {
-                        const result = setBerthOutOfService(
-                          staffId,
-                          MARINA.id,
-                          panel.berthId,
-                          oosReason
-                        );
-                        setError(result.ok ? null : result.error);
-                      }}
+                      disabled={busy}
+                      onClick={() =>
+                        void run(() =>
+                          setBerthOutOfService(staffId, MARINA.id, panel.berthId, oosReason)
+                        )
+                      }
                       className="staff-btn staff-btn-danger mt-2"
                     >
                       Mark out of service

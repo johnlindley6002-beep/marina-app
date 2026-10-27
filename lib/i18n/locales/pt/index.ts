@@ -23,6 +23,7 @@ import { chrome } from "./chrome";
 import { myBoat } from "./myBoat";
 import { account } from "./account";
 import { enquiry } from "./enquiry";
+import { staffLogin } from "./staffLogin";
 
 export const pt: Dictionary = {
   nav,
@@ -49,4 +50,5 @@ export const pt: Dictionary = {
   myBoat,
   account,
   enquiry,
+  staffLogin,
 };

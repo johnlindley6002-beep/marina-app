@@ -3,23 +3,26 @@
 import { useMemo, useState } from "react";
 import { addDaysIso, effectiveEnquiryDeparture, todayIso } from "@/lib/dates";
 import {
-  getBerthStatuses,
+  getBerthStatusesFor,
   getEnquiries,
   markEnquiryArrived,
   markEnquiryDeparted,
   reassignEnquiryBerth,
   setEnquiryFlag,
+  type BerthOperationalInfo,
   type Enquiry,
-  useMock,
+  useStaffData,
 } from "@/lib/data";
 import { formatLength } from "@/lib/units";
-import { useAuth } from "@/components/providers/AuthProvider";
+import { useStaffAction } from "../lib/useStaffAction";
+import { useStaffId } from "./StaffSessionProvider";
 import { Collapse } from "@/components/ui/Disclosure";
 import { useUnits } from "@/components/providers/UnitsProvider";
 import BerthPicker from "./BerthPicker";
 import PreArrivalArrivals from "./PreArrivalArrivals";
 
 const NONE: Enquiry[] = [];
+const NO_STATUSES: Record<string, Record<string, BerthOperationalInfo>> = {};
 const WINDOW_DAYS = 6;
 
 type EventKind = "arrival" | "departure";
@@ -38,17 +41,22 @@ function serviceList(e: Enquiry): string[] {
   return out;
 }
 
-function EventRow({ event, staffId }: { event: BoardEvent; staffId: string | null }) {
+function EventRow({
+  event,
+  staffId,
+  releasedBerth,
+}: {
+  event: BoardEvent;
+  staffId: string | null;
+  releasedBerth: boolean;
+}) {
   const { enquiry, kind } = event;
   const { units } = useUnits();
   const [open, setOpen] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const { busy, error, run } = useStaffAction();
   const [flagDraft, setFlagDraft] = useState(enquiry.flagNote);
   const [editingFlag, setEditingFlag] = useState(false);
   const rowId = `arrival-${enquiry.id}-${kind}`;
-  const releasedBerth =
-    enquiry.assignedBerthId &&
-    getBerthStatuses(enquiry.marinaId, event.date)[enquiry.assignedBerthId]?.status === "released";
 
   return (
     <li className="staff-panel">
@@ -143,19 +151,16 @@ function EventRow({ event, staffId }: { event: BoardEvent; staffId: string | nul
                 loa={enquiry.loa}
                 dateIso={enquiry.arrival}
                 value={enquiry.assignedBerthId ?? ""}
-                onChange={(berthId) => {
-                  const result = reassignEnquiryBerth(staffId, enquiry.id, berthId);
-                  setError(result.ok ? null : result.error);
-                }}
+                onChange={(berthId) =>
+                  void run(() => reassignEnquiryBerth(staffId, enquiry.id, berthId))
+                }
               />
             </label>
             {kind === "arrival" && enquiry.arrivalStatus === "pending" ? (
               <button
                 type="button"
-                onClick={() => {
-                  const result = markEnquiryArrived(staffId, enquiry.id);
-                  setError(result.ok ? null : result.error);
-                }}
+                disabled={busy}
+                onClick={() => void run(() => markEnquiryArrived(staffId, enquiry.id))}
                 className="staff-btn staff-btn-primary"
               >
                 Mark arrived
@@ -164,10 +169,8 @@ function EventRow({ event, staffId }: { event: BoardEvent; staffId: string | nul
             {kind === "departure" && enquiry.arrivalStatus === "arrived" ? (
               <button
                 type="button"
-                onClick={() => {
-                  const result = markEnquiryDeparted(staffId, enquiry.id);
-                  setError(result.ok ? null : result.error);
-                }}
+                disabled={busy}
+                onClick={() => void run(() => markEnquiryDeparted(staffId, enquiry.id))}
                 className="staff-btn staff-btn-primary"
               >
                 Mark departed
@@ -194,9 +197,11 @@ function EventRow({ event, staffId }: { event: BoardEvent; staffId: string | nul
               <div className="mt-2 flex gap-2">
                 <button
                   type="button"
-                  onClick={() => {
-                    setEnquiryFlag(staffId, enquiry.id, flagDraft);
-                    setEditingFlag(false);
+                  disabled={busy}
+                  onClick={async () => {
+                    if (await run(() => setEnquiryFlag(staffId, enquiry.id, flagDraft))) {
+                      setEditingFlag(false);
+                    }
                   }}
                   className="staff-btn staff-btn-primary"
                 >
@@ -227,9 +232,12 @@ function EventRow({ event, staffId }: { event: BoardEvent; staffId: string | nul
 }
 
 export default function ArrivalsBoard() {
-  const { user } = useAuth();
-  const staffId = user?.id ?? null;
-  const { value: enquiries, ready } = useMock(() => getEnquiries(staffId), NONE, staffId ?? "");
+  const staffId = useStaffId();
+  const { value: enquiries, ready } = useStaffData(
+    () => getEnquiries(staffId),
+    NONE,
+    staffId ?? ""
+  );
   const [when, setWhen] = useState<"today" | "upcoming">("upcoming");
   const [type, setType] = useState<"all" | "arrival" | "departure">("all");
 
@@ -253,6 +261,22 @@ export default function ArrivalsBoard() {
       .filter((ev) => (type === "all" ? true : ev.kind === type))
       .sort((a, b) => a.date.localeCompare(b.date) || a.time.localeCompare(b.time));
   }, [enquiries, when, type, today, windowEnd]);
+
+  // One read for the berth status on every row's day, to badge berths a
+  // berth holder has released.
+  const statusPairs = useMemo(
+    () =>
+      events
+        .filter((ev) => ev.enquiry.assignedBerthId)
+        .map((ev) => ({ marinaId: ev.enquiry.marinaId, dateIso: ev.date })),
+    [events]
+  );
+  const statusKey = statusPairs.map((p) => `${p.marinaId}|${p.dateIso}`).join(",");
+  const { value: statuses } = useStaffData(
+    () => getBerthStatusesFor(statusPairs),
+    NO_STATUSES,
+    statusKey
+  );
 
   return (
     <div>
@@ -299,7 +323,16 @@ export default function ArrivalsBoard() {
 
       <ul className="mt-4 space-y-2">
         {events.map((ev) => (
-          <EventRow key={ev.enquiry.id + ev.kind} event={ev} staffId={staffId} />
+          <EventRow
+            key={ev.enquiry.id + ev.kind}
+            event={ev}
+            staffId={staffId}
+            releasedBerth={
+              !!ev.enquiry.assignedBerthId &&
+              statuses[`${ev.enquiry.marinaId}|${ev.date}`]?.[ev.enquiry.assignedBerthId]
+                ?.status === "released"
+            }
+          />
         ))}
       </ul>
 

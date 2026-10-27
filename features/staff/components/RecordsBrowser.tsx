@@ -8,29 +8,33 @@ import {
   getBerthStatuses,
   getEnquiries,
   getMarinaBerthLinks,
+  type BerthOperationalInfo,
   type Enquiry,
-  useMock,
+  useStaffData,
 } from "@/lib/data";
 import { formatLength } from "@/lib/units";
-import { useAuth } from "@/components/providers/AuthProvider";
+import { useStaffId } from "./StaffSessionProvider";
 import { STAFF_STATUS_LABEL } from "@/features/marina/components/BerthAvailabilityMap";
 import { useUnits } from "@/components/providers/UnitsProvider";
 
 const MARINA = getPrimaryMarina();
 const NONE: Enquiry[] = [];
+const NO_STATUSES: Record<string, BerthOperationalInfo> = {};
 const TABS = ["Boats", "Berths", "Customers"] as const;
 type Tab = (typeof TABS)[number];
 
 export default function RecordsBrowser() {
-  const { user } = useAuth();
-  const staffId = user?.id ?? null;
+  const staffId = useStaffId();
   const { units } = useUnits();
   const [tab, setTab] = useState<Tab>("Boats");
   const [q, setQ] = useState("");
 
-  const { value: enquiries } = useMock(() => getEnquiries(staffId), NONE, staffId ?? "");
+  const { value: enquiries } = useStaffData(() => getEnquiries(staffId), NONE, staffId ?? "");
   const links = useMemo(() => getMarinaBerthLinks(MARINA.id), []);
-  const { value: statuses } = useMock(() => getBerthStatuses(MARINA.id, todayIso()), {}, "");
+  const { value: statuses } = useStaffData(
+    () => getBerthStatuses(MARINA.id, todayIso()),
+    NO_STATUSES
+  );
   const berths = useMemo(() => getAllBerths(), []);
 
   const query = q.trim().toLowerCase();

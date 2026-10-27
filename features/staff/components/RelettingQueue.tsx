@@ -14,9 +14,10 @@ import {
   RELETTING_PROGRESS,
   RELETTING_STATUS_LABELS,
   type RelettingQueueItem,
-  useMock,
+  useStaffData,
 } from "@/lib/data";
-import { useAuth } from "@/components/providers/AuthProvider";
+import { useStaffAction } from "../lib/useStaffAction";
+import { useStaffId } from "./StaffSessionProvider";
 import { Collapse } from "@/components/ui/Disclosure";
 
 const NONE: RelettingQueueItem[] = [];
@@ -53,10 +54,10 @@ function NightChips({
   );
 }
 
-function Item({ item, staffId }: { item: RelettingQueueItem; staffId: string }) {
+function Item({ item, staffId }: { item: RelettingQueueItem; staffId: string | null }) {
   const { request, ownerName, boatName, berthClass, estimate } = item;
   const [note, setNote] = useState("");
-  const [error, setError] = useState<string | null>(null);
+  const { busy, error, run } = useStaffAction();
   const [open, setOpen] = useState(false);
   const offered = nightDates(request.startDate, request.endDate);
   const nights = countNights(request.startDate, request.endDate);
@@ -84,22 +85,23 @@ function Item({ item, staffId }: { item: RelettingQueueItem; staffId: string }) 
   const rowId = `relet-${request.id}`;
 
   function decide(decision: "approve" | "decline") {
-    const result = decideReletting(
-      staffId,
-      request.id,
-      decision,
-      note,
-      decision === "approve" ? [...approvedSet] : undefined,
-      decision === "approve"
-        ? {
-            maxLengthM: maxLengthM ? Number(maxLengthM) : null,
-            maxBeamM: maxBeamM ? Number(maxBeamM) : null,
-            earliestReletDate: earliestReletDate || null,
-            bufferDays: Number(bufferDays) || 0,
-          }
-        : undefined
+    return run(() =>
+      decideReletting(
+        staffId,
+        request.id,
+        decision,
+        note,
+        decision === "approve" ? [...approvedSet] : undefined,
+        decision === "approve"
+          ? {
+              maxLengthM: maxLengthM ? Number(maxLengthM) : null,
+              maxBeamM: maxBeamM ? Number(maxBeamM) : null,
+              earliestReletDate: earliestReletDate || null,
+              bufferDays: Number(bufferDays) || 0,
+            }
+          : undefined
+      )
     );
-    setError(result.ok ? null : result.error);
   }
 
   return (
@@ -228,15 +230,16 @@ function Item({ item, staffId }: { item: RelettingQueueItem; staffId: string }) 
               <div className="mt-3 flex flex-wrap items-center gap-2">
                 <button
                   type="button"
-                  onClick={() => decide("approve")}
-                  disabled={approvedSet.size === 0}
+                  onClick={() => void decide("approve")}
+                  disabled={busy || approvedSet.size === 0}
                   className="staff-btn staff-btn-primary"
                 >
                   Approve{approvedSet.size < offered.length ? ` (${approvedSet.size} nights)` : ""}
                 </button>
                 <button
                   type="button"
-                  onClick={() => decide("decline")}
+                  disabled={busy}
+                  onClick={() => void decide("decline")}
                   className="staff-btn staff-btn-danger"
                 >
                   Not approved
@@ -290,12 +293,14 @@ function Item({ item, staffId }: { item: RelettingQueueItem; staffId: string }) 
               ) : null}
               <button
                 type="button"
-                onClick={() => {
-                  const result = advanceRelettingStatus(staffId, request.id, {
-                    nightsBooked: Number(nightsBooked) || undefined,
-                  });
-                  setError(result.ok ? null : result.error);
-                }}
+                disabled={busy}
+                onClick={() =>
+                  void run(() =>
+                    advanceRelettingStatus(staffId, request.id, {
+                      nightsBooked: Number(nightsBooked) || undefined,
+                    })
+                  )
+                }
                 className="staff-btn"
               >
                 Mock: mark as {nextLabel}
@@ -381,12 +386,11 @@ function Ledger({ items }: { items: RelettingQueueItem[] }) {
 // The marina's consent step for reletting: every request from a berth holder
 // lands here as "submitted" and nothing is relet until staff decide it.
 export default function RelettingQueue() {
-  const { user } = useAuth();
-  const staffId = user?.id ?? "";
-  const { value: items, ready } = useMock(
-    () => getRelettingQueue(user?.id ?? null),
+  const staffId = useStaffId();
+  const { value: items, ready } = useStaffData(
+    () => getRelettingQueue(staffId),
     NONE,
-    user?.id ?? ""
+    staffId ?? ""
   );
 
   const pending = items.filter((i) => i.request.status === "submitted");

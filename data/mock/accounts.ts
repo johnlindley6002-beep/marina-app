@@ -13,6 +13,7 @@ import {
   removeKey,
   emitChange,
 } from "./storage";
+import { activeSnapshot } from "./snapshot";
 
 export type Role = "voyager" | "owner" | "staff";
 export type Mode = "guest" | "owner";
@@ -332,8 +333,17 @@ export type StaffMembership = {
   invitedAt: string;
 };
 
-// Only accepted invitations count. Staff tools arrive in the next step.
+// Only accepted invitations count. Against Supabase, the signed-in user's
+// staff_members rows count instead (see snapshot.ts).
 export function getStaffMemberships(userId: string | null): StaffMembership[] {
+  const snapshot = activeSnapshot();
+  if (snapshot) {
+    if (!userId) return [];
+    return snapshot.staffMarinaIds.map((marinaId) => {
+      const name = marinas.find((m) => m.id === marinaId)?.name ?? marinaId;
+      return { marinaId, marinaName: name, invitedBy: name, invitedAt: "" };
+    });
+  }
   if (!userId || !getRoles(userId).includes("staff")) return [];
   return STAFF_INVITATIONS.filter((i) => i.userId === userId && i.status === "accepted").map(
     (invite) => {

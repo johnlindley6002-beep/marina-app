@@ -14,6 +14,7 @@ const routes: { path: string; user?: string }[] = [
   { path: "/my-boat", user: "u-voyager" },
   { path: "/owner", user: "u-owner" },
   { path: "/owner/relet", user: "u-owner" },
+  { path: "/staff/login" },
   { path: "/staff", user: "u-staff" },
   { path: "/staff/arrivals", user: "u-staff" },
   { path: "/staff/berths", user: "u-staff" },

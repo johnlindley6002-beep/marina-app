@@ -1,10 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import type { ReactNode } from "react";
 import { siteConfig } from "@/data/site";
+import { signOutStaff, STAFF_DATA_SOURCE } from "@/lib/data";
 import { useAuth } from "@/components/providers/AuthProvider";
+import { useLanguage } from "@/components/providers/LanguageProvider";
+import { useStaffSession } from "./StaffSessionProvider";
 
 const NAV = [
   { href: "/staff/arrivals", label: "Arrivals" },
@@ -19,7 +22,19 @@ const NAV = [
 // the whole /staff/* area. Dense, working, not the consumer art direction.
 export default function StaffShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
-  const { user, signOut } = useAuth();
+  const router = useRouter();
+  const { user } = useAuth();
+  const { signedIn, email } = useStaffSession();
+  const { t } = useLanguage();
+  const onSignIn = pathname === "/staff/login";
+  const mock = STAFF_DATA_SOURCE === "mock";
+  // On the mock the dev persona's name shows; on Supabase, the email.
+  const who = mock ? user?.name : signedIn ? email : null;
+
+  async function handleSignOut() {
+    await signOutStaff();
+    if (!mock) router.replace("/staff/login");
+  }
 
   return (
     <div className="staff-shell min-h-dvh bg-paper-deep">
@@ -28,37 +43,43 @@ export default function StaffShell({ children }: { children: ReactNode }) {
           <Link href="/staff/arrivals" className="shrink-0 text-sm font-semibold text-ink">
             aldock <span className="font-normal text-ink-soft">staff</span>
           </Link>
-          <nav className="staff-nav overflow-x-auto" aria-label="Staff">
-            {NAV.map((item) => {
-              const active = pathname?.startsWith(item.href);
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  aria-current={active ? "page" : undefined}
-                  className={`staff-nav-link ${active ? "is-active" : ""}`}
-                >
-                  {item.label}
-                </Link>
-              );
-            })}
-          </nav>
+          {onSignIn ? null : (
+            <nav className="staff-nav overflow-x-auto" aria-label="Staff">
+              {NAV.map((item) => {
+                const active = pathname?.startsWith(item.href);
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    aria-current={active ? "page" : undefined}
+                    className={`staff-nav-link ${active ? "is-active" : ""}`}
+                  >
+                    {item.label}
+                  </Link>
+                );
+              })}
+            </nav>
+          )}
         </div>
         <div className="flex shrink-0 items-center gap-3">
-          {user ? (
-            <span className="text-xs text-ink-muted">
-              Signed in as <span className="font-medium text-ink">{user.name}</span>
-            </span>
+          {who ? (
+            <span className="text-xs text-ink-muted">{t.staffLogin.signedInAs(who)}</span>
           ) : null}
-          <button type="button" onClick={signOut} className="staff-btn staff-btn-ghost">
-            Sign out
-          </button>
+          {who && !onSignIn ? (
+            <button
+              type="button"
+              onClick={() => void handleSignOut()}
+              className="staff-btn staff-btn-ghost"
+            >
+              {t.staffLogin.signOut}
+            </button>
+          ) : null}
           <Link href="/" className="staff-btn staff-btn-ghost">
             Exit
           </Link>
         </div>
       </div>
-      {siteConfig.mockMode ? (
+      {siteConfig.mockMode && mock ? (
         <p className="border-b border-hairline bg-paper px-4 py-1.5 text-xs text-ink-muted">
           {siteConfig.accounts.mockNote}
         </p>

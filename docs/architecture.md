@@ -18,12 +18,14 @@ schema (Zod)  ->  forms (wizard steps)  ->  mock repository  ->  generated docum
 
 1. **Schema.** `features/prearrival/lib/schema.ts` is the single source of truth for a pre-arrival draft. Types are inferred from it, so a field exists in one place.
 2. **Forms.** Each wizard step edits a slice of the draft. Hard errors come from the schema and from `warnings.ts` (`getExtraErrors`), and soft guidance from `getWarnings`, which never blocks. `documentRules.ts` decides which documents are asked for, and `readiness.ts` scores a draft by reusing those same rules.
-3. **Repository.** `lib/data/index.ts` is the only door to the data. The mock bodies live in `data/mock/*` and use `localStorage`. A draft is saved as the boater goes, and a submit creates a check-in that staff can see.
+3. **Repository.** `lib/data/index.ts` is the only door to the data. The mock bodies live in `data/mock/*` and use `localStorage`. A draft is saved as the boater goes, and a submit creates a check-in that staff can see. The staff back office's arrivals, berth map and relet approvals are stored in Supabase instead (`lib/data/staff.ts`), running the same rules from `data/mock` against rows loaded for the signed-in staff member; see the README.
 4. **Documents.** From a submitted check-in the app builds the arrival declaration (PDF), the crew list in the IMO FAL Form 5 layout (PDF), and a draft authority report (JSON and CSV) for movements to or from outside the EU. The PDF library loads only when a button is pressed.
 
 Pricing has one rule set, in `data/marinas.ts`: the class is the larger of the length class and the beam class, nights are priced by season, a multihull pays double, and VAT is added once at the end, in whole cents (`lib/money.ts`). The marina page estimate and the pre-arrival quote both use it.
 
 Dates are `YYYY-MM-DD` strings and all day maths is done on whole UTC days (`lib/dates.ts`), so a clock change cannot shift a night. "Today" is the Lisbon calendar day.
+
+Staff access: `/staff/login` sends an email sign-in link (`shouldCreateUser: false`, sign-ups off), `app/auth/callback` swaps the link's code for a session cookie, and `proxy.ts` refreshes that cookie on staff routes. The gate in `app/staff/(backoffice)/layout.tsx` only hides screens; row level security on every table is what refuses the data.
 
 Server and client: pages in `app/` are server components that render a feature component. Anything that reads `localStorage`, the language or the session is a client component. The map, the enquiry form, the lightbox, the dictionaries other than English and the PDF library are loaded on demand.
 

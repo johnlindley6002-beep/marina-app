@@ -2,17 +2,25 @@ import type { NextConfig } from "next";
 
 const isDev = process.env.NODE_ENV !== "production";
 
+// The staff back office talks to Supabase over HTTPS and, for live updates,
+// a websocket on the same host.
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
+const supabaseConnect = supabaseUrl
+  ? ` ${supabaseUrl} ${supabaseUrl.replace(/^https:/, "wss:")}`
+  : "";
+
 // Content security policy. Next.js writes small inline scripts into every page,
 // so script-src has to allow inline until the app moves to per-request nonces
 // (a recommendation in docs/architecture.md). Everything else is locked to the
-// site's own origin. Dev mode also needs eval for hot reloading.
+// site's own origin and the Supabase project. Dev mode also needs eval for hot
+// reloading.
 const contentSecurityPolicy = [
   "default-src 'self'",
   `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}`,
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob:",
   "font-src 'self' data:",
-  `connect-src 'self'${isDev ? " ws: wss:" : ""}`,
+  `connect-src 'self'${supabaseConnect}${isDev ? " ws: wss:" : ""}`,
   "worker-src 'self'",
   "manifest-src 'self'",
   "object-src 'none'",

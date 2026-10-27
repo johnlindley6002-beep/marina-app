@@ -3,7 +3,7 @@
 import { useMemo } from "react";
 import { getAllBerths } from "@/data/berths";
 import { classifyBoatLength } from "@/data/marinas";
-import { getBerthStatuses } from "@/lib/data";
+import { getBerthStatuses, useStaffData, type BerthOperationalInfo } from "@/lib/data";
 import { STAFF_STATUS_LABEL } from "@/features/marina/components/BerthAvailabilityMap";
 
 // Lists the berths modelled for the boat's class, each showing its status on
@@ -11,6 +11,8 @@ import { STAFF_STATUS_LABEL } from "@/features/marina/components/BerthAvailabili
 // own conflict check is still the real guard on submit. Some enquiries are
 // larger than any class the schematic models yet (see the marina page's own
 // map), so with no matching berths this falls back to a manual berth ID.
+const NO_STATUSES: Record<string, BerthOperationalInfo> = {};
+
 export default function BerthPicker({
   marinaId,
   loa,
@@ -27,10 +29,14 @@ export default function BerthPicker({
   id?: string;
 }) {
   const berthClass = classifyBoatLength(Number(loa) || 0);
+  const { value: statuses } = useStaffData(
+    () => getBerthStatuses(marinaId, dateIso),
+    NO_STATUSES,
+    `${marinaId}|${dateIso}`
+  );
 
   const options = useMemo(() => {
     if (!berthClass) return [];
-    const statuses = getBerthStatuses(marinaId, dateIso);
     return getAllBerths()
       .filter((b) => b.sizeClass === berthClass)
       .map((b) => ({ id: b.id, status: statuses[b.id]?.status ?? "free" }))
@@ -42,7 +48,7 @@ export default function BerthPicker({
         }
         return a.id.localeCompare(b.id);
       });
-  }, [marinaId, dateIso, berthClass, value]);
+  }, [statuses, berthClass, value]);
 
   if (options.length === 0) {
     return (

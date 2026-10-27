@@ -4,13 +4,15 @@
 // here is linked from the site's normal navigation.
 
 import {
-  advanceRelettingStatus,
-  decideReletting,
   getRelettingRequests,
   requestEarlyReturn,
   submitRelettingRequest,
   type RelettingRequest,
 } from "@/lib/data";
+// The scenarios fill the berth holder's mock data, which stays in this browser,
+// so they use the mock staff rules directly rather than the Supabase-backed
+// ones in lib/data.
+import { advanceRelettingStatus, decideReletting } from "@/data/mock/reletting";
 
 function freshRequest(id: string): RelettingRequest | null {
   return getRelettingRequests("u-owner").find((r) => r.id === id) ?? null;

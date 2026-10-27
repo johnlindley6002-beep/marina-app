@@ -41,4 +41,4 @@ A change to pricing, rules, validation, dates, money or the reletting logic need
 
 ## Local data
 
-There is no backend. Storage is `localStorage` inside try and catch. Enquiries go out by `mailto:`. Keep `public/images/boatyard.svg` and `public/images/pier.svg` out of commits unless told otherwise. Do not push, merge or force anything.
+The staff back office (arrivals, berth map, relet approvals) uses Supabase through `lib/data/staff.ts`; schema changes go in a new file in `supabase/migrations`, and only the publishable key is ever used in the app. Everything else has no backend: storage is `localStorage` inside try and catch. Enquiries go out by `mailto:`. Keep `public/images/boatyard.svg` and `public/images/pier.svg` out of commits unless told otherwise. Do not push, merge or force anything.

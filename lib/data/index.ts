@@ -1,16 +1,13 @@
 // The data repository: the one surface the UI talks to.
 //
-// Today every function is backed by the mock layer in data/mock (localStorage
-// and seed data). To move to a real backend (Supabase, EU region), replace the
-// bodies behind these exports, module by module; no screen imports data/mock
-// directly, so no screen has to change. Internals of the mock (storage keys,
-// raw seed arrays, store loaders) are deliberately not exported here.
+// The staff back office (arrivals, the berth map, relet approvals) reads and
+// writes Supabase through ./staff, and every function there returns a Promise.
+// Everything else is still backed by the mock layer in data/mock (localStorage
+// and seed data); move it the same way, module by module. No screen imports
+// data/mock directly. Internals of the mock (storage keys, raw seed arrays,
+// store loaders) are deliberately not exported here.
 
-export {
-  type BerthOperationalInfo,
-  getBerthStatuses,
-  suggestReleasedBerths,
-} from "@/data/mock/berthStatus";
+export { type BerthOperationalInfo } from "@/data/mock/berthStatus";
 
 export {
   type CalendarDay,
@@ -22,17 +19,14 @@ export {
   type ReletSplit,
   type RelettingQueueItem,
   type RelettingRequest,
-  advanceRelettingStatus,
   cancelRelettingRequest,
   clearRelettingDraft,
-  decideReletting,
   defaultNightsBooked,
   emptyMockReletting,
   estimateReletting,
   getBerthCalendar,
   getNotifications,
   getRelettingDraft,
-  getRelettingQueue,
   getRelettingRequests,
   isRelettingEditable,
   markNotificationsRead,
@@ -67,17 +61,8 @@ export {
   EMPTY_ENQUIRY_DOCUMENTS,
   type Enquiry,
   type EnquiryStatus,
-  clearBerthOutOfService,
-  decideEnquiry,
-  getEnquiries,
-  getOutOfServiceBerths,
-  markEnquiryArrived,
-  markEnquiryDeparted,
-  reassignEnquiryBerth,
   resetMockEnquiries,
   resetMockOutOfService,
-  setBerthOutOfService,
-  setEnquiryFlag,
   submitEnquiry,
 } from "@/data/mock/enquiries";
 
@@ -97,4 +82,9 @@ export {
   submitPreArrivalCheckIn,
 } from "@/data/mock/prearrival";
 
+export { type OutOfServiceMark } from "@/data/mock/enquiries";
+
+export * from "./staff";
+
 export { useMock } from "./useMock";
+export { useStaffData } from "./useStaffData";

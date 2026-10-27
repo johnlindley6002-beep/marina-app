@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { marinas } from "@/data/marinas";
 import {
-  getPreArrivalCheckInsForStaff,
+  getAllPreArrivalCheckIns,
   markPreArrivalCheckedIn,
   type PreArrivalCheckIn,
   useMock,
@@ -12,11 +12,12 @@ import { maskIdNumber } from "@/features/prearrival/lib/mask";
 import { getVoyageFlags, isMinor } from "@/features/prearrival/lib/schema";
 import { getExtraErrors, getWarnings } from "@/features/prearrival/lib/warnings";
 import { getMissingRequiredDocuments } from "@/features/prearrival/lib/documentRules";
-import { useAuth } from "@/components/providers/AuthProvider";
+import { useStaffSession } from "./StaffSessionProvider";
 import { Collapse } from "@/components/ui/Disclosure";
 import DocumentButtons from "@/features/prearrival/components/DocumentButtons";
 
 const NONE: PreArrivalCheckIn[] = [];
+const NO_MARINAS: string[] = [];
 
 type PreArrivalStatus = "ready" | "missing" | "border";
 
@@ -165,12 +166,14 @@ function Row({ checkIn }: { checkIn: PreArrivalCheckIn }) {
 }
 
 export default function PreArrivalArrivals() {
-  const { user } = useAuth();
-  const staffId = user?.id ?? null;
+  // Pre-arrival check-ins are still stored on this device only, so they are
+  // read from the mock layer and scoped to the signed-in staff member's
+  // marinas here.
+  const marinaIds = useStaffSession().session?.marinaIds ?? NO_MARINAS;
   const { value: checkIns, ready } = useMock(
-    () => getPreArrivalCheckInsForStaff(staffId),
+    () => getAllPreArrivalCheckIns().filter((c) => marinaIds.includes(c.marinaId)),
     NONE,
-    staffId ?? ""
+    marinaIds.join(",")
   );
   const [needsAuthorityOnly, setNeedsAuthorityOnly] = useState(false);
   const [hideBerthed, setHideBerthed] = useState(true);

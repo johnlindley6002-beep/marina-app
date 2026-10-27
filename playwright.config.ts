@@ -22,9 +22,11 @@ export default defineConfig({
   ],
   webServer: {
     // The dev tools flag lets the scenario page and persona switcher exist in
-    // the production build the tests run against.
+    // the production build the tests run against. The staff data flag keeps
+    // the back office on the mock layer, so the tests sign in as the sample
+    // staff member and see the berth holder's side react, without Supabase.
     command: `npx next build && npx next start -p ${PORT}`,
-    env: { NEXT_PUBLIC_ENABLE_DEV_TOOLS: "1" },
+    env: { NEXT_PUBLIC_ENABLE_DEV_TOOLS: "1", NEXT_PUBLIC_STAFF_DATA: "mock" },
     url: `http://localhost:${PORT}`,
     reuseExistingServer: true,
     timeout: 240_000,

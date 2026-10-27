@@ -7,10 +7,11 @@ import {
   markEnquiryArrived,
   markEnquiryDeparted,
   type Enquiry,
-  useMock,
+  useStaffData,
 } from "@/lib/data";
 import { formatLength } from "@/lib/units";
-import { useAuth } from "@/components/providers/AuthProvider";
+import { useStaffAction } from "../lib/useStaffAction";
+import { useStaffId } from "./StaffSessionProvider";
 import { useUnits } from "@/components/providers/UnitsProvider";
 
 const NONE: Enquiry[] = [];
@@ -30,11 +31,14 @@ function BoatCard({
   action,
 }: {
   enquiry: Enquiry;
-  action: { label: string; onClick: () => void } | null;
+  action: {
+    label: string;
+    onClick: () => Promise<{ ok: true } | { ok: false; error: string }>;
+  } | null;
 }) {
   const { units } = useUnits();
   const [open, setOpen] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const { busy, error, run } = useStaffAction();
   const hasDocs =
     enquiry.documents.registrationNumber ||
     enquiry.documents.insuranceProvider ||
@@ -63,10 +67,8 @@ function BoatCard({
           {action ? (
             <button
               type="button"
-              onClick={() => {
-                setError(null);
-                action.onClick();
-              }}
+              disabled={busy}
+              onClick={() => void run(action.onClick)}
               className="staff-btn staff-btn-primary"
             >
               {action.label}
@@ -151,9 +153,12 @@ function BoatCard({
 // A quick daily flow: who is arriving, who is on site, who is departing, with
 // their documents and crew list read only, and one tap to move them along.
 export default function CheckInFlow() {
-  const { user } = useAuth();
-  const staffId = user?.id ?? null;
-  const { value: enquiries, ready } = useMock(() => getEnquiries(staffId), NONE, staffId ?? "");
+  const staffId = useStaffId();
+  const { value: enquiries, ready } = useStaffData(
+    () => getEnquiries(staffId),
+    NONE,
+    staffId ?? ""
+  );
   const today = todayIso();
 
   const { arriving, onSite, departing } = useMemo(() => {
