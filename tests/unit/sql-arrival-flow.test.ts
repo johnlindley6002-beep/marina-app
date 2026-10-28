@@ -45,7 +45,7 @@ beforeAll(async () => {
       ('${STAFF}', 'staff@example.com'),
       ('${GUEST_A}', 'ana@example.com'),
       ('${GUEST_B}', 'ben@example.com');
-    insert into public.staff_members (user_id, marina_id, role) values ('${STAFF}', 'cascais', 'admin');
+    insert into public.staff_members (user_id, marina_id, role) values ('${STAFF}', 'cascais', 'director');
   `);
 });
 
@@ -121,7 +121,7 @@ describe("accounts and holdings", () => {
         GUEST_A,
         `select public.link_berth_holder('${berth.id}', 'ana@example.com', ${day(-1)}, ${day(300)})`
       )
-    ).toMatch(/staff_only/);
+    ).toMatch(/not_allowed/);
   });
 
   it("links a holder by email before they sign up, and attaches it on first sign in", async () => {
@@ -236,7 +236,7 @@ describe("suggested berths", () => {
       `select id from public.arrivals where expected_arrival = ${day(5)}`
     );
     expect(await asError(GUEST_A, `select * from public.suggest_berths('${arrival.id}')`)).toMatch(
-      /staff_only/
+      /not_allowed/
     );
   });
 
@@ -475,7 +475,7 @@ describe("ending a holding", () => {
   it("ends it today, and the holder stops being a berth holder", async () => {
     const holding = await one<{ id: string }>("select id from public.berth_contracts");
     expect(await asError(HOLDER, `select public.end_berth_holding('${holding.id}')`)).toMatch(
-      /staff_only/
+      /not_allowed/
     );
     await as(STAFF, `select public.end_berth_holding('${holding.id}')`);
     expect(

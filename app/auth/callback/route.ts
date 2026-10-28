@@ -32,7 +32,7 @@ export async function GET(request: NextRequest) {
       let target = next;
       if (!target) {
         const { data } = await supabase.from("staff_members").select("marina_id").limit(1);
-        target = (data ?? []).length > 0 ? "/staff/arrivals" : "/my-arrivals";
+        target = (data ?? []).length > 0 ? "/staff" : "/my-arrivals";
       }
       const done = NextResponse.redirect(`${origin}${target}`);
       done.cookies.delete("aldock_next");

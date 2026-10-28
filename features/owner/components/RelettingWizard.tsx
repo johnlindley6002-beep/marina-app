@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useOwnedBerths } from "../lib/useOwnedBerths";
 import { marinas } from "@/data/marinas";
-import { formatLongDate, todayIso, countNights } from "@/lib/dates";
+import { formatLongDate, todayIso, countNights, isValidIsoDate } from "@/lib/dates";
 import {
   clearRelettingDraft,
   estimateReletting,
@@ -83,6 +83,13 @@ function Wizard() {
       setBoatReady(draft.boatReady);
       setBerthReady(draft.berthReady);
       setResumed(draft.mode === "new" && draft.step > 1);
+    } else {
+      // Dates handed over from booking help to leave and come back.
+      const params = new URLSearchParams(window.location.search);
+      const from = params.get("from") ?? "";
+      const to = params.get("to") ?? "";
+      if (isValidIsoDate(from)) setStartDate(from);
+      if (isValidIsoDate(to)) setEndDate(to);
     }
     setHydrated(true);
   }, [userId]);

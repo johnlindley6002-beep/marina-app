@@ -1,6 +1,6 @@
-import { redirect } from "next/navigation";
+import RoleHome from "@/features/staff/components/RoleHome";
 
-// Arrivals is the home screen of the staff back office.
+// Each role starts on its own screen.
 export default function StaffIndexPage() {
-  redirect("/staff/arrivals");
+  return <RoleHome />;
 }

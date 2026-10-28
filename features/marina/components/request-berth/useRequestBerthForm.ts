@@ -10,7 +10,14 @@ import { useBoats } from "@/components/providers/BoatProvider";
 import { useLanguage } from "@/components/providers/LanguageProvider";
 import { useUnits } from "@/components/providers/UnitsProvider";
 import { loadLastEnquiry, saveLastEnquiry } from "@/features/marina/lib/tripStore";
-import { ACCOUNT_DATA_SOURCE, requestArrival, submitEnquiry, upsertBoat } from "@/lib/data";
+import {
+  ACCOUNT_DATA_SOURCE,
+  bookArrivalHelp,
+  requestArrival,
+  submitEnquiry,
+  upsertBoat,
+  type HelpReason,
+} from "@/lib/data";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { guestError } from "@/features/account/lib/errors";
 import { effectiveDeparture, PLAN_KEYS, type StayPlan } from "@/features/marina/lib/stayPlan";
@@ -142,6 +149,13 @@ export function useRequestBerthForm({
   const accountMode = ACCOUNT_DATA_SOURCE === "supabase";
   const [sendState, setSendState] = useState<"idle" | "sending" | "sent">("idle");
   const [sendError, setSendError] = useState("");
+  // Help mooring, booked with the request (signed-in guests only).
+  const [help, setHelp] = useState<{ wanted: boolean; reason: HelpReason; note: string }>({
+    wanted: false,
+    reason: "short_handed",
+    note: "",
+  });
+  const [helpError, setHelpError] = useState("");
   const [needsSignIn, setNeedsSignIn] = useState(false);
   const [mailtoHref, setMailtoHref] = useState("");
   const appliedBoatId = useRef<string | null | undefined>(undefined);
@@ -390,6 +404,11 @@ export function useRequestBerthForm({
         setSendError(guestError(t.accounts, result.error));
         return;
       }
+      setHelpError("");
+      if (help.wanted) {
+        const booked = await bookArrivalHelp(result.value, help.reason, help.note);
+        if (!booked.ok) setHelpError(t.help.bookFailed);
+      }
       setSendState("sent");
       setSummary(text);
       setCopied(false);
@@ -453,6 +472,9 @@ export function useRequestBerthForm({
     selectedBerthId,
     sendError,
     sendState,
+    help,
+    setHelp,
+    helpError,
     setDocs,
     setField,
     setForm,

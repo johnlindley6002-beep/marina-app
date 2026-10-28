@@ -6,6 +6,9 @@ import { StaffSessionProvider } from "@/features/staff/components/StaffSessionPr
 export const metadata: Metadata = {
   title: "Staff - aldock",
   description: "The marina staff back office.",
+  // Installable on a phone's home screen as its own app.
+  manifest: "/staff.webmanifest",
+  appleWebApp: { capable: true, title: "aldock staff", statusBarStyle: "default" },
 };
 
 // The whole /staff/* area sits in one dense shell, separate from the consumer

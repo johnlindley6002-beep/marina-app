@@ -25,6 +25,8 @@ import { useUnits } from "@/components/providers/UnitsProvider";
 import OwnerCalendar from "./OwnerCalendar";
 import OwnerUpdates from "./OwnerUpdates";
 import RelettingLedger from "./RelettingLedger";
+import BookHelp from "./BookHelp";
+import HelpBookings from "@/components/booking/HelpBookings";
 
 const copy = siteConfig.relet;
 const NO_REQUESTS: RelettingRequest[] = [];
@@ -121,9 +123,14 @@ function OwnerBody() {
                   </Link>
                 ) : null}
               </div>
+              {ACCOUNT_DATA_SOURCE === "supabase" ? (
+                <BookHelp contractId={berth.linkId} marinaId={berth.marinaId} />
+              ) : null}
             </section>
           );
         })}
+
+        {ACCOUNT_DATA_SOURCE === "supabase" ? <HelpBookings kind="holder" /> : null}
 
         <section className="chapter" aria-labelledby="calendar-heading">
           <h2 id="calendar-heading" className="type-heading type-h2 text-ink">

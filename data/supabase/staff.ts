@@ -17,6 +17,7 @@ import type { EnquiryStore, OosStore, OutOfServiceMark } from "@/data/mock/enqui
 import type { ReletStore } from "@/data/mock/reletting";
 import { runOnSnapshot, type StaffSnapshot } from "@/data/mock/snapshot";
 import { emitChange } from "@/data/mock/storage";
+import type { StaffRole } from "@/features/staff/lib/roles";
 import {
   enquiryFromRow,
   enquiryToRow,
@@ -36,8 +37,14 @@ export const DOUBLE_BOOKED = "That berth was just taken for those nights. Choose
 export type StaffSession = {
   userId: string;
   email: string;
+  // Marinas where the membership counts (active and in date).
   marinaIds: string[];
-  isAdmin: boolean;
+  // The membership in the first of them: role, team lead and what it may do.
+  memberId: string | null;
+  role: StaffRole | null;
+  teamLead: boolean;
+  displayName: string;
+  capabilities: string[];
 };
 
 type Loaded = {
@@ -55,17 +62,27 @@ export async function getSupabaseStaffSession(): Promise<StaffSession | null> {
   const { data } = await client.auth.getUser();
   const user = data.user;
   if (!user) return null;
-  const { data: rows, error } = await client
-    .from("staff_members")
-    .select("marina_id, role")
-    .eq("user_id", user.id);
+  // Only memberships that count come back: active and not past access_until.
+  const { data: rows, error } = await client.rpc("my_staff_access");
   if (error) return null;
-  const members = (rows ?? []) as { marina_id: string; role: string }[];
+  const members = (rows ?? []) as {
+    member_id: string;
+    marina_id: string;
+    role: StaffRole;
+    team_lead: boolean;
+    display_name: string;
+    capabilities: string[];
+  }[];
+  const first = members[0];
   return {
     userId: user.id,
     email: user.email ?? "",
     marinaIds: members.map((m) => m.marina_id),
-    isAdmin: members.some((m) => m.role === "admin"),
+    memberId: first?.member_id ?? null,
+    role: first?.role ?? null,
+    teamLead: first?.team_lead ?? false,
+    displayName: first?.display_name ?? "",
+    capabilities: first?.capabilities ?? [],
   };
 }
 
@@ -259,8 +276,10 @@ export async function sendStaffSignInLink(
   try {
     const { error } = await supabase().auth.signInWithOtp({
       email,
-      // Staff accounts are invite only: an unknown address gets no account.
-      options: { shouldCreateUser: false, emailRedirectTo: redirectTo },
+      // Someone invited on the Team page may not have an account yet: their
+      // first sign-in creates it and turns the invite into a membership. An
+      // address nobody invited gets an account with no staff access at all.
+      options: { shouldCreateUser: true, emailRedirectTo: redirectTo },
     });
     if (!error) return "sent";
     if (error.status === 429) return "too-many";

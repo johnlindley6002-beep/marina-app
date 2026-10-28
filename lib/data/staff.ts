@@ -4,6 +4,7 @@
 // on the mock layer in the browser, exactly as before. The rules are the same
 // code either way (data/mock), so the two cannot drift apart.
 
+import { ALL_CAPABILITIES } from "@/features/staff/lib/roles";
 import {
   getBerthStatuses as mockGetBerthStatuses,
   suggestReleasedBerths as mockSuggestReleasedBerths,
@@ -67,25 +68,19 @@ export { DOUBLE_BOOKED, SAVE_FAILED } from "@/data/supabase/staff";
 // on Supabase only; in mock mode their screens show a note instead.
 export {
   addRadioEntry,
-  addTask,
   getCustomer,
   getPlannerBerths,
   getRadioLog,
   getReceptionRecord,
-  getTaskBoard,
   listCustomers,
   radioEntryToArrival,
   saveReceptionDetails,
   setAuthorityFormalities,
   setDocumentsChecked,
-  setMyDisplayName,
-  setTaskStatus,
   type Customer,
   type PlannerBerth,
   type RadioEntry,
   type ReceptionRecord,
-  type StaffMemberOption,
-  type TaskBoard,
 } from "@/data/supabase/backoffice";
 
 export const STAFF_DATA_SOURCE: "supabase" | "mock" =
@@ -124,7 +119,13 @@ export async function getStaffSignIn(): Promise<StaffSignIn> {
           userId: user.id,
           email: user.email,
           marinaIds: getStaffMemberships(user.id).map((m) => m.marinaId),
-          isAdmin: false,
+          // The browser mock has one kind of staff member, who may do
+          // everything, so the end-to-end tests see every screen.
+          memberId: null,
+          role: "director",
+          teamLead: false,
+          displayName: user.name,
+          capabilities: ALL_CAPABILITIES,
         }
       : null;
   } else {
@@ -315,3 +316,6 @@ export function watchArrivals(onChange?: (change: ArrivalChange) => void): () =>
     onChange?.(change);
   });
 }
+export * from "@/data/supabase/dock";
+// Asks every open staff screen to read its data again.
+export { emitChange as refreshStaffData } from "@/data/mock/storage";

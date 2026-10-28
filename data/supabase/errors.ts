@@ -10,6 +10,13 @@ export type DbErrorKey =
   | "reason_required"
   | "already_decided"
   | "staff_only"
+  | "not_allowed"
+  | "not_yourself"
+  | "last_director"
+  | "already_staff"
+  | "job_not_open"
+  | "not_on_job"
+  | "invalid_time"
   | "invalid_dates"
   | "dates_in_past"
   | "guest_confirmed"
@@ -30,6 +37,13 @@ const KEYS: DbErrorKey[] = [
   "reason_required",
   "already_decided",
   "staff_only",
+  "not_allowed",
+  "not_yourself",
+  "last_director",
+  "already_staff",
+  "job_not_open",
+  "not_on_job",
+  "invalid_time",
   "invalid_dates",
   "dates_in_past",
   "guest_confirmed",
@@ -44,7 +58,15 @@ const KEYS: DbErrorKey[] = [
   "no_proposal",
 ];
 
-const NOT_FOUND = ["arrival_not_found", "offer_not_found", "holding_not_found", "berth_not_found"];
+const NOT_FOUND = [
+  "arrival_not_found",
+  "offer_not_found",
+  "holding_not_found",
+  "berth_not_found",
+  "job_not_found",
+  "invite_not_found",
+  "member_not_found",
+];
 
 export function dbErrorKey(
   error: { code?: string | null; message?: string | null } | null

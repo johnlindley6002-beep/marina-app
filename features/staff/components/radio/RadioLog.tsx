@@ -6,6 +6,7 @@ import { getPrimaryMarina } from "@/data/marinas";
 import { addDaysIso, isoDateOfTimestamp, todayIso } from "@/lib/dates";
 import {
   addRadioEntry,
+  createJob,
   getRadioLog,
   radioEntryToArrival,
   type RadioEntry,
@@ -21,6 +22,7 @@ import {
 import { useStaffAction } from "../../lib/useStaffAction";
 import SupabaseOnly from "../SupabaseOnly";
 import { useStaffText } from "../StaffLanguageProvider";
+import { useStaffContext } from "../dock/useDock";
 
 const NONE: RadioEntry[] = [];
 const DEFAULT_CHANNEL = String(getPrimaryMarina().vhfChannel);
@@ -181,6 +183,11 @@ function EntryRow({ entry }: { entry: RadioEntry }) {
   const { s, dateLocale } = useStaffText();
   const r = s.radio;
   const action = useStaffAction();
+  const { marinaId, capabilities } = useStaffContext();
+  const [jobMade, setJobMade] = useState(false);
+  const makesJobs = capabilities.some(
+    (c) => c === "create_jobs" || c === "plan_day" || c === "assign_jobs"
+  );
   return (
     <li className="staff-panel flex flex-wrap items-start justify-between gap-3 text-sm">
       <div className="min-w-0">
@@ -210,6 +217,36 @@ function EntryRow({ entry }: { entry: RadioEntry }) {
             {r.makeArrival}
           </button>
         )}
+        {makesJobs && !jobMade ? (
+          <button
+            type="button"
+            disabled={action.busy}
+            onClick={() =>
+              void action.save(async () => {
+                // A walk-in or VHF call for help is always accepted and joins the queue now.
+                const made = await createJob(marinaId, {
+                  jobType: "arrival",
+                  berthCode: "",
+                  boatName: entry.boatName,
+                  lengthM: null,
+                  beamM: null,
+                  dueAt: new Date().toISOString(),
+                  reason: "",
+                  reasonNote: entry.request,
+                  peopleNeeded: null,
+                  source: entry.source === "vhf" ? "vhf" : "walk_in",
+                  description: "",
+                });
+                setJobMade(made.ok);
+                return made.ok;
+              })
+            }
+            className="staff-btn ml-2"
+          >
+            {r.makeJob}
+          </button>
+        ) : null}
+        {jobMade ? <p className="mt-1 text-ink">{r.jobMade}</p> : null}
         {action.error ? (
           <p role="alert" className="field-error mt-2">
             {action.error}

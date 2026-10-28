@@ -1,0 +1,50 @@
+import type { Dictionary } from "../../types";
+
+export const help: Dictionary["help"] = {
+  title: "Ayuda para amarrar",
+  wanted: "Me gustaría ayuda para amarrar",
+  wantedHint:
+    "Alguien del equipo del pantalán le espera en el amarre. Reservar con antelación significa esperar menos en las horas de más movimiento.",
+  reason: "Por qué",
+  reasons: {
+    short_handed: "Tripulación reducida",
+    first_time: "Primera vez en esta marina",
+    other: "Otro",
+  },
+  note: "Cuéntenos más (opcional)",
+  needsEta: "Indique arriba la hora prevista de llegada para que el equipo pueda planificar.",
+  busy: "Hora de mucho movimiento, puede que tenga que esperar.",
+  quieter: "Horas más tranquilas:",
+  useTime: (time) => `Llegar a las ${time}`,
+  roomy: "El equipo tiene disponibilidad a esa hora.",
+  bookFailed:
+    "La solicitud se envió, pero no se pudo reservar la ayuda. Resérvela de nuevo en Mis llegadas.",
+  bookingsTitle: "Ayuda reservada",
+  types: { arrival: "Llegada", departure: "Salida del amarre", return: "Regreso" },
+  statuses: {
+    waiting: "A la espera de que la marina confirme su llegada",
+    booked: "Reservada",
+    done: "Hecha",
+    cancelled: "Cancelada",
+  },
+  at: (date, time) => `${date} a las ${time}`,
+  runningLate: "Llego más tarde",
+  newTime: "Nueva hora",
+  saveTime: "Actualizar hora",
+  timeSaved: "El equipo ya tiene la nueva hora.",
+  cancel: "Cancelar ayuda",
+  bookArrival: "Reservar ayuda para amarrar",
+  holderTitle: "Reservar ayuda",
+  holderIntro:
+    "Reserve al equipo del pantalán para ayudarle a salir del amarre, a volver, o ambas cosas.",
+  kind: "Ayuda para",
+  kinds: { departure: "Salir", return: "Volver", both: "Ambas" },
+  leaveDate: "Salgo el",
+  returnDate: "Vuelvo el",
+  time: "Hora",
+  book: "Reservar ayuda",
+  bookedOk: "Ayuda reservada.",
+  errTime: "Elija una fecha y hora que no sean pasadas.",
+  offerRelet: "Ofrecer mi amarre mientras estoy fuera",
+  offerReletHint: "Sus fechas ya están rellenadas.",
+};

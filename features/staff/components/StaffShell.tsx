@@ -6,20 +6,9 @@ import type { ReactNode } from "react";
 import { siteConfig } from "@/data/site";
 import { signOutStaff, STAFF_DATA_SOURCE } from "@/lib/data";
 import { useAuth } from "@/components/providers/AuthProvider";
+import { navFor } from "../lib/roles";
 import { useStaffSession } from "./StaffSessionProvider";
 import { useStaffText, type StaffLang } from "./StaffLanguageProvider";
-
-const NAV = [
-  { href: "/staff/arrivals", key: "arrivals" },
-  { href: "/staff/reception", key: "reception" },
-  { href: "/staff/planner", key: "planner" },
-  { href: "/staff/berths", key: "berths" },
-  { href: "/staff/enquiries", key: "enquiries" },
-  { href: "/staff/reletting", key: "reletting" },
-  { href: "/staff/customers", key: "customers" },
-  { href: "/staff/tasks", key: "tasks" },
-  { href: "/staff/radio", key: "radio" },
-] as const;
 
 const LANGS: { value: StaffLang; label: string; name: string }[] = [
   { value: "en", label: "EN", name: "English" },
@@ -32,7 +21,9 @@ export default function StaffShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const { user } = useAuth();
-  const { signedIn, email } = useStaffSession();
+  const { signedIn, email, session } = useStaffSession();
+  // Only what the role can use.
+  const nav = navFor(session?.capabilities ?? []);
   const { s, lang, setLang } = useStaffText();
   const onSignIn = pathname === "/staff/login";
   const mock = STAFF_DATA_SOURCE === "mock";
@@ -48,12 +39,12 @@ export default function StaffShell({ children }: { children: ReactNode }) {
     <div className="staff-shell min-h-dvh bg-paper-deep" lang={lang}>
       <div className="staff-topbar flex-wrap gap-y-2 py-2">
         <div className="flex min-w-0 items-center gap-4">
-          <Link href="/staff/arrivals" className="shrink-0 text-sm font-semibold text-ink">
+          <Link href="/staff" className="shrink-0 text-sm font-semibold text-ink">
             aldock <span className="font-normal text-ink-soft">{s.shell.brand}</span>
           </Link>
           {onSignIn ? null : (
             <nav className="staff-nav overflow-x-auto" aria-label={s.shell.navLabel}>
-              {NAV.map((item) => {
+              {nav.map((item) => {
                 const active = pathname?.startsWith(item.href);
                 return (
                   <Link
@@ -91,7 +82,12 @@ export default function StaffShell({ children }: { children: ReactNode }) {
               </button>
             ))}
           </div>
-          {who ? <span className="text-xs text-ink-muted">{s.shell.signedInAs(who)}</span> : null}
+          {who ? (
+            <span className="text-xs text-ink-muted">
+              {s.shell.signedInAs(who)}
+              {session?.role ? `, ${s.roles[session.role]}` : ""}
+            </span>
+          ) : null}
           {who && !onSignIn ? (
             <button
               type="button"

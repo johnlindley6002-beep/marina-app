@@ -102,11 +102,21 @@ Then turn on email sign-ups in the dashboard (Authentication, Sign In / Provider
 
 ### Sample data (development projects only)
 
-`supabase/seed.sql` fills Marina de Cascais with sample guests with boats, Jordan Reyes as the holder of G-14, requests in every status, an approved relet offer, dock tasks and radio entries. It creates real users with the dev password, so run it on a development project only, never on one with real people. Run it with `npx supabase db push --include-seed`, or paste the file into the SQL editor. It is safe to run twice. `npm run db:seed:build` rebuilds it after the sample data changes.
+`supabase/seed.sql` fills Marina de Cascais with sample guests with boats, Jordan Reyes as the holder of G-14, requests in every status, an approved relet offer, dock tasks and radio entries. It creates real users with the dev password (guests, a berth holder, and one account per staff role, a marinheiro team lead and a seasonal marinheiro whose access has ended), so it refuses to run unless the project is marked for development: `alter database postgres set app.allow_dev_seed = 'on';` once, in the SQL editor. Run it with `npx supabase db push --include-seed`, or paste the file into the SQL editor. It is safe to run twice. `npm run db:seed:build` rebuilds it after the sample data changes.
 
 ### Tests of the database rules
 
 `tests/unit/sql-arrival-flow.test.ts` and `tests/unit/sql-seed.test.ts` run the real migrations and the seed on an in-process Postgres (pglite), with Supabase's own pieces stubbed. They check row level security, the double booking constraint, suggested berths, the cancel block, the history log and the seed.
+
+## Staff roles and the dock team
+
+Five roles, each with its own start screen after `/staff/login` and a navigation that shows only what it can use: director (Overview, Team and everything else), dockmaster (Day plan, berth planner, relet approvals, berth holders, shifts, staffing, the dock team), reception (arrivals and requests with suggested berths, check-in, customers, radio log, new jobs), marinheiro (My next job, My day, My shifts; a team lead may also assign jobs) and night watch (Tonight with late check-in, radio log, incident reports, jobs).
+
+What a role may do is a list of capabilities in `role_capabilities` (`supabase/migrations/20261030100000_staff_roles.sql`). `has_capability()` checks the role, that the account is active and that `access_until` has not passed, and row level security uses it on every table: a marinheiro or the night watch never reads customer contact details, passports or documents (the night watch's list comes from `tonight_movements`, boat, size and berth only). The team changes only through database functions: a director invites anyone and changes any role, a dockmaster only marinheiros and the night watch, nobody changes their own access, the last active director stays, and every change lands in `staff_audit_log`. A platform admin (`platform_admins`) can create a marina's first director with `platform_create_director` and reads nothing else. Someone invited without an account becomes a member at their first sign-in; if sign-ups are off in Supabase, also invite them under Authentication, Users.
+
+Booked help: a guest asks for help mooring on the arrival request (with a reason, never anything health related), and a berth holder books help leaving and coming back on My berth. Each booking is a job in `dock_tasks`; an arrival's job stays inactive until staff confirm the arrival. A slot is busy when the people booked reach the marinheiros on shift (`shifts`); a boater only ever sees busy or not, with quieter times, and is never refused. `features/staff/lib/jobs.ts` holds the rules the screens use: people needed from length, capacity per half hour, staffing per hour, and the next job (the dockmaster's order first, then the earliest, preferring the nearest pontoon).
+
+The staff area installs as its own app (`public/staff.webmanifest`). Alerts (a job assigned to me, a colleague asking for help, a job starting soon still short of people) show in the app and, where the phone allows notifications, as a notification while the staff app is open or in the background. Notifications to a closed app need a push server (Web Push keys and a sender); that is not built yet.
 
 ## Design tokens
 

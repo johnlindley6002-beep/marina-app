@@ -34,6 +34,8 @@ Staff screens on Supabase only: Reception (`/staff/reception`, replacing Check-i
 
 Server and client: pages in `app/` are server components that render a feature component. Anything that reads `localStorage`, the language or the session is a client component. The map, the enquiry form, the lightbox, the dictionaries other than English and the PDF library are loaded on demand.
 
+Staff roles: five roles with named capabilities (`role_capabilities`); `has_capability` also requires an active account within `access_until`, so deactivation and the end of a season take effect at once. The older staff functions (confirm, decline, propose dates, suggested berths, link and end a holding) keep their logic as `*_core` and gained a capability check in front. Jobs extend `dock_tasks`; booked help, running late, claiming, finishing, asking for help and assigning are database functions, and `slot_busyness` tells a boater only busy or not.
+
 ## Rules the code encodes, and where they come from
 
 | Rule                                                                                                                                                                                                                                                                     | Where in the code                                                                                  | Source                                                                                              |

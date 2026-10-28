@@ -8,7 +8,6 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/client";
 import { emitChange } from "@/data/mock/storage";
 import type { Enquiry } from "@/data/mock/enquiries";
-import type { DockTask, TaskStatus } from "@/features/staff/lib/tasks";
 import type { RadioSource } from "@/features/staff/lib/radio";
 import { enquiryFromRow, indexBerths, metresFromColumn, type ArrivalRow } from "./rows";
 import { getSupabaseStaffSession } from "./staff";
@@ -345,96 +344,6 @@ export async function getCustomer(id: string): Promise<Customer | null> {
   } catch {
     return null;
   }
-}
-
-// ---------------------------------------------------------------------------
-// Dock tasks
-// ---------------------------------------------------------------------------
-
-export type StaffMemberOption = { id: string; name: string; isMe: boolean };
-
-export type TaskBoard = {
-  tasks: DockTask[];
-  staff: StaffMemberOption[];
-  me: StaffMemberOption | null;
-  berths: { id: string; code: string }[];
-};
-
-export async function getTaskBoard(): Promise<TaskBoard | null> {
-  try {
-    const session = await getSupabaseStaffSession();
-    const client = db();
-    const [tasks, members, berths] = await Promise.all([
-      client
-        .from("dock_tasks")
-        .select("id, description, due_at, assigned_to, status, done_at, berths(code)"),
-      client.from("staff_members").select("id, user_id, display_name"),
-      client.from("berths").select("id, code"),
-    ]);
-    if (tasks.error || members.error || berths.error) return null;
-    const staff = (
-      (members.data ?? []) as { id: string; user_id: string; display_name: string }[]
-    ).map((m) => ({ id: m.id, name: m.display_name, isMe: m.user_id === session?.userId }));
-    return {
-      tasks: (
-        (tasks.data ?? []) as unknown as {
-          id: string;
-          description: string;
-          due_at: string;
-          assigned_to: string | null;
-          status: TaskStatus;
-          done_at: string | null;
-          berths: { code: string } | null;
-        }[]
-      ).map((t) => ({
-        id: t.id,
-        berthCode: t.berths?.code ?? null,
-        description: t.description,
-        dueAt: t.due_at,
-        assignedTo: t.assigned_to,
-        status: t.status,
-        doneAt: t.done_at,
-      })),
-      staff,
-      me: staff.find((m) => m.isMe) ?? null,
-      berths: (berths.data ?? []) as { id: string; code: string }[],
-    };
-  } catch {
-    return null;
-  }
-}
-
-export async function addTask(task: {
-  berthId: string | null;
-  description: string;
-  dueAt: string;
-  assignedTo: string | null;
-}): Promise<boolean> {
-  const session = await getSupabaseStaffSession();
-  const marinaId = session?.marinaIds[0];
-  if (!marinaId) return false;
-  return done(
-    db().from("dock_tasks").insert({
-      marina_id: marinaId,
-      berth_id: task.berthId,
-      description: task.description.trim(),
-      due_at: task.dueAt,
-      assigned_to: task.assignedTo,
-    })
-  );
-}
-
-export function setTaskStatus(id: string, status: TaskStatus): Promise<boolean> {
-  return done(
-    db()
-      .from("dock_tasks")
-      .update({ status, done_at: status === "done" ? new Date().toISOString() : null })
-      .eq("id", id)
-  );
-}
-
-export function setMyDisplayName(name: string): Promise<boolean> {
-  return done(db().rpc("set_my_display_name", { new_name: name }));
 }
 
 // ---------------------------------------------------------------------------

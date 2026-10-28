@@ -34,8 +34,17 @@ const count = async (sql: string): Promise<number> =>
     ).n
   );
 
+let refusal = "";
+
 beforeAll(async () => {
   db = await createMigratedDb();
+  // Without the development flag the seed refuses to run at all.
+  try {
+    await db.exec(SEED);
+  } catch (error) {
+    refusal = (error as { message: string }).message;
+  }
+  await db.exec("set app.allow_dev_seed = 'on'");
   await db.exec(SEED);
 });
 
@@ -44,9 +53,13 @@ afterAll(async () => {
 });
 
 describe("the seed", () => {
-  it("creates the six sample users, each with a profile", async () => {
-    expect(await count("auth.users")).toBe(6);
-    expect(await count("public.profiles")).toBe(6);
+  it("refuses to run on a project not marked for development", () => {
+    expect(refusal).toMatch(/Refusing to seed/);
+  });
+
+  it("creates the sample guests and one account per staff role, each with a profile", async () => {
+    expect(await count("auth.users")).toBe(13);
+    expect(await count("public.profiles")).toBe(13);
     const alex = await db.query(
       `select full_name, nationality, eu_status from public.profiles where user_id = '${ALEX}'`
     );
@@ -55,14 +68,21 @@ describe("the seed", () => {
     ]);
   });
 
-  it("lets only the three persona accounts sign in with the dev password", async () => {
+  it("lets only the persona accounts sign in with the dev password", async () => {
     const rows = await db.query<{ email: string; usable: boolean }>(
       `select email, encrypted_password <> '' as usable from auth.users order by email`
     );
     expect(rows.rows.filter((r) => r.usable).map((r) => r.email)).toEqual([
       "alex.morgan@example.com",
+      "bruno.lima@example.com",
+      "carla.sousa@example.com",
+      "diogo.alves@example.com",
+      "hugo.pinto@example.com",
+      "ines.duarte@example.com",
       "jordan.reyes@example.com",
+      "rui.costa@example.com",
       "sam.okafor@example.com",
+      "teresa.marques@example.com",
     ]);
     const match = await db.query<{ ok: boolean }>(
       `select encrypted_password = extensions.crypt('aldock-dev-only', encrypted_password) as ok
@@ -147,6 +167,47 @@ describe("the seed", () => {
     expect(await count("public.berth_events")).toBeGreaterThan(8);
   });
 
+  it("has one member per role, a team lead and an expired seasonal marinheiro", async () => {
+    const rows = await db.query<{ role: string; team_lead: boolean; expired: boolean }>(
+      `select role, team_lead, coalesce(access_until < public.lisbon_today(), false) as expired
+       from public.staff_members order by role, team_lead, expired`
+    );
+    expect(rows.rows).toEqual([
+      { role: "director", team_lead: false, expired: false },
+      { role: "dockmaster", team_lead: false, expired: false },
+      { role: "marinheiro", team_lead: false, expired: false },
+      { role: "marinheiro", team_lead: false, expired: false },
+      { role: "marinheiro", team_lead: false, expired: true },
+      { role: "marinheiro", team_lead: true, expired: false },
+      { role: "night_watch", team_lead: false, expired: false },
+      { role: "reception", team_lead: false, expired: false },
+    ]);
+  });
+
+  it("plans a day with three marinheiros, a busy slot and a late ETA", async () => {
+    const at = (clock: string) =>
+      `public.slot_start(public.lisbon_at(public.lisbon_today(), '${clock}'))`;
+    const slot = await db.query<{ load: number; capacity: number }>(
+      `select public.slot_load('cascais', ${at("10:00")}) as load, public.slot_capacity('cascais', ${at("10:00")}) as capacity`
+    );
+    // Blue Heron (13 m, two people) and the power job (one) against Rui and Bruno.
+    expect(slot.rows[0]).toEqual({ load: 3, capacity: 2 });
+    const afternoon = await db.query<{ capacity: number }>(
+      `select public.slot_capacity('cascais', ${at("13:00")}) as capacity`
+    );
+    expect(afternoon.rows[0]?.capacity).toBe(3);
+    const kestrel = await db.query<{ due: string; status: string }>(
+      `select to_char(due_at at time zone 'Europe/Lisbon', 'HH24:MI') as due, status
+       from public.dock_tasks where boat_name = 'Kestrel' and job_type = 'arrival'`
+    );
+    expect(kestrel.rows).toEqual([{ due: "13:30", status: "to_do" }]);
+    const meridian = await db.query<{ status: string; people_needed: number }>(
+      "select status, people_needed from public.dock_tasks where boat_name = 'Meridian'"
+    );
+    // Still a request, so the job waits; 13.5 m needs two people.
+    expect(meridian.rows).toEqual([{ status: "pending", people_needed: 2 }]);
+  });
+
   it("can run twice without changing anything", async () => {
     const before = [
       await count("public.arrivals"),
@@ -154,6 +215,9 @@ describe("the seed", () => {
       await count("public.profiles"),
       await count("public.berth_contracts"),
       await count("public.relet_offers"),
+      await count("public.dock_tasks"),
+      await count("public.shifts"),
+      await count("public.job_assignments"),
     ];
     // A real run is a new session; pglite keeps the seed's temporary helpers.
     await db.exec("drop function pg_temp.d(integer); drop function pg_temp.ts(integer, text);");
@@ -164,6 +228,9 @@ describe("the seed", () => {
       await count("public.profiles"),
       await count("public.berth_contracts"),
       await count("public.relet_offers"),
+      await count("public.dock_tasks"),
+      await count("public.shifts"),
+      await count("public.job_assignments"),
     ];
     expect(after).toEqual(before);
   });

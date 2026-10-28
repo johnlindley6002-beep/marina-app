@@ -10,6 +10,7 @@ import ServicesSection from "./ServicesSection";
 import VesselStatusSection from "./VesselStatusSection";
 import DocumentsSection from "./DocumentsSection";
 import SubmitSection from "./SubmitSection";
+import HelpSection from "./HelpSection";
 import SummaryPanel from "./SummaryPanel";
 
 export default function RequestBerthForm(props: RequestBerthProps) {
@@ -32,6 +33,7 @@ export default function RequestBerthForm(props: RequestBerthProps) {
         <ServicesSection ctx={ctx} />
         <VesselStatusSection ctx={ctx} />
         <DocumentsSection ctx={ctx} />
+        <HelpSection ctx={ctx} />
         <SubmitSection ctx={ctx} />
       </form>
 

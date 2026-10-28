@@ -5,10 +5,15 @@ import { useState } from "react";
 import {
   ACCOUNT_DATA_SOURCE,
   acceptProposedDates,
+  bookArrivalHelp,
   listMyArrivals,
+  myHelpBookings,
   useAccountData,
+  type HelpBooking,
+  type HelpReason,
   type MyArrival,
 } from "@/lib/data";
+import HelpBookings from "@/components/booking/HelpBookings";
 import { guestError } from "../lib/errors";
 import PageHeader from "@/components/layout/PageHeader";
 import RoleGate from "@/components/layout/RoleGate";
@@ -53,7 +58,60 @@ function ProposedDates({ arrival }: { arrival: MyArrival }) {
   );
 }
 
-function ArrivalCard({ arrival }: { arrival: MyArrival }) {
+const NO_BOOKINGS: HelpBooking[] = [];
+
+// Help mooring for a request that has none yet.
+function AddHelp({ arrivalId }: { arrivalId: string }) {
+  const { t } = useLanguage();
+  const copy = t.help;
+  const [open, setOpen] = useState(false);
+  const [reason, setReason] = useState<HelpReason>("short_handed");
+  const [error, setError] = useState("");
+  if (!open) {
+    return (
+      <button type="button" onClick={() => setOpen(true)} className="btn-quiet mt-3 min-h-11">
+        {copy.bookArrival}
+      </button>
+    );
+  }
+  return (
+    <fieldset className="mt-3">
+      <legend className="field-label">{copy.reason}</legend>
+      {(["short_handed", "first_time", "other"] as const).map((r) => (
+        <label
+          key={r}
+          className="flex min-h-11 cursor-pointer items-center gap-2 text-base text-ink"
+        >
+          <input
+            type="radio"
+            name={`help-${arrivalId}`}
+            className="h-5 w-5"
+            checked={reason === r}
+            onChange={() => setReason(r)}
+          />
+          {copy.reasons[r]}
+        </label>
+      ))}
+      <button
+        type="button"
+        onClick={async () => {
+          const result = await bookArrivalHelp(arrivalId, reason, "");
+          setError(result.ok ? "" : copy.bookFailed);
+        }}
+        className="btn-quiet mt-2 min-h-11"
+      >
+        {copy.book}
+      </button>
+      {error ? (
+        <p role="alert" className="mt-1 text-sm text-error">
+          {error}
+        </p>
+      ) : null}
+    </fieldset>
+  );
+}
+
+function ArrivalCard({ arrival, helped }: { arrival: MyArrival; helped: boolean }) {
   const { t } = useLanguage();
   const { date } = useFormat();
   const copy = t.accounts.arrivals;
@@ -101,6 +159,9 @@ function ArrivalCard({ arrival }: { arrival: MyArrival }) {
           {arrival.proposedArrival ? <ProposedDates arrival={arrival} /> : null}
         </>
       ) : null}
+      {!helped && (arrival.status === "requested" || arrival.status === "confirmed") ? (
+        <AddHelp arrivalId={arrival.id} />
+      ) : null}
       <p className="mt-3 text-sm text-ink-muted">
         {copy.sent(date(arrival.createdAt.slice(0, 10)))}
       </p>
@@ -120,6 +181,17 @@ function MyArrivalsBody() {
   );
 
   const arrivals = value ?? [];
+  const { value: bookings } = useAccountData(
+    () => (ACCOUNT_DATA_SOURCE === "mock" ? Promise.resolve(NO_BOOKINGS) : myHelpBookings()),
+    NO_BOOKINGS,
+    userId
+  );
+  const helped = new Set(
+    bookings
+      .filter((b) => b.status !== "cancelled")
+      .map((b) => b.arrivalId)
+      .filter(Boolean)
+  );
   const failed = ready && value === null;
 
   return (
@@ -153,11 +225,12 @@ function MyArrivalsBody() {
           ) : (
             <ul className="mt-4">
               {arrivals.map((arrival) => (
-                <ArrivalCard key={arrival.id} arrival={arrival} />
+                <ArrivalCard key={arrival.id} arrival={arrival} helped={helped.has(arrival.id)} />
               ))}
             </ul>
           )}
         </section>
+        {ACCOUNT_DATA_SOURCE === "supabase" ? <HelpBookings kind="arrivals" /> : null}
       </div>
     </div>
   );

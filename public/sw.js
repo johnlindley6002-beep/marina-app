@@ -116,3 +116,21 @@ self.addEventListener("fetch", (event) => {
     event.respondWith(staleWhileRevalidate(request, IMAGES_CACHE));
   }
 });
+
+// A staff notification (a new job, a call for help, a job short of people)
+// opens the staff app on the page it names, reusing an open window if any.
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  const target = (event.notification.data && event.notification.data.url) || "/staff";
+  event.waitUntil(
+    self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((windows) => {
+      for (const client of windows) {
+        if (client.url.includes("/staff") && "focus" in client) {
+          client.navigate(target);
+          return client.focus();
+        }
+      }
+      return self.clients.openWindow(target);
+    })
+  );
+});

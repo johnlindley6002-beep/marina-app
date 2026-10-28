@@ -6,6 +6,7 @@ import type { myBoat } from "./locales/en/myBoat";
 import type { chrome } from "./locales/en/chrome";
 import type { marinaPage } from "./locales/en/marinaPage";
 import type { stay } from "./locales/en/stay";
+import type { help } from "./locales/en/help";
 
 export type Locale = "en" | "pt" | "es" | "fr";
 
@@ -374,4 +375,5 @@ export type Dictionary = {
   account: typeof account;
   enquiry: typeof enquiry;
   accounts: typeof accounts;
+  help: typeof help;
 };

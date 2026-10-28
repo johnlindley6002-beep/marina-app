@@ -27,6 +27,16 @@ const routes: { path: string; user?: string }[] = [
   { path: "/staff/tasks", user: "u-staff" },
   { path: "/staff/radio", user: "u-staff" },
   { path: "/staff/reletting", user: "u-staff" },
+  { path: "/staff/overview", user: "u-staff" },
+  { path: "/staff/day", user: "u-staff" },
+  { path: "/staff/my-job", user: "u-staff" },
+  { path: "/staff/my-day", user: "u-staff" },
+  { path: "/staff/my-shifts", user: "u-staff" },
+  { path: "/staff/tonight", user: "u-staff" },
+  { path: "/staff/shifts", user: "u-staff" },
+  { path: "/staff/staffing", user: "u-staff" },
+  { path: "/staff/incidents", user: "u-staff" },
+  { path: "/staff/team", user: "u-staff" },
 ];
 
 for (const route of routes) {

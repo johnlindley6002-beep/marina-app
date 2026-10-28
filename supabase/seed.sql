@@ -6,6 +6,16 @@
 -- Dates are relative to the Lisbon day the seed runs on. Safe to run more than
 -- once. FOR A DEVELOPMENT PROJECT ONLY: it creates users with a known password.
 
+-- Refuses to run unless the project is marked as a development project:
+--   alter database postgres set app.allow_dev_seed = 'on';
+do $$
+begin
+  if coalesce(current_setting('app.allow_dev_seed', true), '') <> 'on' then
+    raise exception 'Refusing to seed: this seed creates users with a public password. On a development project only, run: alter database postgres set app.allow_dev_seed = ''on'';';
+  end if;
+end;
+$$;
+
 create function pg_temp.d(days integer) returns date language sql as $$
   select (now() at time zone 'Europe/Lisbon')::date + days
 $$;
@@ -651,9 +661,102 @@ values (gen_random_uuid(), '00000000-0000-4000-8000-900000000011', '00000000-000
 on conflict (provider_id, provider) do nothing;
 update public.profiles set phone = '+351 214 000 303', nationality = 'Portugal', eu_status = 'eu' where user_id = '00000000-0000-4000-8000-900000000011';
 
-insert into public.staff_members (user_id, marina_id, role, display_name)
-values ('00000000-0000-4000-8000-900000000011', 'cascais', 'staff', 'Sam Okafor')
-on conflict (user_id, marina_id) do nothing;
+insert into auth.users (instance_id, id, aud, role, email, encrypted_password, email_confirmed_at, raw_app_meta_data, raw_user_meta_data, created_at, updated_at, confirmation_token, recovery_token, email_change_token_new, email_change)
+values ('00000000-0000-0000-0000-000000000000', '00000000-0000-4000-8000-900000000011', 'authenticated', 'authenticated', 'sam.okafor@example.com', extensions.crypt('aldock-dev-only', extensions.gen_salt('bf')), now(), '{"provider":"email","providers":["email"]}'::jsonb, '{"full_name":"Sam Okafor"}'::jsonb, now(), now(), '', '', '', '')
+on conflict (id) do nothing;
+insert into auth.identities (id, user_id, provider_id, identity_data, provider, last_sign_in_at, created_at, updated_at)
+values (gen_random_uuid(), '00000000-0000-4000-8000-900000000011', '00000000-0000-4000-8000-900000000011', jsonb_build_object('sub', '00000000-0000-4000-8000-900000000011'::text, 'email', 'sam.okafor@example.com', 'email_verified', true), 'email', now(), now(), now())
+on conflict (provider_id, provider) do nothing;
+update public.profiles set phone = '', nationality = 'Portugal', eu_status = 'eu' where user_id = '00000000-0000-4000-8000-900000000011';
+
+insert into auth.users (instance_id, id, aud, role, email, encrypted_password, email_confirmed_at, raw_app_meta_data, raw_user_meta_data, created_at, updated_at, confirmation_token, recovery_token, email_change_token_new, email_change)
+values ('00000000-0000-0000-0000-000000000000', '00000000-0000-4000-8000-900000000012', 'authenticated', 'authenticated', 'teresa.marques@example.com', extensions.crypt('aldock-dev-only', extensions.gen_salt('bf')), now(), '{"provider":"email","providers":["email"]}'::jsonb, '{"full_name":"Teresa Marques"}'::jsonb, now(), now(), '', '', '', '')
+on conflict (id) do nothing;
+insert into auth.identities (id, user_id, provider_id, identity_data, provider, last_sign_in_at, created_at, updated_at)
+values (gen_random_uuid(), '00000000-0000-4000-8000-900000000012', '00000000-0000-4000-8000-900000000012', jsonb_build_object('sub', '00000000-0000-4000-8000-900000000012'::text, 'email', 'teresa.marques@example.com', 'email_verified', true), 'email', now(), now(), now())
+on conflict (provider_id, provider) do nothing;
+update public.profiles set phone = '', nationality = 'Portugal', eu_status = 'eu' where user_id = '00000000-0000-4000-8000-900000000012';
+
+insert into auth.users (instance_id, id, aud, role, email, encrypted_password, email_confirmed_at, raw_app_meta_data, raw_user_meta_data, created_at, updated_at, confirmation_token, recovery_token, email_change_token_new, email_change)
+values ('00000000-0000-0000-0000-000000000000', '00000000-0000-4000-8000-900000000013', 'authenticated', 'authenticated', 'ines.duarte@example.com', extensions.crypt('aldock-dev-only', extensions.gen_salt('bf')), now(), '{"provider":"email","providers":["email"]}'::jsonb, '{"full_name":"Inês Duarte"}'::jsonb, now(), now(), '', '', '', '')
+on conflict (id) do nothing;
+insert into auth.identities (id, user_id, provider_id, identity_data, provider, last_sign_in_at, created_at, updated_at)
+values (gen_random_uuid(), '00000000-0000-4000-8000-900000000013', '00000000-0000-4000-8000-900000000013', jsonb_build_object('sub', '00000000-0000-4000-8000-900000000013'::text, 'email', 'ines.duarte@example.com', 'email_verified', true), 'email', now(), now(), now())
+on conflict (provider_id, provider) do nothing;
+update public.profiles set phone = '', nationality = 'Portugal', eu_status = 'eu' where user_id = '00000000-0000-4000-8000-900000000013';
+
+insert into auth.users (instance_id, id, aud, role, email, encrypted_password, email_confirmed_at, raw_app_meta_data, raw_user_meta_data, created_at, updated_at, confirmation_token, recovery_token, email_change_token_new, email_change)
+values ('00000000-0000-0000-0000-000000000000', '00000000-0000-4000-8000-900000000014', 'authenticated', 'authenticated', 'rui.costa@example.com', extensions.crypt('aldock-dev-only', extensions.gen_salt('bf')), now(), '{"provider":"email","providers":["email"]}'::jsonb, '{"full_name":"Rui Costa"}'::jsonb, now(), now(), '', '', '', '')
+on conflict (id) do nothing;
+insert into auth.identities (id, user_id, provider_id, identity_data, provider, last_sign_in_at, created_at, updated_at)
+values (gen_random_uuid(), '00000000-0000-4000-8000-900000000014', '00000000-0000-4000-8000-900000000014', jsonb_build_object('sub', '00000000-0000-4000-8000-900000000014'::text, 'email', 'rui.costa@example.com', 'email_verified', true), 'email', now(), now(), now())
+on conflict (provider_id, provider) do nothing;
+update public.profiles set phone = '', nationality = 'Portugal', eu_status = 'eu' where user_id = '00000000-0000-4000-8000-900000000014';
+
+insert into auth.users (instance_id, id, aud, role, email, encrypted_password, email_confirmed_at, raw_app_meta_data, raw_user_meta_data, created_at, updated_at, confirmation_token, recovery_token, email_change_token_new, email_change)
+values ('00000000-0000-0000-0000-000000000000', '00000000-0000-4000-8000-900000000015', 'authenticated', 'authenticated', 'bruno.lima@example.com', extensions.crypt('aldock-dev-only', extensions.gen_salt('bf')), now(), '{"provider":"email","providers":["email"]}'::jsonb, '{"full_name":"Bruno Lima"}'::jsonb, now(), now(), '', '', '', '')
+on conflict (id) do nothing;
+insert into auth.identities (id, user_id, provider_id, identity_data, provider, last_sign_in_at, created_at, updated_at)
+values (gen_random_uuid(), '00000000-0000-4000-8000-900000000015', '00000000-0000-4000-8000-900000000015', jsonb_build_object('sub', '00000000-0000-4000-8000-900000000015'::text, 'email', 'bruno.lima@example.com', 'email_verified', true), 'email', now(), now(), now())
+on conflict (provider_id, provider) do nothing;
+update public.profiles set phone = '', nationality = 'Portugal', eu_status = 'eu' where user_id = '00000000-0000-4000-8000-900000000015';
+
+insert into auth.users (instance_id, id, aud, role, email, encrypted_password, email_confirmed_at, raw_app_meta_data, raw_user_meta_data, created_at, updated_at, confirmation_token, recovery_token, email_change_token_new, email_change)
+values ('00000000-0000-0000-0000-000000000000', '00000000-0000-4000-8000-900000000016', 'authenticated', 'authenticated', 'carla.sousa@example.com', extensions.crypt('aldock-dev-only', extensions.gen_salt('bf')), now(), '{"provider":"email","providers":["email"]}'::jsonb, '{"full_name":"Carla Sousa"}'::jsonb, now(), now(), '', '', '', '')
+on conflict (id) do nothing;
+insert into auth.identities (id, user_id, provider_id, identity_data, provider, last_sign_in_at, created_at, updated_at)
+values (gen_random_uuid(), '00000000-0000-4000-8000-900000000016', '00000000-0000-4000-8000-900000000016', jsonb_build_object('sub', '00000000-0000-4000-8000-900000000016'::text, 'email', 'carla.sousa@example.com', 'email_verified', true), 'email', now(), now(), now())
+on conflict (provider_id, provider) do nothing;
+update public.profiles set phone = '', nationality = 'Portugal', eu_status = 'eu' where user_id = '00000000-0000-4000-8000-900000000016';
+
+insert into auth.users (instance_id, id, aud, role, email, encrypted_password, email_confirmed_at, raw_app_meta_data, raw_user_meta_data, created_at, updated_at, confirmation_token, recovery_token, email_change_token_new, email_change)
+values ('00000000-0000-0000-0000-000000000000', '00000000-0000-4000-8000-900000000017', 'authenticated', 'authenticated', 'hugo.pinto@example.com', extensions.crypt('aldock-dev-only', extensions.gen_salt('bf')), now(), '{"provider":"email","providers":["email"]}'::jsonb, '{"full_name":"Hugo Pinto"}'::jsonb, now(), now(), '', '', '', '')
+on conflict (id) do nothing;
+insert into auth.identities (id, user_id, provider_id, identity_data, provider, last_sign_in_at, created_at, updated_at)
+values (gen_random_uuid(), '00000000-0000-4000-8000-900000000017', '00000000-0000-4000-8000-900000000017', jsonb_build_object('sub', '00000000-0000-4000-8000-900000000017'::text, 'email', 'hugo.pinto@example.com', 'email_verified', true), 'email', now(), now(), now())
+on conflict (provider_id, provider) do nothing;
+update public.profiles set phone = '', nationality = 'Portugal', eu_status = 'eu' where user_id = '00000000-0000-4000-8000-900000000017';
+
+insert into auth.users (instance_id, id, aud, role, email, encrypted_password, email_confirmed_at, raw_app_meta_data, raw_user_meta_data, created_at, updated_at, confirmation_token, recovery_token, email_change_token_new, email_change)
+values ('00000000-0000-0000-0000-000000000000', '00000000-0000-4000-8000-900000000018', 'authenticated', 'authenticated', 'diogo.alves@example.com', extensions.crypt('aldock-dev-only', extensions.gen_salt('bf')), now(), '{"provider":"email","providers":["email"]}'::jsonb, '{"full_name":"Diogo Alves"}'::jsonb, now(), now(), '', '', '', '')
+on conflict (id) do nothing;
+insert into auth.identities (id, user_id, provider_id, identity_data, provider, last_sign_in_at, created_at, updated_at)
+values (gen_random_uuid(), '00000000-0000-4000-8000-900000000018', '00000000-0000-4000-8000-900000000018', jsonb_build_object('sub', '00000000-0000-4000-8000-900000000018'::text, 'email', 'diogo.alves@example.com', 'email_verified', true), 'email', now(), now(), now())
+on conflict (provider_id, provider) do nothing;
+update public.profiles set phone = '', nationality = 'Portugal', eu_status = 'eu' where user_id = '00000000-0000-4000-8000-900000000018';
+
+insert into public.staff_members (id, user_id, marina_id, role, team_lead, access_until, display_name)
+values ('00000000-0000-4000-8000-400000000011', '00000000-0000-4000-8000-900000000011', 'cascais', 'director', false, null, 'Sam Okafor')
+on conflict (user_id, marina_id) do update set role = excluded.role, team_lead = excluded.team_lead,
+  access_until = excluded.access_until, display_name = excluded.display_name, active = true;
+insert into public.staff_members (id, user_id, marina_id, role, team_lead, access_until, display_name)
+values ('00000000-0000-4000-8000-400000000012', '00000000-0000-4000-8000-900000000012', 'cascais', 'dockmaster', false, null, 'Teresa Marques')
+on conflict (user_id, marina_id) do update set role = excluded.role, team_lead = excluded.team_lead,
+  access_until = excluded.access_until, display_name = excluded.display_name, active = true;
+insert into public.staff_members (id, user_id, marina_id, role, team_lead, access_until, display_name)
+values ('00000000-0000-4000-8000-400000000013', '00000000-0000-4000-8000-900000000013', 'cascais', 'reception', false, null, 'Inês Duarte')
+on conflict (user_id, marina_id) do update set role = excluded.role, team_lead = excluded.team_lead,
+  access_until = excluded.access_until, display_name = excluded.display_name, active = true;
+insert into public.staff_members (id, user_id, marina_id, role, team_lead, access_until, display_name)
+values ('00000000-0000-4000-8000-400000000014', '00000000-0000-4000-8000-900000000014', 'cascais', 'marinheiro', true, null, 'Rui Costa')
+on conflict (user_id, marina_id) do update set role = excluded.role, team_lead = excluded.team_lead,
+  access_until = excluded.access_until, display_name = excluded.display_name, active = true;
+insert into public.staff_members (id, user_id, marina_id, role, team_lead, access_until, display_name)
+values ('00000000-0000-4000-8000-400000000015', '00000000-0000-4000-8000-900000000015', 'cascais', 'marinheiro', false, null, 'Bruno Lima')
+on conflict (user_id, marina_id) do update set role = excluded.role, team_lead = excluded.team_lead,
+  access_until = excluded.access_until, display_name = excluded.display_name, active = true;
+insert into public.staff_members (id, user_id, marina_id, role, team_lead, access_until, display_name)
+values ('00000000-0000-4000-8000-400000000016', '00000000-0000-4000-8000-900000000016', 'cascais', 'marinheiro', false, null, 'Carla Sousa')
+on conflict (user_id, marina_id) do update set role = excluded.role, team_lead = excluded.team_lead,
+  access_until = excluded.access_until, display_name = excluded.display_name, active = true;
+insert into public.staff_members (id, user_id, marina_id, role, team_lead, access_until, display_name)
+values ('00000000-0000-4000-8000-400000000017', '00000000-0000-4000-8000-900000000017', 'cascais', 'night_watch', false, null, 'Hugo Pinto')
+on conflict (user_id, marina_id) do update set role = excluded.role, team_lead = excluded.team_lead,
+  access_until = excluded.access_until, display_name = excluded.display_name, active = true;
+insert into public.staff_members (id, user_id, marina_id, role, team_lead, access_until, display_name)
+values ('00000000-0000-4000-8000-400000000018', '00000000-0000-4000-8000-900000000018', 'cascais', 'marinheiro', false, pg_temp.d(-3), 'Diogo Alves')
+on conflict (user_id, marina_id) do update set role = excluded.role, team_lead = excluded.team_lead,
+  access_until = excluded.access_until, display_name = excluded.display_name, active = true;
 
 insert into public.boats (id, user_id, name, boat_type, length_m, beam_m, draft_m, flag_country, registration_number, home_port, documents)
 values ('00000000-0000-4000-8000-d00000000101', '00000000-0000-4000-8000-900000000001', 'Wind Song', 'sail', 8.8, 3.0, 1.5, 'United Kingdom', 'UK-WS-4410', 'Southampton', '{"registrationNumber":"UK-WS-4410","insuranceProvider":"","insurancePolicy":"","insuranceExpiry":"","competenceCertificate":"RYA-558812","vhfLicence":""}'::jsonb)
@@ -839,21 +942,343 @@ insert into public.relet_offers (id, marina_id, berth_id, berth_holder, berth_ho
 values ('00000000-0000-4000-8000-b00000000002', 'cascais', (select id from public.berths where marina_id = 'cascais' and code = 'G-14'), 'Jordan Reyes', '00000000-0000-4000-8000-900000000010', '00000000-0000-4000-8000-900000000010', pg_temp.d(3), pg_temp.d(10), 'approved', true, true, true, pg_temp.ts(-6, '09:00:00'), pg_temp.ts(-6, '09:00:00'), jsonb_build_array(jsonb_build_object('status', 'submitted', 'at', pg_temp.ts(-6, '09:00:00')), jsonb_build_object('status', 'approved', 'at', pg_temp.ts(-4, '11:00:00'))), '{"maxLengthM":null,"maxBeamM":null,"earliestReletDate":null,"bufferDays":0}'::jsonb, '{}'::date[], array(select generate_series(pg_temp.d(3), pg_temp.d(9), interval '1 day')::date), pg_temp.ts(-6, '09:00:00'))
 on conflict (id) do nothing;
 
-insert into public.dock_tasks (id, marina_id, berth_id, description, due_at, status, done_at, created_by)
-values ('00000000-0000-4000-8000-100000000001', 'cascais', (select id from public.berths where marina_id = 'cascais' and code = 'P-4'), 'Check Aurora''s mooring lines after the wind', pg_temp.ts(0, '08:00:00'), 'to_do', null, null)
+-- Shifts today and tomorrow.
+
+insert into public.shifts (id, marina_id, member_id, day, starts_at, ends_at)
+values ('00000000-0000-4000-8000-300000000001', 'cascais', (select id from public.staff_members where user_id = '00000000-0000-4000-8000-900000000012' and marina_id = 'cascais'), pg_temp.d(0), '08:00', '17:00')
 on conflict (id) do nothing;
 
-insert into public.dock_tasks (id, marina_id, berth_id, description, due_at, status, done_at, created_by)
-values ('00000000-0000-4000-8000-100000000002', 'cascais', (select id from public.berths where marina_id = 'cascais' and code = 'P-2'), 'Meet Kestrel and help her moor', pg_temp.ts(0, '10:30:00'), 'to_do', null, null)
+insert into public.shifts (id, marina_id, member_id, day, starts_at, ends_at)
+values ('00000000-0000-4000-8000-300000000002', 'cascais', (select id from public.staff_members where user_id = '00000000-0000-4000-8000-900000000014' and marina_id = 'cascais'), pg_temp.d(0), '08:00', '16:00')
 on conflict (id) do nothing;
 
-insert into public.dock_tasks (id, marina_id, berth_id, description, due_at, status, done_at, created_by)
-values ('00000000-0000-4000-8000-100000000003', 'cascais', (select id from public.berths where marina_id = 'cascais' and code = 'G-14'), 'Shore power pedestal is tripping, call the electrician', pg_temp.ts(0, '14:00:00'), 'to_do', null, null)
+insert into public.shifts (id, marina_id, member_id, day, starts_at, ends_at)
+values ('00000000-0000-4000-8000-300000000003', 'cascais', (select id from public.staff_members where user_id = '00000000-0000-4000-8000-900000000015' and marina_id = 'cascais'), pg_temp.d(0), '08:00', '16:00')
 on conflict (id) do nothing;
 
-insert into public.dock_tasks (id, marina_id, berth_id, description, due_at, status, done_at, created_by)
-values ('00000000-0000-4000-8000-100000000004', 'cascais', (select id from public.berths where marina_id = 'cascais' and code = 'P-4'), 'Pump-out for Aurora', pg_temp.ts(-1, '16:00:00'), 'done', pg_temp.ts(-1, '16:00:00'), null)
+insert into public.shifts (id, marina_id, member_id, day, starts_at, ends_at)
+values ('00000000-0000-4000-8000-300000000004', 'cascais', (select id from public.staff_members where user_id = '00000000-0000-4000-8000-900000000016' and marina_id = 'cascais'), pg_temp.d(0), '12:00', '20:00')
 on conflict (id) do nothing;
+
+insert into public.shifts (id, marina_id, member_id, day, starts_at, ends_at)
+values ('00000000-0000-4000-8000-300000000005', 'cascais', (select id from public.staff_members where user_id = '00000000-0000-4000-8000-900000000017' and marina_id = 'cascais'), pg_temp.d(0), '20:00', '08:00')
+on conflict (id) do nothing;
+
+insert into public.shifts (id, marina_id, member_id, day, starts_at, ends_at)
+values ('00000000-0000-4000-8000-300000000006', 'cascais', (select id from public.staff_members where user_id = '00000000-0000-4000-8000-900000000012' and marina_id = 'cascais'), pg_temp.d(1), '08:00', '17:00')
+on conflict (id) do nothing;
+
+insert into public.shifts (id, marina_id, member_id, day, starts_at, ends_at)
+values ('00000000-0000-4000-8000-300000000007', 'cascais', (select id from public.staff_members where user_id = '00000000-0000-4000-8000-900000000014' and marina_id = 'cascais'), pg_temp.d(1), '08:00', '16:00')
+on conflict (id) do nothing;
+
+insert into public.shifts (id, marina_id, member_id, day, starts_at, ends_at)
+values ('00000000-0000-4000-8000-300000000008', 'cascais', (select id from public.staff_members where user_id = '00000000-0000-4000-8000-900000000015' and marina_id = 'cascais'), pg_temp.d(1), '08:00', '16:00')
+on conflict (id) do nothing;
+
+insert into public.shifts (id, marina_id, member_id, day, starts_at, ends_at)
+values ('00000000-0000-4000-8000-300000000009', 'cascais', (select id from public.staff_members where user_id = '00000000-0000-4000-8000-900000000016' and marina_id = 'cascais'), pg_temp.d(1), '12:00', '20:00')
+on conflict (id) do nothing;
+
+insert into public.shifts (id, marina_id, member_id, day, starts_at, ends_at)
+values ('00000000-0000-4000-8000-300000000010', 'cascais', (select id from public.staff_members where user_id = '00000000-0000-4000-8000-900000000017' and marina_id = 'cascais'), pg_temp.d(1), '20:00', '08:00')
+on conflict (id) do nothing;
+
+
+
+-- Jobs.
+
+insert into public.dock_tasks (id, marina_id, berth_id, description, due_at, status, done_at, created_by, job_type, boat_name, length_m, beam_m, reason_note, people_needed, source, contract_id, booked_by)
+values ('00000000-0000-4000-8000-100000000001', 'cascais', (select id from public.berths where marina_id = 'cascais' and code = 'P-4'), 'Check the mooring lines after the wind', public.lisbon_at(pg_temp.d(0), '08:00'), 'to_do', null, null, 'inspection', 'Aurora', 8.4, 3, '', 1, 'staff', null, null)
+on conflict (id) do nothing;
+
+insert into public.dock_tasks (id, marina_id, berth_id, description, due_at, status, done_at, created_by, job_type, boat_name, length_m, beam_m, reason_note, people_needed, source, contract_id, booked_by)
+values ('00000000-0000-4000-8000-100000000002', 'cascais', (select id from public.berths where marina_id = 'cascais' and code = 'P-6'), '', public.lisbon_at(pg_temp.d(0), '10:00'), 'to_do', null, null, 'arrival', 'Blue Heron', 13, 4.1, 'Came to the desk, mooring in ten minutes', 2, 'walk_in', null, null)
+on conflict (id) do nothing;
+
+insert into public.dock_tasks (id, marina_id, berth_id, description, due_at, status, done_at, created_by, job_type, boat_name, length_m, beam_m, reason_note, people_needed, source, contract_id, booked_by)
+values ('00000000-0000-4000-8000-100000000003', 'cascais', (select id from public.berths where marina_id = 'cascais' and code = 'G-14'), 'Shore power pedestal is tripping', public.lisbon_at(pg_temp.d(0), '10:15'), 'to_do', null, null, 'power', '', null, null, '', 1, 'staff', null, null)
+on conflict (id) do nothing;
+
+insert into public.dock_tasks (id, marina_id, berth_id, description, due_at, status, done_at, created_by, job_type, boat_name, length_m, beam_m, reason_note, people_needed, source, contract_id, booked_by)
+values ('00000000-0000-4000-8000-100000000004', 'cascais', (select id from public.berths where marina_id = 'cascais' and code = 'P-4'), 'Pump-out', public.lisbon_at(pg_temp.d(-1), '16:00'), 'done', public.lisbon_at(pg_temp.d(-1), '16:00'), null, 'other', 'Aurora', 8.4, 3, '', 1, 'staff', null, null)
+on conflict (id) do nothing;
+
+insert into public.dock_tasks (id, marina_id, berth_id, description, due_at, status, done_at, created_by, job_type, boat_name, length_m, beam_m, reason_note, people_needed, source, contract_id, booked_by)
+values ('00000000-0000-4000-8000-100000000005', 'cascais', (select id from public.berths where marina_id = 'cascais' and code = 'G-14'), '', public.lisbon_at(pg_temp.d(3), '09:30'), 'to_do', null, null, 'departure', 'Mar Azul', 7.6, 2.9, '', 1, 'booked', '00000000-0000-4000-8000-e00000000001', '00000000-0000-4000-8000-900000000010')
+on conflict (id) do nothing;
+
+insert into public.dock_tasks (id, marina_id, berth_id, description, due_at, status, done_at, created_by, job_type, boat_name, length_m, beam_m, reason_note, people_needed, source, contract_id, booked_by)
+values ('00000000-0000-4000-8000-100000000006', 'cascais', (select id from public.berths where marina_id = 'cascais' and code = 'G-14'), '', public.lisbon_at(pg_temp.d(10), '16:00'), 'to_do', null, null, 'return', 'Mar Azul', 7.6, 2.9, '', 1, 'booked', '00000000-0000-4000-8000-e00000000001', '00000000-0000-4000-8000-900000000010')
+on conflict (id) do nothing;
+
+insert into public.dock_tasks (id, marina_id, berth_id, description, due_at, status, done_at, created_by, job_type, boat_name, length_m, beam_m, reason_note, people_needed, source, contract_id, booked_by)
+values ('00000000-0000-4000-8000-100000000100', 'cascais', null, '', public.lisbon_at(pg_temp.d(-1), '09:00'), 'done', public.lisbon_at(pg_temp.d(-1), '09:00'), null, 'departure', '', 14, null, '', 2, 'booked', null, null)
+on conflict (id) do nothing;
+
+insert into public.dock_tasks (id, marina_id, berth_id, description, due_at, status, done_at, created_by, job_type, boat_name, length_m, beam_m, reason_note, people_needed, source, contract_id, booked_by)
+values ('00000000-0000-4000-8000-100000000101', 'cascais', null, '', public.lisbon_at(pg_temp.d(-2), '10:00'), 'done', public.lisbon_at(pg_temp.d(-2), '10:00'), null, 'arrival', '', 9, null, '', 1, 'booked', null, null)
+on conflict (id) do nothing;
+
+insert into public.dock_tasks (id, marina_id, berth_id, description, due_at, status, done_at, created_by, job_type, boat_name, length_m, beam_m, reason_note, people_needed, source, contract_id, booked_by)
+values ('00000000-0000-4000-8000-100000000102', 'cascais', null, '', public.lisbon_at(pg_temp.d(-3), '11:00'), 'done', public.lisbon_at(pg_temp.d(-3), '11:00'), null, 'arrival', '', 9, null, '', 1, 'booked', null, null)
+on conflict (id) do nothing;
+
+insert into public.dock_tasks (id, marina_id, berth_id, description, due_at, status, done_at, created_by, job_type, boat_name, length_m, beam_m, reason_note, people_needed, source, contract_id, booked_by)
+values ('00000000-0000-4000-8000-100000000103', 'cascais', null, '', public.lisbon_at(pg_temp.d(-4), '15:00'), 'done', public.lisbon_at(pg_temp.d(-4), '15:00'), null, 'departure', '', 9, null, '', 1, 'booked', null, null)
+on conflict (id) do nothing;
+
+insert into public.dock_tasks (id, marina_id, berth_id, description, due_at, status, done_at, created_by, job_type, boat_name, length_m, beam_m, reason_note, people_needed, source, contract_id, booked_by)
+values ('00000000-0000-4000-8000-100000000104', 'cascais', null, '', public.lisbon_at(pg_temp.d(-5), '16:00'), 'done', public.lisbon_at(pg_temp.d(-5), '16:00'), null, 'arrival', '', 14, null, '', 2, 'booked', null, null)
+on conflict (id) do nothing;
+
+insert into public.dock_tasks (id, marina_id, berth_id, description, due_at, status, done_at, created_by, job_type, boat_name, length_m, beam_m, reason_note, people_needed, source, contract_id, booked_by)
+values ('00000000-0000-4000-8000-100000000105', 'cascais', null, '', public.lisbon_at(pg_temp.d(-6), '17:00'), 'done', public.lisbon_at(pg_temp.d(-6), '17:00'), null, 'arrival', '', 9, null, '', 1, 'booked', null, null)
+on conflict (id) do nothing;
+
+insert into public.dock_tasks (id, marina_id, berth_id, description, due_at, status, done_at, created_by, job_type, boat_name, length_m, beam_m, reason_note, people_needed, source, contract_id, booked_by)
+values ('00000000-0000-4000-8000-100000000106', 'cascais', null, '', public.lisbon_at(pg_temp.d(-7), '09:00'), 'done', public.lisbon_at(pg_temp.d(-7), '09:00'), null, 'departure', '', 9, null, '', 1, 'booked', null, null)
+on conflict (id) do nothing;
+
+insert into public.dock_tasks (id, marina_id, berth_id, description, due_at, status, done_at, created_by, job_type, boat_name, length_m, beam_m, reason_note, people_needed, source, contract_id, booked_by)
+values ('00000000-0000-4000-8000-100000000107', 'cascais', null, '', public.lisbon_at(pg_temp.d(-8), '10:00'), 'done', public.lisbon_at(pg_temp.d(-8), '10:00'), null, 'arrival', '', 9, null, '', 1, 'booked', null, null)
+on conflict (id) do nothing;
+
+insert into public.dock_tasks (id, marina_id, berth_id, description, due_at, status, done_at, created_by, job_type, boat_name, length_m, beam_m, reason_note, people_needed, source, contract_id, booked_by)
+values ('00000000-0000-4000-8000-100000000108', 'cascais', null, '', public.lisbon_at(pg_temp.d(-9), '11:00'), 'done', public.lisbon_at(pg_temp.d(-9), '11:00'), null, 'arrival', '', 14, null, '', 2, 'booked', null, null)
+on conflict (id) do nothing;
+
+insert into public.dock_tasks (id, marina_id, berth_id, description, due_at, status, done_at, created_by, job_type, boat_name, length_m, beam_m, reason_note, people_needed, source, contract_id, booked_by)
+values ('00000000-0000-4000-8000-100000000109', 'cascais', null, '', public.lisbon_at(pg_temp.d(-10), '15:00'), 'done', public.lisbon_at(pg_temp.d(-10), '15:00'), null, 'departure', '', 9, null, '', 1, 'booked', null, null)
+on conflict (id) do nothing;
+
+insert into public.dock_tasks (id, marina_id, berth_id, description, due_at, status, done_at, created_by, job_type, boat_name, length_m, beam_m, reason_note, people_needed, source, contract_id, booked_by)
+values ('00000000-0000-4000-8000-100000000110', 'cascais', null, '', public.lisbon_at(pg_temp.d(-11), '16:00'), 'done', public.lisbon_at(pg_temp.d(-11), '16:00'), null, 'arrival', '', 9, null, '', 1, 'booked', null, null)
+on conflict (id) do nothing;
+
+insert into public.dock_tasks (id, marina_id, berth_id, description, due_at, status, done_at, created_by, job_type, boat_name, length_m, beam_m, reason_note, people_needed, source, contract_id, booked_by)
+values ('00000000-0000-4000-8000-100000000111', 'cascais', null, '', public.lisbon_at(pg_temp.d(-12), '17:00'), 'done', public.lisbon_at(pg_temp.d(-12), '17:00'), null, 'arrival', '', 9, null, '', 1, 'booked', null, null)
+on conflict (id) do nothing;
+
+insert into public.dock_tasks (id, marina_id, berth_id, description, due_at, status, done_at, created_by, job_type, boat_name, length_m, beam_m, reason_note, people_needed, source, contract_id, booked_by)
+values ('00000000-0000-4000-8000-100000000112', 'cascais', null, '', public.lisbon_at(pg_temp.d(-13), '09:00'), 'done', public.lisbon_at(pg_temp.d(-13), '09:00'), null, 'departure', '', 14, null, '', 2, 'booked', null, null)
+on conflict (id) do nothing;
+
+insert into public.dock_tasks (id, marina_id, berth_id, description, due_at, status, done_at, created_by, job_type, boat_name, length_m, beam_m, reason_note, people_needed, source, contract_id, booked_by)
+values ('00000000-0000-4000-8000-100000000113', 'cascais', null, '', public.lisbon_at(pg_temp.d(-14), '10:00'), 'done', public.lisbon_at(pg_temp.d(-14), '10:00'), null, 'arrival', '', 9, null, '', 1, 'booked', null, null)
+on conflict (id) do nothing;
+
+insert into public.dock_tasks (id, marina_id, berth_id, description, due_at, status, done_at, created_by, job_type, boat_name, length_m, beam_m, reason_note, people_needed, source, contract_id, booked_by)
+values ('00000000-0000-4000-8000-100000000114', 'cascais', null, '', public.lisbon_at(pg_temp.d(-15), '11:00'), 'done', public.lisbon_at(pg_temp.d(-15), '11:00'), null, 'arrival', '', 9, null, '', 1, 'booked', null, null)
+on conflict (id) do nothing;
+
+insert into public.dock_tasks (id, marina_id, berth_id, description, due_at, status, done_at, created_by, job_type, boat_name, length_m, beam_m, reason_note, people_needed, source, contract_id, booked_by)
+values ('00000000-0000-4000-8000-100000000115', 'cascais', null, '', public.lisbon_at(pg_temp.d(-16), '15:00'), 'done', public.lisbon_at(pg_temp.d(-16), '15:00'), null, 'departure', '', 9, null, '', 1, 'booked', null, null)
+on conflict (id) do nothing;
+
+insert into public.dock_tasks (id, marina_id, berth_id, description, due_at, status, done_at, created_by, job_type, boat_name, length_m, beam_m, reason_note, people_needed, source, contract_id, booked_by)
+values ('00000000-0000-4000-8000-100000000116', 'cascais', null, '', public.lisbon_at(pg_temp.d(-17), '16:00'), 'done', public.lisbon_at(pg_temp.d(-17), '16:00'), null, 'arrival', '', 14, null, '', 2, 'booked', null, null)
+on conflict (id) do nothing;
+
+insert into public.dock_tasks (id, marina_id, berth_id, description, due_at, status, done_at, created_by, job_type, boat_name, length_m, beam_m, reason_note, people_needed, source, contract_id, booked_by)
+values ('00000000-0000-4000-8000-100000000117', 'cascais', null, '', public.lisbon_at(pg_temp.d(-18), '17:00'), 'done', public.lisbon_at(pg_temp.d(-18), '17:00'), null, 'arrival', '', 9, null, '', 1, 'booked', null, null)
+on conflict (id) do nothing;
+
+insert into public.dock_tasks (id, marina_id, berth_id, description, due_at, status, done_at, created_by, job_type, boat_name, length_m, beam_m, reason_note, people_needed, source, contract_id, booked_by)
+values ('00000000-0000-4000-8000-100000000118', 'cascais', null, '', public.lisbon_at(pg_temp.d(-19), '09:00'), 'done', public.lisbon_at(pg_temp.d(-19), '09:00'), null, 'departure', '', 9, null, '', 1, 'booked', null, null)
+on conflict (id) do nothing;
+
+insert into public.dock_tasks (id, marina_id, berth_id, description, due_at, status, done_at, created_by, job_type, boat_name, length_m, beam_m, reason_note, people_needed, source, contract_id, booked_by)
+values ('00000000-0000-4000-8000-100000000119', 'cascais', null, '', public.lisbon_at(pg_temp.d(-20), '10:00'), 'done', public.lisbon_at(pg_temp.d(-20), '10:00'), null, 'arrival', '', 9, null, '', 1, 'booked', null, null)
+on conflict (id) do nothing;
+
+insert into public.dock_tasks (id, marina_id, berth_id, description, due_at, status, done_at, created_by, job_type, boat_name, length_m, beam_m, reason_note, people_needed, source, contract_id, booked_by)
+values ('00000000-0000-4000-8000-100000000120', 'cascais', null, '', public.lisbon_at(pg_temp.d(-21), '11:00'), 'done', public.lisbon_at(pg_temp.d(-21), '11:00'), null, 'arrival', '', 14, null, '', 2, 'booked', null, null)
+on conflict (id) do nothing;
+
+insert into public.dock_tasks (id, marina_id, berth_id, description, due_at, status, done_at, created_by, job_type, boat_name, length_m, beam_m, reason_note, people_needed, source, contract_id, booked_by)
+values ('00000000-0000-4000-8000-100000000121', 'cascais', null, '', public.lisbon_at(pg_temp.d(-22), '15:00'), 'done', public.lisbon_at(pg_temp.d(-22), '15:00'), null, 'departure', '', 9, null, '', 1, 'booked', null, null)
+on conflict (id) do nothing;
+
+insert into public.dock_tasks (id, marina_id, berth_id, description, due_at, status, done_at, created_by, job_type, boat_name, length_m, beam_m, reason_note, people_needed, source, contract_id, booked_by)
+values ('00000000-0000-4000-8000-100000000122', 'cascais', null, '', public.lisbon_at(pg_temp.d(-23), '16:00'), 'done', public.lisbon_at(pg_temp.d(-23), '16:00'), null, 'arrival', '', 9, null, '', 1, 'booked', null, null)
+on conflict (id) do nothing;
+
+insert into public.dock_tasks (id, marina_id, berth_id, description, due_at, status, done_at, created_by, job_type, boat_name, length_m, beam_m, reason_note, people_needed, source, contract_id, booked_by)
+values ('00000000-0000-4000-8000-100000000123', 'cascais', null, '', public.lisbon_at(pg_temp.d(-24), '17:00'), 'done', public.lisbon_at(pg_temp.d(-24), '17:00'), null, 'arrival', '', 9, null, '', 1, 'booked', null, null)
+on conflict (id) do nothing;
+
+insert into public.dock_tasks (id, marina_id, berth_id, description, due_at, status, done_at, created_by, job_type, boat_name, length_m, beam_m, reason_note, people_needed, source, contract_id, booked_by)
+values ('00000000-0000-4000-8000-100000000124', 'cascais', null, '', public.lisbon_at(pg_temp.d(-25), '09:00'), 'done', public.lisbon_at(pg_temp.d(-25), '09:00'), null, 'departure', '', 14, null, '', 2, 'booked', null, null)
+on conflict (id) do nothing;
+
+insert into public.dock_tasks (id, marina_id, berth_id, description, due_at, status, done_at, created_by, job_type, boat_name, length_m, beam_m, reason_note, people_needed, source, contract_id, booked_by)
+values ('00000000-0000-4000-8000-100000000125', 'cascais', null, '', public.lisbon_at(pg_temp.d(-26), '10:00'), 'done', public.lisbon_at(pg_temp.d(-26), '10:00'), null, 'arrival', '', 9, null, '', 1, 'booked', null, null)
+on conflict (id) do nothing;
+
+insert into public.dock_tasks (id, marina_id, berth_id, description, due_at, status, done_at, created_by, job_type, boat_name, length_m, beam_m, reason_note, people_needed, source, contract_id, booked_by)
+values ('00000000-0000-4000-8000-100000000126', 'cascais', null, '', public.lisbon_at(pg_temp.d(-27), '11:00'), 'done', public.lisbon_at(pg_temp.d(-27), '11:00'), null, 'arrival', '', 9, null, '', 1, 'booked', null, null)
+on conflict (id) do nothing;
+
+insert into public.dock_tasks (id, marina_id, berth_id, description, due_at, status, done_at, created_by, job_type, boat_name, length_m, beam_m, reason_note, people_needed, source, contract_id, booked_by)
+values ('00000000-0000-4000-8000-100000000127', 'cascais', null, '', public.lisbon_at(pg_temp.d(-28), '15:00'), 'done', public.lisbon_at(pg_temp.d(-28), '15:00'), null, 'departure', '', 9, null, '', 1, 'booked', null, null)
+on conflict (id) do nothing;
+
+insert into public.dock_tasks (id, marina_id, berth_id, description, due_at, status, done_at, created_by, job_type, boat_name, length_m, beam_m, reason_note, people_needed, source, contract_id, booked_by)
+values ('00000000-0000-4000-8000-100000000128', 'cascais', null, '', public.lisbon_at(pg_temp.d(-1), '16:00'), 'done', public.lisbon_at(pg_temp.d(-1), '16:00'), null, 'arrival', '', 14, null, '', 2, 'booked', null, null)
+on conflict (id) do nothing;
+
+insert into public.dock_tasks (id, marina_id, berth_id, description, due_at, status, done_at, created_by, job_type, boat_name, length_m, beam_m, reason_note, people_needed, source, contract_id, booked_by)
+values ('00000000-0000-4000-8000-100000000129', 'cascais', null, '', public.lisbon_at(pg_temp.d(-2), '17:00'), 'done', public.lisbon_at(pg_temp.d(-2), '17:00'), null, 'arrival', '', 9, null, '', 1, 'booked', null, null)
+on conflict (id) do nothing;
+
+
+
+-- Who is on which job.
+
+insert into public.job_assignments (job_id, member_id, claimed)
+values ('00000000-0000-4000-8000-100000000001', (select id from public.staff_members where user_id = '00000000-0000-4000-8000-900000000015' and marina_id = 'cascais'), true)
+on conflict do nothing;
+
+insert into public.job_assignments (job_id, member_id, claimed)
+values ('00000000-0000-4000-8000-100000000003', (select id from public.staff_members where user_id = '00000000-0000-4000-8000-900000000014' and marina_id = 'cascais'), false)
+on conflict do nothing;
+
+insert into public.job_assignments (job_id, member_id, claimed)
+values ('00000000-0000-4000-8000-100000000100', (select id from public.staff_members where user_id = '00000000-0000-4000-8000-900000000015' and marina_id = 'cascais'), true)
+on conflict do nothing;
+
+insert into public.job_assignments (job_id, member_id, claimed)
+values ('00000000-0000-4000-8000-100000000101', (select id from public.staff_members where user_id = '00000000-0000-4000-8000-900000000016' and marina_id = 'cascais'), true)
+on conflict do nothing;
+
+insert into public.job_assignments (job_id, member_id, claimed)
+values ('00000000-0000-4000-8000-100000000102', (select id from public.staff_members where user_id = '00000000-0000-4000-8000-900000000014' and marina_id = 'cascais'), true)
+on conflict do nothing;
+
+insert into public.job_assignments (job_id, member_id, claimed)
+values ('00000000-0000-4000-8000-100000000103', (select id from public.staff_members where user_id = '00000000-0000-4000-8000-900000000015' and marina_id = 'cascais'), true)
+on conflict do nothing;
+
+insert into public.job_assignments (job_id, member_id, claimed)
+values ('00000000-0000-4000-8000-100000000104', (select id from public.staff_members where user_id = '00000000-0000-4000-8000-900000000016' and marina_id = 'cascais'), true)
+on conflict do nothing;
+
+insert into public.job_assignments (job_id, member_id, claimed)
+values ('00000000-0000-4000-8000-100000000105', (select id from public.staff_members where user_id = '00000000-0000-4000-8000-900000000014' and marina_id = 'cascais'), true)
+on conflict do nothing;
+
+insert into public.job_assignments (job_id, member_id, claimed)
+values ('00000000-0000-4000-8000-100000000106', (select id from public.staff_members where user_id = '00000000-0000-4000-8000-900000000015' and marina_id = 'cascais'), true)
+on conflict do nothing;
+
+insert into public.job_assignments (job_id, member_id, claimed)
+values ('00000000-0000-4000-8000-100000000107', (select id from public.staff_members where user_id = '00000000-0000-4000-8000-900000000016' and marina_id = 'cascais'), true)
+on conflict do nothing;
+
+insert into public.job_assignments (job_id, member_id, claimed)
+values ('00000000-0000-4000-8000-100000000108', (select id from public.staff_members where user_id = '00000000-0000-4000-8000-900000000014' and marina_id = 'cascais'), true)
+on conflict do nothing;
+
+insert into public.job_assignments (job_id, member_id, claimed)
+values ('00000000-0000-4000-8000-100000000109', (select id from public.staff_members where user_id = '00000000-0000-4000-8000-900000000015' and marina_id = 'cascais'), true)
+on conflict do nothing;
+
+insert into public.job_assignments (job_id, member_id, claimed)
+values ('00000000-0000-4000-8000-100000000110', (select id from public.staff_members where user_id = '00000000-0000-4000-8000-900000000016' and marina_id = 'cascais'), true)
+on conflict do nothing;
+
+insert into public.job_assignments (job_id, member_id, claimed)
+values ('00000000-0000-4000-8000-100000000111', (select id from public.staff_members where user_id = '00000000-0000-4000-8000-900000000014' and marina_id = 'cascais'), true)
+on conflict do nothing;
+
+insert into public.job_assignments (job_id, member_id, claimed)
+values ('00000000-0000-4000-8000-100000000112', (select id from public.staff_members where user_id = '00000000-0000-4000-8000-900000000015' and marina_id = 'cascais'), true)
+on conflict do nothing;
+
+insert into public.job_assignments (job_id, member_id, claimed)
+values ('00000000-0000-4000-8000-100000000113', (select id from public.staff_members where user_id = '00000000-0000-4000-8000-900000000016' and marina_id = 'cascais'), true)
+on conflict do nothing;
+
+insert into public.job_assignments (job_id, member_id, claimed)
+values ('00000000-0000-4000-8000-100000000114', (select id from public.staff_members where user_id = '00000000-0000-4000-8000-900000000014' and marina_id = 'cascais'), true)
+on conflict do nothing;
+
+insert into public.job_assignments (job_id, member_id, claimed)
+values ('00000000-0000-4000-8000-100000000115', (select id from public.staff_members where user_id = '00000000-0000-4000-8000-900000000015' and marina_id = 'cascais'), true)
+on conflict do nothing;
+
+insert into public.job_assignments (job_id, member_id, claimed)
+values ('00000000-0000-4000-8000-100000000116', (select id from public.staff_members where user_id = '00000000-0000-4000-8000-900000000016' and marina_id = 'cascais'), true)
+on conflict do nothing;
+
+insert into public.job_assignments (job_id, member_id, claimed)
+values ('00000000-0000-4000-8000-100000000117', (select id from public.staff_members where user_id = '00000000-0000-4000-8000-900000000014' and marina_id = 'cascais'), true)
+on conflict do nothing;
+
+insert into public.job_assignments (job_id, member_id, claimed)
+values ('00000000-0000-4000-8000-100000000118', (select id from public.staff_members where user_id = '00000000-0000-4000-8000-900000000015' and marina_id = 'cascais'), true)
+on conflict do nothing;
+
+insert into public.job_assignments (job_id, member_id, claimed)
+values ('00000000-0000-4000-8000-100000000119', (select id from public.staff_members where user_id = '00000000-0000-4000-8000-900000000016' and marina_id = 'cascais'), true)
+on conflict do nothing;
+
+insert into public.job_assignments (job_id, member_id, claimed)
+values ('00000000-0000-4000-8000-100000000120', (select id from public.staff_members where user_id = '00000000-0000-4000-8000-900000000014' and marina_id = 'cascais'), true)
+on conflict do nothing;
+
+insert into public.job_assignments (job_id, member_id, claimed)
+values ('00000000-0000-4000-8000-100000000121', (select id from public.staff_members where user_id = '00000000-0000-4000-8000-900000000015' and marina_id = 'cascais'), true)
+on conflict do nothing;
+
+insert into public.job_assignments (job_id, member_id, claimed)
+values ('00000000-0000-4000-8000-100000000122', (select id from public.staff_members where user_id = '00000000-0000-4000-8000-900000000016' and marina_id = 'cascais'), true)
+on conflict do nothing;
+
+insert into public.job_assignments (job_id, member_id, claimed)
+values ('00000000-0000-4000-8000-100000000123', (select id from public.staff_members where user_id = '00000000-0000-4000-8000-900000000014' and marina_id = 'cascais'), true)
+on conflict do nothing;
+
+insert into public.job_assignments (job_id, member_id, claimed)
+values ('00000000-0000-4000-8000-100000000124', (select id from public.staff_members where user_id = '00000000-0000-4000-8000-900000000015' and marina_id = 'cascais'), true)
+on conflict do nothing;
+
+insert into public.job_assignments (job_id, member_id, claimed)
+values ('00000000-0000-4000-8000-100000000125', (select id from public.staff_members where user_id = '00000000-0000-4000-8000-900000000016' and marina_id = 'cascais'), true)
+on conflict do nothing;
+
+insert into public.job_assignments (job_id, member_id, claimed)
+values ('00000000-0000-4000-8000-100000000126', (select id from public.staff_members where user_id = '00000000-0000-4000-8000-900000000014' and marina_id = 'cascais'), true)
+on conflict do nothing;
+
+insert into public.job_assignments (job_id, member_id, claimed)
+values ('00000000-0000-4000-8000-100000000127', (select id from public.staff_members where user_id = '00000000-0000-4000-8000-900000000015' and marina_id = 'cascais'), true)
+on conflict do nothing;
+
+insert into public.job_assignments (job_id, member_id, claimed)
+values ('00000000-0000-4000-8000-100000000128', (select id from public.staff_members where user_id = '00000000-0000-4000-8000-900000000016' and marina_id = 'cascais'), true)
+on conflict do nothing;
+
+insert into public.job_assignments (job_id, member_id, claimed)
+values ('00000000-0000-4000-8000-100000000129', (select id from public.staff_members where user_id = '00000000-0000-4000-8000-900000000014' and marina_id = 'cascais'), true)
+on conflict do nothing;
+
+
+
+-- Help booked on arrival requests: Kestrel (confirmed, running late to
+
+-- 13:30), Meridian (still a request, so its job waits) and Sea Otter.
+
+update public.arrivals set help_requested = true, help_reason = 'first_time' where id = '00000000-0000-4000-8000-a00000000001';
+
+update public.arrivals set eta = '13:30' where id = '00000000-0000-4000-8000-a00000000001';
+
+update public.arrivals set help_requested = true, help_reason = 'short_handed' where id = '00000000-0000-4000-8000-a00000000004';
+
+update public.arrivals set help_requested = true, help_reason = 'short_handed', help_note = 'Two of us, first time in Portugal' where id = '00000000-0000-4000-8000-a00000000006';
+
+
 
 insert into public.radio_log (id, marina_id, logged_at, boat_name, source, vhf_channel, request, logged_by)
 values ('00000000-0000-4000-8000-200000000001', 'cascais', pg_temp.ts(0, '07:40:00'), 'Mistral', 'vhf', 9, 'Asks for a berth tonight, 11 m sloop', null)

@@ -24,6 +24,7 @@ import { myBoat } from "./myBoat";
 import { account } from "./account";
 import { enquiry } from "./enquiry";
 import { accounts } from "./accounts";
+import { help } from "./help";
 
 export const en: Dictionary = {
   nav,
@@ -51,4 +52,5 @@ export const en: Dictionary = {
   account,
   enquiry,
   accounts,
+  help,
 };

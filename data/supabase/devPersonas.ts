@@ -28,7 +28,43 @@ export const SEEDED_PERSONAS: SeededPersona[] = [
   {
     id: "staff",
     email: "sam.okafor@example.com",
-    label: "Marina staff",
-    description: "Staff of Marina de Cascais",
+    label: "Director",
+    description: "Sam, director of Marina de Cascais: everything",
+  },
+  {
+    id: "dockmaster",
+    email: "teresa.marques@example.com",
+    label: "Dockmaster",
+    description: "Teresa: day plan, berths, relets, the dock team",
+  },
+  {
+    id: "reception",
+    email: "ines.duarte@example.com",
+    label: "Reception",
+    description: "Ines: arrivals, check-in, customers, radio log",
+  },
+  {
+    id: "team-lead",
+    email: "rui.costa@example.com",
+    label: "Marinheiro, team lead",
+    description: "Rui: claims jobs and may assign them",
+  },
+  {
+    id: "marinheiro",
+    email: "bruno.lima@example.com",
+    label: "Marinheiro",
+    description: "Bruno: my next job, my day, my shifts",
+  },
+  {
+    id: "night-watch",
+    email: "hugo.pinto@example.com",
+    label: "Night watch",
+    description: "Hugo: tonight, late check-in, incidents",
+  },
+  {
+    id: "seasonal",
+    email: "diogo.alves@example.com",
+    label: "Seasonal, access ended",
+    description: "Diogo: access ended three days ago, sees nothing",
   },
 ];

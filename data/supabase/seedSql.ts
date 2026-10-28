@@ -39,6 +39,8 @@ const PREFIX = {
   task: "1",
   radio: "2",
   user: "9",
+  shift: "3",
+  member: "4",
 } as const;
 
 // Fixed ids, so the seed can run twice without duplicating rows.
@@ -48,6 +50,35 @@ export function seedUuid(kind: keyof typeof PREFIX, n: number): string {
 
 // The berth holder's customer number; guests are numbered as their arrivals.
 const HOLDER = 10;
+
+// One account per staff role at Marina de Cascais, a marinheiro team lead,
+// and a seasonal marinheiro whose access ended three days ago.
+type SeedStaff = {
+  n: number;
+  email: string;
+  name: string;
+  role: "director" | "dockmaster" | "reception" | "marinheiro" | "night_watch";
+  teamLead?: boolean;
+  // Days from today; negative is already past.
+  accessUntil?: number;
+};
+
+export const STAFF: SeedStaff[] = [
+  { n: 11, email: "sam.okafor@example.com", name: "Sam Okafor", role: "director" },
+  { n: 12, email: "teresa.marques@example.com", name: "Teresa Marques", role: "dockmaster" },
+  { n: 13, email: "ines.duarte@example.com", name: "Inês Duarte", role: "reception" },
+  { n: 14, email: "rui.costa@example.com", name: "Rui Costa", role: "marinheiro", teamLead: true },
+  { n: 15, email: "bruno.lima@example.com", name: "Bruno Lima", role: "marinheiro" },
+  { n: 16, email: "carla.sousa@example.com", name: "Carla Sousa", role: "marinheiro" },
+  { n: 17, email: "hugo.pinto@example.com", name: "Hugo Pinto", role: "night_watch" },
+  {
+    n: 18,
+    email: "diogo.alves@example.com",
+    name: "Diogo Alves",
+    role: "marinheiro",
+    accessUntil: -3,
+  },
+];
 
 type SeedUser = {
   n: number;
@@ -115,6 +146,15 @@ const SEED_USERS: SeedUser[] = [
     euStatus: "eu",
     password: true,
   },
+  ...STAFF.map((m) => ({
+    n: m.n,
+    email: m.email,
+    name: m.name,
+    phone: "",
+    nationality: "Portugal",
+    euStatus: "eu" as const,
+    password: true,
+  })),
 ];
 
 function userFor(email: string): SeedUser | undefined {
@@ -172,20 +212,16 @@ function userSql(user: SeedUser): string[] {
 function accountsSql(enquiries: Enquiry[]): string[] {
   const out: string[] = ["-- Sample accounts: real users with a profile and boats of their own."];
   for (const user of SEED_USERS) out.push(...userSql(user), "");
-  out.push(
-    insert(
-      "staff_members",
-      {
-        user_id: quote(seedUuid("user", 11)),
-        marina_id: quote(SEED_MARINA),
-        role: quote("staff"),
-        display_name: quote("Sam Okafor"),
-      },
-      "(user_id, marina_id)"
-    ),
-    ""
-  );
-  for (const user of SEED_USERS.filter((u) => u.n !== 11)) {
+  for (const m of STAFF) {
+    out.push(
+      `insert into public.staff_members (id, user_id, marina_id, role, team_lead, access_until, display_name)
+values (${quote(seedUuid("member", m.n))}, ${quote(seedUuid("user", m.n))}, ${quote(SEED_MARINA)}, ${quote(m.role)}, ${m.teamLead ? "true" : "false"}, ${m.accessUntil === undefined ? "null" : `pg_temp.d(${m.accessUntil})`}, ${quote(m.name)})
+on conflict (user_id, marina_id) do update set role = excluded.role, team_lead = excluded.team_lead,
+  access_until = excluded.access_until, display_name = excluded.display_name, active = true;`
+    );
+  }
+  out.push("");
+  for (const user of SEED_USERS.filter((u) => !STAFF.some((m) => m.n === u.n))) {
     const boat = ownBoat(user, enquiries);
     if (!boat) continue;
     out.push(
@@ -666,28 +702,215 @@ function plannerReletSql(): string {
   );
 }
 
-function taskSql(
-  n: number,
-  berth: string | null,
-  description: string,
-  days: number,
-  clock: string,
-  done: boolean
-): string {
+function memberLookup(n: number): string {
+  return `(select id from public.staff_members where user_id = ${quote(seedUuid("user", n))} and marina_id = ${quote(SEED_MARINA)})`;
+}
+
+// A Lisbon day (days from today) and wall-clock time, as a moment.
+function lisbon(days: number, clock: string): string {
+  return `public.lisbon_at(pg_temp.d(${days}), ${quote(clock)})`;
+}
+
+type SeedJob = {
+  n: number;
+  type: "arrival" | "departure" | "return" | "power" | "inspection" | "other";
+  berth: string | null;
+  boat: string;
+  length: number | null;
+  beam: number | null;
+  days: number;
+  clock: string;
+  people: number;
+  source: "booked" | "walk_in" | "vhf" | "staff";
+  description?: string;
+  reasonNote?: string;
+  done?: boolean;
+  // A berth holder's booking: the seeded holding and its holder.
+  holder?: boolean;
+};
+
+function jobSql(job: SeedJob): string {
   return insert(
     "dock_tasks",
     {
-      id: quote(seedUuid("task", n)),
+      id: quote(seedUuid("task", job.n)),
       marina_id: quote(SEED_MARINA),
-      berth_id: berthLookup(berth),
-      description: quote(description),
-      due_at: `pg_temp.ts(${days}, ${quote(clock)})`,
-      status: quote(done ? "done" : "to_do"),
-      done_at: done ? `pg_temp.ts(${days}, ${quote(clock)})` : "null",
+      berth_id: berthLookup(job.berth),
+      description: quote(job.description ?? ""),
+      due_at: lisbon(job.days, job.clock),
+      status: quote(job.done ? "done" : "to_do"),
+      done_at: job.done ? lisbon(job.days, job.clock) : "null",
       created_by: "null",
+      job_type: quote(job.type),
+      boat_name: quote(job.boat),
+      length_m: job.length === null ? "null" : String(job.length),
+      beam_m: job.beam === null ? "null" : String(job.beam),
+      reason_note: quote(job.reasonNote ?? ""),
+      people_needed: String(job.people),
+      source: quote(job.source),
+      contract_id: job.holder ? quote(seedUuid("contract", 1)) : "null",
+      booked_by: job.holder ? quote(seedUuid("user", HOLDER)) : "null",
     },
     "(id)"
   );
+}
+
+function assignSql(job: number, member: number, claimed: boolean): string {
+  return `insert into public.job_assignments (job_id, member_id, claimed)
+values (${quote(seedUuid("task", job))}, ${memberLookup(member)}, ${claimed})
+on conflict do nothing;`;
+}
+
+function shiftSql(n: number, member: number, days: number, from: string, to: string): string {
+  return insert(
+    "shifts",
+    {
+      id: quote(seedUuid("shift", n)),
+      marina_id: quote(SEED_MARINA),
+      member_id: memberLookup(member),
+      day: `pg_temp.d(${days})`,
+      starts_at: quote(from),
+      ends_at: quote(to),
+    },
+    "(id)"
+  );
+}
+
+// A realistic day: three marinheiros on shift (Rui and Bruno from 08:00, Carla
+// from 12:00), the dockmaster and the night watch; booked help for arrivals,
+// the berth holder's departure and return, a walk-in, one slot over capacity
+// (10:00, three people booked against two on shift) and one late ETA
+// (Kestrel, now 13:30). Plus a month of finished jobs for the staffing view.
+function dockSql(): string[] {
+  const out: string[] = ["-- Shifts today and tomorrow."];
+  let shift = 0;
+  for (const days of [0, 1]) {
+    for (const [member, from, to] of [
+      [12, "08:00", "17:00"],
+      [14, "08:00", "16:00"],
+      [15, "08:00", "16:00"],
+      [16, "12:00", "20:00"],
+      [17, "20:00", "08:00"],
+    ] as const) {
+      shift += 1;
+      out.push(shiftSql(shift, member, days, from, to));
+    }
+  }
+  out.push("", "-- Jobs.");
+  const jobs: SeedJob[] = [
+    {
+      n: 1,
+      type: "inspection",
+      berth: "P-4",
+      boat: "Aurora",
+      length: 8.4,
+      beam: 3,
+      days: 0,
+      clock: "08:00",
+      people: 1,
+      source: "staff",
+      description: "Check the mooring lines after the wind",
+    },
+    {
+      n: 2,
+      type: "arrival",
+      berth: "P-6",
+      boat: "Blue Heron",
+      length: 13,
+      beam: 4.1,
+      days: 0,
+      clock: "10:00",
+      people: 2,
+      source: "walk_in",
+      reasonNote: "Came to the desk, mooring in ten minutes",
+    },
+    {
+      n: 3,
+      type: "power",
+      berth: "G-14",
+      boat: "",
+      length: null,
+      beam: null,
+      days: 0,
+      clock: "10:15",
+      people: 1,
+      source: "staff",
+      description: "Shore power pedestal is tripping",
+    },
+    {
+      n: 4,
+      type: "other",
+      berth: "P-4",
+      boat: "Aurora",
+      length: 8.4,
+      beam: 3,
+      days: -1,
+      clock: "16:00",
+      people: 1,
+      source: "staff",
+      description: "Pump-out",
+      done: true,
+    },
+    {
+      n: 5,
+      type: "departure",
+      berth: "G-14",
+      boat: "Mar Azul",
+      length: 7.6,
+      beam: 2.9,
+      days: 3,
+      clock: "09:30",
+      people: 1,
+      source: "booked",
+      holder: true,
+    },
+    {
+      n: 6,
+      type: "return",
+      berth: "G-14",
+      boat: "Mar Azul",
+      length: 7.6,
+      beam: 2.9,
+      days: 10,
+      clock: "16:00",
+      people: 1,
+      source: "booked",
+      holder: true,
+    },
+  ];
+  // Four weeks of finished jobs at the usual busy hours.
+  const hours = ["09:00", "10:00", "11:00", "15:00", "16:00", "17:00"];
+  for (let i = 0; i < 30; i += 1) {
+    jobs.push({
+      n: 100 + i,
+      type: i % 3 === 0 ? "departure" : "arrival",
+      berth: null,
+      boat: "",
+      length: i % 4 === 0 ? 14 : 9,
+      beam: null,
+      days: -(1 + (i % 28)),
+      clock: hours[i % hours.length]!,
+      people: i % 4 === 0 ? 2 : 1,
+      source: "booked",
+      done: true,
+    });
+  }
+  out.push(...jobs.map(jobSql));
+  out.push(
+    "",
+    "-- Who is on which job.",
+    assignSql(1, 15, true),
+    assignSql(3, 14, false),
+    ...jobs.filter((j) => j.n >= 100).map((j) => assignSql(j.n, 14 + (j.n % 3), true)),
+    "",
+    "-- Help booked on arrival requests: Kestrel (confirmed, running late to",
+    "-- 13:30), Meridian (still a request, so its job waits) and Sea Otter.",
+    `update public.arrivals set help_requested = true, help_reason = 'first_time' where id = ${quote(seedUuid("arrival", 1))};`,
+    `update public.arrivals set eta = '13:30' where id = ${quote(seedUuid("arrival", 1))};`,
+    `update public.arrivals set help_requested = true, help_reason = 'short_handed' where id = ${quote(seedUuid("arrival", 4))};`,
+    `update public.arrivals set help_requested = true, help_reason = 'short_handed', help_note = 'Two of us, first time in Portugal' where id = ${quote(seedUuid("arrival", 6))};`
+  );
+  return out;
 }
 
 function radioSql(
@@ -717,17 +940,8 @@ function radioSql(
 function tasksAndRadioSql(): string[] {
   const channel = marinas.find((m) => m.id === SEED_MARINA)?.vhfChannel ?? 9;
   return [
-    taskSql(1, "P-4", "Check Aurora's mooring lines after the wind", 0, "08:00:00", false),
-    taskSql(2, "P-2", "Meet Kestrel and help her moor", 0, "10:30:00", false),
-    taskSql(
-      3,
-      "G-14",
-      "Shore power pedestal is tripping, call the electrician",
-      0,
-      "14:00:00",
-      false
-    ),
-    taskSql(4, "P-4", "Pump-out for Aurora", -1, "16:00:00", true),
+    ...dockSql(),
+    "",
     radioSql(1, 0, "07:40:00", "Mistral", channel, "Asks for a berth tonight, 11 m sloop"),
     radioSql(2, 0, "09:15:00", "Blue Heron", null, "Asks about the fuel dock opening hours"),
     radioSql(
@@ -756,6 +970,16 @@ export function buildSeedSql(): string {
     "-- arrivals in every status, relet offers, dock tasks and radio log entries.",
     "-- Dates are relative to the Lisbon day the seed runs on. Safe to run more than",
     "-- once. FOR A DEVELOPMENT PROJECT ONLY: it creates users with a known password.",
+    "",
+    "-- Refuses to run unless the project is marked as a development project:",
+    "--   alter database postgres set app.allow_dev_seed = 'on';",
+    "do $$",
+    "begin",
+    "  if coalesce(current_setting('app.allow_dev_seed', true), '') <> 'on' then",
+    "    raise exception 'Refusing to seed: this seed creates users with a public password. On a development project only, run: alter database postgres set app.allow_dev_seed = ''on'';';",
+    "  end if;",
+    "end;",
+    "$$;",
     "",
     "create function pg_temp.d(days integer) returns date language sql as $$",
     "  select (now() at time zone 'Europe/Lisbon')::date + days",
