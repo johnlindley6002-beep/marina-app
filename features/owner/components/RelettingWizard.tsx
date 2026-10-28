@@ -1,16 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useOwnedBerths } from "../lib/useOwnedBerths";
 import { marinas } from "@/data/marinas";
 import { formatLongDate, todayIso, countNights } from "@/lib/dates";
 import {
   clearRelettingDraft,
   estimateReletting,
-  getOwnedBerths,
   getRelettingDraft,
   saveRelettingDraft,
-  submitRelettingRequest,
+  submitMyRelettingRequest,
   updateRelettingRequest,
   type RelettingDraft,
   type RelettingRequest,
@@ -34,7 +34,7 @@ const quietClass = "btn-quiet";
 function Wizard() {
   const { user } = useAuth();
   // One held berth today. With several, a picker would go here.
-  const berth = useMemo(() => getOwnedBerths(user?.id ?? null)[0], [user?.id]);
+  const berth = useOwnedBerths()[0];
   const marina = marinas.find((m) => m.id === berth?.marinaId);
   const terms = marina?.reletting ?? null;
   const mediated = terms?.reletAllowed === "marina_mediated";
@@ -210,12 +210,12 @@ function Wizard() {
     setError(null);
   }
 
-  function onSubmit() {
+  async function onSubmit() {
     if (!berth) return;
     const result =
       mode === "edit" && requestId
         ? updateRelettingRequest(userId, requestId, { startDate, endDate })
-        : submitRelettingRequest(userId, {
+        : await submitMyRelettingRequest(userId, {
             berthId: berth.berthId,
             startDate,
             endDate,

@@ -54,13 +54,13 @@ export default function RootLayout({
         <LanguageProvider>
           <SkipLink />
           <UnitsProvider>
-            <BoatProvider>
-              <AuthProvider>
+            <AuthProvider>
+              <BoatProvider>
                 <AppChrome>{children}</AppChrome>
                 <ServiceWorkerRegister />
                 <FloatingDock />
-              </AuthProvider>
-            </BoatProvider>
+              </BoatProvider>
+            </AuthProvider>
           </UnitsProvider>
         </LanguageProvider>
       </body>

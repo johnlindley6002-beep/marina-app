@@ -2,19 +2,12 @@
 
 import { useState } from "react";
 import { formatLongDate } from "@/lib/dates";
-import {
-  decideEnquiry,
-  getEnquiries,
-  type Enquiry,
-  type EnquiryStatus,
-  useStaffData,
-} from "@/lib/data";
+import { getEnquiries, type Enquiry, type EnquiryStatus, useStaffData } from "@/lib/data";
 import { formatLength } from "@/lib/units";
-import { useStaffAction } from "../lib/useStaffAction";
 import { useStaffId } from "./StaffSessionProvider";
 import { Collapse } from "@/components/ui/Disclosure";
 import { useUnits } from "@/components/providers/UnitsProvider";
-import BerthPicker from "./BerthPicker";
+import RequestActions from "./RequestActions";
 import { useStaffText } from "./StaffLanguageProvider";
 
 const NONE: Enquiry[] = [];
@@ -23,7 +16,13 @@ function isCommercialUseValue(vesselUse: string): boolean {
   return vesselUse !== "" && vesselUse !== "private";
 }
 
-const STATUS_TABS: (EnquiryStatus | "all")[] = ["new", "approved", "declined", "all"];
+const STATUS_TABS: (EnquiryStatus | "all")[] = [
+  "new",
+  "dates_proposed",
+  "approved",
+  "declined",
+  "all",
+];
 
 function EuFlag({ enquiry }: { enquiry: Enquiry }) {
   const { s } = useStaffText();
@@ -35,14 +34,11 @@ function EuFlag({ enquiry }: { enquiry: Enquiry }) {
   );
 }
 
-function Row({ enquiry, staffId }: { enquiry: Enquiry; staffId: string | null }) {
+export function EnquiryRow({ enquiry, staffId }: { enquiry: Enquiry; staffId: string | null }) {
   const { units } = useUnits();
   const { s, dateLocale } = useStaffText();
   const q = s.enquiries;
   const [open, setOpen] = useState(false);
-  const [berthId, setBerthId] = useState(enquiry.assignedBerthId ?? "");
-  const [reason, setReason] = useState("");
-  const { busy, error, run } = useStaffAction();
   const rowId = `enquiry-${enquiry.id}`;
 
   return (
@@ -130,51 +126,8 @@ function Row({ enquiry, staffId }: { enquiry: Enquiry; staffId: string | null })
             </div>
           ) : null}
 
-          {enquiry.status === "new" ? (
-            <div className="mt-4 flex flex-wrap items-end gap-3">
-              <label className="block text-sm">
-                <span className="staff-label" id={`${rowId}-berth`}>
-                  {q.assignBerth}
-                </span>
-                <BerthPicker
-                  id={`${rowId}-berth`}
-                  marinaId={enquiry.marinaId}
-                  loa={enquiry.loa}
-                  dateIso={enquiry.arrival}
-                  value={berthId}
-                  onChange={setBerthId}
-                />
-              </label>
-              <button
-                type="button"
-                disabled={busy}
-                onClick={() =>
-                  void run(() => decideEnquiry(staffId, enquiry.id, "approve", { berthId }))
-                }
-                className="staff-btn staff-btn-primary"
-              >
-                {q.approve}
-              </button>
-              <label className="block flex-1 text-sm">
-                <span className="staff-label">{q.declineReason}</span>
-                <input
-                  type="text"
-                  value={reason}
-                  onChange={(e) => setReason(e.target.value)}
-                  className="staff-field"
-                />
-              </label>
-              <button
-                type="button"
-                disabled={busy}
-                onClick={() =>
-                  void run(() => decideEnquiry(staffId, enquiry.id, "decline", { reason }))
-                }
-                className="staff-btn staff-btn-danger"
-              >
-                {q.decline}
-              </button>
-            </div>
+          {enquiry.status === "new" || enquiry.status === "dates_proposed" ? (
+            <RequestActions enquiry={enquiry} staffId={staffId} />
           ) : (
             <p className="mt-4 text-ink-soft">
               {enquiry.status === "approved"
@@ -182,11 +135,6 @@ function Row({ enquiry, staffId }: { enquiry: Enquiry; staffId: string | null })
                 : q.declinedWith(enquiry.decisionNote)}
             </p>
           )}
-          {error ? (
-            <p role="alert" className="field-error mt-2">
-              {error}
-            </p>
-          ) : null}
         </div>
       </Collapse>
     </li>
@@ -209,6 +157,7 @@ export default function EnquiryInbox() {
     new: enquiries.filter((e) => e.status === "new").length,
     approved: enquiries.filter((e) => e.status === "approved").length,
     declined: enquiries.filter((e) => e.status === "declined").length,
+    dates_proposed: enquiries.filter((e) => e.status === "dates_proposed").length,
   };
 
   return (
@@ -236,7 +185,7 @@ export default function EnquiryInbox() {
 
       <ul className="mt-4 space-y-2">
         {filtered.map((e) => (
-          <Row key={e.id} enquiry={e} staffId={staffId} />
+          <EnquiryRow key={e.id} enquiry={e} staffId={staffId} />
         ))}
       </ul>
 

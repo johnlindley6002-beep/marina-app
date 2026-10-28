@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo, useState } from "react";
 import { getAllBerths } from "@/data/berths";
 import { getPrimaryMarina } from "@/data/marinas";
@@ -12,6 +13,7 @@ import {
   getOutOfServiceBerths,
   reassignEnquiryBerth,
   setBerthOutOfService,
+  STAFF_DATA_SOURCE,
   suggestReleasedBerths,
   type BerthOperationalInfo,
   type Enquiry,
@@ -30,6 +32,7 @@ const MARINA = getPrimaryMarina();
 const NONE: Enquiry[] = [];
 const NO_MARKS: OutOfServiceMark[] = [];
 const NO_STATUSES: Record<string, BerthOperationalInfo> = {};
+const NO_LINKS: Awaited<ReturnType<typeof getMarinaBerthLinks>> = [];
 
 type PanelData = {
   berthId: string;
@@ -57,7 +60,7 @@ export default function BerthOperations() {
   const { value: oosMarks } = useStaffData(() => getOutOfServiceBerths(MARINA.id), NO_MARKS);
 
   const allBerths = useMemo(() => getAllBerths(), []);
-  const berthLinks = useMemo(() => getMarinaBerthLinks(MARINA.id), []);
+  const { value: berthLinks } = useStaffData(() => getMarinaBerthLinks(MARINA.id), NO_LINKS);
 
   const panel: PanelData | null = useMemo(() => {
     if (!selectedBerthId) return null;
@@ -142,6 +145,14 @@ export default function BerthOperations() {
           ) : (
             <div>
               <h2 className="type-heading type-h3 text-ink">{s.common.berthCode(panel.berthId)}</h2>
+              {STAFF_DATA_SOURCE === "supabase" ? (
+                <Link
+                  href={`/staff/berths/${encodeURIComponent(panel.berthId)}`}
+                  className="mt-1 inline-block text-sm underline underline-offset-4"
+                >
+                  {s.berthPage.open}
+                </Link>
+              ) : null}
               <p className="mt-1 text-sm text-ink-muted">
                 {s.common.classLabel(panel.sizeClass)} · {s.status[panel.info.status]}
                 {panel.info.detail ? ` · ${panel.info.detail}` : ""}
@@ -151,7 +162,8 @@ export default function BerthOperations() {
                 <div className="mt-3 text-sm">
                   <p className="staff-label">{b.heldBy}</p>
                   <p className="text-ink">
-                    {link.ownerName}, {link.boatOnFile.name}
+                    {link.ownerName}
+                    {link.boatOnFile.name ? `, ${link.boatOnFile.name}` : ""}
                   </p>
                   <p className="text-xs text-ink-muted">
                     {b.linked(formatLongDate(link.linkedAt, dateLocale))}

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { ACCOUNT_DATA_SOURCE } from "@/lib/data";
 import AccountMenu from "./AccountMenu";
 import { useAuth } from "@/components/providers/AuthProvider";
 import LanguageSelect from "./LanguageSelect";
@@ -12,7 +13,7 @@ import UnitSegmented from "@/components/ui/UnitSegmented";
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const { t } = useLanguage();
-  const { user, mode } = useAuth();
+  const { ready, user, mode } = useAuth();
 
   // Owner mode has its own navigation, the way a host mode does elsewhere.
   const ownerMode = !!user && mode === "owner";
@@ -21,6 +22,9 @@ export default function Navbar() {
     : [
         { href: "/marinas", label: t.nav.marinas },
         { href: "/my-boat", label: t.nav.myBoat },
+        ...(ACCOUNT_DATA_SOURCE === "supabase" && user
+          ? [{ href: "/my-arrivals", label: t.accounts.nav.myArrivals }]
+          : []),
         { href: "/#about", label: t.nav.aboutUs },
         { href: "/#contact", label: t.nav.contact },
       ];
@@ -33,6 +37,18 @@ export default function Navbar() {
   }, [menuOpen]);
 
   const closeMenu = () => setMenuOpen(false);
+
+  // Signed out, an account build offers a sign-in link where the account menu will be.
+  const signIn =
+    ACCOUNT_DATA_SOURCE === "supabase" && ready && !user ? (
+      <Link
+        href="/login"
+        onClick={closeMenu}
+        className="inline-flex min-h-11 items-center rounded-full border border-stone/40 px-4 text-[15px] font-medium text-paper transition-colors hover:border-paper"
+      >
+        {t.accounts.nav.signIn}
+      </Link>
+    ) : null;
 
   return (
     <header className="sticky top-0 z-50 border-b border-paper/10 bg-ink text-paper">
@@ -68,6 +84,7 @@ export default function Navbar() {
         <div className="ml-auto hidden items-center gap-3 md:flex">
           <UnitSegmented />
           <LanguageSelect />
+          {signIn}
           <AccountMenu />
         </div>
 
@@ -116,6 +133,7 @@ export default function Navbar() {
             <div className="mt-10 flex flex-wrap items-center gap-3">
               <UnitSegmented />
               <LanguageSelect />
+              {signIn}
             </div>
             <AccountMenu variant="inline" onNavigate={closeMenu} />
           </div>

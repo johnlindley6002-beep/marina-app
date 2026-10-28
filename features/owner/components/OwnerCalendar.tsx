@@ -2,7 +2,12 @@
 
 import { useState } from "react";
 import { formatLongDate, todayIso } from "@/lib/dates";
-import { getBerthCalendar, type CalendarDay, type CalendarState, useMock } from "@/lib/data";
+import {
+  getMyBerthCalendar,
+  type CalendarDay,
+  type CalendarState,
+  useAccountData,
+} from "@/lib/data";
 import { useAuth } from "@/components/providers/AuthProvider";
 
 const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
@@ -44,8 +49,8 @@ export default function OwnerCalendar() {
     return { year: year ?? 1970, month: (month ?? 1) - 1 };
   });
   const userId = user?.id ?? null;
-  const { value: calendar } = useMock(
-    () => getBerthCalendar(userId, cursor.year, cursor.month),
+  const { value: calendar } = useAccountData(
+    () => getMyBerthCalendar(userId, cursor.year, cursor.month),
     EMPTY,
     `${userId}-${cursor.year}-${cursor.month}`
   );

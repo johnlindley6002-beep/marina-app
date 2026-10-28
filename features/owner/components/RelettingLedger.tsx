@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { creditModelHeadline, marinas } from "@/data/marinas";
@@ -7,15 +8,16 @@ import { siteConfig } from "@/data/site";
 import { formatLongDate, countNights, nightDates } from "@/lib/dates";
 import { eur } from "@/lib/money";
 import {
-  cancelRelettingRequest,
-  getRelettingRequests,
+  ACCOUNT_DATA_SOURCE,
+  cancelMyRelettingRequest,
+  getMyRelettingRequests,
   isRelettingEditable,
-  requestEarlyReturn,
+  requestMyEarlyReturn,
   RELETTING_PROGRESS,
   RELETTING_STATUS_LABELS,
   startRelettingDraftFrom,
   type RelettingRequest,
-  useMock,
+  useAccountData,
 } from "@/lib/data";
 import { useAuth } from "@/components/providers/AuthProvider";
 import Disclosure from "@/components/ui/Disclosure";
@@ -109,8 +111,8 @@ function EarlyReturn({ request }: { request: RelettingRequest }) {
     <div className="mt-3">
       <button
         type="button"
-        onClick={() => {
-          const result = requestEarlyReturn(user?.id ?? null, request.id);
+        onClick={async () => {
+          const result = await requestMyEarlyReturn(user?.id ?? null, request.id);
           setError(result.ok ? null : result.error);
         }}
         className="btn-quiet text-sm"
@@ -146,9 +148,11 @@ function Actions({ request }: { request: RelettingRequest }) {
     return (
       <div className="mt-6">
         <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
-          <button type="button" onClick={() => begin("edit")} className="btn-secondary">
-            Change dates
-          </button>
+          {ACCOUNT_DATA_SOURCE === "mock" ? (
+            <button type="button" onClick={() => begin("edit")} className="btn-secondary">
+              Change dates
+            </button>
+          ) : null}
           {!confirming ? (
             <button type="button" onClick={() => setConfirming(true)} className="btn-quiet">
               Cancel request
@@ -161,9 +165,9 @@ function Actions({ request }: { request: RelettingRequest }) {
             <div className="mt-1 flex flex-wrap items-center gap-x-4">
               <button
                 type="button"
-                onClick={() => {
-                  const result = cancelRelettingRequest(userId, request.id);
-                  if (!result.ok) setError(result.error);
+                onClick={async () => {
+                  const result = await cancelMyRelettingRequest(userId, request.id);
+                  setError(result.ok ? null : result.error);
                   setConfirming(false);
                 }}
                 className="btn-quiet font-medium text-error"
@@ -176,7 +180,7 @@ function Actions({ request }: { request: RelettingRequest }) {
             </div>
           </div>
         ) : null}
-        {request.status !== "submitted" ? (
+        {request.status !== "submitted" && ACCOUNT_DATA_SOURCE === "mock" ? (
           <p className="mt-2 text-sm text-ink-muted">
             Changing the dates sends the request to the marina again, because it approved the
             earlier dates.
@@ -198,9 +202,15 @@ function Actions({ request }: { request: RelettingRequest }) {
           {copy.notApprovedLead}
           {request.decisionNote ? ` Reason: ${request.decisionNote}` : ""}
         </p>
-        <button type="button" onClick={() => begin("resubmit")} className="btn-secondary mt-4">
-          Adjust and resubmit
-        </button>
+        {ACCOUNT_DATA_SOURCE === "mock" ? (
+          <button type="button" onClick={() => begin("resubmit")} className="btn-secondary mt-4">
+            Adjust and resubmit
+          </button>
+        ) : (
+          <Link href="/owner/relet" className="btn-secondary mt-4">
+            Send a new offer
+          </Link>
+        )}
         {error ? (
           <p role="alert" className="field-error mt-2">
             {error}
@@ -236,8 +246,8 @@ function Actions({ request }: { request: RelettingRequest }) {
 // earned, and what the holder can still do. All from the mock layer.
 export default function RelettingLedger() {
   const { user } = useAuth();
-  const { value: requests, ready } = useMock(
-    () => getRelettingRequests(user?.id ?? null),
+  const { value: requests, ready } = useAccountData(
+    () => getMyRelettingRequests(user?.id ?? null),
     NONE,
     user?.id ?? ""
   );

@@ -2,10 +2,10 @@
 
 import { formatLongDate } from "@/lib/dates";
 import {
-  getNotifications,
-  markNotificationsRead,
+  getMyNotifications,
+  markMyNotificationsRead,
   type MockNotification,
-  useMock,
+  useAccountData,
 } from "@/lib/data";
 import { useAuth } from "@/components/providers/AuthProvider";
 
@@ -14,8 +14,8 @@ const NONE: MockNotification[] = [];
 // The mock notifications: approved, declined, booked and credit applied.
 export default function OwnerUpdates() {
   const { user } = useAuth();
-  const { value: notes, ready } = useMock(
-    () => getNotifications(user?.id ?? null),
+  const { value: notes, ready } = useAccountData(
+    () => getMyNotifications(user?.id ?? null),
     NONE,
     user?.id ?? ""
   );
@@ -50,7 +50,7 @@ export default function OwnerUpdates() {
       {unread > 0 ? (
         <button
           type="button"
-          onClick={() => markNotificationsRead(user?.id ?? null)}
+          onClick={() => void markMyNotificationsRead(user?.id ?? null)}
           className="btn-quiet mt-2"
         >
           Mark all as read

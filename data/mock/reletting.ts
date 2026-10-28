@@ -17,7 +17,7 @@ import {
 } from "./storage";
 import {
   ACCOUNTS,
-  BERTH_LINKS,
+  activeBerthLinks,
   getRoles,
   getOwnedBerths,
   isStaffOfMarina,
@@ -54,7 +54,7 @@ export const RELETTING_PROGRESS: RelettingStatus[] = [
 ];
 
 export const RELETTING_STATUS_LABELS: Record<RelettingStatus, string> = {
-  submitted: "Submitted",
+  submitted: "Pending",
   approved: "Approved",
   declined: "Not approved",
   cancelled: "Cancelled",
@@ -470,12 +470,12 @@ export function getRelettingQueue(staffUserId: string | null): RelettingQueueIte
     .requests.filter((r) => isStaffOfMarina(staffUserId, r.marinaId))
     .map((request) => {
       const owner = ACCOUNTS.find((a) => a.id === request.userId);
-      const link = BERTH_LINKS.find(
+      const link = activeBerthLinks().find(
         (l) => l.userId === request.userId && l.berthId === request.berthId
       );
       return {
         request,
-        ownerName: owner?.name ?? "Berth holder",
+        ownerName: activeSnapshot()?.ownerNames?.[request.id] ?? owner?.name ?? "Berth holder",
         boatName: link?.boatOnFile.name ?? "",
         berthClass: allBerths.find((b) => b.id === request.berthId)?.sizeClass ?? null,
         estimate: estimateReletting(
@@ -900,7 +900,16 @@ export function getBerthCalendar(
   year: number,
   monthIndex: number
 ): { label: string; days: CalendarDay[] } {
-  const requests = getRelettingRequests(userId);
+  return buildBerthCalendar(getRelettingRequests(userId), year, monthIndex);
+}
+
+// The same month for requests the caller already holds, for example loaded
+// from the database.
+export function buildBerthCalendar(
+  requests: RelettingRequest[],
+  year: number,
+  monthIndex: number
+): { label: string; days: CalendarDay[] } {
   const stateByNight = new Map<string, CalendarState>();
   const mark = (night: string, state: CalendarState) => {
     const current = stateByNight.get(night) ?? "none";

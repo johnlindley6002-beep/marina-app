@@ -6,6 +6,7 @@ import RoleGate from "@/components/layout/RoleGate";
 import { useStaffText } from "./StaffLanguageProvider";
 import { signOutStaff, STAFF_DATA_SOURCE } from "@/lib/data";
 import { useStaffSession } from "./StaffSessionProvider";
+import StaffRealtime from "./StaffRealtime";
 
 // Shows the back office only to signed-in staff of a marina. Signed out, it
 // goes to the sign-in page. This hides screens only: row level security is
@@ -46,5 +47,10 @@ export default function StaffGate({ children }: { children: ReactNode }) {
       </div>
     );
   }
-  return <>{children}</>;
+  return (
+    <>
+      <StaffRealtime />
+      {children}
+    </>
+  );
 }

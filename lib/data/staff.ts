@@ -9,6 +9,7 @@ import {
   suggestReleasedBerths as mockSuggestReleasedBerths,
 } from "@/data/mock/berthStatus";
 import {
+  checkBerthAvailability,
   clearBerthOutOfService as mockClearBerthOutOfService,
   decideEnquiry as mockDecideEnquiry,
   getEnquiries as mockGetEnquiries,
@@ -24,7 +25,31 @@ import {
   decideReletting as mockDecideReletting,
   getRelettingQueue as mockGetRelettingQueue,
 } from "@/data/mock/reletting";
-import { getCurrentUser, getStaffMemberships, signOut } from "@/data/mock/accounts";
+import { CLASS_BEAM_RANGES, CLASS_LENGTH_RANGES } from "@/data/marinas";
+import { getAllBerths } from "@/data/berths";
+import {
+  getCurrentUser,
+  getMarinaBerthLinks as mockGetMarinaBerthLinks,
+  getStaffMemberships,
+  signOut,
+} from "@/data/mock/accounts";
+import { emitChange } from "@/data/mock/storage";
+import { effectiveEnquiryDeparture } from "@/lib/dates";
+import {
+  confirmArrival,
+  declineArrival,
+  endBerthHolding,
+  getBerthPage,
+  linkBerthHolder,
+  proposeDates,
+  subscribeToArrivals,
+  suggestBerths,
+  type ArrivalChange,
+  type BerthPage,
+  type BerthSuggestion,
+  type StaffResult,
+} from "@/data/supabase/arrivals";
+import type { DbErrorKey } from "@/data/supabase/errors";
 import {
   getSupabaseStaffSession,
   readStaff,
@@ -36,7 +61,7 @@ import {
 } from "@/data/supabase/staff";
 
 export type { SignInLinkResult, StaffSession };
-export { SAVE_FAILED } from "@/data/supabase/staff";
+export { DOUBLE_BOOKED, SAVE_FAILED } from "@/data/supabase/staff";
 
 // Reception, the berth planner, customers, dock tasks and the radio log run
 // on Supabase only; in mock mode their screens show a note instead.
@@ -135,6 +160,9 @@ export const setEnquiryFlag = writer(mockSetEnquiryFlag);
 
 // ---- Berth map ----
 
+// The berths a berth holder holds today, from the marina's own records.
+export const getMarinaBerthLinks = reader(mockGetMarinaBerthLinks, () => []);
+
 export const getBerthStatuses = reader(mockGetBerthStatuses, () => ({}));
 
 // The statuses for several marina and date pairs from one read, keyed
@@ -156,3 +184,134 @@ export const clearBerthOutOfService = writer(mockClearBerthOutOfService);
 export const getRelettingQueue = reader(mockGetRelettingQueue, () => []);
 export const decideReletting = writer(mockDecideReletting);
 export const advanceRelettingStatus = writer(mockAdvanceRelettingStatus);
+
+// ---- Arrival requests: suggested berths and the three decisions ----
+
+export type { BerthSuggestion } from "@/data/supabase/arrivals";
+export type {
+  ArrivalChange,
+  BerthEvent,
+  BerthHolding,
+  BerthOffer,
+  BerthPage,
+  BerthStay,
+} from "@/data/supabase/arrivals";
+
+// Supabase answers with an error key the screens translate; the mock's rules
+// answer with an English sentence.
+export type RequestOutcome = { ok: true } | { ok: false; error: string; key?: DbErrorKey };
+
+function outcome<T>(result: StaffResult<T>): RequestOutcome {
+  emitChange();
+  return result.ok ? { ok: true } : { ok: false, error: result.error, key: result.error };
+}
+
+function mockSuggestions(arrivalId: string): BerthSuggestion[] {
+  const enquiry = mockGetEnquiries(getCurrentUser()?.id ?? null).find((e) => e.id === arrivalId);
+  if (!enquiry) return [];
+  const departure = effectiveEnquiryDeparture(enquiry);
+  const loa = Number(enquiry.loa) || 0;
+  const beam = Number(enquiry.beam) || 0;
+  const held = new Set(mockGetMarinaBerthLinks(enquiry.marinaId).map((l) => l.berthId));
+  return getAllBerths()
+    .filter(
+      (b) =>
+        loa <= CLASS_LENGTH_RANGES[b.sizeClass].maxM &&
+        beam <= CLASS_BEAM_RANGES[b.sizeClass] &&
+        checkBerthAvailability(enquiry.marinaId, b.id, enquiry.arrival, departure).ok
+    )
+    .map((b) => ({
+      berthKey: b.id,
+      code: b.id,
+      pontoon: b.pontoonId,
+      sizeClass: b.sizeClass,
+      maxLengthM: CLASS_LENGTH_RANGES[b.sizeClass].maxM,
+      beamM: CLASS_BEAM_RANGES[b.sizeClass],
+      draftM: 0,
+      viaRelet: held.has(b.id),
+    }))
+    .sort(
+      (a, b) =>
+        Number(a.viaRelet) - Number(b.viaRelet) ||
+        a.maxLengthM - loa - (b.maxLengthM - loa) ||
+        a.code.localeCompare(b.code)
+    )
+    .slice(0, 8);
+}
+
+// Berths that fit the boat and are free for every night of the stay, including
+// berths a berth holder offered while away. Staff only.
+export async function getSuggestedBerths(arrivalId: string): Promise<BerthSuggestion[]> {
+  if (STAFF_DATA_SOURCE === "mock") return mockSuggestions(arrivalId);
+  return (await suggestBerths(arrivalId)) ?? [];
+}
+
+// Confirms the request into the berth in one step.
+export async function confirmWithBerth(
+  staffId: string | null,
+  arrivalId: string,
+  berthKey: string,
+  note = ""
+): Promise<RequestOutcome> {
+  if (STAFF_DATA_SOURCE === "mock") {
+    const result = mockDecideEnquiry(staffId, arrivalId, "approve", { berthId: berthKey });
+    return result.ok ? { ok: true } : result;
+  }
+  return outcome(await confirmArrival(arrivalId, berthKey, note));
+}
+
+export async function declineWithReason(
+  staffId: string | null,
+  arrivalId: string,
+  reason: string
+): Promise<RequestOutcome> {
+  if (STAFF_DATA_SOURCE === "mock") {
+    const result = mockDecideEnquiry(staffId, arrivalId, "decline", { reason });
+    return result.ok ? { ok: true } : result;
+  }
+  return outcome(await declineArrival(arrivalId, reason));
+}
+
+export async function proposeOtherDates(
+  arrivalId: string,
+  from: string,
+  to: string,
+  note: string
+): Promise<RequestOutcome> {
+  if (STAFF_DATA_SOURCE === "mock") {
+    return { ok: false, error: "Proposing other dates needs the marina's database." };
+  }
+  return outcome(await proposeDates(arrivalId, from, to, note));
+}
+
+// ---- A berth's page ----
+
+export async function getBerthPageData(marinaId: string, code: string): Promise<BerthPage | null> {
+  if (STAFF_DATA_SOURCE === "mock") return null;
+  return getBerthPage(marinaId, code);
+}
+
+export async function linkHolder(
+  berthId: string,
+  email: string,
+  startsOn: string,
+  endsOn: string,
+  name: string
+): Promise<RequestOutcome> {
+  return outcome(await linkBerthHolder(berthId, email, startsOn, endsOn, name));
+}
+
+export async function endHolding(contractId: string): Promise<RequestOutcome> {
+  return outcome(await endBerthHolding(contractId));
+}
+
+// Calls back when an arrival or relet offer of the staff member's marina
+// changes, and refreshes every staff screen. Does nothing on the mock, where
+// screens already follow the browser's own change event.
+export function watchArrivals(onChange?: (change: ArrivalChange) => void): () => void {
+  if (STAFF_DATA_SOURCE === "mock") return () => {};
+  return subscribeToArrivals((change) => {
+    emitChange();
+    onChange?.(change);
+  });
+}

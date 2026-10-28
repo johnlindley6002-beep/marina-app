@@ -5,6 +5,7 @@
 // rows. Every rule here is synchronous, so a snapshot is only ever active for
 // the length of one call.
 
+import type { BerthLinkRecord } from "./accounts";
 import type { EnquiryStore, OosStore } from "./enquiries";
 import type { ReletStore } from "./reletting";
 
@@ -14,6 +15,11 @@ export type StaffSnapshot = {
   oos: OosStore;
   // The marinas the signed-in user is staff of.
   staffMarinaIds: string[];
+  // The berth holder's name for each relet offer, by offer id.
+  ownerNames?: Record<string, string>;
+  // The berth holdings of the marina, read from the database. When absent the
+  // sample links in accounts.ts apply.
+  holdings?: BerthLinkRecord[];
 };
 
 let active: StaffSnapshot | null = null;

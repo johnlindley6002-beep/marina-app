@@ -1,20 +1,22 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { marinas } from "@/data/marinas";
 import { siteConfig } from "@/data/site";
 import { formatLongDate } from "@/lib/dates";
 import {
-  getNotifications,
-  getOwnedBerths,
+  ACCOUNT_DATA_SOURCE,
+  getMyNotifications,
+  getMyRelettingRequests,
   getRelettingDraft,
-  getRelettingRequests,
   type MockNotification,
   type RelettingDraft,
   type RelettingRequest,
+  useAccountData,
   useMock,
 } from "@/lib/data";
+import { useOwnedBerths } from "../lib/useOwnedBerths";
 import { formatLength } from "@/lib/units";
 import { useAuth } from "@/components/providers/AuthProvider";
 import PageHeader from "@/components/layout/PageHeader";
@@ -32,17 +34,17 @@ function OwnerBody() {
   const { user, mode, setMode } = useAuth();
   const { units } = useUnits();
   const userId = user?.id ?? null;
-  const berths = useMemo(() => getOwnedBerths(userId), [userId]);
+  const berths = useOwnedBerths();
   const termsHref =
     marinas.find((m) => m.id === berths[0]?.marinaId)?.reletting?.termsHref ??
     "/legal/reletting-terms";
 
-  const { value: requests, ready } = useMock(
-    () => getRelettingRequests(userId),
+  const { value: requests, ready } = useAccountData(
+    () => getMyRelettingRequests(userId),
     NO_REQUESTS,
     userId ?? ""
   );
-  const { value: notes } = useMock(() => getNotifications(userId), NO_NOTES, userId ?? "");
+  const { value: notes } = useAccountData(() => getMyNotifications(userId), NO_NOTES, userId ?? "");
   const { value: draft } = useMock<RelettingDraft | null>(
     () => getRelettingDraft(userId),
     null,
@@ -62,7 +64,7 @@ function OwnerBody() {
   return (
     <div className="section">
       <div className="page-column page-reading">
-        <PageHeader title="My berth" mock />
+        <PageHeader title="My berth" mock={ACCOUNT_DATA_SOURCE === "mock"} />
 
         {berths.map((berth) => {
           const boat = berth.boatOnFile;
@@ -81,15 +83,17 @@ function OwnerBody() {
                   {`, linked ${formatLongDate(berth.linkedAt)}`}
                 </span>
               </p>
-              <p className="tabular mt-4 text-ink">
-                <span className="font-medium">{boat.name}</span>
-                <span className="text-ink-soft">
-                  {" "}
-                  on file: {formatLength(Number(boat.loa), units)} long,{" "}
-                  {formatLength(Number(boat.beam), units)} beam,{" "}
-                  {formatLength(Number(boat.draft), units)} draft
-                </span>
-              </p>
+              {boat.name ? (
+                <p className="tabular mt-4 text-ink">
+                  <span className="font-medium">{boat.name}</span>
+                  <span className="text-ink-soft">
+                    {" "}
+                    on file: {formatLength(Number(boat.loa), units)} long,{" "}
+                    {formatLength(Number(boat.beam), units)} beam,{" "}
+                    {formatLength(Number(boat.draft), units)} draft
+                  </span>
+                </p>
+              ) : null}
               <p className="measure mt-4 text-ink-soft">{copy.useRight}</p>
               <p className="measure mt-2 text-sm text-ink-muted">{copy.contractNote}</p>
 

@@ -23,6 +23,7 @@ import { chrome } from "./chrome";
 import { myBoat } from "./myBoat";
 import { account } from "./account";
 import { enquiry } from "./enquiry";
+import { accounts } from "./accounts";
 
 export const fr: Dictionary = {
   nav,
@@ -49,4 +50,5 @@ export const fr: Dictionary = {
   myBoat,
   account,
   enquiry,
+  accounts,
 };

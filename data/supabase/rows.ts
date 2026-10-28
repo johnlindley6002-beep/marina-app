@@ -3,8 +3,9 @@
 // their code ('G-14') in the app, so both directions take a lookup.
 
 import { fromCents, toCents } from "@/lib/money";
-import type { Enquiry, OutOfServiceMark } from "@/data/mock/enquiries";
+import type { Enquiry, OutOfServiceMark, SubmitEnquiryInput } from "@/data/mock/enquiries";
 import type { RelettingConditions, RelettingRequest } from "@/data/mock/reletting";
+import type { BoatDocuments, SavedBoat } from "@/features/my-boat/lib/boatProfile";
 
 export type BerthRow = {
   id: string;
@@ -26,6 +27,9 @@ export type ArrivalRow = {
   arrived_at: string | null;
   departed_at: string | null;
   flag_note: string;
+  // Written by the propose_dates function only, so the app never sends them.
+  proposed_arrival?: string | null;
+  proposed_departure?: string | null;
   expected_arrival: string;
   eta: string | null;
   departure: string | null;
@@ -155,6 +159,8 @@ export function enquiryFromRow(row: ArrivalRow, index: BerthIndex): Enquiry {
     arrivedAt: row.arrived_at,
     departedAt: row.departed_at,
     flagNote: row.flag_note,
+    proposedArrival: row.proposed_arrival ?? "",
+    proposedDeparture: row.proposed_departure ?? "",
     arrival: row.expected_arrival,
     eta: timeFromColumn(row.eta),
     departure: row.departure ?? "",
@@ -306,5 +312,100 @@ export function outOfServiceFromRow(row: BerthRow): OutOfServiceMark | null {
     marinaId: row.marina_id,
     reason: row.status_reason,
     setAt: row.status_set_at ?? "",
+  };
+}
+
+// ---- A user's own boats ----
+
+export type BoatRow = {
+  id: string;
+  user_id: string;
+  name: string;
+  boat_type: string;
+  length_m: number | string | null;
+  beam_m: number | string | null;
+  draft_m: number | string | null;
+  flag_country: string;
+  registration_number: string;
+  home_port: string;
+  documents: Partial<BoatDocuments> | null;
+};
+
+const text = (value: unknown): string => (typeof value === "string" ? value : "");
+
+export function boatFromRow(row: BoatRow): SavedBoat {
+  const d = row.documents ?? {};
+  return {
+    id: row.id,
+    name: row.name,
+    type: row.boat_type,
+    loa: metresFromColumn(row.length_m),
+    beam: metresFromColumn(row.beam_m),
+    draft: metresFromColumn(row.draft_m),
+    flag: row.flag_country,
+    homePort: row.home_port,
+    documents: {
+      registrationNumber: text(d.registrationNumber) || row.registration_number,
+      insuranceProvider: text(d.insuranceProvider),
+      insurancePolicy: text(d.insurancePolicy),
+      insuranceExpiry: text(d.insuranceExpiry),
+      competenceCertificate: text(d.competenceCertificate),
+      vhfLicence: text(d.vhfLicence),
+    },
+  };
+}
+
+export function boatToRow(boat: SavedBoat, userId: string): BoatRow {
+  const documents: Partial<BoatDocuments> = boat.documents ?? {};
+  return {
+    id: boat.id,
+    user_id: userId,
+    // The database requires a name; an unnamed boat is stored as "My boat".
+    name: boat.name.trim() || "My boat",
+    boat_type: boat.type,
+    length_m: metresToColumn(boat.loa),
+    beam_m: metresToColumn(boat.beam),
+    draft_m: metresToColumn(boat.draft),
+    flag_country: boat.flag,
+    registration_number: documents.registrationNumber ?? "",
+    home_port: boat.homePort,
+    documents,
+  };
+}
+
+// ---- What the guest sends to request_arrival ----
+
+// The columns request_arrival reads from the form. The user, the boat link,
+// the customer record and the status are set by the database function.
+export function enquiryToRequest(enquiry: SubmitEnquiryInput): Record<string, unknown> {
+  return {
+    expected_arrival: enquiry.arrival,
+    eta: timeToColumn(enquiry.eta),
+    departure: enquiry.departure || null,
+    etd: timeToColumn(enquiry.etd),
+    open_ended: enquiry.openEnded,
+    boat_name: enquiry.boatName,
+    boat_type: enquiry.vesselType,
+    length_m: enquiry.loa,
+    beam_m: enquiry.beam,
+    draft_m: enquiry.draft,
+    flag_country: enquiry.flagCountry,
+    requested_berth_code: enquiry.requestedBerthId,
+    skipper_name: enquiry.skipperName,
+    phone: enquiry.phone,
+    email: enquiry.email,
+    home_port: enquiry.homePort,
+    people_on_board: enquiry.peopleOnBoard,
+    services: enquiry.services,
+    boat_use: enquiry.vesselUse,
+    operating_entity: enquiry.operatingEntity,
+    company_registration: enquiry.companyRegistration,
+    contract_name: enquiry.contractName,
+    contract_role: enquiry.contractRole,
+    eu_status: enquiry.euStatus,
+    last_port: enquiry.lastPort,
+    next_port: enquiry.nextPort,
+    crew: enquiry.crew,
+    documents: enquiry.documents,
   };
 }

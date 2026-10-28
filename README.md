@@ -1,6 +1,6 @@
 # aldock
 
-aldock helps boaters find a berth at a marina in Portugal, tell the marina about their boat and crew before they arrive, and keep their details in one place. It starts with Marina de Cascais. Berth holders can offer their berth for reletting while they are away, and marina staff handle arrivals, enquiries and relet approvals. The staff back office (arrivals, reception, the berth planner and map, enquiries, relet approvals, customers, dock tasks and the radio log) runs on Supabase with an email sign-in link, in English and Portuguese. Everything else is still a front-end mock: the data lives in the browser, and an enquiry is sent by the visitor's own email app.
+aldock helps boaters find a berth at a marina in Portugal, tell the marina about their boat and crew before they arrive, and keep their details in one place. It starts with Marina de Cascais. Berth holders can offer their berth for reletting while they are away, and marina staff handle arrivals, enquiries and relet approvals. The whole app runs on Supabase with an email sign-in link: guests and berth holders sign in at `/login` (profile, boats, arrival requests, relet offers), and the staff back office (arrivals, reception, the berth planner and map, enquiries, relet approvals, customers, dock tasks and the radio log) is in English and Portuguese. The marina controls every berth: only staff can link a berth holder to a berth, confirm a guest into one, or approve a relet offer. Without a Supabase project the site falls back to a browser mock (see below).
 
 ## Stack
 
@@ -17,7 +17,7 @@ npm run dev        # http://localhost:3000
 
 Copy `.env.local.example` to `.env.local` and fill in the Supabase project URL and publishable key. The staff area signs in at `/staff/login` with a link sent by email; see "Supabase" below for setting up the database and the first admin.
 
-Guest and berth holder sign-in is mocked. In development a small switcher at the bottom left lets you sign in as a sample voyager, owner or staff member. A production build hides it and the `/dev` pages unless `NEXT_PUBLIC_ENABLE_DEV_TOOLS=1` is set at build time (set it to demo the owner and staff areas on a hosted preview).
+Guests and berth holders sign in at `/login` with a link sent by email. In development a small switcher at the bottom left lets you sign in as a seeded sample guest, berth holder or staff member (real users that `supabase/seed.sql` creates, with the password in `data/supabase/devPersonas.ts`). A production build hides it and the `/dev` pages unless `NEXT_PUBLIC_ENABLE_DEV_TOOLS=1` is set at build time. Do not set that flag on a project with real people in it: the sample accounts have a public password. With no Supabase project configured, or `NEXT_PUBLIC_ACCOUNT_DATA=mock`, the switcher signs in mock accounts that live in the browser instead.
 
 ## Scripts
 
@@ -60,19 +60,53 @@ docs/                 architecture.md and the quality audit in docs/audit
 
 Everything the UI reads or writes goes through `lib/data/index.ts`. Nothing outside `data/` and `lib/data` should know where the data comes from.
 
-- **Guest and berth holder screens** still use `data/mock/*`. The mock bodies read and write `localStorage` (always inside try and catch) and fire an `aldock-mock-changed` event so screens stay in step.
+- **Guest and berth holder screens** (`lib/data/account.ts`, `lib/data/holder.ts`, `data/supabase/accounts.ts`) read and write Supabase: the profile, the user's own boats, arrival requests (`request_arrival`), `My arrivals`, and relet offers (`submit_relet_offer`, `cancel_relet_offer`, `request_early_return`). The browser mock in `data/mock/*` stays for the end-to-end tests and for running with no project (`NEXT_PUBLIC_ACCOUNT_DATA=mock`). It reads and writes `localStorage` (always inside try and catch) and fires an `aldock-mock-changed` event so screens stay in step.
 - **The staff back office** uses `lib/data/staff.ts`, where every function returns a Promise and screens read through `useStaffData`. Each call loads the staff member's marina data from Supabase, runs the same rule as the mock (`data/mock/snapshot.ts` points the mock stores at the loaded rows for the length of one call), and saves only the rows that changed (`data/supabase/staff.ts`). The rules are written once, so the mock and Supabase cannot disagree. `NEXT_PUBLIC_STAFF_DATA=mock` switches the back office back to the mock; the end-to-end tests do this.
 - **Reception, the berth planner, customers, dock tasks and the radio log** read and write Supabase directly (`data/supabase/backoffice.ts`) and have no mock. On the mock they show a short note instead. Their rules (the document checklist, berth fit, the planner grid, expiry, task and log checks) are in `features/staff/lib` with unit tests.
 
-Until the guest and berth holder screens move over, their new enquiries and relet offers stay in the browser and do not reach the staff database, and staff decisions do not reach the berth holder's screen.
+On Supabase, a guest's request and a berth holder's offer reach the staff database at once, and staff decisions reach their screens (My arrivals, My berth).
 
 ## Supabase
 
 The schema is in `supabase/migrations` and the sample data in `supabase/seed.sql` (generated, do not edit by hand). Every table has row level security: a signed-in user reads and writes only the marinas they are in `staff_members` for, an admin of a marina manages its staff, and the anon role has no access at all. The browser only ever holds the publishable key.
 
-Staff accounts are invite only. Sign-ups are off, and the sign-in form never creates an account. To add someone, invite their email in Supabase (Authentication, Users, Invite user), then add a `staff_members` row for their user id and marina.
+### Accounts and roles
 
-Known gap: the berth conflict check runs in the browser, not in one database transaction, so two staff members approving the same berth at the same moment could both succeed. Move it into a database function before the guest side goes live.
+Sign-ups are on, because guests create their own account with the email link at `/login`. A role is never chosen by the person:
+
+- **Guest**: anyone who signs in. They read and write only their own profile, boats and arrival requests (`profiles`, `boats` with a `user_id`, and the `my_arrivals` view). They never see which berth is free or who is in which berth.
+- **Berth holder**: a guest the marina has linked to a berth. Staff enter the holder's email on the berth's page in the back office (`/staff/berths/G-14`, which calls `link_berth_holder`). If the person has not signed in yet the holding waits for the email and attaches when they first do. The holding is a row in `berth_contracts` with a start and end date, and only staff can create or end it. The Guest and Berth holder switch shows only while a holding covers today.
+- **Staff**: a row in `staff_members`. The staff sign-in form never creates an account, so a person who signs up as a guest cannot become staff. To add someone, invite their email in Supabase (Authentication, Users, Invite user), then add a `staff_members` row for their user id and marina.
+
+Every table has row level security. Signed-out visitors can read the `marinas` table and nothing else (no berths, no occupancy).
+
+### The arrival flow
+
+1. A guest sends a request from the marina page. `request_arrival` creates an `arrivals` row with status `new` (shown as Requested), linked to the guest and the boat they chose.
+2. Staff see it at once on the arrivals board (Supabase Realtime), with a New badge. `suggest_berths` lists the berths that fit the boat's length, beam and draft and are free every night of the stay, including a berth whose holder has an approved relet offer covering those nights.
+3. Staff act: `confirm_arrival` (one click on a suggestion), `decline_arrival` (a reason is required and the guest sees it) or `propose_dates`. The guest sees the result under My arrivals, and can accept proposed dates (`accept_proposed_dates`).
+4. The database refuses a double booking: an exclusion constraint on `arrivals` (`arrivals_no_double_booking`) stops two confirmed or arrived stays overlapping on one berth, even if two staff members confirm at the same moment. Staff see "That berth was just taken for those nights."
+5. A berth holder's `Offer my berth` calls `submit_relet_offer` (status Pending). Staff approve or decline it in Reletting. Only an approved offer makes the berth available to `suggest_berths`. Cancelling an approved offer is refused (`cancel_relet_offer`) while a guest is confirmed on the berth in that period; the holder is told to contact the marina.
+6. `berth_events` records every status change on an arrival, a relet offer and a berth holding (who, what, when), by trigger. Each berth's page in the back office shows it.
+
+Statuses on screen map to the existing columns: Requested is `new`, Confirmed is `approved` with `pending`, Arrived and Departed are the `arrival_status` values, Declined is `declined`, and Other dates offered is the new `dates_proposed`. A relet offer's first status `submitted` is shown as Pending.
+
+### Set up a project
+
+```bash
+npx supabase link --project-ref <your-project-ref>
+npx supabase db push
+```
+
+Then turn on email sign-ups in the dashboard (Authentication, Sign In / Providers, Email: allow new users to sign up), add `http://localhost:3000/auth/callback` and your site's `/auth/callback` address to the redirect URLs, and set up your own email provider (Authentication, SMTP). The built-in sender allows only a few emails an hour, which is not enough for guests.
+
+### Sample data (development projects only)
+
+`supabase/seed.sql` fills Marina de Cascais with sample guests with boats, Jordan Reyes as the holder of G-14, requests in every status, an approved relet offer, dock tasks and radio entries. It creates real users with the dev password, so run it on a development project only, never on one with real people. Run it with `npx supabase db push --include-seed`, or paste the file into the SQL editor. It is safe to run twice. `npm run db:seed:build` rebuilds it after the sample data changes.
+
+### Tests of the database rules
+
+`tests/unit/sql-arrival-flow.test.ts` and `tests/unit/sql-seed.test.ts` run the real migrations and the seed on an in-process Postgres (pglite), with Supabase's own pieces stubbed. They check row level security, the double booking constraint, suggested berths, the cancel block, the history log and the seed.
 
 ## Design tokens
 

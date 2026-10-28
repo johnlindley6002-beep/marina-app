@@ -25,8 +25,13 @@ export default defineConfig({
     // the production build the tests run against. The staff data flag keeps
     // the back office on the mock layer, so the tests sign in as the sample
     // staff member and see the berth holder's side react, without Supabase.
+    // The account flag does the same for guests and berth holders.
     command: `npx next build && npx next start -p ${PORT}`,
-    env: { NEXT_PUBLIC_ENABLE_DEV_TOOLS: "1", NEXT_PUBLIC_STAFF_DATA: "mock" },
+    env: {
+      NEXT_PUBLIC_ENABLE_DEV_TOOLS: "1",
+      NEXT_PUBLIC_STAFF_DATA: "mock",
+      NEXT_PUBLIC_ACCOUNT_DATA: "mock",
+    },
     url: `http://localhost:${PORT}`,
     reuseExistingServer: true,
     timeout: 240_000,

@@ -182,7 +182,11 @@ export function clearAllSavedData(): void {
   }
 }
 
+// A UUID, so the same id works as the row id when the boat is saved to an account.
 export function newBoatId(): string {
+  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+    return crypto.randomUUID();
+  }
   return `boat-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
 }
 

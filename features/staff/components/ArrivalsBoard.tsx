@@ -23,6 +23,7 @@ import { serviceList } from "../lib/services";
 import BerthPicker from "./BerthPicker";
 import { useStaffText } from "./StaffLanguageProvider";
 import PreArrivalArrivals from "./PreArrivalArrivals";
+import { EnquiryRow } from "./EnquiryInbox";
 
 const NONE: Enquiry[] = [];
 const NO_STATUSES: Record<string, Record<string, BerthOperationalInfo>> = {};
@@ -244,6 +245,16 @@ export default function ArrivalsBoard() {
   const today = todayIso();
   const windowEnd = addDaysIso(today, WINDOW_DAYS);
 
+  // Requests nobody has answered yet, oldest first, so none is left waiting.
+  // They arrive here live: see StaffRealtime.
+  const waiting = useMemo(
+    () =>
+      enquiries
+        .filter((e) => e.status === "new" || e.status === "dates_proposed")
+        .sort((x, y) => x.createdAt.localeCompare(y.createdAt)),
+    [enquiries]
+  );
+
   const events = useMemo(() => {
     const out: BoardEvent[] = [];
     for (const e of enquiries) {
@@ -284,7 +295,22 @@ export default function ArrivalsBoard() {
         <h1 className="type-heading type-h2 text-ink">{a.title}</h1>
       </div>
 
-      <div className="mt-3 flex flex-wrap gap-4">
+      <section className="mt-3" aria-labelledby="new-requests-heading">
+        <h2 id="new-requests-heading" className="type-heading type-h3 text-ink">
+          {s.requests.boardTitle(waiting.length)}
+        </h2>
+        {ready && waiting.length === 0 ? (
+          <p className="staff-empty mt-2">{s.requests.boardNone}</p>
+        ) : (
+          <ul className="mt-2 space-y-2">
+            {waiting.map((e) => (
+              <EnquiryRow key={e.id} enquiry={e} staffId={staffId} />
+            ))}
+          </ul>
+        )}
+      </section>
+
+      <div className="mt-6 flex flex-wrap gap-4">
         <div
           role="group"
           aria-label={a.when}

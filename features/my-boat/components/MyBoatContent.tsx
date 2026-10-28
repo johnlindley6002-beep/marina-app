@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRef, useState } from "react";
 import { marinas } from "@/data/marinas";
 import { clearFrequentCrew } from "@/features/my-boat/lib/boatProfile";
-import { resetMockPreArrival } from "@/lib/data";
+import { ACCOUNT_DATA_SOURCE, resetMockPreArrival } from "@/lib/data";
 import { formatLength } from "@/lib/units";
 import { useFormat } from "@/components/providers/useFormat";
 import { useBoats } from "@/components/providers/BoatProvider";
@@ -23,11 +23,14 @@ const labelClass = "field-label";
 
 export default function MyBoatContent() {
   const { t } = useLanguage();
-  const copy = t.myBoat;
+  const base = t.myBoat;
+  const a = t.accounts.myBoat;
   const { moneyCompact } = useFormat();
   const {
     ready,
     storageOk,
+    inAccount,
+    syncFailed,
     boats,
     activeBoat,
     setActiveId,
@@ -38,6 +41,8 @@ export default function MyBoatContent() {
     clearAll,
   } = useBoats();
   const { units } = useUnits();
+  // Signed in, the boats live in the account and the words change to say so.
+  const copy = inAccount ? { ...base, ...a } : base;
 
   // "new", a boat id being edited, or null when the editor is closed.
   const [editing, setEditing] = useState<string | null>(null);
@@ -66,6 +71,19 @@ export default function MyBoatContent() {
         {!storageOk ? (
           <p role="alert" className="measure mt-4 border-l-2 border-error pl-3 text-sm text-error">
             {copy.storageBlocked}
+          </p>
+        ) : null}
+        {inAccount && syncFailed ? (
+          <p role="alert" className="measure mt-4 border-l-2 border-error pl-3 text-sm text-error">
+            {a.syncFailed}
+          </p>
+        ) : null}
+        {ACCOUNT_DATA_SOURCE === "supabase" && ready && !inAccount ? (
+          <p className="measure mt-4 text-sm text-ink-soft">
+            {a.signInPrompt}{" "}
+            <Link href="/login?next=/my-boat" className="underline underline-offset-4">
+              {a.signInLink}
+            </Link>
           </p>
         ) : null}
         <p role="status" className="mt-4 min-h-6 text-sm font-medium text-ink">
@@ -284,6 +302,7 @@ export default function MyBoatContent() {
                 autoCapitalize="none"
                 spellCheck={false}
                 value={skipper.email}
+                readOnly={inAccount}
                 onChange={(e) => {
                   saveSkipper({ ...skipper, email: e.target.value });
                   flash(copy.savedOnDevice);
@@ -314,7 +333,9 @@ export default function MyBoatContent() {
             label={t.marinaPage.approach.dataHandled}
             openLabel={t.marinaPage.approach.hideDataHandled}
           >
-            <p className="measure pb-2 text-ink-soft">{t.chrome.privacyNote}</p>
+            <p className="measure pb-2 text-ink-soft">
+              {ACCOUNT_DATA_SOURCE === "supabase" ? t.accounts.privacyNote : t.chrome.privacyNote}
+            </p>
           </Disclosure>
           {confirmClear ? (
             <div role="alertdialog" aria-label={copy.clearLabel} className="mt-4">

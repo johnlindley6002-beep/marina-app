@@ -5,7 +5,7 @@
 import { getAllBerths } from "@/data/berths";
 import { addDaysIso, effectiveEnquiryDeparture, nightDates } from "@/lib/dates";
 import { CLASS_BEAM_RANGES, CLASS_LENGTH_RANGES, type MarinaClass } from "@/data/marinas";
-import { ACCOUNTS, BERTH_LINKS } from "./accounts";
+import { ACCOUNTS, activeBerthLinks } from "./accounts";
 import { loadReletStore, formatWindow } from "./reletting";
 import { loadEnquiryStore, getOutOfServiceBerths } from "./enquiries";
 
@@ -45,7 +45,7 @@ export function getBerthStatuses(
       continue;
     }
 
-    const link = BERTH_LINKS.find(
+    const link = activeBerthLinks().find(
       (l) => l.marinaId === marinaId && l.berthId === berth.id && l.active
     );
     if (link) {

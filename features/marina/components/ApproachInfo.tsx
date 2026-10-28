@@ -1,6 +1,7 @@
 "use client";
 
 import type { Marina } from "@/data/marinas";
+import { ACCOUNT_DATA_SOURCE } from "@/lib/data";
 import { formatCoordinates } from "@/lib/geo";
 import { formatLength } from "@/lib/units";
 import { useLanguage } from "@/components/providers/LanguageProvider";
@@ -122,7 +123,9 @@ export default function ApproachInfo({ marina, arrivalInstructions, gettingThere
             openLabel={copy.hideDataHandled}
             className="mt-4"
           >
-            <p className="measure pt-2 pb-2 text-ink-soft">{t.chrome.privacyNote}</p>
+            <p className="measure pt-2 pb-2 text-ink-soft">
+              {ACCOUNT_DATA_SOURCE === "supabase" ? t.accounts.privacyNote : t.chrome.privacyNote}
+            </p>
           </Disclosure>
         </div>
 

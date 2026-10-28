@@ -53,6 +53,8 @@ export type BerthLinkRecord = {
   // A released link (the berth was sold or the agreement ended) grants nothing.
   active: boolean;
   boatOnFile: BoatRecord;
+  // Set on holdings loaded from the database, where the name is not an account here.
+  holderName?: string;
 };
 
 // Created by a MARINA to invite someone as staff. It grants the staff role
@@ -421,12 +423,20 @@ export type MarinaBerthLink = {
   linkedAt: string;
 };
 
+// The holdings the staff rules look at: the marina's own rows while a snapshot
+// from Supabase is active, the sample links otherwise.
+export function activeBerthLinks(): BerthLinkRecord[] {
+  return activeSnapshot()?.holdings ?? BERTH_LINKS;
+}
+
 export function getMarinaBerthLinks(marinaId: string): MarinaBerthLink[] {
-  return BERTH_LINKS.filter((l) => l.marinaId === marinaId && l.active).map((l) => ({
-    berthId: l.berthId,
-    marinaId: l.marinaId,
-    boatOnFile: l.boatOnFile,
-    ownerName: ACCOUNTS.find((a) => a.id === l.userId)?.name ?? "Berth holder",
-    linkedAt: l.linkedAt,
-  }));
+  return activeBerthLinks()
+    .filter((l) => l.marinaId === marinaId && l.active)
+    .map((l) => ({
+      berthId: l.berthId,
+      marinaId: l.marinaId,
+      boatOnFile: l.boatOnFile,
+      ownerName: l.holderName ?? ACCOUNTS.find((a) => a.id === l.userId)?.name ?? "Berth holder",
+      linkedAt: l.linkedAt,
+    }));
 }

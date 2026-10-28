@@ -3,14 +3,16 @@
 // the same rule the mock layer runs (data/mock, through snapshot.ts), and
 // writes back only the rows the rule changed.
 //
-// Known gap: the berth conflict check runs here, not in one database
-// transaction, so two staff members approving the same berth at the same
-// moment could both succeed. A database function or constraint should take
-// that over before the guest side goes live.
+// The berth conflict check here runs in the browser, so two staff members
+// could pass it at the same moment. The database refuses the second one (the
+// exclusion constraint arrivals_no_double_booking, error 23P01), and that
+// shows as DOUBLE_BOOKED. Confirm, decline and propose dates are database
+// functions (data/supabase/arrivals.ts) and are atomic.
 
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/client";
-import { ACCOUNTS } from "@/data/mock/accounts";
+import { ACCOUNTS, type BerthLinkRecord } from "@/data/mock/accounts";
+import { todayIso } from "@/lib/dates";
 import type { EnquiryStore, OosStore, OutOfServiceMark } from "@/data/mock/enquiries";
 import type { ReletStore } from "@/data/mock/reletting";
 import { runOnSnapshot, type StaffSnapshot } from "@/data/mock/snapshot";
@@ -29,6 +31,7 @@ import {
 } from "./rows";
 
 export const SAVE_FAILED = "Could not save. Check your connection and try again.";
+export const DOUBLE_BOOKED = "That berth was just taken for those nights. Choose another berth.";
 
 export type StaffSession = {
   userId: string;
@@ -69,22 +72,32 @@ export async function getSupabaseStaffSession(): Promise<StaffSession | null> {
 async function load(): Promise<Loaded> {
   const client = supabase();
   const session = await getSupabaseStaffSession();
-  const [berths, arrivals, offers] = await Promise.all([
+  const [berths, arrivals, offers, holdings] = await Promise.all([
     client.from("berths").select("id, marina_id, code, status, status_reason, status_set_at"),
     client.from("arrivals").select("*"),
     client.from("relet_offers").select("*"),
+    client
+      .from("berth_contracts")
+      .select(
+        "id, marina_id, berth_id, user_id, holder_email, starts_on, ends_on, customers(full_name)"
+      ),
   ]);
-  const failed = berths.error ?? arrivals.error ?? offers.error;
+  const failed = berths.error ?? arrivals.error ?? offers.error ?? holdings.error;
   if (failed) throw failed;
 
   const berthRows = (berths.data ?? []) as BerthRow[];
   const index = indexBerths(berthRows);
   const offerRows = (offers.data ?? []) as ReletOfferRow[];
+  const holderNames = new Map(offerRows.map((r) => [r.id, r.berth_holder]));
   return {
     index,
-    holderNames: new Map(offerRows.map((r) => [r.id, r.berth_holder])),
+    holderNames,
     snapshot: {
       staffMarinaIds: session?.marinaIds ?? [],
+      ownerNames: Object.fromEntries(holderNames),
+      holdings: ((holdings.data ?? []) as unknown as HoldingRow[]).map((h) =>
+        holdingToLink(h, index)
+      ),
       enquiries: {
         enquiries: ((arrivals.data ?? []) as ArrivalRow[]).map((r) => enquiryFromRow(r, index)),
       },
@@ -97,6 +110,33 @@ async function load(): Promise<Loaded> {
         marks: berthRows.map(outOfServiceFromRow).filter((m): m is OutOfServiceMark => m !== null),
       },
     },
+  };
+}
+
+type HoldingRow = {
+  id: string;
+  marina_id: string;
+  berth_id: string;
+  user_id: string | null;
+  holder_email: string;
+  starts_on: string;
+  ends_on: string;
+  customers: { full_name: string } | null;
+};
+
+// A holding as the rules in data/mock know a berth link. Only a holding that
+// covers today is active; the boat on file is not kept for a holding.
+function holdingToLink(row: HoldingRow, index: BerthIndex): BerthLinkRecord {
+  const today = todayIso();
+  return {
+    id: row.id,
+    userId: row.user_id ?? row.holder_email,
+    marinaId: row.marina_id,
+    berthId: index.codeById.get(row.berth_id) ?? "",
+    linkedAt: row.starts_on,
+    active: row.starts_on <= today && row.ends_on >= today,
+    boatOnFile: { name: "", type: "", loa: "", beam: "", draft: "", flag: "" },
+    holderName: row.customers?.full_name ?? row.holder_email,
   };
 }
 
@@ -114,7 +154,7 @@ function changed<T extends { id: string }>(before: T[], after: T[]): T[] {
 async function persist(
   loaded: Loaded,
   before: { enquiries: EnquiryStore; relet: ReletStore; oos: OosStore }
-): Promise<boolean> {
+): Promise<"saved" | "double_booked" | "failed"> {
   const client = supabase();
   const { snapshot, index, holderNames } = loaded;
   const writes: PromiseLike<{ error: unknown }>[] = [];
@@ -159,7 +199,9 @@ async function persist(
   }
 
   const results = await Promise.all(writes);
-  return results.every((r) => !r.error);
+  const errors = results.map((r) => r.error as { code?: string } | null).filter(Boolean);
+  if (errors.length === 0) return "saved";
+  return errors.some((e) => e?.code === "23P01") ? "double_booked" : "failed";
 }
 
 // Runs a read-only rule against the staff member's data.
@@ -190,14 +232,15 @@ export async function writeStaff<T extends { ok: true } | { ok: false; error: st
   });
   const result = runOnSnapshot(loaded.snapshot, rule);
   if (!result.ok) return result;
-  let saved = false;
+  let saved: Awaited<ReturnType<typeof persist>> = "failed";
   try {
     saved = await persist(loaded, before);
   } catch {
-    saved = false;
+    saved = "failed";
   }
   emitChange();
-  return saved ? result : { ok: false, error: SAVE_FAILED };
+  if (saved === "saved") return result;
+  return { ok: false, error: saved === "double_booked" ? DOUBLE_BOOKED : SAVE_FAILED };
 }
 
 export async function signOutStaff(): Promise<void> {

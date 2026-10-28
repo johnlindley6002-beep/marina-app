@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { usePathname } from "next/navigation";
 import { DEV_TOOLS_ENABLED } from "@/lib/devTools";
-import type { Role } from "@/lib/data";
+import { ACCOUNT_DATA_SOURCE, type Role } from "@/lib/data";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { useLanguage } from "@/components/providers/LanguageProvider";
 
@@ -29,11 +30,25 @@ function Message({ title, body }: { title: string; body: string }) {
 export default function RoleGate({ role, children }: { role?: Role; children: ReactNode }) {
   const { ready, user } = useAuth();
   const { t } = useLanguage();
+  const pathname = usePathname();
   const gate = t.chrome.gate;
 
   if (!ready) {
     // Reserves the height so nothing jumps when the account loads.
     return <div className="min-h-[24rem]" aria-hidden="true" />;
+  }
+  if (!user && ACCOUNT_DATA_SOURCE === "supabase") {
+    return (
+      <div className="section">
+        <div className="page-column page-reading">
+          <h1 className="type-title text-ink">{t.accounts.gate.signInTitle}</h1>
+          <p className="measure mt-4 text-lg text-ink-soft">{t.accounts.gate.signInBody}</p>
+          <Link href={`/login?next=${encodeURIComponent(pathname)}`} className="btn-primary mt-6">
+            {t.accounts.gate.signInLink}
+          </Link>
+        </div>
+      </div>
+    );
   }
   if (!user) {
     return (

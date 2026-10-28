@@ -3,6 +3,11 @@
 // Run `npm run db:seed:build` after changing the berths or the mock seeds;
 // a unit test fails while the file and this builder disagree.
 //
+// The sample accounts are real Supabase users (auth.users, with a profile and
+// boats of their own): three the dev switcher signs in as (a guest, a berth
+// holder of G-14 and a staff member, password in devPersonas.ts) and three more
+// guests so every status shows. This seed is for a DEVELOPMENT project only.
+//
 // The mock enquiries are dated relative to today, so their dates are written
 // as offsets from the Lisbon day the seed runs on. The customers, a relet
 // period in the planner's window, dock tasks and radio log entries exist only
@@ -11,9 +16,15 @@
 import { getAllBerths } from "@/data/berths";
 import { CLASS_BEAM_RANGES, CLASS_LENGTH_RANGES, marinas } from "@/data/marinas";
 import { ACCOUNTS } from "@/data/mock/accounts";
-import { buildSeedEnquiryStore, seedEnquiry, type Enquiry } from "@/data/mock/enquiries";
+import {
+  buildSeedEnquiryStore,
+  EMPTY_ENQUIRY_DOCUMENTS,
+  seedEnquiry,
+  type Enquiry,
+} from "@/data/mock/enquiries";
 import { buildSeedRelettingStore } from "@/data/mock/reletting";
 import { addDaysIso, daysBetween, todayIso } from "@/lib/dates";
+import { DEV_PASSWORD } from "./devPersonas";
 import { enquiryToRow, reletToRow, type BerthIndex } from "./rows";
 
 const SEED_MARINA = "cascais";
@@ -27,6 +38,7 @@ const PREFIX = {
   document: "f",
   task: "1",
   radio: "2",
+  user: "9",
 } as const;
 
 // Fixed ids, so the seed can run twice without duplicating rows.
@@ -36,6 +48,212 @@ export function seedUuid(kind: keyof typeof PREFIX, n: number): string {
 
 // The berth holder's customer number; guests are numbered as their arrivals.
 const HOLDER = 10;
+
+type SeedUser = {
+  n: number;
+  email: string;
+  name: string;
+  phone: string;
+  nationality: string;
+  euStatus: "eu" | "non_eu";
+  // Only the three the dev switcher signs in as can sign in with a password.
+  password: boolean;
+};
+
+const SEED_USERS: SeedUser[] = [
+  {
+    n: 1,
+    email: "alex.morgan@example.com",
+    name: "Alex Morgan",
+    phone: "+44 7700 900101",
+    nationality: "United Kingdom",
+    euStatus: "non_eu",
+    password: true,
+  },
+  {
+    n: 2,
+    email: "ines.ferreira@example.com",
+    name: "Ines Ferreira",
+    phone: "+351 912 000 111",
+    nationality: "Portugal",
+    euStatus: "eu",
+    password: false,
+  },
+  {
+    n: 3,
+    email: "marc.duran@example.com",
+    name: "Marc Duran",
+    phone: "+34 600 000 222",
+    nationality: "Spain",
+    euStatus: "eu",
+    password: false,
+  },
+  {
+    n: 4,
+    email: "lena.fischer@example.com",
+    name: "Lena Fischer",
+    phone: "+49 151 0000 333",
+    nationality: "Germany",
+    euStatus: "eu",
+    password: false,
+  },
+  {
+    n: HOLDER,
+    email: "jordan.reyes@example.com",
+    name: "Jordan Reyes",
+    phone: "+351 912 000 202",
+    nationality: "Portugal",
+    euStatus: "eu",
+    password: true,
+  },
+  {
+    n: 11,
+    email: "sam.okafor@example.com",
+    name: "Sam Okafor",
+    phone: "+351 214 000 303",
+    nationality: "Portugal",
+    euStatus: "eu",
+    password: true,
+  },
+];
+
+function userFor(email: string): SeedUser | undefined {
+  return SEED_USERS.find((u) => u.email === email);
+}
+
+function userSql(user: SeedUser): string[] {
+  const id = quote(seedUuid("user", user.n));
+  const password = user.password
+    ? `extensions.crypt(${quote(DEV_PASSWORD)}, extensions.gen_salt('bf'))`
+    : "''";
+  return [
+    insert(
+      "users",
+      {
+        instance_id: quote("00000000-0000-0000-0000-000000000000"),
+        id,
+        aud: quote("authenticated"),
+        role: quote("authenticated"),
+        email: quote(user.email),
+        encrypted_password: password,
+        email_confirmed_at: "now()",
+        raw_app_meta_data: `'{"provider":"email","providers":["email"]}'::jsonb`,
+        raw_user_meta_data: literal({ full_name: user.name }),
+        created_at: "now()",
+        updated_at: "now()",
+        confirmation_token: "''",
+        recovery_token: "''",
+        email_change_token_new: "''",
+        email_change: "''",
+      },
+      "(id)"
+    ).replace("insert into public.users", "insert into auth.users"),
+    insert(
+      "identities",
+      {
+        id: "gen_random_uuid()",
+        user_id: id,
+        provider_id: id,
+        identity_data: `jsonb_build_object('sub', ${id}::text, 'email', ${quote(user.email)}, 'email_verified', true)`,
+        provider: quote("email"),
+        last_sign_in_at: "now()",
+        created_at: "now()",
+        updated_at: "now()",
+      },
+      "(provider_id, provider)"
+    ).replace("insert into public.identities", "insert into auth.identities"),
+    // The profile row is made by a trigger when the user is created.
+    `update public.profiles set phone = ${quote(user.phone)}, nationality = ${quote(user.nationality)}, eu_status = ${quote(user.euStatus)} where user_id = ${id};`,
+  ];
+}
+
+// The sample users, a staff membership for Sam, and each guest's own boat
+// (the same boat the sample arrival names).
+function accountsSql(enquiries: Enquiry[]): string[] {
+  const out: string[] = ["-- Sample accounts: real users with a profile and boats of their own."];
+  for (const user of SEED_USERS) out.push(...userSql(user), "");
+  out.push(
+    insert(
+      "staff_members",
+      {
+        user_id: quote(seedUuid("user", 11)),
+        marina_id: quote(SEED_MARINA),
+        role: quote("staff"),
+        display_name: quote("Sam Okafor"),
+      },
+      "(user_id, marina_id)"
+    ),
+    ""
+  );
+  for (const user of SEED_USERS.filter((u) => u.n !== 11)) {
+    const boat = ownBoat(user, enquiries);
+    if (!boat) continue;
+    out.push(
+      insert(
+        "boats",
+        {
+          id: quote(seedUuid("boat", 100 + user.n)),
+          user_id: quote(seedUuid("user", user.n)),
+          name: quote(boat.name),
+          boat_type: quote(boat.type),
+          length_m: boat.loa,
+          beam_m: boat.beam,
+          draft_m: boat.draft,
+          flag_country: quote(boat.flag),
+          registration_number: quote(boat.registration),
+          home_port: quote(boat.homePort),
+          documents: literal(boat.documents),
+        },
+        "(id)"
+      ),
+      ""
+    );
+  }
+  return out;
+}
+
+type OwnBoat = {
+  name: string;
+  type: string;
+  loa: string;
+  beam: string;
+  draft: string;
+  flag: string;
+  registration: string;
+  homePort: string;
+  documents: Enquiry["documents"];
+};
+
+// The boat a sample user keeps in their account: the one on their first sample
+// arrival, and Mar Azul for the berth holder.
+function ownBoat(user: SeedUser, enquiries: Enquiry[]): OwnBoat | null {
+  if (user.n === HOLDER) {
+    return {
+      name: "Mar Azul",
+      type: "sail",
+      loa: "7.6",
+      beam: "2.9",
+      draft: "1.4",
+      flag: "Portugal",
+      registration: "PT-MA-2210",
+      homePort: "Cascais",
+      documents: { ...EMPTY_ENQUIRY_DOCUMENTS, registrationNumber: "PT-MA-2210" },
+    };
+  }
+  const e = enquiries.find((x) => x.email === user.email);
+  if (!e) return null;
+  return {
+    name: e.boatName,
+    type: e.vesselType,
+    loa: e.loa,
+    beam: e.beam,
+    draft: e.draft,
+    flag: e.flagCountry,
+    registration: e.documents.registrationNumber,
+    homePort: e.homePort,
+    documents: e.documents,
+  };
+}
 
 function quote(value: string): string {
   return `'${value.replaceAll("'", "''")}'`;
@@ -121,7 +339,13 @@ function berthsSql(): string {
   ].join("\n");
 }
 
-function arrivalSql(enquiry: Enquiry, n: number, today: string): string {
+// One customer per email address, numbered by the first arrival that has it.
+function customerNumber(enquiries: Enquiry[], enquiry: Enquiry): number {
+  if (!enquiry.email) return enquiries.indexOf(enquiry) + 1;
+  return enquiries.findIndex((e) => e.email === enquiry.email) + 1;
+}
+
+function arrivalSql(enquiries: Enquiry[], enquiry: Enquiry, n: number, today: string): string {
   const row = enquiryToRow(enquiry, codeIndex());
   const out: Record<string, string> = {};
   for (const [column, value] of Object.entries(row)) out[column] = literal(value);
@@ -133,7 +357,18 @@ function arrivalSql(enquiry: Enquiry, n: number, today: string): string {
   out.arrived_at = relativeTimestamp(enquiry.arrivedAt, today);
   out.departed_at = relativeTimestamp(enquiry.departedAt, today);
   out.created_at = relativeTimestamp(enquiry.createdAt, today);
-  out.customer_id = quote(seedUuid("customer", n));
+  out.customer_id = quote(seedUuid("customer", customerNumber(enquiries, enquiry)));
+  const user = userFor(enquiry.email);
+  if (user) {
+    out.user_id = quote(seedUuid("user", user.n));
+    out.boat_id = quote(seedUuid("boat", 100 + user.n));
+  }
+  if (enquiry.proposedArrival) {
+    out.proposed_arrival = relativeDate(enquiry.proposedArrival, today);
+    out.proposed_departure = enquiry.proposedDeparture
+      ? relativeDate(enquiry.proposedDeparture, today)
+      : "null";
+  }
   if (enquiry.documents.insuranceExpiry) {
     const undated = literal({ ...enquiry.documents, insuranceExpiry: "" });
     out.documents = `jsonb_set(${undated}, '{insuranceExpiry}', to_jsonb(${relativeDate(enquiry.documents.insuranceExpiry, today)}::text))`;
@@ -148,6 +383,10 @@ function reletSql(): string[] {
     const out: Record<string, string> = {};
     for (const [column, value] of Object.entries(row)) out[column] = literal(value);
     out.id = quote(seedUuid("relet", i + 1));
+    if (request.userId === "u-owner") {
+      out.user_id = quote(seedUuid("user", HOLDER));
+      out.berth_holder_ref = quote(seedUuid("user", HOLDER));
+    }
     out.berth_id = berthLookup(request.berthId);
     out.booked_nights = dateArray(request.bookedNights);
     out.approved_nights = dateArray(request.approvedNights);
@@ -176,6 +415,63 @@ function plannerArrival(today: string): Enquiry {
     email: "pieter.devries@example.com",
     decisionAt: today + "T10:00:00.000Z",
   });
+}
+
+// Alex Morgan's three requests: one waiting for the marina, one where the
+// marina offered other dates, and a stay that is over.
+function alexArrivals(today: string): Enquiry[] {
+  const boat = {
+    boatName: "Wind Song",
+    vesselType: "sail",
+    loa: "8.8",
+    beam: "3.0",
+    draft: "1.5",
+    flagCountry: "United Kingdom",
+    skipperName: "Alex Morgan",
+    phone: "+44 7700 900101",
+    email: "alex.morgan@example.com",
+    homePort: "Southampton",
+    documents: {
+      ...EMPTY_ENQUIRY_DOCUMENTS,
+      registrationNumber: "UK-WS-4410",
+      competenceCertificate: "RYA-558812",
+    },
+  };
+  return [
+    seedEnquiry({
+      id: "alex-requested",
+      ...boat,
+      status: "new",
+      arrival: addDaysIso(today, 20),
+      departure: addDaysIso(today, 23),
+      createdAt: today + "T08:30:00.000Z",
+    }),
+    seedEnquiry({
+      id: "alex-proposed",
+      ...boat,
+      status: "dates_proposed",
+      arrival: addDaysIso(today, 30),
+      departure: addDaysIso(today, 33),
+      proposedArrival: addDaysIso(today, 36),
+      proposedDeparture: addDaysIso(today, 39),
+      decisionAt: today + "T09:00:00.000Z",
+      decisionNote: "The marina is full that week.",
+      createdAt: addDaysIso(today, -2) + "T10:00:00.000Z",
+    }),
+    seedEnquiry({
+      id: "alex-departed",
+      ...boat,
+      status: "approved",
+      arrivalStatus: "departed",
+      assignedBerthId: "P-2",
+      arrival: addDaysIso(today, -40),
+      departure: addDaysIso(today, -36),
+      arrivedAt: addDaysIso(today, -40) + "T13:00:00.000Z",
+      departedAt: addDaysIso(today, -36) + "T09:30:00.000Z",
+      decisionAt: addDaysIso(today, -50) + "T09:00:00.000Z",
+      createdAt: addDaysIso(today, -52) + "T09:00:00.000Z",
+    }),
+  ];
 }
 
 function customerSql(
@@ -257,6 +553,8 @@ function customersSql(enquiries: Enquiry[], today: string): string[] {
   const out: string[] = [];
   enquiries.forEach((e, i) => {
     const n = i + 1;
+    // A guest with several arrivals is one customer.
+    if (customerNumber(enquiries, e) !== n) return;
     out.push(
       customerSql(n, "guest", e.skipperName, e.email, e.phone, e.crew[0]?.nationality ?? "")
     );
@@ -319,6 +617,8 @@ function customersSql(enquiries: Enquiry[], today: string): string[] {
         boat_id: quote(seedUuid("boat", HOLDER)),
         starts_on: quote("2026-03-12"),
         ends_on: quote("2031-03-11"),
+        user_id: quote(seedUuid("user", HOLDER)),
+        holder_email: quote("jordan.reyes@example.com"),
       },
       "(id)"
     )
@@ -339,7 +639,8 @@ function plannerReletSql(): string {
       marina_id: quote(SEED_MARINA),
       berth_id: berthLookup("G-14"),
       berth_holder: quote("Jordan Reyes"),
-      berth_holder_ref: quote("u-owner"),
+      berth_holder_ref: quote(seedUuid("user", HOLDER)),
+      user_id: quote(seedUuid("user", HOLDER)),
       away_from: "pg_temp.d(3)",
       away_to: "pg_temp.d(10)",
       status: quote("approved"),
@@ -442,13 +743,19 @@ function tasksAndRadioSql(): string[] {
 
 export function buildSeedSql(): string {
   const today = todayIso();
-  const enquiries = [...buildSeedEnquiryStore().enquiries, plannerArrival(today)];
+  const enquiries = [
+    ...buildSeedEnquiryStore().enquiries,
+    plannerArrival(today),
+    ...alexArrivals(today),
+  ];
   return [
     "-- Generated by data/supabase/seedSql.ts (npm run db:seed:build). Do not edit by hand.",
     "--",
-    "-- Marina de Cascais, its berths, customers and boats, the sample arrivals and",
-    "-- relet offers, dock tasks and radio log entries. Dates are relative to the",
-    "-- Lisbon day the seed runs on. Safe to run more than once.",
+    "-- Marina de Cascais, its berths, sample accounts (real users, with the dev",
+    "-- password from data/supabase/devPersonas.ts), customers and boats, sample",
+    "-- arrivals in every status, relet offers, dock tasks and radio log entries.",
+    "-- Dates are relative to the Lisbon day the seed runs on. Safe to run more than",
+    "-- once. FOR A DEVELOPMENT PROJECT ONLY: it creates users with a known password.",
     "",
     "create function pg_temp.d(days integer) returns date language sql as $$",
     "  select (now() at time zone 'Europe/Lisbon')::date + days",
@@ -462,8 +769,9 @@ export function buildSeedSql(): string {
     "",
     berthsSql(),
     "",
+    ...accountsSql(enquiries),
     ...customersSql(enquiries, today).flatMap((sql) => [sql, ""]),
-    ...enquiries.flatMap((e, i) => [arrivalSql(e, i + 1, today), ""]),
+    ...enquiries.flatMap((e, i) => [arrivalSql(enquiries, e, i + 1, today), ""]),
     ...reletSql().flatMap((sql) => [sql, ""]),
     plannerReletSql(),
     "",

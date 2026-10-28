@@ -1,6 +1,7 @@
 import type { FacilityKey } from "@/data/marinas";
 import type { enquiry } from "./locales/en/enquiry";
 import type { account } from "./locales/en/account";
+import type { accounts } from "./locales/en/accounts";
 import type { myBoat } from "./locales/en/myBoat";
 import type { chrome } from "./locales/en/chrome";
 import type { marinaPage } from "./locales/en/marinaPage";
@@ -372,4 +373,5 @@ export type Dictionary = {
   myBoat: typeof myBoat;
   account: typeof account;
   enquiry: typeof enquiry;
+  accounts: typeof accounts;
 };

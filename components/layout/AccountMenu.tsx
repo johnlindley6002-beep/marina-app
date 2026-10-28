@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { ACCOUNT_DATA_SOURCE } from "@/lib/data";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { useLanguage } from "@/components/providers/LanguageProvider";
 
@@ -25,6 +26,13 @@ function MenuBody({ onNavigate }: { onNavigate: () => void }) {
             {t.chrome.account.account}
           </Link>
         </li>
+        {ACCOUNT_DATA_SOURCE === "supabase" ? (
+          <li>
+            <Link href="/my-arrivals" onClick={onNavigate} className={itemClass}>
+              {t.accounts.nav.myArrivals}
+            </Link>
+          </li>
+        ) : null}
         {isStaff ? (
           <li>
             <Link href="/staff" onClick={onNavigate} className={itemClass}>

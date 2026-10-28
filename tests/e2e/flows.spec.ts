@@ -94,6 +94,43 @@ test("the staff arrivals board shows the right badges", async ({ page }) => {
   await expect(board.getByText("On site").first()).toBeVisible();
 });
 
+test("staff confirm a new request in one click from the suggested berths", async ({ page }) => {
+  await signInAs(page, "u-staff");
+  await page.goto("/staff/enquiries");
+  // Halcyon is new, and the badge says so.
+  const row = page.locator("li", { hasText: "Halcyon" }).first();
+  await row.getByRole("button").first().click();
+  await expect(row.getByRole("heading", { name: "Suggested berths" })).toBeVisible();
+  const confirm = row.getByRole("button", { name: /^Confirm with / });
+  await expect(confirm.first()).toBeVisible();
+  await confirm.first().click();
+  // It leaves the New tab and is now approved.
+  await expect(page.locator("li", { hasText: "Halcyon" })).toHaveCount(0);
+  await page.getByRole("button", { name: /^Approved/ }).click();
+  await expect(page.locator("li", { hasText: "Halcyon" }).first()).toBeVisible();
+});
+
+test("staff decline a request only with a reason the guest will see", async ({ page }) => {
+  await signInAs(page, "u-staff");
+  await page.goto("/staff/enquiries");
+  const row = page.locator("li", { hasText: "Meridian" }).first();
+  await row.getByRole("button").first().click();
+  await row.getByRole("button", { name: "Decline request" }).click();
+  await expect(row.getByText("Give a reason. The guest sees it.")).toBeVisible();
+  await row.getByPlaceholder("Reason (the guest sees it)").fill("Dredging that week");
+  await row.getByRole("button", { name: "Decline request" }).click();
+  await page.getByRole("button", { name: /^Declined/ }).click();
+  await expect(page.locator("li", { hasText: "Meridian" }).first()).toContainText(
+    "Dredging that week"
+  );
+});
+
+test("the sign-in page explains that the preview has no email sign-in", async ({ page }) => {
+  await page.goto("/login");
+  await expect(page.getByRole("heading", { level: 1, name: "Sign in" })).toBeVisible();
+  await expect(page.getByText("Email sign-in is switched off in this preview.")).toBeVisible();
+});
+
 test("an owner's reletting request reaches the staff queue", async ({ page }) => {
   await signInAs(page, "u-owner");
   await page.goto("/owner/relet");

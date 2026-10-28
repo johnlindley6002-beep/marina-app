@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { useRef, useState, type FormEvent } from "react";
-import type { CurrentUser } from "@/lib/data";
+import { ACCOUNT_DATA_SOURCE, type CurrentUser } from "@/lib/data";
+import { COUNTRIES, isEU } from "@/lib/countries";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { useLanguage } from "@/components/providers/LanguageProvider";
 import PageHeader from "@/components/layout/PageHeader";
@@ -15,17 +16,20 @@ const errorClass = "field-error";
 type Errors = Partial<Record<"name" | "email", string>>;
 
 function ProfileForm({ user }: { user: CurrentUser }) {
-  const { updateProfile } = useAuth();
+  const { account, updateProfile, saveProfileFields } = useAuth();
   const { t } = useLanguage();
   const copy = t.account;
   const [name, setName] = useState(user.name);
   const [email, setEmail] = useState(user.email);
   const [phone, setPhone] = useState(user.phone);
+  const [nationality, setNationality] = useState(account?.profile.nationality ?? "");
+  const [euStatus, setEuStatus] = useState(account?.profile.euStatus ?? "");
+  const inAccount = ACCOUNT_DATA_SOURCE === "supabase";
   const [errors, setErrors] = useState<Errors>({});
   const [status, setStatus] = useState("");
   const formRef = useRef<HTMLFormElement>(null);
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const next: Errors = {};
     if (!name.trim()) next.name = copy.errName;
@@ -40,12 +44,15 @@ function ProfileForm({ user }: { user: CurrentUser }) {
       );
       return;
     }
-    const ok = updateProfile({
+    const ok = await updateProfile({
       name: name.trim(),
       email: email.trim(),
       phone: phone.trim(),
     });
-    setStatus(ok ? copy.saved : copy.saveFailed);
+    const extras = inAccount ? await saveProfileFields({ nationality, euStatus }) : true;
+    const saved = t.accounts.profile;
+    if (inAccount) setStatus(ok && extras ? saved.saved : saved.saveFailed);
+    else setStatus(ok ? copy.saved : copy.saveFailed);
   }
 
   const aria = (key: keyof Errors) => ({
@@ -82,10 +89,13 @@ function ProfileForm({ user }: { user: CurrentUser }) {
             autoComplete="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-
+            readOnly={inAccount}
             className={inputClass}
             {...aria("email")}
           />
+          {inAccount ? (
+            <p className="mt-1 text-xs text-ink-muted">{t.accounts.profile.emailFixed}</p>
+          ) : null}
           {errors.email ? (
             <p id="account-err-email" role="alert" className={errorClass}>
               {errors.email}
@@ -105,6 +115,44 @@ function ProfileForm({ user }: { user: CurrentUser }) {
           />
         </label>
       </div>
+      {inAccount ? (
+        <div className="mt-4 grid gap-4 sm:grid-cols-3">
+          <label className="block text-sm">
+            <span className={labelClass}>{t.accounts.profile.nationality}</span>
+            <select
+              value={nationality}
+              onChange={(e) => {
+                setNationality(e.target.value);
+                // A first guess from the country, which the person can change.
+                if (!euStatus && e.target.value)
+                  setEuStatus(isEU(e.target.value) ? "eu" : "non_eu");
+              }}
+              autoComplete="country-name"
+              className={inputClass}
+            >
+              <option value="">{t.accounts.profile.nationalityChoose}</option>
+              {COUNTRIES.map((country) => (
+                <option key={country} value={country}>
+                  {country}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="block text-sm">
+            <span className={labelClass}>{t.accounts.profile.euStatus}</span>
+            <select
+              value={euStatus}
+              onChange={(e) => setEuStatus(e.target.value as typeof euStatus)}
+              className={inputClass}
+            >
+              <option value="">{t.accounts.profile.euStatusChoose}</option>
+              <option value="eu">{t.accounts.profile.eu}</option>
+              <option value="non_eu">{t.accounts.profile.nonEu}</option>
+            </select>
+            <span className="mt-1 block text-xs text-ink-muted">{t.accounts.profile.euNote}</span>
+          </label>
+        </div>
+      ) : null}
       <div className="mt-6 flex flex-wrap items-center gap-4">
         <button type="submit" className="btn-primary">
           {copy.save}
@@ -126,7 +174,7 @@ function AccountBody() {
   return (
     <div className="section">
       <div className="page-column page-reading">
-        <PageHeader title={copy.title} mock>
+        <PageHeader title={copy.title} mock={ACCOUNT_DATA_SOURCE === "mock"}>
           {copy.signedInAs(user.name)}
         </PageHeader>
 

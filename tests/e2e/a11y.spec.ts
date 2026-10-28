@@ -10,6 +10,8 @@ const routes: { path: string; user?: string }[] = [
   { path: "/marinas/portugal/cascais" },
   { path: "/marinas/portugal/cascais/pre-arrival" },
   { path: "/legal/reletting-terms" },
+  { path: "/login" },
+  { path: "/my-arrivals", user: "u-voyager" },
   { path: "/account", user: "u-voyager" },
   { path: "/my-boat", user: "u-voyager" },
   { path: "/owner", user: "u-owner" },

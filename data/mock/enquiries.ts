@@ -12,7 +12,7 @@ import {
 } from "@/lib/dates";
 import { ENQUIRY_KEY, OOS_KEY, readJson, writeJson, removeKey, emitChange, newId } from "./storage";
 import {
-  BERTH_LINKS,
+  activeBerthLinks,
   getStaffMemberships,
   isStaffOfMarina,
   type StaffActionResult,
@@ -34,7 +34,8 @@ import { activeSnapshot } from "./snapshot";
 
 // ---- Enquiries ("Request a berth") ----
 
-export type EnquiryStatus = "new" | "approved" | "declined";
+// "dates_proposed": staff offered other dates and the guest has not answered.
+export type EnquiryStatus = "new" | "approved" | "declined" | "dates_proposed";
 export type EnquiryArrivalStatus = "pending" | "arrived" | "departed";
 
 export type EnquiryDocuments = {
@@ -89,6 +90,10 @@ export type Enquiry = {
   departedAt: string | null;
   // A short staff-only note, for example "needs a tow to the berth".
   flagNote: string;
+  // The other dates staff offered, while status is "dates_proposed". Empty
+  // otherwise. Set by the database function only, never by the mock rules.
+  proposedArrival: string;
+  proposedDeparture: string;
 
   arrival: string;
   eta: string;
@@ -144,6 +149,8 @@ export function seedEnquiry(overrides: Partial<Enquiry> & Pick<Enquiry, "id">): 
     arrivedAt: null,
     departedAt: null,
     flagNote: "",
+    proposedArrival: "",
+    proposedDeparture: "",
     arrival: today,
     eta: "12:00",
     departure: addDaysIso(today, 3),
@@ -424,6 +431,8 @@ export type SubmitEnquiryInput = Omit<
   | "arrivedAt"
   | "departedAt"
   | "flagNote"
+  | "proposedArrival"
+  | "proposedDeparture"
 >;
 
 export function submitEnquiry(input: SubmitEnquiryInput): Enquiry {
@@ -440,6 +449,8 @@ export function submitEnquiry(input: SubmitEnquiryInput): Enquiry {
     arrivedAt: null,
     departedAt: null,
     flagNote: "",
+    proposedArrival: "",
+    proposedDeparture: "",
   };
   saveEnquiryStore({ enquiries: [enquiry, ...store.enquiries] });
   return enquiry;
@@ -492,7 +503,7 @@ export function checkBerthAvailability(
       error: `Berth ${berthId} already holds ${conflict.boatName || "another boat"} for overlapping dates.`,
     };
   }
-  const link = BERTH_LINKS.find(
+  const link = activeBerthLinks().find(
     (l) => l.marinaId === marinaId && l.berthId === berthId && l.active
   );
   if (link) {

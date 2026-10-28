@@ -10,7 +10,9 @@ import { useBoats } from "@/components/providers/BoatProvider";
 import { useLanguage } from "@/components/providers/LanguageProvider";
 import { useUnits } from "@/components/providers/UnitsProvider";
 import { loadLastEnquiry, saveLastEnquiry } from "@/features/marina/lib/tripStore";
-import { submitEnquiry } from "@/lib/data";
+import { ACCOUNT_DATA_SOURCE, requestArrival, submitEnquiry, upsertBoat } from "@/lib/data";
+import { useAuth } from "@/components/providers/AuthProvider";
+import { guestError } from "@/features/account/lib/errors";
 import { effectiveDeparture, PLAN_KEYS, type StayPlan } from "@/features/marina/lib/stayPlan";
 import {
   type FormData,
@@ -128,7 +130,20 @@ export function useRequestBerthForm({
 
   // Pre-fill from the active boat: into empty fields on first load, and over
   // the boat details when the visitor switches boats (here or in My boat).
-  const { ready: boatsReady, activeBoat, skipper: savedSkipper, saveSkipper } = useBoats();
+  const {
+    ready: boatsReady,
+    activeBoat,
+    skipper: savedSkipper,
+    saveBoat,
+    saveSkipper,
+  } = useBoats();
+  const { user } = useAuth();
+  // With accounts on, a request goes to the marina through the person's account.
+  const accountMode = ACCOUNT_DATA_SOURCE === "supabase";
+  const [sendState, setSendState] = useState<"idle" | "sending" | "sent">("idle");
+  const [sendError, setSendError] = useState("");
+  const [needsSignIn, setNeedsSignIn] = useState(false);
+  const [mailtoHref, setMailtoHref] = useState("");
   const appliedBoatId = useRef<string | null | undefined>(undefined);
   const skipperApplied = useRef(false);
   const [rememberSkipper, setRememberSkipper] = useState(false);
@@ -316,7 +331,7 @@ export function useRequestBerthForm({
     }));
   }
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setSubmitted(true);
     const validationErrors = validate(form, t.enquiry.errors);
@@ -325,6 +340,12 @@ export function useRequestBerthForm({
       setSubmitTick((n) => n + 1);
       return;
     }
+
+    if (accountMode && !user) {
+      setNeedsSignIn(true);
+      return;
+    }
+    setNeedsSignIn(false);
 
     const text = buildSummary(form, marina, nights, quote, includeDocs ? docs : null, locale);
     if (rememberSkipper) {
@@ -335,6 +356,47 @@ export function useRequestBerthForm({
       });
     }
     saveLastEnquiry(toLastEnquiry(form, marina));
+    const mailto = `mailto:${marina.email}?subject=${encodeURIComponent(
+      "Berth enquiry - Marina de Cascais"
+    )}&body=${encodeURIComponent(text)}`;
+
+    if (accountMode) {
+      // The request is linked to the person and to the boat they chose, so the
+      // boat is saved to the account first if it is not there yet.
+      setSendState("sending");
+      setSendError("");
+      const boat =
+        activeBoat ??
+        saveBoat({
+          name: form.boatName.trim(),
+          type: form.vesselType,
+          loa: form.loa,
+          beam: form.beam,
+          draft: form.draft,
+          flag: form.flagCountry,
+          homePort: form.homePort,
+          documents: includeDocs ? docs : undefined,
+        });
+      const boatSaved = await upsertBoat(boat);
+      const result = boatSaved
+        ? await requestArrival(
+            marina.id,
+            boat.id,
+            toEnquiryInput(form, marina, includeDocs ? docs : null)
+          )
+        : ({ ok: false, error: "boat_not_found" } as const);
+      if (!result.ok) {
+        setSendState("idle");
+        setSendError(guestError(t.accounts, result.error));
+        return;
+      }
+      setSendState("sent");
+      setSummary(text);
+      setCopied(false);
+      setMailtoHref(mailto);
+      return;
+    }
+
     // In addition to the mailto below (which is still the record of the
     // enquiry), submit it to the mock layer so staff can act on it in real
     // time instead of only replying by email later.
@@ -343,9 +405,6 @@ export function useRequestBerthForm({
     setSummary(text);
     setCopied(false);
 
-    const mailto = `mailto:${marina.email}?subject=${encodeURIComponent(
-      "Berth enquiry - Marina de Cascais"
-    )}&body=${encodeURIComponent(text)}`;
     window.location.href = mailto;
   }
 
@@ -361,6 +420,7 @@ export function useRequestBerthForm({
   }
 
   return {
+    accountMode,
     activeBoat,
     addCrewRow,
     appliedBoatId,
@@ -377,7 +437,9 @@ export function useRequestBerthForm({
     listedCrew,
     listedGuests,
     localForm,
+    mailtoHref,
     marina,
+    needsSignIn,
     nights,
     onPlanChange,
     plan,
@@ -389,6 +451,8 @@ export function useRequestBerthForm({
     saveSkipper,
     savedSkipper,
     selectedBerthId,
+    sendError,
+    sendState,
     setDocs,
     setField,
     setForm,

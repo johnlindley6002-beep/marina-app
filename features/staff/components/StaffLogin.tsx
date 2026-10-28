@@ -31,6 +31,8 @@ export default function StaffLogin() {
     }
     setError(false);
     setSending(true);
+    // A guest's unused return page must not redirect a staff member.
+    document.cookie = "aldock_next=; path=/; max-age=0";
     const result = await sendStaffSignInLink(address, `${window.location.origin}/auth/callback`);
     setSending(false);
     setSentTo(address);

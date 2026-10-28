@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useState } from "react";
-import { SAVE_FAILED } from "@/lib/data";
+import { DOUBLE_BOOKED, SAVE_FAILED } from "@/lib/data";
 import { useStaffText } from "../components/StaffLanguageProvider";
 
 type Result = { ok: true } | { ok: false; error: string };
@@ -35,7 +35,12 @@ export function useStaffAction() {
 
   return {
     busy,
-    error: error === SAVE_FAILED ? s.common.saveFailed : error,
+    error:
+      error === SAVE_FAILED
+        ? s.common.saveFailed
+        : error === DOUBLE_BOOKED
+          ? s.requests.errors.double_booked
+          : error,
     setError,
     run,
     save,
